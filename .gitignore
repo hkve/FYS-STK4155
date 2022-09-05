@@ -1,2 +1,15 @@
 __pycache__
 sandkasse/
+
+*.blg
+*.aux
+*.bbl
+*.fdb_latexmk
+*.log
+*.fls
+*.log
+*.out
+*.run.xml
+*.gz
+
+Project1/main-blx.bib
