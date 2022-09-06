@@ -19,8 +19,10 @@ X = np.c_[one, x, x**2, x**3]
 lin1 = LR(fit_intercept=False).fit(X, y)
 
 # Method can be INV or SVD 
-lin2 = LR_custom(method="SVD").fit(X, y)
+lin2 = LR_custom(method="INV").fit(X, y)
+lin3 = LR_custom(method="SVD").fit(X, y)
 
 print(lin1.coef_)
 print(lin2.coef_)
+print(lin3.coef_)
 

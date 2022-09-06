@@ -1,6 +1,11 @@
 import numpy as np
 
 class Model:
+	"""
+	Base model class for linear models (OLS, Ridge, Lasso). Implements basic features such as prediction,
+	in addition to some metric such as mse and r^2 score. This class is not suppose to be used for
+	actual fitting.
+	"""
 	def __init__(self, method="SVD"):
 		self.method_ = method
 
@@ -17,10 +22,10 @@ class Model:
 	def predict(self, X):
 		return X @ self.coef_
 
-	def mse(y, y_pred):
-		return np.sum((y-y_pred)**2)/n
+	def mse(self, y, y_pred):
+		return np.mean((y-y_pred)**2)
 
-	def r2_score(y, y_pred):
+	def r2_score(self, y, y_pred):
 		y_bar = np.mean(y)
 		return 1 - np.sum((y-y_pred)**2)/np.sum((y-y_bar)**2)
 
@@ -31,6 +36,10 @@ class Model:
 		raise NotImplementedError("Model base does not implemen usefull stuff")
 
 class LinearRegression(Model):
+	"""
+	Implementation of OLS. Can preform coefficient estimation using both direct matrix inversion of X.T @ X 
+	and trough SVD decomposition.  
+	"""
 	def __init__(self, **kwargs):
 		Model.__init__(self, **kwargs)
 
