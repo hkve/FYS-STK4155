@@ -1,0 +1,46 @@
+import numpy as np
+
+class Model:
+	def __init__(self, method="SVD"):
+		self.method_ = method
+
+		self.methods_ = {
+			"INV": self.fit_matrix_inv,
+			"SVD": self.fit_svd_decomp
+		}
+
+		self.coef_ = None
+
+	def fit(self, X, y):
+		return self.methods_[self.method_](X, y)
+
+	def predict(self, X):
+		return X @ self.coef_
+
+	def mse(y, y_pred):
+		return np.sum((y-y_pred)**2)/n
+
+	def r2_score(y, y_pred):
+		y_bar = np.mean(y)
+		return 1 - np.sum((y-y_pred)**2)/np.sum((y-y_bar)**2)
+
+	def fit_matrix_inv(self, X, y):
+		raise NotImplementedError("Model base does not implemen usefull stuff")
+
+	def fit_svd_decomp(self, X, y):
+		raise NotImplementedError("Model base does not implemen usefull stuff")
+
+class LinearRegression(Model):
+	def __init__(self, **kwargs):
+		Model.__init__(self, **kwargs)
+
+	def fit_matrix_inv(self, X, y):	
+		self.coef_ = np.linalg.inv(X.T @ X) @ X.T @ y
+		return self
+
+	def fit_svd_decomp(self, X, y):
+		U, S, VT = np.linalg.svd(X, full_matrices=False)
+
+		self.coef_ = VT.T @ np.linalg.inv(np.diag(S)) @ U.T @ y
+		
+		return self
