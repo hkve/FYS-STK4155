@@ -35,7 +35,7 @@ class TrainingFacility: # working title
         Packs y, X into shape (y, *X)
         NB. See unpack data...
         '''
-        return np.array([(yi, *xi) for yi, xi in zip(y, X)])
+        return np.c_[y, X]
 
     def scale_data(self, scheme="Standard"):
         '''
