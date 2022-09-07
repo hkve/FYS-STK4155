@@ -1,7 +1,5 @@
 # This is horrible, but if you find a better way please tell (and explain) to me how
-import sys
-from os import path
-sys.path.append( path.dirname( path.dirname( path.abspath(__file__) ) ) )
+import context
 
 from sknotlearn.linear_model import LinearRegression
 import numpy as np
