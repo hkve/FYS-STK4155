@@ -41,7 +41,7 @@ def solve_a(n=1000, train_size=0.8, random_state=123):
 
 		X_train, X_test, y_train, y_test = train_test_split(X_poly, y, random_state=random_state)
 
-		reg = LinearRegression(method="SVD").fit(X_train, y_train)
+		reg = LinearRegression(method="pINV").fit(X_train, y_train)
 
 		y_train_pred = reg.predict(X_train)
 		y_test_pred = reg.predict(X_test)

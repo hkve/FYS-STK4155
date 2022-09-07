@@ -5,9 +5,10 @@ from matplotlib import cm
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from mpl_toolkits.mplot3d import Axes3D
 
-def make_FrankeFunction(n=1000, uniform=False):
+def make_FrankeFunction(n=1000, uniform=False, random_state=42):
 	x, y = None, None
 
+	np.random.seed(random_state)
 	if uniform:
 		x = np.random.uniform(low=0, high=1, size=n)
 		y = np.random.uniform(low=0, high=1, size=n)

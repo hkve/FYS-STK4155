@@ -11,6 +11,7 @@ class Model:
 
 		self.methods_ = {
 			"INV": self.fit_matrix_inv,
+			"pINV": self.fit_matrix_psuedo_inv,
 			"SVD": self.fit_svd_decomp
 		}
 
@@ -45,6 +46,10 @@ class LinearRegression(Model):
 
 	def fit_matrix_inv(self, X, y):	
 		self.coef_ = np.linalg.inv(X.T @ X) @ X.T @ y
+		return self
+
+	def fit_matrix_psuedo_inv(self, X, y):
+		self.coef_ = np.linalg.pinv(X.T @ X) @ X.T @ y
 		return self
 
 	def fit_svd_decomp(self, X, y):
