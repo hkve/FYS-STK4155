@@ -79,6 +79,8 @@ class TrainingFacility: # working title
 
 
 if __name__ == '__main__':
+    # testing with random function I thought of
+    # setting up first
     from sknotlearn.linear_model import LinearRegression
     x = np.random.uniform(0, 1, size=100)
     X = np.array([np.ones_like(x), x, x**2]).T
@@ -86,12 +88,13 @@ if __name__ == '__main__':
     y = np.exp(x*x) + 2*np.exp(-2*x) + 0.1*np.random.randn(x.size)
     data = np.array([(yi, 1, xi, xi**2) for yi, xi in zip(y,x)])
 
-
+    # testing some functionality
     test = TrainingFacility(LinearRegression, data)
     test.scale_data()
     fit = test.fit_training_data()
     print(f"MSE score : {np.mean((fit.predict(X)-y))**2}")
 
+    # plot result
     import matplotlib.pyplot as plt
     plt.scatter(x, y)
     x.sort()
