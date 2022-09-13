@@ -76,9 +76,9 @@ class Model:
 		y_bar = np.mean(y)
 		return 1 - np.sum((y-y_pred)**2)/np.sum((y-y_bar)**2)
 
-	def coef_se(self, X, y):
+	def coef_var(self, X, noise_std):
 		"""
-		Calculates (?) coef standard error and returns.
+		Calculates the variance of coef.
 		Used eg for V[beta_hat|X] p.3 from https://lukesonnet.com/teaching/inference/200d_standard_errors.pdf
 		
 		Args:
@@ -86,13 +86,10 @@ class Model:
 			y: (np.array), True values of y, y_hat is calculated based on X
 
 		Returns
-			diag_var_beta: (np.array), Diagonal of beta variance matrix 
-		"""
-		y_hat = self.predict(X)
-		residual = y_hat - y
-		n, p = X.shape
-		var_beta = np.dot(residual, residual)/(n-p) * np.linalg.inv(X.T @ X)
-		return  np.diag(var_beta)
+			var_beta: (np.array), Beta variance matrix 
+		"""	
+		var_beta = noise_std**2 * np.linalg.inv(X.T @ X)
+		return  var_beta
 
 	# These functions should be implemented in classes inheriting from Model
 	def fit_matrix_inv(self, X, y): 
@@ -149,6 +146,14 @@ class LinearRegression(Model):
 		"""		
 		U, S, VT = np.linalg.svd(X, full_matrices=False)
 
-		self.coef_ = VT.T @ np.linalg.inv(np.diag(S)) @ U.T @ y
+		n, p = X.shape
+		tol = 1e-12
+		# use p
+		S = S[np.where(S > tol)]
+		S_inv = np.zeros((p,p))	
+		for i in range(len(S)):
+			S_inv[i,i] = 1/S[i]
+
+		self.coef_ = VT.T @  S_inv @ U.T @ y
 		
 		return self
