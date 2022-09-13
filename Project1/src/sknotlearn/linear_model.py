@@ -12,7 +12,7 @@ class Model:
 		be fitted. 
 
 		Args:
-			method: (str), optional. Name of method used to preform coefficient fitting
+			method: (str), optional. Name of method used to perform coefficient fitting
 		"""
 		self.methods_ = {
 			"INV": self.fit_matrix_inv,
