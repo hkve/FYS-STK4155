@@ -1,12 +1,12 @@
 '''
 This is very messy, I have just done the first things that have come to mind, and I am rusty...
 '''
-from sknotlearn.linear_model import LinearRegression
 import numpy as np
 import sys
 from os import path
 sys.path.append( path.dirname( path.dirname( path.abspath(__file__) ) ) )
 
+from sknotlearn.linear_model import LinearRegression
 
 class Data:
     '''
@@ -15,12 +15,12 @@ class Data:
     def __init__(self, y, X):
         self.y = np.array(y)
         self.X = np.array(X)
-        self.n_features = X.shape[-1]+1
+        self.n_features = X.shape[-1]
 
         self.unscale = lambda self : self
 
     def __len__(self):
-        return 
+        return self.n_features+1
 
     def __getitem__(self, key):
         try:
@@ -31,18 +31,18 @@ class Data:
                 return self.X[j, i]
             else:
                 raise IndexError(f"Index {i} out of bounds for data of with {self.n_features} features.")
-        except ValueError:
-            if i==0:
+        except TypeError:
+            if key==0:
                 return self.y
-            elif i > 0 and i < self.X.shape[1]:
-                return self.X[:,i]
+            elif key > 0 and key < self.X.shape[1]:
+                return self.X[:,key]
             else:
-                raise IndexError(f"Index {i} out of bounds for data of with {self.n_features} features.")
+                raise IndexError(f"Index {key} out of bounds for data of with {self.n_features} features.")
 
 
     def __iter__(self):
         self.i = 0
-        yield Data(self.y[self.i], self.X[self.i])
+        yield Data(np.array([self.y[self.i]]), np.array([self.X[self.i]]))
 
     def __next__(self):
         self.i += 1
@@ -104,7 +104,19 @@ class Data:
 
 
     def unpack(self):
+        '''
+        Unpacks the Data into the 
+        '''
         return self.y, self.X
+
+    def sorted(self, axis=0):
+        '''
+        Return sorted Data along specified axis. Index 0 refers to y, 1 etc. to features.
+        '''
+        sorted_idxs = np.argsort(self[axis])
+        y_sorted = self.y[sorted_idxs]
+        X_sorted = self.X[sorted_idxs,:]
+        return Data(y_sorted, X_sorted)
 
     def train_test_split(self, ratio=2/3, random_seed=None):
         '''
@@ -124,24 +136,26 @@ class Data:
     def scale(self, scheme="None"):
         return self.scalers_[scheme](self)
 
-    def none_scaler_(self, data):
+    def none_scaler_(data):
         '''
         Does not scale y, *X.
         '''
         return data
 
-    def standard_scaler_(self, data):
+    def standard_scaler_(data):
         '''
         Scales y, *X to be N(0, 1)-distributed.
         '''
+        # extracting data from Data-class to more versatile numpy array
         data = np.concatenate(([data.y], [*data.X.T])).T
+        # vectorised scaling
         data_mean = np.mean(data, axis=0)
         data_std = np.std(data, axis=0)
         data_std = np.where(data_std != 0, data_std, 1) # sets unvaried data-columns to 0
         data_scaled = (data - data_mean) / data_std
 
-        scaled_data = Data(data_scaled[:,0], data_scaled[:,1:])
-        scaled_data.unscale = lambda data : data*data_std + data_mean
+        scaled_data = Data(data_scaled[:,0], data_scaled[:,1:]) # packing result into new Data-instance
+        scaled_data.unscale = lambda data : data*data_std + data_mean # teching new Data how to unscale
 
         return scaled_data
     
@@ -188,19 +202,34 @@ class TrainingFacility: # working title
 
 
 if __name__ == '__main__':
+    # example of use
     import matplotlib.pyplot as plt
 
+    # generate data to stuff down the pipe
     x = np.random.uniform(0, 1, size=100)
     X = np.array([np.ones_like(x), x, x**2]).T
     y = np.exp(x*x) +2*np.exp(-2*x) + 0.1*np.random.randn(x.size)
-    testdata = Data(y, X)
+    testdata = Data(y, X) # storing the data and design matrix in Data-class
 
+    # builiding TrainingFacility with the LinearRegression-class from linear_model.py
     tester = TrainingFacility(LinearRegression, testdata)
 
-    test_fit = tester.fit_training_data()
-    ytest, Xtest = tester.test_data.unpack()
-    ypredict = test_fit.predict(Xtest)
-    
+    # fitting the model
+    fitted_linear_model = tester.fit_training_data(
+        scaler = "None",
+        ratio = 3/4,
+        random_seed = 69420
+    )
+    # fitted instance of LinearRegression can then be used further
+    ytest, Xtest = tester.test_data.unpack() # extracting the data that was not used for training
+    ypredict = fitted_linear_model.predict(Xtest)
+
+    # showing off some functionality of Data-class
+    predicted_data = Data(ypredict, Xtest)
+    sorted_data = predicted_data.sorted(axis=2)
+    ysorted, Xsorted = sorted_data.unpack()
+
+    # simple (simple...) plot
     plt.scatter(Xtest[:,1], ytest)
-    plt.scatter(Xtest[:,1], ypredict)
+    plt.plot(Xsorted[:,1], ysorted)
     plt.show()
