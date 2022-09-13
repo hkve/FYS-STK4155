@@ -103,7 +103,7 @@ class Data:
             raise TypeError(f"Division not implemented between Data and {type(other)}")
 
 
-    def unpack(self):
+    def unpacked(self):
         '''
         Unpacks the Data into the 
         '''
@@ -187,25 +187,29 @@ class TrainingFacility: # working title
         '''
         scaled_data = self.data.scale(scheme=scaler)
         self.training_data, self.test_data = self.data.train_test_split(ratio=ratio, random_seed=random_seed)
-        y_training, X_training = self.training_data.unpack()
+        y_training, X_training = self.training_data.unpacked()
         self.fit_model = self.model(method="INV").fit(X_training, y_training)
         self.isFit = True
         return self.fit_model
 
     def predict_test_data(self):
+        '''
+        Returns predicted Data after training.
+        '''
         if self.isFit:
-            X_test = self.test_data.unpack()[1]
+            X_test = self.test_data.unpacked()[1]
             y_predict = self.fit_model.predict(X_test)
-            return y_predict
+            return Data(y_predict, X_test)
         else:
             raise Exception("Cannot make prediction, model has not yet been fitted to data.")
 
 
 if __name__ == '__main__':
     # example of use
+
     import matplotlib.pyplot as plt
 
-    # generate data to stuff down the pipe
+    # generating data to stuff down the pipe
     x = np.random.uniform(0, 1, size=100)
     X = np.array([np.ones_like(x), x, x**2]).T
     y = np.exp(x*x) +2*np.exp(-2*x) + 0.1*np.random.randn(x.size)
@@ -220,16 +224,16 @@ if __name__ == '__main__':
         ratio = 3/4,
         random_seed = 69420
     )
-    # fitted instance of LinearRegression can then be used further
-    ytest, Xtest = tester.test_data.unpack() # extracting the data that was not used for training
-    ypredict = fitted_linear_model.predict(Xtest)
+    # predicting the test data
+    predicted_data = tester.predict_test_data()
+    # this return an instance of Data-class
 
     # showing off some functionality of Data-class
-    predicted_data = Data(ypredict, Xtest)
     sorted_data = predicted_data.sorted(axis=2)
-    ysorted, Xsorted = sorted_data.unpack()
+    ysorted, Xsorted = sorted_data.unpacked()
 
     # simple (simple...) plot
+    ytest, Xtest = tester.test_data.unpacked()
     plt.scatter(Xtest[:,1], ytest)
     plt.plot(Xsorted[:,1], ysorted)
     plt.show()
