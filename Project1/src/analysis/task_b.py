@@ -57,10 +57,11 @@ def plot_beta_progression(betas, betas_se, powers, degrees=[1,3,5]):
 			labels.append(label)
 		
 		# Plot for degree p
+		print(np.mean(betas_se[p]))
 		ticks = np.arange(len(labels))
 		ax.set_xticks(ticks, labels)
 		ax.plot(ticks, betas[p])
-		ax.fill_between(ticks, (betas[p]-betas_se[p]), (betas[p]+betas_se[p]), color='b', alpha=.1)
+		ax.fill_between(ticks, (betas[p]-2*betas_se[p]), (betas[p]+2*betas_se[p]), color='r', alpha=.3)
 		ax.set(ylim=(-0.6, 0.6))
 
 
@@ -68,7 +69,7 @@ def plot_beta_progression(betas, betas_se, powers, degrees=[1,3,5]):
 	plt.show()
 
 
-def solve_a(n=1000, train_size=0.8, random_state=123):
+def solve_a(n=1000, train_size=0.8, noise_std=0.1, random_state=123):
 	"""
 	Function to preform what I assume task b is asking. R2 and MSE (test and train) for polynomials (1,5)
 
@@ -79,7 +80,7 @@ def solve_a(n=1000, train_size=0.8, random_state=123):
 	5. Plot mse & r2
 	6. Plot chaos beta plot
 	"""
-	X, y = make_FrankeFunction(n=n, uniform=True, random_state=random_state)
+	X, y = make_FrankeFunction(n=n, uniform=True, random_state=random_state, noise_std=noise_std)
 
 	scaler = StandardScaler()
 	X = scaler.fit_transform(X)
@@ -99,27 +100,28 @@ def solve_a(n=1000, train_size=0.8, random_state=123):
 		X_poly = poly.fit_transform(X)
 		
 
-		X_train, X_test, y_train, y_test = train_test_split(X_poly, y, random_state=random_state)
+		X_train, X_test, y_train, y_test = train_test_split(X_poly, y, train_size=train_size, random_state=random_state)
 
-		reg = LinearRegression(method="pINV").fit(X_train, y_train)
+		reg = LinearRegression(method="SVD").fit(X_train, y_train)
 
 		y_train_pred = reg.predict(X_train)
 		y_test_pred = reg.predict(X_test)
 
-		mse_train[i] = reg.mse(y_train_pred, y_train)
-		mse_test[i] = reg.mse(y_test_pred, y_test)
+		mse_train[i] = reg.mse(y_train, y_train_pred)
+		mse_test[i] = reg.mse(y_test, y_test_pred)
 
-		r2_train[i] = reg.r2_score(y_train_pred, y_train)
-		r2_test[i] = reg.r2_score(y_test_pred, y_test)
+		r2_train[i] = reg.r2_score(y_train, y_train_pred)
+		r2_test[i] = reg.r2_score(y_test, y_test_pred)
 
 		betas[degree] = reg.coef_
-		betas_se[degree] = reg.coef_se(X_test, y_test)
+		var_beta = noise_std**2 * np.diag(reg.coef_var(X_train, noise_std))
+		betas_se[degree] = 2*np.sqrt(var_beta)
 		powers[degree] = poly.powers_
 
 	# Show mse and r2 score 
-	#plot_mse_and_r2(degrees, mse_train, mse_test, r2_train, r2_test)
+	plot_mse_and_r2(degrees, mse_train, mse_test, r2_train, r2_test)
 	
 	plot_beta_progression(betas, betas_se, powers)
 
 if __name__ == "__main__":
-	solve_a()
+	solve_a(n=1000, noise_std=0.4, random_state=123)
