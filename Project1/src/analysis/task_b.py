@@ -30,7 +30,7 @@ def plot_mse_and_r2(degrees, mse_train, mse_test, r2_train, r2_test):
 	plt.show()
 
 
-def plot_beta_progression(betas, powers, degrees=[1,3,5]):
+def plot_beta_progression(betas, betas_se, powers, degrees=[1,3,5]):
 	"""
 	Function to plot the evolution of of fitted paramters based on different polynomial degrees. Betas and powers are 
 	dicts with keys as poly power (1,2,3 ...) as created by the script. Beta values are the beta values (duh) and powers an array of (x,y) powers for
@@ -58,9 +58,9 @@ def plot_beta_progression(betas, powers, degrees=[1,3,5]):
 		
 		# Plot for degree p
 		ticks = np.arange(len(labels))
-
 		ax.set_xticks(ticks, labels)
-		ax.scatter(ticks, betas[p])
+		ax.plot(ticks, betas[p])
+		ax.fill_between(ticks, (betas[p]-betas_se[p]), (betas[p]+betas_se[p]), color='b', alpha=.1)
 		ax.set(ylim=(-0.6, 0.6))
 
 
@@ -90,6 +90,7 @@ def solve_a(n=1000, train_size=0.8, random_state=123):
 	r2_train = np.zeros_like(degrees, dtype=float)
 	r2_test = np.zeros_like(degrees, dtype=float)
 	betas = {}
+	betas_se = {}
 	powers = {} 
 
 	for i, degree in enumerate(degrees):
@@ -112,12 +113,13 @@ def solve_a(n=1000, train_size=0.8, random_state=123):
 		r2_test[i] = reg.r2_score(y_test_pred, y_test)
 
 		betas[degree] = reg.coef_
+		betas_se[degree] = reg.coef_se(X_test, y_test)
 		powers[degree] = poly.powers_
 
 	# Show mse and r2 score 
 	#plot_mse_and_r2(degrees, mse_train, mse_test, r2_train, r2_test)
 	
-	plot_beta_progression(betas, powers)
+	plot_beta_progression(betas, betas_se, powers)
 
 if __name__ == "__main__":
 	solve_a()
