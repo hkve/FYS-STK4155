@@ -91,7 +91,7 @@ class Data:
         elif type(other) == Data:
             return Data(self.y/other.y, self.X/other.X)
         else:
-            raise TypeError(f"Division not implemented betwee Data and {type(other)}")
+            raise TypeError(f"Division not implemented between Data and {type(other)}")
 
 
     def unpack(self):
