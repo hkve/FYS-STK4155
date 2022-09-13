@@ -1,6 +1,7 @@
 '''
 This is very messy, I have just done the first things that have come to mind, and I am rusty...
 '''
+from sknotlearn.linear_model import LinearRegression
 import numpy as np
 import sys
 from os import path
@@ -16,20 +17,28 @@ class Data:
         self.X = np.array(X)
         self.n_features = X.shape[-1]+1
 
-        self.scalers_ = {
-            "Standard" : self.standard_scaler_
-        }
-
         self.unscale = lambda self : self
 
+    def __len__(self):
+        return 
+
     def __getitem__(self, key):
-        i, j = key
-        if i == 0:
-            return self.y[j]
-        elif i > 0 and i < X.shape[1]:
-            return X[j, i]
-        else:
-            raise IndexError(f"Index i out of bounds for data of with {self.n_features} features.")
+        try:
+            i, j = key
+            if i == 0:
+                return self.y[j]
+            elif i > 0 and i < self.X.shape[1]:
+                return self.X[j, i]
+            else:
+                raise IndexError(f"Index {i} out of bounds for data of with {self.n_features} features.")
+        except ValueError:
+            if i==0:
+                return self.y
+            elif i > 0 and i < self.X.shape[1]:
+                return self.X[:,i]
+            else:
+                raise IndexError(f"Index {i} out of bounds for data of with {self.n_features} features.")
+
 
     def __iter__(self):
         self.i = 0
@@ -97,17 +106,29 @@ class Data:
     def unpack(self):
         return self.y, self.X
 
-    def train_test_split(self, ratio=2/3):
+    def train_test_split(self, ratio=2/3, random_seed=None):
         '''
         Splits the data into training data and test data according to train_test-ratio
         '''
-        size = data.shape[0]
-        np.random.shuffle(data)
-        training_data, test_data = data[:int(size*ratio)], data[int(size*ratio):]
+        np.random.seed(seed=random_seed) # allows control over random seed
+
+        size = self.y.size
+        split_idx = int(size*ratio)
+        shuffled_idxs = np.arange(size); np.random.shuffle(np.arange(size))
+        training_idxs = shuffled_idxs[:split_idx]
+        test_idxs = shuffled_idxs[split_idx:]
+        training_data = Data(self.y[training_idxs], self.X[training_idxs])
+        test_data = Data(self.y[test_idxs], self.X[test_idxs])
         return training_data, test_data
 
-    def scale(self, scheme="Standard"):
+    def scale(self, scheme="None"):
         return self.scalers_[scheme](self)
+
+    def none_scaler_(self, data):
+        '''
+        Does not scale y, *X.
+        '''
+        return data
 
     def standard_scaler_(self, data):
         '''
@@ -123,112 +144,63 @@ class Data:
         scaled_data.unscale = lambda data : data*data_std + data_mean
 
         return scaled_data
+    
+    scalers_ = {
+        "None" : none_scaler_,
+        "Standard" : standard_scaler_
+    }
+
 
 
 class TrainingFacility: # working title
     def __init__(self, model, data):
         '''
         model : a Model class to undergo training etc.
-        data  : array of data in shape (y, *X), where *X denotes columns of X.
+        data  : an instance of the Data class
         '''
         self.model = model
         self.data = data
 
+        self.isFit = False
+        self.fitmodel = None
         self.scaled_data = None
         self.unscale_data = lambda scaled_data : None
 
-        self.scalers_ = {
-            "Standard" : self.standard_scaler_
-        }
-
-    def unpack_data_(self, data):
-        '''
-        Unpacks data array into y and X.
-        NB. This is a mess made from being to fancy with data-packing...
-        '''
-        return data[:,0], data[:,1:]
-
-    def pack_data_(self, y, X):
-        '''
-        Packs y, X into shape (y, *X)
-        NB. See unpack data...
-        '''
-        return np.c_[y, X]
-
-    def scale_data(self, scheme="Standard"):
-        '''
-        Scales the data according to scheme
-
-        NB. Schemes not implemented yet, deafults to Standard scaling of y, x to be N(1,0)-distributed.
-        '''
-        self.scaled_data = self.scalers_[scheme](self.data)
-
-        return self
-
-    def train_test_split(self, data, train_test=2/3):
-        '''
-        Splits the data into training data and test data according to train_test-ratio
-        '''
-        size = data.shape[0]
-        np.random.shuffle(data)
-        training_data, test_data = data[:int(size*train_test)], data[int(size*train_test):]
-        return training_data, test_data
-
-    def fit_training_data(self, scale=False, train_test=2/3):
+    def fit_training_data(self, scaler="None", ratio=2/3, random_seed=None):
         '''
         Fits the model to training data.
         NB. Not sure just how I want to implement this bit.
         '''
-        if scale:
-            self.scale_data()
-            data = self.scaled_data
-            # print(self.scaled_data[:,:1].shape, self.scaled_data[:,2:].shape)
-            # sys.exit()
-            data = np.concatenate((self.scaled_data[:,:1], self.scaled_data[:,2:]), axis=1)
+        scaled_data = self.data.scale(scheme=scaler)
+        self.training_data, self.test_data = self.data.train_test_split(ratio=ratio, random_seed=random_seed)
+        y_training, X_training = self.training_data.unpack()
+        self.fit_model = self.model(method="INV").fit(X_training, y_training)
+        self.isFit = True
+        return self.fit_model
+
+    def predict_test_data(self):
+        if self.isFit:
+            X_test = self.test_data.unpack()[1]
+            y_predict = self.fit_model.predict(X_test)
+            return y_predict
         else:
-            data = self.data
-        training_data, self.test_data = self.train_test_split(data, train_test=train_test)
-        y_training, X_training = self.unpack_data_(training_data)
-        fit_model = self.model(method="INV").fit(X_training, y_training)
-        return fit_model
-
-    def standard_scaler_(self, data):
-        '''
-        Scales y, *X to be N(0, 1)-distributed.
-        '''
-        data_mean = np.mean(data, axis=0)
-        data_std = np.std(data, axis=0)
-        data_std = np.where(data_std != 0, data_std, 1) # sets unvaried data-columns to 0
-        data_scaled = (data - data_mean) / data_std
-
-        self.unscale_data = lambda scaled_data : scaled_data*data_std + data_mean
-
-        return data_scaled
+            raise Exception("Cannot make prediction, model has not yet been fitted to data.")
 
 
 if __name__ == '__main__':
-    x = np.random.uniform(0, 1, size=10)
+    import matplotlib.pyplot as plt
+
+    x = np.random.uniform(0, 1, size=100)
     X = np.array([np.ones_like(x), x, x**2]).T
     y = np.exp(x*x) +2*np.exp(-2*x) + 0.1*np.random.randn(x.size)
     testdata = Data(y, X)
-    testdata_scaled = testdata.scale()
 
+    tester = TrainingFacility(LinearRegression, testdata)
 
-    # testing with random function I thought of
-    # setting up first
-    from sknotlearn.linear_model import LinearRegression
-    x = np.random.uniform(0, 1, size=1000)
-    X = np.array([np.ones_like(x), x, x**2]).T
-    beta = np.array([1, -2, 3])
-    y = np.exp(x*x) + 2*np.exp(-2*x) + 0.1*np.random.randn(x.size)
-    # y = X@beta + 0.1*np.random.randn(x.size)
-    data = np.array([(yi, 1, xi, xi**2) for yi, xi in zip(y,x)])
-
-    # testing some functionality
-    test = TrainingFacility(LinearRegression, data)
-    fit = test.fit_training_data(scale=True)
-    ypredict = test.unscale_data(fit.predict(test.test_data[:,2:]))
-
-    import matplotlib.pyplot as plt
-    plt.scatter(test.test_data[:,2], test.test_data[:,0])
-    plt.scatter(test.test_data[:,2], ypredict)
+    test_fit = tester.fit_training_data()
+    ytest, Xtest = tester.test_data.unpack()
+    ypredict = test_fit.predict(Xtest)
+    
+    plt.scatter(Xtest[:,1], ytest)
+    plt.scatter(Xtest[:,1], ypredict)
+    plt.show()
