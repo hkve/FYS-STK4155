@@ -88,7 +88,7 @@ class Model:
 		Returns
 			var_beta: (np.array), Beta variance matrix 
 		"""	
-		var_beta = noise_std**2 * np.linalg.inv(X.T @ X)
+		var_beta = noise_std**2 * np.linalg.pinv(X.T @ X)
 		return  var_beta
 
 	# These functions should be implemented in classes inheriting from Model
