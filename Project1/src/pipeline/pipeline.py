@@ -133,6 +133,18 @@ class Data:
         test_data = Data(self.y[test_idxs], self.X[test_idxs])
         return training_data, test_data
 
+    def mean(self):
+        ''''
+        Returns the mean of the y-data
+        '''
+        return np.mean(self.y)
+
+    def var(self):
+        '''
+        Returns the variance of the y-data
+        '''
+        return np.mean((self.y-np.mean(self.y))**2)
+
     def scale(self, scheme="None"):
         return self.scalers_[scheme](self)
 
@@ -186,13 +198,13 @@ class TrainingFacility: # working title
         NB. Not sure just how I want to implement this bit.
         '''
         scaled_data = self.data.scale(scheme=scaler)
-        self.training_data, self.test_data = self.data.train_test_split(ratio=ratio, random_seed=random_seed)
+        self.training_data, self.test_data = scaled_data.train_test_split(ratio=ratio, random_seed=random_seed)
         y_training, X_training = self.training_data.unpacked()
-        self.fit_model = self.model(method="INV").fit(X_training, y_training)
+        self.fit_model = self.model(method="pINV").fit(X_training, y_training)
         self.isFit = True
         return self.fit_model
 
-    def predict_test_data(self):
+    def predict_test_data(self): # This is more proof of concept than useful method.
         '''
         Returns predicted Data after training.
         '''
@@ -203,6 +215,22 @@ class TrainingFacility: # working title
         else:
             raise Exception("Cannot make prediction, model has not yet been fitted to data.")
 
+    def diagnose_statistics(self):
+        '''
+        Returns a dictionary with the MSE and R2 of the models predicted data on the training and test data.
+        '''
+        y_train, X_train = self.training_data.unpacked()
+        y_test, X_test = self.test_data.unpacked()
+        y_train_predicted = self.fit_model.predict(X_train)
+        y_test_predicted = self.fit_model.predict(X_test)
+
+        statistics = {
+            "MSE_train" : self.fit_model.mse(y_train, y_train_predicted),
+            "R2_train" : self.fit_model.r2_score(y_train, y_train_predicted),
+            "MSE_test" : self.fit_model.mse(y_test, y_test_predicted),
+            "R2_test" : self.fit_model.r2_score(y_test, y_test_predicted)
+        }
+        return statistics
 
 if __name__ == '__main__':
     # example of use
@@ -210,6 +238,8 @@ if __name__ == '__main__':
     import matplotlib.pyplot as plt
 
     # generating data to stuff down the pipe
+    random_state = 69420
+    np.random.seed(random_state)
     x = np.random.uniform(0, 1, size=100)
     X = np.array([np.ones_like(x), x, x**2]).T
     y = np.exp(x*x) +2*np.exp(-2*x) + 0.1*np.random.randn(x.size)
@@ -222,14 +252,18 @@ if __name__ == '__main__':
     fitted_linear_model = tester.fit_training_data(
         scaler = "None",
         ratio = 3/4,
-        random_seed = 69420
+        random_seed = random_state
     )
     # predicting the test data
     predicted_data = tester.predict_test_data()
     # this return an instance of Data-class
 
+    # Generating useful statistics
+    for statistic, value in tester.diagnose_statistics().items():
+        print(statistic + f" score is {value:.5f}")
+
     # showing off some functionality of Data-class
-    sorted_data = predicted_data.sorted(axis=2)
+    sorted_data = predicted_data.sorted(axis=2) # sorts after x-values
     ysorted, Xsorted = sorted_data.unpacked()
 
     # simple (simple...) plot
