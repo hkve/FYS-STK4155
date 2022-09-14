@@ -146,9 +146,9 @@ class LinearRegression(Model):
 		"""		
 		U, S, VT = np.linalg.svd(X, full_matrices=False)
 
-		n, p = X.shape
+		_, p = X.shape
+	
 		tol = 1e-12
-		# use p
 		S = S[np.where(S > tol)]
 		S_inv = np.zeros((p,p))	
 		for i in range(len(S)):
