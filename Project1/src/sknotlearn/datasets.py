@@ -5,7 +5,7 @@ from matplotlib import cm
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from mpl_toolkits.mplot3d import Axes3D
 
-def make_FrankeFunction(n=1000, uniform=False, random_state=42):
+def make_FrankeFunction(n=1000, uniform=False, noise_std=0, random_state=42):
 	x, y = None, None
 
 	np.random.seed(random_state)
@@ -16,13 +16,13 @@ def make_FrankeFunction(n=1000, uniform=False, random_state=42):
 		x = np.linspace(0, 1, n)
 		y = np.linspace(0, 1, n)
 
-	z = FrankeFunction(x, y)
+	z = FrankeFunction(x, y) + np.random.normal(loc=0, scale=noise_std, size=n)
 
 	return np.c_[x, y], z
 
-def plot_FrankeFunction(x, y):
+def plot_FrankeFunction(x, y, noise_std=0):
 	X, Y = np.meshgrid(x, y)
-	Z = FrankeFunction(X, Y)
+	Z = FrankeFunction(X, Y) + np.random.normal(loc=0, scale=noise_std, size=(len(x), len(y)))
 
 	fig = plt.figure()
 	ax = fig.gca(projection="3d")
