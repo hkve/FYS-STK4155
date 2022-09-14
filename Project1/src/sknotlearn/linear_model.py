@@ -88,7 +88,7 @@ class Model:
 		Returns
 			var_beta: (np.array), Beta variance matrix 
 		"""	
-		var_beta = noise_std**2 * np.linalg.inv(X.T @ X)
+		var_beta = noise_std**2 * np.linalg.pinv(X.T @ X)
 		return  var_beta
 
 	# These functions should be implemented in classes inheriting from Model
@@ -146,9 +146,9 @@ class LinearRegression(Model):
 		"""		
 		U, S, VT = np.linalg.svd(X, full_matrices=False)
 
-		n, p = X.shape
+		_, p = X.shape
+	
 		tol = 1e-12
-		# use p
 		S = S[np.where(S > tol)]
 		S_inv = np.zeros((p,p))	
 		for i in range(len(S)):

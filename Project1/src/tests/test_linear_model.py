@@ -11,7 +11,7 @@ def test_LinearRegression():
 	y = np.sum(np.array([b*x**i for i, b in enumerate(beta)]), axis=0)
 	X = np.c_[np.ones_like(x), x, x**2, x**3]	
 	lin_INV = LinearRegression(method="INV").fit(X, y)
-	lin_SVD = LinearRegression(method="INV").fit(X, y)
+	lin_SVD = LinearRegression(method="SVD").fit(X, y)
 
 	tol = 1e-12
 	assert np.sum(np.abs(beta-lin_INV.coef_)) < tol, "Error in full LinearRegression test using matrix inversion" 
