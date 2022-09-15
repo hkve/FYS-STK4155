@@ -44,8 +44,10 @@ from sknotlearn.datasets import make_FrankeFunction
 # plt.grid(True)
 # plt.show()
 
-def bootstrap(y_train, x_train, y_test, x_test, rounds, method_='SVD'):
+def bootstrap(y_train, x_train, y_test, x_test, rounds, method='SVD'):
     """Will take in x_train which is chosen multiple times 
+
+    NB: It is important to keep the testdata constant. 
 
     Args:
         y_train (_type_): _description_
@@ -64,7 +66,7 @@ def bootstrap(y_train, x_train, y_test, x_test, rounds, method_='SVD'):
         x_train_boot = x_train[indices]
         y_train_boot = y_train[indices]
 
-        reg = LinearRegression(method=method_).fit(x_train_boot, y_train_boot)
+        reg = LinearRegression(method=method).fit(x_train_boot, y_train_boot)
         y_train_pred = reg.predict(x_train_boot)
         y_test_pred = reg.predict(x_test)
 
@@ -74,19 +76,32 @@ def bootstrap(y_train, x_train, y_test, x_test, rounds, method_='SVD'):
     return mse_train_values, mse_test_values
 
 
-if __name__ == "__main__":
-    X, y = make_FrankeFunction(n=600, uniform=True, random_state=321)
+
+def solve_c(n=600, uniform=True, random_state=321, degree=6, rounds=1000, method='SVD'):
+    X, y = make_FrankeFunction(n=n, uniform=uniform, random_state=random_state)
     scaler = StandardScaler()
     X = scaler.fit_transform(X)
 
-    poly = PolynomialFeatures(degree=6)
+    poly = PolynomialFeatures(degree=degree)
     X_poly = poly.fit_transform(X)
-    X_train, X_test, y_train, y_test = train_test_split(X_poly, y, random_state=321)
+    X_train, X_test, y_train, y_test = train_test_split(X_poly, y, random_state=random_state)
 
-    mse_train, mse_test = bootstrap(y_train, X_train, y_test, X_test, rounds=1000, method_='SVD')
+    mse_train, mse_test = bootstrap(y_train, X_train, y_test, X_test, rounds=rounds, method=method)
 
-    bins = 10
-    plt.hist(mse_train, bins)
-    plt.hist(mse_test, bins=100, alpha=0.6)
+    find_bins = lambda arr, times=25000: int((np.max(arr)-np.min(arr))*times)
+
+    plt.hist(mse_train, bins=find_bins(mse_train), label='mse for training data')
+    plt.hist(mse_test, alpha=0.75, bins=find_bins(mse_test),  label='mse for test data') #Cannot use density=True because MSE
+    plt.xlabel('MSE')
+    plt.ylabel('Probability')
+    plt.title(f'Results of MSE when bootstrapping {rounds} times')
+    plt.legend()
     plt.show()
+
+
+if __name__ == "__main__":
+    solve_c()
+
+
+
 
