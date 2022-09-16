@@ -111,12 +111,19 @@ class Data:
 
     def sorted(self, axis=0):
         '''
-        Return sorted Data along specified axis. Index 0 refers to y, 1 etc. to features.
+        Returns sorted Data along specified axis. Index 0 refers to y, 1 etc. to features.
         '''
         sorted_idxs = np.argsort(self[axis])
         y_sorted = self.y[sorted_idxs]
         X_sorted = self.X[sorted_idxs,:]
         return Data(y_sorted, X_sorted)
+
+    def shuffled(self):
+        '''
+        Returns shuffled Data.
+        '''
+        shuffled_idxs = np.arange(self.y.size); np.random.shuffle(shuffled_idxs)
+        return Data(self.y[shuffled_idxs], self.X[shuffled_idxs])
 
     def train_test_split(self, ratio=2/3, random_seed=None):
         '''
@@ -126,7 +133,7 @@ class Data:
 
         size = self.y.size
         split_idx = int(size*ratio)
-        shuffled_idxs = np.arange(size); np.random.shuffle(np.arange(size))
+        shuffled_idxs = np.arange(size); np.random.shuffle(shuffled_idxs)
         training_idxs = shuffled_idxs[:split_idx]
         test_idxs = shuffled_idxs[split_idx:]
         training_data = Data(self.y[training_idxs], self.X[training_idxs])
@@ -190,7 +197,7 @@ class TrainingFacility: # working title
         self.isFit = False
         self.fitmodel = None
         self.scaled_data = None
-        self.unscale_data = lambda scaled_data : None
+        self.unscale_data = lambda scaled_data : None   
 
     def fit_training_data(self, scaler="None", ratio=2/3, random_seed=None):
         '''
@@ -241,7 +248,7 @@ if __name__ == '__main__':
     random_state = 69420
     np.random.seed(random_state)
     x = np.random.uniform(0, 1, size=100)
-    X = np.array([np.ones_like(x), x, x**2]).T
+    X = np.array([np.ones_like(x), x, x*x]).T
     y = np.exp(x*x) +2*np.exp(-2*x) + 0.1*np.random.randn(x.size)
     testdata = Data(y, X) # storing the data and design matrix in Data-class
 
