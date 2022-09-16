@@ -20,6 +20,11 @@ class Model:
 			"SVD": self.fit_svd_decomp
 		}
 
+		self.metrics_ = {
+			"mse": self.mse,
+			"r2_score": self.r2_score
+		}
+		
 		assert method in self.methods_.keys(), f"{method = } is not a valid method. Please choose between {self.methods_.keys()}"
 		self.method_ = method
 
