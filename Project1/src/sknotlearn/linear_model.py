@@ -1,4 +1,5 @@
 import numpy as np
+from cvxopt import matrix, solvers
 
 class Model:
 	"""
@@ -17,7 +18,8 @@ class Model:
 		self.methods_ = {
 			"INV": self.fit_matrix_inv,
 			"pINV": self.fit_matrix_psuedo_inv,
-			"SVD": self.fit_svd_decomp
+			"SVD": self.fit_svd_decomp,
+			"cMIN": self.fit_cost_min,
 		}
 
 		assert method in self.methods_.keys(), f"{method = } is not a valid method. Please choose between {self.methods_.keys()}"
@@ -157,3 +159,143 @@ class LinearRegression(Model):
 		self.coef_ = VT.T @  S_inv @ U.T @ y
 		
 		return self
+
+class Ridge(Model):
+	"""
+	Implementation of Ridge Regression. Can preform coefficient estimation using both direct matrix inversion of X.T @ X 
+	and trough SVD decomposition.  
+	"""
+	def __init__(self, lmbda, **kwargs):
+		"""
+		Simply call Models constructor. Key-word arguments are passed to Model constructor.  
+		"""
+		self.lmbda = lmbda
+		Model.__init__(self, **kwargs)
+
+		self.methods_ = {
+			"INV" : self.fit_matrix_inv,
+			"cMIN" : self.fit_cost_min,
+		}
+
+	def fit_matrix_inv(self, X, y):	
+		"""
+		Estimates coefficients based on default matrix inversion of X.T @ X + I.
+		Matrix is never singular, so pseudo inversion not supported.
+
+		Args:
+			X: np.array, Design matrix used for coefficient fitting
+			y: np.array, Target values used for fitting.
+		"""
+		_, p = X.shape
+		self.coef_ = np.linalg.inv(X.T @ X + self.lmbda*np.eye(p)) @ X.T @ y
+		return self
+
+	def fit_svd_decomp(self, X, y):
+		"""
+		Estimates coefficients based on SVD decomposition.
+
+		Args:
+			X: np.array, Design matrix used for coefficient fitting
+			y: np.array, Target values used for fitting.
+		"""		
+		U, S, VT = np.linalg.svd(X, full_matrices=False)
+
+		_, p = X.shape
+	
+		tol = 1e-12
+		S = S[np.where(S > tol)]
+		S_inv = np.zeros((p,p))	
+		for i in range(len(S)):
+			S_inv[i,i] = 1/S[i]
+
+		self.coef_ = VT.T @  S_inv @ U.T @ y
+		return self
+
+	def fit_cost_min(self, X, y):	
+		"""
+
+		Args:
+			X: np.array, Design matrix used for coefficient fitting
+			y: np.array, Target values used for fitting.
+		"""
+		def F(beta=None, z=None):
+			'''
+			Follows cvxopt prescription for defining convex function to minimize.
+			Args:
+				beta (None, cvxopt.matrix) : values of the parameters to optimize
+				z (cvxopt.matrix) : wheights for when conditions are applied to cost function.
+			'''
+			if beta is None:
+				# this initializes the problem. Return number of conditions (0), and initial parameter guess
+				return 0, matrix(np.ones_like(X[0]))
+			beta = np.array(beta)[:,0] # translating cvxopt matrix into numpy array
+			# cost function
+			f = np.sum( (y-X@beta)**2 ) + self.lmbda * np.sum( beta**2 )
+			# cost function gradient
+			Df = matrix(np.array([-X.T@(y-X@beta) + 2*self.lmbda*beta]))
+			if z is None:
+				return f, Df
+			# cost function Hessian, approximating Dirac delta
+			H = matrix(2*z[0] * (X.T@X + self.lmbda))
+			return f, Df, H
+
+		self.coef_ = solvers.cp(F)['x']
+		return self
+
+class Lasso(Model):
+	"""
+	Implementation of Ridge Regression. Can preform coefficient estimation using both direct matrix inversion of X.T @ X 
+	and trough SVD decomposition.  
+	"""
+	def __init__(self, lmbda, **kwargs):
+		"""
+		Simply call Models constructor. Key-word arguments are passed to Model constructor.  
+		"""
+		self.lmbda = lmbda
+		Model.__init__(self, method="cMIN", **kwargs)
+
+		self.methods_ = {
+			"cMIN" : self.fit_cost_min
+		}
+
+	def fit_cost_min(self, X, y):	
+		"""
+
+		Args:
+			X: np.array, Design matrix used for coefficient fitting
+			y: np.array, Target values used for fitting.
+		"""
+		def F(beta=None, z=None):
+			'''
+			Follows cvxopt prescription for defining convex function to minimize.
+			Args:
+				beta (None, cvxopt.matrix) : values of the parameters to optimize
+				z (cvxopt.matrix) : wheights for when conditions are applied to cost function.
+			'''
+			if beta is None:
+				# this initializes the problem. Return number of conditions (0), and initial parameter guess
+				return 0, matrix(np.ones_like(X[0]))
+			beta = np.array(beta)[:,0] # translating cvxopt matrix into numpy array
+			# cost function
+			f = np.sum( (y-X@beta)**2 ) + self.lmbda * np.sum( np.abs(beta) )
+			# cost function gradient
+			Df = matrix(np.array([-X.T@(y-X@beta) + self.lmbda*np.sign(beta)]))
+			if z is None:
+				return f, Df
+			# cost function Hessian, approximating Dirac delta
+			H = matrix(2*z[0] * (X.T@X + self.lmbda * ddelta(beta, sigma=1e-12)))
+			return f, Df, H
+
+		self.coef_ = solvers.cp(F)['x']
+		return self
+
+def ddelta(beta, sigma):
+	'''
+	Returns gaussian approximation of Dirac delta function.
+    Args:
+        beta (float, ndarray): values to evalute 𝛿(beta)
+        sigma (float): standard deviation of the gaussian approximation. Should be small.
+	'''
+	return 1/(np.sqrt(2*np.pi)*sigma) * np.exp(-beta*beta / (2*sigma*sigma))
+
+solvers.options['show_progress'] = False # suppresses cvxopt messages
