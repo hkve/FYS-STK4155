@@ -85,7 +85,7 @@ def solve_a(n=1000, train_size=0.8, noise_std=0.1, random_state=123):
 	scaler = StandardScaler()
 	X = scaler.fit_transform(X)
 	
-	degrees = np.arange(1, 5+1)
+	degrees = np.arange(1, 12+1)
 	mse_train = np.zeros_like(degrees, dtype=float)
 	mse_test = np.zeros_like(degrees, dtype=float)
 	r2_train = np.zeros_like(degrees, dtype=float)
@@ -114,7 +114,7 @@ def solve_a(n=1000, train_size=0.8, noise_std=0.1, random_state=123):
 		r2_test[i] = reg.r2_score(y_test, y_test_pred)
 
 		betas[degree] = reg.coef_
-		var_beta = noise_std**2 * np.diag(reg.coef_var(X_train, noise_std))
+		var_beta =	 np.diag(reg.coef_var(X_train, noise_std))
 		betas_se[degree] = 2*np.sqrt(var_beta)
 		powers[degree] = poly.powers_
 
@@ -124,4 +124,4 @@ def solve_a(n=1000, train_size=0.8, noise_std=0.1, random_state=123):
 	plot_beta_progression(betas, betas_se, powers)
 
 if __name__ == "__main__":
-	solve_a(n=1000, noise_std=0.4, random_state=123)
+	solve_a(n=600, noise_std=0.1, random_state=321, train_size=0.8)
