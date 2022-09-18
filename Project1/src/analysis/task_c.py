@@ -77,30 +77,56 @@ def bootstrap(y_train, x_train, y_test, x_test, rounds, method='SVD'):
 
 
 
-def solve_c(n=600, uniform=True, random_state=321, degree=6, rounds=1000, method='SVD'):
+def mse_from_bootstrap(n=600, uniform=True, random_state=321, degrees=np.arange(1, 12+1), rounds=600, method='SVD'):
     X, y = make_FrankeFunction(n=n, uniform=uniform, random_state=random_state)
     scaler = StandardScaler()
     X = scaler.fit_transform(X)
 
-    poly = PolynomialFeatures(degree=degree)
-    X_poly = poly.fit_transform(X)
-    X_train, X_test, y_train, y_test = train_test_split(X_poly, y, random_state=random_state)
+    mse_train_list = []
+    mse_test_list = []
+    for deg in degrees: 
+        poly = PolynomialFeatures(degree=deg)
+        X_poly = poly.fit_transform(X)
+        X_train, X_test, y_train, y_test = train_test_split(X_poly, y, random_state=random_state)
 
-    mse_train, mse_test = bootstrap(y_train, X_train, y_test, X_test, rounds=rounds, method=method)
+        mse_train, mse_test = bootstrap(y_train, X_train, y_test, X_test, rounds=rounds, method=method)
+        mse_train_list.append(mse_train)
+        mse_test_list.append(mse_test)
+    
+    return mse_train_list, mse_test_list
 
+
+def plot_hist_of_bootstrap(mse_train, mse_test, degree, rounds=600):
     find_bins = lambda arr, times=25000: int((np.max(arr)-np.min(arr))*times)
-
     plt.hist(mse_train, bins=find_bins(mse_train), label='mse for training data')
     plt.hist(mse_test, alpha=0.75, bins=find_bins(mse_test),  label='mse for test data') #Cannot use density=True because MSE
     plt.xlabel('MSE')
     plt.ylabel('Probability')
-    plt.title(f'Results of MSE when bootstrapping {rounds} times')
+    plt.title(f'Model of degree {degree}: Results of MSE when bootstrapping {rounds} times')
     plt.legend()
     plt.show()
 
+def hastie_2_11_ex_c(mse_train_list, mse_test_list, degrees):
+    #Could have saved degrees as a global variable 
+    plt.plot(degrees, np.mean(mse_train_list, axis=1))
+    plt.plot(degrees, np.mean(mse_test_list, axis=1))
+    plt.show()
+
+
+
+
 
 if __name__ == "__main__":
-    solve_c()
+    mse_train_list, mse_test_list = mse_from_bootstrap()
+    hastie_2_11_ex_c(mse_train_list, mse_test_list, degrees=np.arange(1, 12+1))
+    # print(np.mean(mse_train_list, axis=1), np.shape(mse_train_list))
+
+    # i = 0
+    # plot_hist_of_bootstrap(mse_train_list[i], mse_test_list[i], degree=i+1) 
+    
+
+
+# Play around with the number of bootstrap rounds
 
 
 
