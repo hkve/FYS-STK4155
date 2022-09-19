@@ -38,7 +38,7 @@
 \newcommand{\bclosed}[1]{\left[#1\right]}
 \newcommand{\cclosed}[1]{\left\{#1\right\}}
 \newcommand{\vclosed}[1]{\left|#1\right|}
-\renewcommand{\norm}[2][]{\ensuremath{{\|#2\|_{#1}}}}
+\renewcommand{\norm}[2][]{\ensuremath{\|#2\|_{#1}}}
 \renewcommand{\exp}[1]{e^{#1}}
 
 \renewcommand{\expval}{\operatorname{\mathbb{E}}}
@@ -65,9 +65,11 @@
 ]
 
 \section{Introduction}
-    In this project, we will introduce some of the most important general properties of machine learning models in the context of linear regression. Specifically the mean squared error (MSE), the bias and the variance of data predictions are essential in evaluating the quality of a statistical model. We look at the phenomena of underfitting and overfitting models, and explore them in the context of bias-variance tradeoff. The three models we will use explicitly are ordinary linear regression (OLS), ridge regression and Least-Absolute-Shrinkage-and-Selection-Operation (LASSO) regression. These will first be tested on the 2D Franke function, and later on real geographical terrain data.
+    In this project, we will introduce some of the most important general properties of machine learning models in the context of linear regression. Specifically the mean squared error (MSE), the bias and the variance of data predictions are essential in evaluating the quality of a statistical model. We look at the phenomena of underfitting and overfitting, and explore them in the context of bias-variance trade-off. The three models we will use explicitly are Ordinary Linear Regression (OLS), Ridge regression and Least-Absolute-Shrinkage-and-Selection-Operation (LASSO) regression. These will first be tested on the 2D Franke function, and later on real geographical terrain data.
 
-    Resampling something something
+    The aforementioned models will be explored using resampling techniques, which will be employed to extract the relevant statistical quantities in an accurate way. We will use the standard methods of Bootstrapping and Cross Validation and compare the results we get between them across the three linear models.
+
+    All the models will be applied by fitting a two-dimensional polynomial expansion to the observed data.
 
 
 
