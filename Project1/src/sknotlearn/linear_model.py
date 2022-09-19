@@ -90,17 +90,16 @@ class Model:
 	def coef_var(self, X, noise_std):
 		"""
 		Calculates the variance of coef.
-		Used eg for V[beta_hat|X] p.3 from https://lukesonnet.com/teaching/inference/200d_standard_errors.pdf
-		
+	
 		Args:
 			X: (np.array), Designe matrix used for se calculations
 			y: (np.array), True values of y, y_hat is calculated based on X
 
 		Returns
-			var_beta: (np.array), Beta variance matrix 
+			var_coef: (np.array), Coefficient variance matrix 
 		"""	
-		var_beta = noise_std**2 * np.linalg.pinv(X.T @ X)
-		return  var_beta
+		var_coef = noise_std**2 * np.linalg.pinv(X.T @ X)
+		return  var_coef
 
 	# These functions should be implemented in classes inheriting from Model
 	def fit_matrix_inv(self, X, y): 
