@@ -26,6 +26,7 @@
 
 % Misc
 \usepackage{appendix}
+\usepackage{xfrac} % provides \sfrac
 
 % Commands
 
@@ -37,6 +38,7 @@
 \newcommand{\bclosed}[1]{\left[#1\right]}
 \newcommand{\cclosed}[1]{\left\{#1\right\}}
 \newcommand{\vclosed}[1]{\left|#1\right|}
+\renewcommand{\norm}[2][]{\ensuremath{{\|#2\|_{#1}}}}
 \renewcommand{\exp}[1]{e^{#1}}
 
 \renewcommand{\expval}{\operatorname{\mathbb{E}}}
@@ -105,7 +107,7 @@
             \end{align}.
 
 
-        \subsection{Ridge regression and Lasso}
+        \subsection{Ridge and LASSO regression}
             So far, we have assumed that the parameters $\vec{\theta}$ are uniformly distributed, and as such have no \textit{bias} towards any particular value. In practice, this means that the OLS model will contort to fit itself to all values in the data. As such, a motivation for adding a bias could be for the sake of stability in the fit. This is done in ridge regression, where one assumes that the parameters are normally distributed, such that parameter values far from the mean are thought less likely to occurr. This in practice means that the model is less willing to contort to outliers in the dataset, trading it for a bias towards certain parameter values. Assuming the probability distrbution for $\vec{\theta}$
             \begin{align}
                 P(\vec{\theta}) = \prod_{i=0}^{p-1} \frac{1}{\sqrt{2\pi\tau^2}} \exp{-\frac{\theta_i^2}{2\tau^2}},
@@ -131,13 +133,13 @@
             \begin{align}
                 P(\vec{\theta}) = \prod_{i=0}^{p-1} \frac{1}{2\tau} \exp{-\frac{|\theta_i|}{\tau}},
             \end{align}
-            which as we can see is not differentiable at $\theta_i = 0$. This means that the optimisation of this the probability $P(\vec{\theta}|X, \vec{y})$ is not necessarily possible analytically without putting bounds on the data $\vec{y}, X$, and even numerical algorithms like gradient descent will encounter run into trouble. Furthermore, it is not optimisable point by point, unless bounds like $X^TX$ being diagonal, which makes LASSO generally less used. Nevertheless, we can coax a cost function out of the probability that is minimalisable. We can choose $\msub{C}{lasso}(\vec{\theta}) = -A\log\pclosed{P(\vec{\theta|X,\vec{y}})} + C$, where we can choose the constants $A, C$ such that
+            which as we can see is not differentiable at $\theta_i = 0$. This means that the optimisation of this the probability $P(\vec{\theta}|X, \vec{y})$ is not necessarily possible analytically without putting bounds on the data $X, \vec{y}$, and even numerical algorithms like gradient descent will encounter run into trouble. Furthermore, it is not optimisable point by point, unless bounds like $X^TX$ being diagonal are enforced, which makes LASSO generally less used. Nevertheless, we can coax a cost function out of the probability that is minimalisable. Letting the cost function be written $\msub{C}{lasso}(\vec{\theta}) = -A\log\pclosed{P(\vec{\theta|X,\vec{y}})} + C$  we can choose the constants $A, C$ such that
             \begin{align}
                 \boxed{
-                    \msub{C}{lasso}(\vec{\vec{\theta}}) = \pclosed{ \vec{y} - X\vec{\theta} }^2 + \lambda \vclosed{\vec{\theta}},
+                    \msub{C}{lasso}(\vec{\vec{\theta}}) = \norm[2]{ \vec{y} - X\vec{\theta} }^2 + \lambda \norm[1]{\vec{\theta}},
                 }
             \end{align}
-            where $\lambda = \frac{2\sigma^2}{\tau}$.
+            where $\lambda = \frac{2\sigma^2}{\tau}$ and $\norm[p]{\vec{v}} = \pclosed{\sum_i |v_i|^p}^{\sfrac{1}{p}}$ denotes the $L_p$ norm of the vector $\vec{v}$.
 
 
 
