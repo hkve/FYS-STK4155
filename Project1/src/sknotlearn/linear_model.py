@@ -1,5 +1,9 @@
 import numpy as np
 from cvxopt import matrix, solvers
+import sys
+from os import path
+sys.path.append( path.dirname( path.dirname( path.abspath(__file__) ) ) )
+from sknotlearn.l1regls import l1regls
 
 class Model:
 	"""
@@ -107,6 +111,10 @@ class Model:
 
 	def fit_matrix_psuedo_inv(self, X, y):
 		raise NotImplementedError("Model base does not implement useful stuff")
+	
+	def fit_cost_min(self, X, y):
+		raise NotImplementedError("Model base does not implement useful stuff")
+
 
 class LinearRegression(Model):
 	"""
@@ -237,11 +245,11 @@ class Ridge(Model):
 			# cost function
 			f = np.sum( (y-X@beta)**2 ) + self.lmbda * np.sum( beta**2 )
 			# cost function gradient
-			Df = matrix(np.array([-X.T@(y-X@beta) + 2*self.lmbda*beta]))
+			Df = matrix(np.array([-2*X.T@(y-X@beta) + 2*self.lmbda*beta]))
 			if z is None:
 				return f, Df
 			# cost function Hessian, approximating Dirac delta
-			H = matrix(2*z[0] * (X.T@X + self.lmbda))
+			H = matrix(2*z[0] * (X.T@X + self.lmbda*np.eye(X.shape[-1], X.shape[-1])))
 			return f, Df, H
 
 		self.coef_ = solvers.cp(F)['x']
@@ -256,6 +264,8 @@ class Lasso(Model):
 		"""
 		Simply call Models constructor. Key-word arguments are passed to Model constructor.  
 		"""
+		if lmbda == 0:
+			self.fit_cost_min = LinearRegression.fit_matrix_psuedo_inv # if lmbda=0 revert to OLS.
 		self.lmbda = lmbda
 		Model.__init__(self, method="cMIN", **kwargs)
 
@@ -270,37 +280,9 @@ class Lasso(Model):
 			X: np.array, Design matrix used for coefficient fitting
 			y: np.array, Target values used for fitting.
 		"""
-		def F(beta=None, z=None):
-			'''
-			Follows cvxopt prescription for defining convex function to minimize.
-			Args:
-				beta (None, cvxopt.matrix) : values of the parameters to optimize
-				z (cvxopt.matrix) : wheights for when conditions are applied to cost function.
-			'''
-			if beta is None:
-				# this initializes the problem. Return number of conditions (0), and initial parameter guess
-				return 0, matrix(np.ones_like(X[0]))
-			beta = np.array(beta)[:,0] # translating cvxopt matrix into numpy array
-			# cost function
-			f = np.sum( (y-X@beta)**2 ) + self.lmbda * np.sum( np.abs(beta) )
-			# cost function gradient
-			Df = matrix(np.array([-X.T@(y-X@beta) + self.lmbda*np.sign(beta)]))
-			if z is None:
-				return f, Df
-			# cost function Hessian, approximating Dirac delta
-			H = matrix(2*z[0] * (X.T@X + self.lmbda * ddelta(beta, sigma=1e-12)))
-			return f, Df, H
-
-		self.coef_ = solvers.cp(F)['x']
+		A = matrix(X/np.sqrt(self.lmbda))
+		b = matrix(y/np.sqrt(self.lmbda))
+		self.coef_ = np.array(l1regls(A, b))[:,0]
 		return self
-
-def ddelta(beta, sigma):
-	'''
-	Returns gaussian approximation of Dirac delta function.
-    Args:
-        beta (float, ndarray): values to evalute 𝛿(beta)
-        sigma (float): standard deviation of the gaussian approximation. Should be small.
-	'''
-	return 1/(np.sqrt(2*np.pi)*sigma) * np.exp(-beta*beta / (2*sigma*sigma))
 
 solvers.options['show_progress'] = False # suppresses cvxopt messages
