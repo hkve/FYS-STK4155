@@ -40,6 +40,7 @@
 \newcommand{\vclosed}[1]{\left|#1\right|}
 \renewcommand{\norm}[2][]{\ensuremath{\|#2\|_{#1}}}
 \renewcommand{\exp}[1]{e^{#1}}
+\newcommand{\exptext}[1]{\text{exp}\pclosed{#1}}
 
 \renewcommand{\expval}{\operatorname{\mathbb{E}}}
 \renewcommand{\var}{\operatorname{Var}}
@@ -143,7 +144,38 @@
             \end{align}
             where $\lambda = \frac{2\sigma^2}{\tau}$ and $\norm[p]{\vec{v}} = \pclosed{\sum_i |v_i|^p}^{\sfrac{1}{p}}$ denotes the $L_p$ norm of the vector $\vec{v}$.
 
+\section{Method}
+Something general about initially fitting Franke data using OLS, ridge and lasso. Then moving on to real terrain data something something.
+    
+    \subsection{Franke function}
 
+    For the initial testing of our implemented fitting routines, we will use the so called \textit{Franke function}. Being able to control the number of sample points and noise levels will serve as a good examination of our models advantages and disadvantaged. Defined for $x, y \in [0,1]$
+
+    \begin{align}
+        F(x,y) = f_1(x,y) + f_2(x,y) + f_3(x,y) + f_4(x,y) + \epsilon \label{eq:met:Franke_Function}
+    \end{align}
+
+    Where the $f_i(x,y)$ are Gaussian functions, constructed to mimic the shape of a hill top landscape. More concretely, these are defined as:
+
+    \begin{align} \nonumber
+        f_1(x,y) &= \frac{3}{4}\exptext{ -\frac{(9x-2)^2}{4} - \frac{(9y-2)^2}{4} } \nonumber \\
+        f_2(x,y) &= \frac{3}{4}\exptext{ -\frac{(9x+1)^2}{49} - \frac{(9y+1)}{10}} \nonumber \\
+        f_3(x,y) &= \frac{1}{2}\exptext{ -\frac{(9x-7)^2}{4} - \frac{(9y-3)^2}{4}} \nonumber \\
+        f_4(x,y) &= -\frac{3}{4}\exptext{ -(9x-4)^2 - (9y-7)^2} \nonumber
+    \end{align}
+
+    And $\epsilon$ is some stochastic noise $\epsilon \sim N(0,\sigma^2)$. By visual inspection, we can fine tune $\sigma$ to create data that looks like noisy digital terrain data.     
+
+    \subsection{Re-sampling techniques}
+
+        \subsubsection{Bootstrap}
+
+        \subsubsection{Cross-validation}
+
+\section{Results}
+
+
+\section{Concluding remarks}
 
 
 

@@ -8,5 +8,5 @@ sigma = [0, 0.01, 0.1, 0.2]
 
 for s in sigma:
     s_str = str(s).replace(".", "_")
-    filename = f"../../tex/figs/franke_functions_{s_str}"
+    filename = f"../../tex/figs/franke_functions_{s_str}.pdf"
     plot_FrankeFunction(v,v, s, filename=filename)
