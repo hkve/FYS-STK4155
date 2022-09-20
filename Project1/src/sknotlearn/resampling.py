@@ -1,6 +1,10 @@
 from random import shuffle
 import numpy as np
 
+# class Bootstrap: 
+#     def __init__(self, reg,):
+
+
 class cross_validate:
     def __init__(self, reg, y, X, k=5, scoring=("mse"), shuffle=True, random_state=321):
         if type(scoring) not in [list, tuple]:

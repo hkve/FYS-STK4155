@@ -9,7 +9,7 @@ def test_LinearRegression():
 	beta = np.array([1, 0.25, -1.5, 3])
 
 	y = np.sum(np.array([b*x**i for i, b in enumerate(beta)]), axis=0)
-	X = np.c_[np.ones_like(x), x, x**2, x**3]	
+	X = np.c_[np.ones_like(x), x, x**2, x**3]
 	lin_INV = LinearRegression(method="INV").fit(X, y)
 	lin_SVD = LinearRegression(method="SVD").fit(X, y)
 

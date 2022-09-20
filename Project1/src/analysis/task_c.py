@@ -11,38 +11,6 @@ import context
 from sknotlearn.linear_model import LinearRegression
 from sknotlearn.datasets import make_FrankeFunction
 
-# # Returns mean of bootstrap samples 
-# # Bootstrap algorithm
-# def bootstrap(data, datapoints):
-#     t = np.zeros(datapoints)
-#     n = len(data)
-#     # non-parametric bootstrap         
-#     for i in range(datapoints):
-#         t[i] = np.mean(data[np.random.randint(0,n,n)])
-#     # analysis    
-#     print("Bootstrap Statistics :")
-#     print("original           bias      std. error")
-#     print("%8g %8g %14g %15g" % (np.mean(data), np.std(data),np.mean(t),np.std(t)))
-#     return t
-
-# # We set the mean value to 100 and the standard deviation to 15
-# mu, sigma = 100, 15
-# datapoints = 10000
-# # We generate random numbers according to the normal distribution
-# x = mu + sigma*np.random.randn(datapoints)
-# # bootstrap returns the data sample                                    
-# t = bootstrap(x, datapoints)
-
-
-# # the histogram of the bootstrapped data (normalized data if density = True)
-# n, binsboot, patches = plt.hist(t, 50, density=True, facecolor='red', alpha=0.75)
-# # add a 'best fit' line  
-# y = norm.pdf(binsboot, np.mean(t), np.std(t))
-# lt = plt.plot(binsboot, y, 'b', linewidth=1)
-# plt.xlabel('x')
-# plt.ylabel('Probability')
-# plt.grid(True)
-# plt.show()
 
 def bootstrap(y_train, x_train, y_test, x_test, rounds, method='SVD'):
     """Will take in x_train which is chosen multiple times 
@@ -76,7 +44,6 @@ def bootstrap(y_train, x_train, y_test, x_test, rounds, method='SVD'):
     return mse_train_values, mse_test_values
 
 
-
 def mse_from_bootstrap(n=600, uniform=True, random_state=321, degrees=np.arange(1, 12+1), rounds=600, method='SVD'):
     X, y = make_FrankeFunction(n=n, uniform=uniform, random_state=random_state)
     scaler = StandardScaler()
@@ -106,6 +73,7 @@ def plot_hist_of_bootstrap(mse_train, mse_test, degree, rounds=600):
     plt.legend()
     plt.show()
 
+
 def hastie_2_11_ex_c(mse_train_list, mse_test_list, degrees):
     #Could have saved degrees as a global variable 
     plt.plot(degrees, np.mean(mse_train_list, axis=1))
@@ -113,13 +81,9 @@ def hastie_2_11_ex_c(mse_train_list, mse_test_list, degrees):
     plt.show()
 
 
-
-
-
 if __name__ == "__main__":
     mse_train_list, mse_test_list = mse_from_bootstrap()
     hastie_2_11_ex_c(mse_train_list, mse_test_list, degrees=np.arange(1, 12+1))
-    # print(np.mean(mse_train_list, axis=1), np.shape(mse_train_list))
 
     # i = 0
     # plot_hist_of_bootstrap(mse_train_list[i], mse_test_list[i], degree=i+1) 
