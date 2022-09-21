@@ -22,6 +22,8 @@
 % Formatting
 \usepackage{float}
 \usepackage{graphicx}
+\usepackage{subcaption}
+
 \graphicspath{ {./figs/} } 
 
 % Misc
@@ -179,7 +181,7 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
         Consider a data sample $D = (\vec{y}, X)$, consisting of $n$ data points. Initially we partion $D$ into $k$ folds $D_i$, $i = 1, ... , k$ of equal size.   
         For each fold $D_i$, a model is fitted using every fold \textit{except} $D_i$, which we write as $D_{-i}$. With this model, we calcualte the different measures 
         using $D_i$, which was not used to fit the model. When this is done for all $k$ folds, we take the mean of the measures to get the 
-        final goodness of fit.
+        final goodness of fit. 
 
 
 \section{Results}
@@ -214,6 +216,36 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
         &= \sigma^2 (X^TX)^{-1},
     \end{align}
     where we have used that \(\expval(\vec{y}\vec{y}^T) = \expval\pclosed{(X\vec{\beta}+\vec{\epsilon})(X\vec{\beta}+\vec{\epsilon})^T} = X\vec{\beta}\vec{\beta}^TX^T + \sigma^2 \eye\).
+
+    \begin{figure*}
+        \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{franke_functions_0.pdf}
+        \caption{$\sigma = 0$}
+        \end{subfigure}
+        \hfill
+        \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{franke_functions_0_01.pdf}
+        \caption{$\sigma = 0.01$}
+        \end{subfigure}
+        \hfill
+        \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{franke_functions_0_1.pdf}
+        \caption{$\sigma = 0.1$}
+        \end{subfigure}
+        \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{franke_functions_0_2.pdf}
+        \caption{$\sigma = 0.2$}
+        \end{subfigure}
+
+
+        \centerline{Showing Franke function with increasing noise, from \textit{a} to \textit{d}, $\sigma \in \{ 0, 0.01, 0.1, 0.2\}$. All figures plotted with 600 uniformly spaced $(x,y)$ points.   }
+    \end{figure*}
+
+
 \end{appendix}
 
 \printbibliography
