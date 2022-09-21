@@ -171,6 +171,18 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
         \subsubsection{Bootstrap}
 
         \subsubsection{Cross-validation}
+        With the intent to compute more accurate metrics such as MSE and $R^2$ scores, we 
+        artificially increase the data sample by fitting the model on partitions subsamples (which we will call \textit{folds}). Using some folds
+        for fitting the model and others for computing metrics, we can get multiple values of the same metric by changing what folds are used for fitting 
+        and metric computiations. We will now outline the approch for \textit{k-fold Cross-validation}. 
+        \newline\newline
+        Consider a data sample $D = (\vec{y}, X)$. 
+        % Metric is a bad word. Also tried to avoid "dataset" since "set" is kinda misleading. 
+        
+        Due to the possibility of some specific ordering of point in the data set,
+        we firstly shuffle around the rows of $\vec{y}$ and $X$. Thereafter, partition the data into $k$ equal sized \textit{folds} $D_i$, $i = 1, ... , k$. For each fold $D_i$, 
+        a model is fitted using every fold except $D_i$, which we write as $D_{-i}$     
+
 
 \section{Results}
 
