@@ -32,6 +32,8 @@
 
 % Commands
 
+\newcommand{\comment}[1]{\textcolor{red}{#1}\\}
+
 \newcommand{\integral}[1]{\ensuremath{\int\!\mathrm{d}#1\,}}
 \renewcommand{\d}[2][x]{\ensuremath{\frac{\mathrm{d}#2}{\mathrm{d}#1}}}
 
@@ -170,7 +172,7 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
     And $\epsilon$ is some stochastic noise $\epsilon \sim N(0,\sigma^2)$. By visual inspection, we can fine tune $\sigma$ to create data that looks like noisy digital terrain data.
     
     \subsection{Linear regression}
-    % not sure about how we should divide these subsection, but I wanted to write a bit about data scaling
+    \comment{not sure about how we should divide these subsections, but I wanted to write a bit about data scaling}
     Before fitting our models to the sampled data, we will scale the data using the $Z$-score normalisation. This scales the inputs $x_i$ and the targets $\vec{y}$ such that they have a mean value of $0$ with a standard deviation $1$. In effect, we rescale
     \begin{subequations}
         \begin{align}
@@ -200,8 +202,8 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
 
 \section{Discussion}
     \subsection{Data scaling}
-        % This should probably be a subsubsection within something else. Just summing up the thoughts we have thrown around regarding the necessity and function of scaling.
-        % Please read and see if it makes sense at all!
+        \comment{This should probably be a subsubsection within something else. Just summing up the thoughts we have thrown around regarding the necessity and function of scaling.}
+        \comment{Please read and see if it makes sense at all!}
         The scaling of the inputs and measurments can roughly be divided into two operations, each with their own set consequences. Let us first consider shifting of the measurements $\vec{y}$ and the inputs $\vec{x}_a$ by their respective means. Effectively, this eliminates a degree of freedom from our model $\hat{f}(x)$ as we set it mean value to nought, and leave out any parameter that would govern this. However, if we shift $\vec{y}$ to have a mean of nought as well, this degree of freedom becomes redundant, and we end up effectively reducing the dimensionality of the model by one.
 
         Considering now the rescaling of $\vec{y}$ and $\vec{x}_a$, these affect the fitting of the model more subtely. Looking at it through the lense of dimensionality know that
