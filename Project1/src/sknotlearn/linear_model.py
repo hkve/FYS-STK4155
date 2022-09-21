@@ -115,9 +115,6 @@ class Model:
 		raise NotImplementedError("Model base does not implement useful stuff")
 
 
-	def fit_cost_min(self, x,y):
-		raise NotImplementedError("Model base does not implement useful stuff")
-
 class LinearRegression(Model):
 	"""
 	Implementation of OLS. Can preform coefficient estimation using both direct matrix inversion of X.T @ X 

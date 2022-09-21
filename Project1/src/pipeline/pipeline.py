@@ -12,12 +12,17 @@ class Data:
     '''
     Class for storing and handling (y, X) data
     '''
-    def __init__(self, y, X):
+    def __init__(self, y, X, unscale=None):
         self.y = np.array(y)
         self.X = np.array(X)
         self.n_features = X.shape[-1]
 
-        self.unscale = lambda self : self
+        if unscale is None:
+            self.unscale = lambda data : data
+        elif callable(unscale):
+            self.unscale = unscale
+        else:
+            raise TypeError("Specified unscaler is not callable.")
 
     def __len__(self):
         return self.n_features+1
@@ -116,14 +121,17 @@ class Data:
         sorted_idxs = np.argsort(self[axis])
         y_sorted = self.y[sorted_idxs]
         X_sorted = self.X[sorted_idxs,:]
-        return Data(y_sorted, X_sorted)
+        return Data(y_sorted, X_sorted, unscale=self.unscale)
 
     def shuffled(self):
         '''
         Returns shuffled Data.
         '''
         shuffled_idxs = np.arange(self.y.size); np.random.shuffle(shuffled_idxs)
-        return Data(self.y[shuffled_idxs], self.X[shuffled_idxs])
+        return Data(self.y[shuffled_idxs], self.X[shuffled_idxs], unscale=self.unscale)
+    
+    def unscaled(self):
+        return self.unscale(self)
 
     def train_test_split(self, ratio=2/3, random_seed=None):
         '''
@@ -136,8 +144,16 @@ class Data:
         shuffled_idxs = np.arange(size); np.random.shuffle(shuffled_idxs)
         training_idxs = shuffled_idxs[:split_idx]
         test_idxs = shuffled_idxs[split_idx:]
-        training_data = Data(self.y[training_idxs], self.X[training_idxs])
-        test_data = Data(self.y[test_idxs], self.X[test_idxs])
+        training_data = Data(
+            self.y[training_idxs],
+            self.X[training_idxs],
+            unscale = self.unscale
+        )
+        test_data = Data(
+            self.y[test_idxs],
+            self.X[test_idxs],
+            unscale = self.unscale
+        )
         return training_data, test_data
 
     def mean(self):
@@ -173,16 +189,17 @@ class Data:
         data_std = np.where(data_std != 0, data_std, 1) # sets unvaried data-columns to 0
         data_scaled = (data - data_mean) / data_std
 
-        scaled_data = Data(data_scaled[:,0], data_scaled[:,1:]) # packing result into new Data-instance
-        scaled_data.unscale = lambda data : data*data_std + data_mean # teching new Data how to unscale
-
+        scaled_data = Data( # packing result into new Data-instance
+            data_scaled[:,0],
+            data_scaled[:,1:],
+            unscale = lambda data : data*data_std + data_mean # teching new Data how to unscale
+        )
         return scaled_data
     
     scalers_ = {
         "None" : none_scaler_,
         "Standard" : standard_scaler_
     }
-
 
 
 class TrainingFacility: # working title
@@ -216,9 +233,10 @@ class TrainingFacility: # working title
         Returns predicted Data after training.
         '''
         if self.isFit:
-            X_test = self.test_data.unpacked()[1]
+            _, X_test = self.test_data.unpacked()
             y_predict = self.fit_model.predict(X_test)
-            return Data(y_predict, X_test)
+            result = Data(y_predict, X_test, unscale=self.test_data.unscale)
+            return result
         else:
             raise Exception("Cannot make prediction, model has not yet been fitted to data.")
 
@@ -245,7 +263,7 @@ if __name__ == '__main__':
     import matplotlib.pyplot as plt
 
     # generating data to stuff down the pipe
-    random_state = 69420
+    random_state = 321
     np.random.seed(random_state)
     x = np.random.uniform(0, 1, size=100)
     X = np.array([np.ones_like(x), x, x*x]).T
@@ -262,19 +280,20 @@ if __name__ == '__main__':
         random_seed = random_state
     )
     # predicting the test data
-    predicted_data = tester.predict_test_data()
-    # this return an instance of Data-class
+    predicted_data = tester.predict_test_data().unscaled()
+    # this returns an instance of Data-class
 
     # Generating useful statistics
     for statistic, value in tester.diagnose_statistics().items():
         print(statistic + f" score is {value:.5f}")
 
     # showing off some functionality of Data-class
-    sorted_data = predicted_data.sorted(axis=2) # sorts after x-values
+    sorted_data = predicted_data.sorted(axis=2) # sorts by x-values
     ysorted, Xsorted = sorted_data.unpacked()
 
     # simple (simple...) plot
-    ytest, Xtest = tester.test_data.unpacked()
+    ytest, Xtest = tester.test_data.unscaled().unpacked()
     plt.scatter(Xtest[:,1], ytest)
     plt.plot(Xsorted[:,1], ysorted)
+
     plt.show()
