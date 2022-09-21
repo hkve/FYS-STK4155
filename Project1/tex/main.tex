@@ -171,17 +171,15 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
         \subsubsection{Bootstrap}
 
         \subsubsection{Cross-validation}
-        With the intent to compute more accurate metrics such as MSE and $R^2$ scores, we 
-        artificially increase the data sample by fitting the model on partitions subsamples (which we will call \textit{folds}). Using some folds
-        for fitting the model and others for computing metrics, we can get multiple values of the same metric by changing what folds are used for fitting 
-        and metric computiations. We will now outline the approch for \textit{k-fold Cross-validation}. 
+        With the intent to compute more accurate measures for goodness of fit (such as MSE and $R^2$), we 
+        artificially increase the data sample by fitting the model on partitioned subsamples (which we will call \textit{folds}). Using some folds
+        for fitting the model and others for computing metrics, we can get multiple values for the same measure by changing which folds are used for fitting 
+        and which are used for calculating measures. We will now outline the approch for \textit{k-fold Cross-validation}. 
         \newline\newline
-        Consider a data sample $D = (\vec{y}, X)$. 
-        % Metric is a bad word. Also tried to avoid "dataset" since "set" is kinda misleading. 
-        
-        Due to the possibility of some specific ordering of point in the data set,
-        we firstly shuffle around the rows of $\vec{y}$ and $X$. Thereafter, partition the data into $k$ equal sized \textit{folds} $D_i$, $i = 1, ... , k$. For each fold $D_i$, 
-        a model is fitted using every fold except $D_i$, which we write as $D_{-i}$     
+        Consider a data sample $D = (\vec{y}, X)$, consisting of $n$ data points. Initially we partion $D$ into $k$ folds $D_i$, $i = 1, ... , k$ of equal size.   
+        For each fold $D_i$, a model is fitted using every fold \textit{except} $D_i$, which we write as $D_{-i}$. With this model, we calcualte the different measures 
+        using $D_i$, which was not used to fit the model. When this is done for all $k$ folds, we take the mean of the measures to get the 
+        final goodness of fit.
 
 
 \section{Results}
