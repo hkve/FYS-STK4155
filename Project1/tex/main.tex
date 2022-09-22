@@ -32,6 +32,8 @@
 
 % Commands
 
+\newcommand{\comment}[1]{\textcolor{red}{#1}\\}
+
 \newcommand{\integral}[1]{\ensuremath{\int\!\mathrm{d}#1\,}}
 \renewcommand{\d}[2][x]{\ensuremath{\frac{\mathrm{d}#2}{\mathrm{d}#1}}}
 
@@ -42,7 +44,8 @@
 \newcommand{\vclosed}[1]{\left|#1\right|}
 \renewcommand{\norm}[2][]{\ensuremath{\|#2\|_{#1}}}
 \renewcommand{\exp}[1]{e^{#1}}
-\newcommand{\exptext}[1]{\text{exp}\pclosed{#1}}
+\newcommand{\exptext}[1]{\operatorname{exp}\pclosed{#1}}
+\newcommand{\dimof}[1]{\bigl[#1\bigr]}
 
 \renewcommand{\expval}{\operatorname{\mathbb{E}}}
 \renewcommand{\var}{\operatorname{Var}}
@@ -86,7 +89,7 @@
     \subsection{Statistical introduction to linear regression}
         A way to motivate the process of statistical learning is that we want to develop a process by which we use observed data to inform our belief in a future outcome. Such a process can be developed from the ideas of Bayes' theorem, which we can use to inform us what confidence we should have in the parameters of a given model, given data points we have observed.
         
-        Let $\vec{y}$ denote a vector of a series of measured values $y_i$ at points $X$, where $X$ is a matrix where the rows $x_i$ correspond to the input values for the measurement $y_i$. Further let $\vec{\theta}$ denote the parameters of our given model -- then Bayes' theorem tells us that our \textit{posteriori} confidence in the parameters $\vec{\theta}$ given the available data follows
+        Let $\vec{y}$ denote a vector of a series of measured values $y_i$, $i\in 1, 2,..., n$ at points $X$, where $X$ is a matrix where the rows $x_i$ correspond to the input values for the measurement $y_i$. For completeness we refer to the columns of $X$ as $\vec{x}_a$, $a=1, 2,..., p$.\footnote{Throughout this project, $a, b$ will always index the $p$ features for a model, and $i, j$ the $n$ data points.} Further let $\vec{\theta}$ denote the parameters of our given model -- then Bayes' theorem tells us that our \textit{posteriori} confidence in the parameters $\vec{\theta}$ given the available data follows
         \begin{align}
             P(\vec{\theta}|X, \vec{y}) = \frac{P(\vec{y}|X,\vec{\vec{\theta}})P(\vec{\theta})}{P(X,\vec{y})}.
         \end{align}
@@ -95,14 +98,14 @@
         \subsubsection{Ordinary least squares}
             Now we can define the ordinary least squares method by assuming that the data $y$ that we want to make a fit to has a linear noise term that is normally distributed with mean nought. That is, the data is generated as $y(x) = f(x) + \epsilon$, where $f(x)$ is some analytic, non-stochastic function of the data input $x$, and $\epsilon \sim N(0, \sigma^2)$. Further, if we make a model fitting $y(x)$ by a $\tilde{y}(x)$, we should expect the error at every data point $(y_i, x_i)$ to be be normally distributed with the same variance, i.e., independently and identically distributed (i.i.d.). This can be summarised
             \begin{align}
-                P(\vec{y}|X, \vec{\theta}) = \prod_{i=0}^{n-1} \frac{1}{\sqrt{2\pi\sigma^2}} \exp{-\frac{{(y_i-\tilde{y}_i)}^2}{2\sigma^2}}.
+                P(\vec{y}|X, \vec{\theta}) = \prod_{i=1}^{n} \frac{1}{\sqrt{2\pi\sigma^2}} \exp{-\frac{{(y_i-\tilde{y}_i)}^2}{2\sigma^2}}.
             \end{align}
             Furthermore, we assume the parameters $\vec{\theta}$ to be distributed evenly, and as such, $P(\vec{\theta})$ just contributed to an overall normalisation. This means that maximising $P(\vec{y}|X, \vec{\beta})$ amounts to the same as maximising $P(\vec{\theta}|X, \vec{y})$, and can be done analytically.
 
             Knowing that the Gaussian distribution has a single extremum that is a maximum, we can find the values for $\vec{\theta}$ maximising the probability as
             \begin{align} \nonumber
                 \d[\theta_k]{P(\vec{y}|X,\vec{\theta})} &= 0 \\
-                \Rightarrow \prod_{i=0}^{n-1} \frac{1}{\sqrt{2\pi\sigma^2}} \frac{1}{\sigma^2} X_{ik}(y_i-X_{ij}\theta_j) \exp{-\frac{{(y_i - X_{ij}\theta_j)}^2}{2\sigma^2}} &= 0,
+                \Rightarrow \prod_{i=1}^{n} \frac{1}{\sqrt{2\pi\sigma^2}} \frac{1}{\sigma^2} X_{ib}(y_i-X_{ia}\theta_a) \exp{-\frac{{(y_i - X_{ia}\theta_a)}^2}{2\sigma^2}} &= 0,
             \end{align}
             which as we can see, is maximisable point by point. This means that the optimal parameters $\msub{\vec{\hat{\theta}}}{OLS}$ that maximise $P(\vec{y}|X, \vec{\theta})$ can be found as
             \begin{align}
@@ -115,11 +118,11 @@
         \subsection{Ridge and LASSO regression}
             So far, we have assumed that the parameters $\vec{\theta}$ are uniformly distributed, and as such have no \textit{bias} towards any particular value. In practice, this means that the OLS model will contort to fit itself to all values in the data. As such, a motivation for adding a bias could be for the sake of stability in the fit. This is done in ridge regression, where one assumes that the parameters are normally distributed, such that parameter values far from the mean are thought less likely to occurr. This in practice means that the model is less willing to contort to outliers in the dataset, trading it for a bias towards certain parameter values. Assuming the probability distrbution for $\vec{\theta}$
             \begin{align}
-                P(\vec{\theta}) = \prod_{i=0}^{p-1} \frac{1}{\sqrt{2\pi\tau^2}} \exp{-\frac{\theta_i^2}{2\tau^2}},
+                P(\vec{\theta}) = \prod_{a=1}^{p} \frac{1}{\sqrt{2\pi\tau^2}} \exp{-\frac{\theta_a^2}{2\tau^2}},
             \end{align}
-            with a derivative with respect to $\vec{\theta}$
+            with a derivative with respect to $\theta_b$
             \begin{align}
-                \d[\theta_k]{P(\vec{\theta})} = -\prod_{i=0}^{p-1} \frac{1}{\sqrt{2\pi\tau^2}} \frac{1}{\tau^2} \theta_k \exp{-\frac{\theta_i^2}{2\tau^2}} = -\frac{1}{\tau^2} \theta_k P(\vec{\theta}),
+                \d[\theta_b]{P(\vec{\theta})} = -\prod_{a=1}^{p} \frac{1}{\sqrt{2\pi\tau^2}} \frac{1}{\tau^2} \theta_b \exp{-\frac{\theta_a^2}{2\tau^2}} = -\frac{1}{\tau^2} \theta_b P(\vec{\theta}),
             \end{align}
             the condition for maximising $P(\vec{\theta}|X, \vec{y})$ becomes
             \begin{align} \nonumber
@@ -136,7 +139,7 @@
 
             LASSO regression builds on the same ideas as ridge regression, by assumes rather a Laplace distribution $L(0, \tau)$ for the parameters $\vec{\theta}$. This gives
             \begin{align}
-                P(\vec{\theta}) = \prod_{i=0}^{p-1} \frac{1}{2\tau} \exp{-\frac{|\theta_i|}{\tau}},
+                P(\vec{\theta}) = \prod_{a=1}^{p} \frac{1}{2\tau} \exp{-\frac{|\theta_a|}{\tau}},
             \end{align}
             which as we can see is not differentiable at $\theta_i = 0$. This means that the optimisation of this the probability $P(\vec{\theta}|X, \vec{y})$ is not necessarily possible analytically without putting bounds on the data $X, \vec{y}$, and even numerical algorithms like gradient descent will encounter run into trouble. Furthermore, it is not optimisable point by point, unless bounds like $X^TX$ being diagonal are enforced, which makes LASSO generally less used. Nevertheless, we can coax a cost function out of the probability that is minimalisable. Letting the cost function be written $\msub{C}{lasso}(\vec{\theta}) = -A\log\pclosed{P(\vec{\theta|X,\vec{y}})} + B$  we can choose the constants $A, B$ such that
             \begin{align}
@@ -144,7 +147,7 @@
                     \msub{C}{lasso}(\vec{\vec{\theta}}) = \norm[2]{ \vec{y} - X\vec{\theta} }^2 + \lambda \norm[1]{\vec{\theta}},
                 }
             \end{align}
-            where $\lambda = \frac{2\sigma^2}{\tau}$ and $\norm[p]{\vec{v}} = \pclosed{\sum_i |v_i|^p}^{\sfrac{1}{p}}$ denotes the $L_p$ norm of the vector $\vec{v}$.
+            where $\lambda = \frac{2\sigma^2}{\tau}$ and $\norm[p]{\vec{v}} = \pclosed{\sum_k |v_k|^p}^{\sfrac{1}{p}}$ denotes the $L_p$ norm of the vector $\vec{v} \in \mathbb{R}^k$.
 
 \section{Method}
 Something general about initially fitting Franke data using OLS, ridge and lasso. Then moving on to real terrain data something something.
@@ -166,13 +169,24 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
         f_4(x,y) &= -\frac{3}{4}\exptext{ -(9x-4)^2 - (9y-7)^2} \nonumber
     \end{align}
 
-    And $\epsilon$ is some stochastic noise $\epsilon \sim N(0,\sigma^2)$. By visual inspection, we can fine tune $\sigma$ to create data that looks like noisy digital terrain data.     
+    And $\epsilon$ is some stochastic noise $\epsilon \sim N(0,\sigma^2)$. By visual inspection, we can fine tune $\sigma$ to create data that looks like noisy digital terrain data.
+    
+    \subsection{Linear regression}
+    \comment{not sure about how we should divide these subsections, but I wanted to write a bit about data scaling}
+    Before fitting our models to the sampled data, we will scale the data using the $Z$-score normalisation. This scales the inputs $x_i$ and the targets $\vec{y}$ such that they have a mean value of $0$ with a standard deviation $1$. In effect, we rescale
+    \begin{subequations}
+        \begin{align}
+            \vec{y}^\text{scaled} &= \frac{\vec{y}-\bar{y}}{\bar{\sigma}_{\vec{y}}}, \\
+            \vec{x}_a^\text{scaled} &= \frac{\vec{x}_a - \bar{x}_a}{\bar{\sigma}_{\vec{x}_a}},
+        \end{align}
+    \end{subequations}
+    where $\bar{z} = \frac{1}{n} \sum_{i=0}^n z_n$ detotes the sample mean of $\vec{z}$ and $\sigma_{\vec{z}}^2 = \frac{1}{n} \sum_{i=0}^n {(z_i-\bar{z})}^2$ denotes the sample std of $\vec{z}$.
 
-    \subsection{Re-sampling techniques}
+    \subsection{Resampling techniques}
 
-        \subsubsection{Bootstrap}
+        \subsubsection*{Bootstrap}
 
-        \subsubsection{Cross-validation}
+        \subsubsection*{Cross-validation}
         With the intent to compute more accurate measures for goodness of fit (such as MSE and $R^2$), we 
         artificially increase the data sample by fitting the model on partitioned subsamples (which we will call \textit{folds}). Using some folds
         for fitting the model and others for computing metrics, we can get multiple values for the same measure by changing which folds are used for fitting 
@@ -185,6 +199,18 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
 
 
 \section{Results}
+
+\section{Discussion}
+    \subsection{Data scaling}
+        \comment{This should probably be a subsubsection within something else. Just summing up the thoughts we have thrown around regarding the necessity and function of scaling.}
+        \comment{Please read and see if it makes sense at all!}
+        The scaling of the inputs and measurments can roughly be divided into two operations, each with their own set consequences. Let us first consider shifting of the measurements $\vec{y}$ and the inputs $\vec{x}_a$ by their respective means. Effectively, this eliminates a degree of freedom from our model $\hat{f}(x)$ as we set it mean value to nought, and leave out any parameter that would govern this. However, if we shift $\vec{y}$ to have a mean of nought as well, this degree of freedom becomes redundant, and we end up effectively reducing the dimensionality of the model by one.
+
+        Considering now the rescaling of $\vec{y}$ and $\vec{x}_a$, these affect the fitting of the model more subtely. Looking at it through the lense of dimensionality know that
+        \begin{align}
+            \dimof{\theta_a} = \dimof{y} / \dimof{x_a}.
+        \end{align}
+        From this we can infer that the order of magnitude of a parameter $\theta_a$ is governed by the dimension its corresponding feature $\dimof{x_a}$. This matters in the regularised models where a cost is associated with the norm of the parameters $\norm[p]{\vec{theta}}$, which will be dominated by parameters whose dimension is large. In practice, this means that the fitting will focus more on reducing the magnitude of the parameters whose associated dimension is large, letting the others fluctuate more freely. By making the $x_a$'s dimensionless, the parameters are put on a `level playing field', so to speak. The dimension of $y$ serves to raise or lower the order of magnitude of the all the paramers, and can be adjusted as to avoid numerical truncation errors by avoiding larger floats.
 
 
 \section{Concluding remarks}
