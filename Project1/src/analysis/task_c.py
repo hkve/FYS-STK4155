@@ -1,3 +1,6 @@
+from code import interact
+from statistics import variance
+from FYS-STK4155.FYS-STK4155.Project1.sandkasse.prov import Bootstrap
 import numpy as np
 from time import time
 from scipy.stats import norm
@@ -5,6 +8,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.preprocessing import PolynomialFeatures, StandardScaler
 from sklearn.model_selection import train_test_split
+from sklearn.utils import resample
+from sklearn.pipeline import make_pipeline
 
 # Custom stuff
 import context
@@ -26,9 +31,12 @@ def bootstrap(y_train, x_train, y_test, x_test, rounds, method='SVD'):
         method_ (str, optional): _description_. Defaults to 'SVD'.
     """
     
+    n = len(x_train)
+    y_test_pred_values = np.empty((len(y_test),rounds))
+    y_test_values = np.empty((len(y_test),rounds))
     mse_train_values = np.zeros(rounds)
     mse_test_values = np.zeros(rounds)
-    n = len(x_train)
+    
     for i in range(rounds): 
         indices = np.random.randint(0,n,n)
         x_train_boot = x_train[indices]
@@ -40,8 +48,11 @@ def bootstrap(y_train, x_train, y_test, x_test, rounds, method='SVD'):
 
         mse_train_values[i] = reg.mse(y_train_pred, y_train_boot)
         mse_test_values[i] = reg.mse(y_test_pred, y_test)
+
+        y_test_pred_values[:,i] = y_test_pred
+        y_test_values[:,i] = y_test
     
-    return mse_train_values, mse_test_values
+    return mse_train_values, mse_test_values, y_test_pred_values, y_test_values
 
 
 def mse_from_bootstrap(n=600, uniform=True, random_state=321, degrees=np.arange(1, 12+1), rounds=600, method='SVD'):
@@ -51,14 +62,25 @@ def mse_from_bootstrap(n=600, uniform=True, random_state=321, degrees=np.arange(
 
     mse_train_list = []
     mse_test_list = []
+    # for deg in degrees: 
+    #     poly = PolynomialFeatures(degree=deg)
+    #     X_poly = poly.fit_transform(X)
+    #     X_train, X_test, y_train, y_test = train_test_split(X_poly, y, random_state=random_state)
+
+    #     mse_train, mse_test, _, _ = bootstrap(y_train, X_train, y_test, X_test, rounds=rounds, method=method)
+    #     mse_train_list.append(mse_train)
+    #     mse_test_list.append(mse_test)
+    Bootstrap_list = []
     for deg in degrees: 
         poly = PolynomialFeatures(degree=deg)
         X_poly = poly.fit_transform(X)
         X_train, X_test, y_train, y_test = train_test_split(X_poly, y, random_state=random_state)
+        reg = LinearRegression()
 
-        mse_train, mse_test = bootstrap(y_train, X_train, y_test, X_test, rounds=rounds, method=method)
-        mse_train_list.append(mse_train)
-        mse_test_list.append(mse_test)
+        BS = Bootstrap(X_train, X_test, y_train, y_test, reg, 123)
+        BS(100)
+        Bootstrap_list.append(BS)
+
     
     return mse_train_list, mse_test_list
 
@@ -76,17 +98,62 @@ def plot_hist_of_bootstrap(mse_train, mse_test, degree, rounds=600):
 
 def hastie_2_11_ex_c(mse_train_list, mse_test_list, degrees):
     #Could have saved degrees as a global variable 
-    plt.plot(degrees, np.mean(mse_train_list, axis=1))
-    plt.plot(degrees, np.mean(mse_test_list, axis=1))
+    plt.plot(degrees, np.mean(mse_train_list, axis=1), label='train')
+    plt.plot(degrees, np.mean(mse_test_list, axis=1), label='test')
     plt.show()
 
 
+def bias_var(n=600, uniform=True, random_state=123, degrees=np.arange(1, 12+1)):
+    """NB: This is not correct!!!
+    """
+    X, y = make_FrankeFunction(n=n, uniform=uniform, random_state=random_state)
+    scaler = StandardScaler()
+    X = scaler.fit_transform(X)
+
+    poly_degrees = np.zeros(degrees.shape[0])
+    error = np.zeros(degrees.shape[0])
+    error2 = np.zeros(degrees.shape[0])
+    bias = np.zeros(degrees.shape[0])
+    variance = np.zeros(degrees.shape[0])
+
+    for i, deg in enumerate(degrees): 
+        #Make the model + data
+        poly = PolynomialFeatures(degree=deg)
+        X_poly = poly.fit_transform(X)
+        X_train, X_test, y_train, y_test = train_test_split(X_poly, y, random_state=random_state)
+
+        #Fit the model through bootstrap
+        mse_train, mse_test, y_test_pred_val, y_test_val = bootstrap(y_train, X_train, y_test, X_test, 60)
+
+        #Calculate the relevant values of the bias_var_trade_off:
+        poly_degrees[i] = deg
+        error[i] = np.mean(mse_train)
+        error2[i] = np.mean(mse_test)
+        bias[i] = np.mean((y_test_val - np.mean(y_test_pred_val))**2)
+        variance[i] = np.mean(np.var(y_test_pred_val))
+    
+    plt.plot(poly_degrees, error, label='Error')
+    plt.plot(poly_degrees, error2,'--', label='Error2')
+    plt.plot(poly_degrees, bias, label='Bias')
+    plt.plot(poly_degrees, variance, label='Variance')
+    plt.legend()
+    plt.show()
+        
+
+
 if __name__ == "__main__":
-    mse_train_list, mse_test_list = mse_from_bootstrap()
-    hastie_2_11_ex_c(mse_train_list, mse_test_list, degrees=np.arange(1, 12+1))
+    # mse_train_list, mse_test_list = mse_from_bootstrap()
+    # hastie_2_11_ex_c(mse_train_list, mse_test_list, degrees=np.arange(1, 12+1))
 
     # i = 0
     # plot_hist_of_bootstrap(mse_train_list[i], mse_test_list[i], degree=i+1) 
+
+
+    # ### Bias_var:
+    bias_var()
+
+
+
     
 
 
