@@ -1,6 +1,5 @@
 from code import interact
 from statistics import variance
-from FYS-STK4155.FYS-STK4155.Project1.sandkasse.prov import Bootstrap
 import numpy as np
 from time import time
 from scipy.stats import norm
@@ -15,8 +14,72 @@ from sklearn.pipeline import make_pipeline
 import context
 from sknotlearn.linear_model import LinearRegression
 from sknotlearn.datasets import make_FrankeFunction
+from sknotlearn.resampling import Bootstrap
+
+# def mse_from_bootstrap(Bootstrap_list):
+#     """Generate the mse values from the bootstrapped 
+
+#     Args:
+#         Bootstraplist (_type_): _description_
+
+#     Returns:
+#         _type_: _description_
+#     """
+#     n = len(Bootstrap_list)
+
+#     mse_test_values = np.zeros(n)
+#     mse_train_values = np.zeros(n)
+
+#     for i in range(n):
+#         BS = Bootstrap_list[i]
+
+#         mse_test_values[i] = np.mean((BS.y_test_values - BS.y_test_pred_values)**2)
+#         mse_train_values[i] = np.mean((BS.y_train_boot_values - BS.y_train_pred_values)**2)
+
+#     return mse_test_values, mse_train_values
 
 
+X, y = make_FrankeFunction(n=600, uniform=True, random_state=123)
+scaler = StandardScaler()
+X = scaler.fit_transform(X)
+
+degrees = np.arange(1, 12+1)
+Bootstrap_list = []
+for deg in degrees: 
+    poly = PolynomialFeatures(degree=deg)
+    X_poly = poly.fit_transform(X)
+    X_train, X_test, y_train, y_test = train_test_split(X_poly, y, random_state=123)
+    reg = LinearRegression()
+
+    BS = Bootstrap(X_train, X_test, y_train, y_test, reg, 123)
+    BS(60)
+    BS.mse()
+    Bootstrap_list.append(BS)
+
+
+plt.hist(Bootstrap_list[4].mse_train, bins=20)
+plt.hist(Bootstrap_list[4].mse_test, bins=20, alpha=.6)
+plt.show()
+# print((Bootstrap_list[0].mse_test).shape)
+# print(Bootstrap_list[0].y_test_pred_values.shape, len(Bootstrap_list))
+# print(len(mse_from_bootstrap(Bootstrap_list)[0]))
+# plt.hist(mse_from_bootstrap(Bootstrap_list)[0])
+# plt.hist(mse_from_bootstrap(Bootstrap_list)[1])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+exit()
 def bootstrap(y_train, x_train, y_test, x_test, rounds, method='SVD'):
     """Will take in x_train which is chosen multiple times 
 
