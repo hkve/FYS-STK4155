@@ -1,7 +1,91 @@
 import numpy as np
 
-# class Bootstrap: 
-#     def __init__(self, reg,):
+class Bootstrap: 
+    """
+    A class which takes in the relevant data and type of regression as well as the number of rounds to 
+    preform the bootstrap. Then preforms a bootstrap said rounds and 'returns' the prediction from train 
+    and test data as well as the actual test data.
+    """
+    def __init__(self, x_train, x_test, y_train, y_test, reg, random_state=321, rounds=600):
+        """Initiates a bootstrap
+
+        Args:
+            x_train (ndarr´ay): Array that corresponds to the model in question. Trainingdata
+            x_test (ndarray): Array that corresponds to the model in question.
+            y_train (ndarray): Array that corresponds to the model in question.
+            y_test (ndarray): Array that corresponds to the model in question.
+            reg (class instance (?)): Model, preferably imported from sknotlearn.  
+            random_state (int, optional): Seed to set random state. Defaults to 321.
+            rounds (int, optional): Rounds of bootstrap. Defaults to 600. This can also be set in call.
+        """
+
+        # Set seed
+        np.random.seed(random_state)
+
+        self.x_train, self.y_train, self.x_test, self.y_test, self.reg = x_train, y_train, x_test, y_test, reg
+        self.rounds = rounds
+        self.random_state = random_state
+    
+    def __call__(self, no_rounds=None):
+        """Preforms the actual bootstrap
+
+        Args:
+            no_rounds (int, optional): If rounds should be different from the initial value. 
+                                        Can remove this. Defaults to None.
+        """
+
+        rounds = no_rounds or self.rounds
+        x_train, y_train, x_test, y_test, reg = self.x_train, self.y_train, self.x_test, self.y_test, self.reg 
+
+        y_train_boot_values = np.empty((len(y_train),rounds))
+        y_train_pred_values = np.empty((len(y_train),rounds))
+        y_test_pred_values = np.empty((len(y_test),rounds))
+        y_test_values = np.empty((len(y_test),rounds))
+
+        #mse_train = np.zeros(rounds)
+        #mse_test = np.zeros(rounds)
+        
+        n = len(x_train)
+        for i in range(rounds): 
+            indices = np.random.randint(0,n,n)
+            x_train_boot = x_train[indices]
+            y_train_boot = y_train[indices]
+
+            reg.fit(x_train_boot, y_train_boot)
+            y_train_pred = reg.predict(x_train_boot)
+            y_test_pred = reg.predict(x_test)
+
+            y_train_boot_values[:,i] = y_train_boot
+            y_train_pred_values[:,i] = y_train_pred
+            y_test_pred_values[:,i] = y_test_pred
+            y_test_values[:,i] = y_test
+
+            #mse_train[i] = reg.mse(y_train_boot, y_train_pred)
+            #mse_test[i] = reg.mse(y_test, y_test_pred)
+        
+        #Make global variables:
+        self.y_train_boot_values, self.y_train_pred_values = y_train_boot_values, y_train_pred_values
+        self.y_test_pred_values, self.y_test_values = y_test_pred_values, y_test_values
+        #self.mse_train, self.mse_test = mse_train, mse_test
+    
+
+    def mse(self):
+        """Calculates the mse-values of the various bootstrapped datasets (for a given model of a certain 
+        degree). 
+        Returns both for test and train.
+
+        'Returns':
+            self.mse_train (ndarray): An array with a mse-value for each bootstrap. Shape: (rounds,)
+            self.mse_test (ndarray): An array with a mse-value for each bootstrap. Shape: (rounds,)
+        """
+        y_train_boot_values, y_train_pred_values = self.y_train_boot_values, self.y_train_pred_values
+        y_test_pred_values, y_test_values = self.y_test_pred_values, self.y_test_values 
+
+        mse_train = np.mean((y_train_boot_values - y_train_pred_values)**2, axis=0, keepdims=True)
+        mse_test = np.mean((y_test_values - y_test_pred_values)**2, axis=0, keepdims=True)
+
+        #Make global variables 
+        self.mse_train, self.mse_test = mse_train[0], mse_test[0]
 
 
 class cross_validate:
