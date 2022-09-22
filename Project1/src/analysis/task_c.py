@@ -70,6 +70,8 @@ def mse_from_bootstrap(n=600, uniform=True, random_state=321, degrees=np.arange(
     #     mse_train, mse_test, _, _ = bootstrap(y_train, X_train, y_test, X_test, rounds=rounds, method=method)
     #     mse_train_list.append(mse_train)
     #     mse_test_list.append(mse_test)
+
+    #Nanna:
     Bootstrap_list = []
     for deg in degrees: 
         poly = PolynomialFeatures(degree=deg)
@@ -83,6 +85,10 @@ def mse_from_bootstrap(n=600, uniform=True, random_state=321, degrees=np.arange(
 
     
     return mse_train_list, mse_test_list
+
+#Nanna:
+def plot(bootsraps):
+    MSE = [BS.trainMSE for BS in bootsraps]
 
 
 def plot_hist_of_bootstrap(mse_train, mse_test, degree, rounds=600):
