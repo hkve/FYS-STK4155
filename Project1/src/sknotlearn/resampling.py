@@ -107,7 +107,7 @@ class Bootstrap:
         self.mse_train, self.mse_test = mse_train[0], mse_test[0]
 
 
-class cross_validate:
+class KFold_cross_validate:
     """
     Class to preform k-fold cross validation given a regression instance derived from
     sknotlearn.linear_model.model. Taking X as your designe matrix and y as your target values, preform
@@ -297,5 +297,5 @@ if __name__ == "__main__":
     from linear_model import LinearRegression
 
     reg = LinearRegression()
-    cv = cross_validate(reg, y, X, k=4, scoring=("mse", "r2_score"))
+    cv = KFold_cross_validate(reg, y, X, k=4, scoring=("mse", "r2_score"))
     print(cv["train_mse"].mean(), cv["train_mse"])
