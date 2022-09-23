@@ -6,7 +6,7 @@ from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from mpl_toolkits.mplot3d import Axes3D
 import seaborn as sns
 
-def make_FrankeFunction(n=1000, uniform=False, noise_std=0, random_state=42):
+def make_FrankeFunction(n=1000, uniform=True, noise_std=0, random_state=42):
 	x, y = None, None
 
 	np.random.seed(random_state)
