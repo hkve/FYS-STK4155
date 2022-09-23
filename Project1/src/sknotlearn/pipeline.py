@@ -8,6 +8,7 @@ from os import path
 sys.path.append( path.dirname( path.dirname( path.abspath(__file__) ) ) )
 
 from linear_model import Model, LinearRegression
+import resampling
 
 class Data:
     '''
@@ -203,59 +204,59 @@ class Data:
     }
 
 
-class TrainingFacility: # working title
-    def __init__(self, model, data):
-        '''
-        model : a Model class to undergo training etc.
-        data  : an instance of the Data class
-        '''
-        self.model = model
-        self.data = data
+# class TrainingFacility: # working title
+#     def __init__(self, model, data):
+#         '''
+#         model : a Model class to undergo training etc.
+#         data  : an instance of the Data class
+#         '''
+#         self.model = model
+#         self.data = data
 
-        self.isFit = False
-        self.fitmodel = None
-        self.scaled_data = None
+#         self.isFit = False
+#         self.fitmodel = None
+#         self.scaled_data = None
 
-    def fit_training_data(self, scaler="None", ratio=2/3, random_seed=None):
-        '''
-        Fits the model to training data.
-        NB. Not sure just how I want to implement this bit.
-        '''
-        scaled_data = self.data.scale(scheme=scaler)
-        self.training_data, self.test_data = scaled_data.train_test_split(ratio=ratio, random_seed=random_seed)
-        y_training, X_training = self.training_data.unpacked()
-        self.fit_model = self.model(method="pINV").fit(X_training, y_training)
-        self.isFit = True
-        return self.fit_model
+#     def fit_training_data(self, scaler="None", ratio=2/3, random_seed=None):
+#         '''
+#         Fits the model to training data.
+#         NB. Not sure just how I want to implement this bit.
+#         '''
+#         scaled_data = self.data.scale(scheme=scaler)
+#         self.training_data, self.test_data = scaled_data.train_test_split(ratio=ratio, random_seed=random_seed)
+#         y_training, X_training = self.training_data.unpacked()
+#         self.fit_model = self.model(method="pINV").fit(X_training, y_training)
+#         self.isFit = True
+#         return self.fit_model
 
-    def predict_test_data(self): # This is more proof of concept than useful method.
-        '''
-        Returns predicted Data after training.
-        '''
-        if self.isFit:
-            _, X_test = self.test_data.unpacked()
-            y_predict = self.fit_model.predict(X_test)
-            result = Data(y_predict, X_test, unscale=self.test_data.unscale)
-            return result
-        else:
-            raise Exception("Cannot make prediction, model has not yet been fitted to data.")
+#     def predict_test_data(self): # This is more proof of concept than useful method.
+#         '''
+#         Returns predicted Data after training.
+#         '''
+#         if self.isFit:
+#             _, X_test = self.test_data.unpacked()
+#             y_predict = self.fit_model.predict(X_test)
+#             result = Data(y_predict, X_test, unscale=self.test_data.unscale)
+#             return result
+#         else:
+#             raise Exception("Cannot make prediction, model has not yet been fitted to data.")
 
-    def diagnose_statistics(self):
-        '''
-        Returns a dictionary with the MSE and R2 of the models predicted data on the training and test data.
-        '''
-        y_train, X_train = self.training_data.unpacked()
-        y_test, X_test = self.test_data.unpacked()
-        y_train_predicted = self.fit_model.predict(X_train)
-        y_test_predicted = self.fit_model.predict(X_test)
+#     def diagnose_statistics(self):
+#         '''
+#         Returns a dictionary with the MSE and R2 of the models predicted data on the training and test data.
+#         '''
+#         y_train, X_train = self.training_data.unpacked()
+#         y_test, X_test = self.test_data.unpacked()
+#         y_train_predicted = self.fit_model.predict(X_train)
+#         y_test_predicted = self.fit_model.predict(X_test)
 
-        statistics = {
-            "MSE_train" : self.fit_model.mse(y_train, y_train_predicted),
-            "R2_train" : self.fit_model.r2_score(y_train, y_train_predicted),
-            "MSE_test" : self.fit_model.mse(y_test, y_test_predicted),
-            "R2_test" : self.fit_model.r2_score(y_test, y_test_predicted)
-        }
-        return statistics
+#         statistics = {
+#             "MSE_train" : self.fit_model.mse(y_train, y_train_predicted),
+#             "R2_train" : self.fit_model.r2_score(y_train, y_train_predicted),
+#             "MSE_test" : self.fit_model.mse(y_test, y_test_predicted),
+#             "R2_test" : self.fit_model.r2_score(y_test, y_test_predicted)
+#         }
+#         return statistics
 
 
 class Pipeline:
