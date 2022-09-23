@@ -19,7 +19,6 @@ def test_cross_validation():
 
     k = 10
     kfold = KFold(n_splits=k)
-    scores_KFold = np.zeros(k)
 
     r1 = sknotlearn.linear_model.LinearRegression()
     r2 = sklearn.linear_model.LinearRegression()
