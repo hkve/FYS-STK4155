@@ -16,7 +16,44 @@ from sknotlearn.linear_model import LinearRegression
 from sknotlearn.datasets import make_FrankeFunction
 from sknotlearn.resampling import Bootstrap
 
+""" 
+With the bias and var calculated across the bootstrap
+"""
 
+def bias_from_bootstrap(y, y_pred):
+    """Should take in np.ndarrays with the shape: (bootstraps,y-values) NOT for various degrees
+
+    Args:
+        y (_type_): _description_
+        y_pred (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+    return np.mean((y - np.mean(y_pred, axis=1, keepdims=True))**2)
+
+
+
+if __name__ == "__main__":
+    X, y = make_FrankeFunction(n=600, uniform=True, random_state=4110)
+    scaler = StandardScaler()
+    X = scaler.fit_transform(X)
+
+    degrees = np.arange(1, 12+1)
+    Bootstrap_list = []
+    for deg in degrees: 
+        poly = PolynomialFeatures(degree=deg)
+        X_poly = poly.fit_transform(X)
+        X_train, X_test, y_train, y_test = train_test_split(X_poly, y, random_state=4110)
+        reg = LinearRegression()
+
+        BS = Bootstrap(reg, X_train, X_test, y_train, y_test, random_state = 4110, rounds=20, scoring=("mse"))
+        Bootstrap_list.append(BS)
+
+
+
+
+exit()
 def plot_hist_of_bootstrap(mse_train, mse_test, degree, rounds=600):
     find_bins = lambda arr, times=25000: int((np.max(arr)-np.min(arr))*times)
     plt.hist(mse_train, bins=find_bins(mse_train), label='mse for training data')
@@ -36,7 +73,7 @@ def hastie_2_11_ex_c(Bootstrap_list, degrees):
 
 def plot_bias_var(Bootstrap_list, degrees):
     MSE = [BS.scores_["test_mse"] for BS in Bootstrap_list]
-    bias =  [BS.scores_["test_bias"] for BS in Bootstrap_list]
+    bias =  [BS.scores_["test_bias2"] for BS in Bootstrap_list]
     var =  [BS.scores_["test_var"] for BS in Bootstrap_list]
 
     plt.plot(degrees, np.mean(MSE, axis=1), label="Error")
@@ -60,7 +97,7 @@ if __name__ == "__main__":
         X_train, X_test, y_train, y_test = train_test_split(X_poly, y, random_state=4110)
         reg = LinearRegression()
 
-        BS = Bootstrap(reg, X_train, X_test, y_train, y_test, random_state = 4110, rounds=200, scoring=("mse", "bias", "var"))
+        BS = Bootstrap(reg, X_train, X_test, y_train, y_test, random_state = 4110, rounds=20, scoring=("mse", "bias2", "var"))
         Bootstrap_list.append(BS)
 
     plot_hist_of_bootstrap(Bootstrap_list[4].scores_["train_mse"], Bootstrap_list[4].scores_["test_mse"], 4)
@@ -227,7 +264,7 @@ def bias_var(n=600, uniform=True, random_state=123, degrees=np.arange(1, 12+1)):
         poly_degrees[i] = deg
         error[i] = np.mean(mse_train)
         error2[i] = np.mean(mse_test)
-        bias[i] = np.mean((y_test_val - np.mean(y_test_pred_val))**2)
+        bias[i] = np.mean((y_test_val - np.mean(y_test_pred_val, axis=1, keepdims=True))**2)
         variance[i] = np.mean(np.var(y_test_pred_val))
     
     plt.plot(poly_degrees, error, label='Error')

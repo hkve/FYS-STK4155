@@ -79,13 +79,10 @@ class Bootstrap:
         rounds = no_rounds or self.rounds
         x_train, y_train, x_test, y_test, reg = self.x_train, self.y_train, self.x_test, self.y_test, self.reg 
 
-        # y_train_boot_values = np.empty((len(y_train),rounds))
-        # y_train_pred_values = np.empty((len(y_train),rounds))
-        # y_test_pred_values = np.empty((len(y_test),rounds))
-        # y_test_values = np.empty((len(y_test),rounds))
-
-        # mse_train = np.zeros(rounds)
-        # mse_test = np.zeros(rounds)
+        y_train_boot_values = np.empty((len(y_train),rounds))
+        y_train_pred_values = np.empty((len(y_train),rounds))
+        y_test_pred_values = np.empty((len(y_test),rounds))
+        y_test_values = np.empty((len(y_test),rounds))
         
         n = len(x_train)
         for i in range(rounds): 
@@ -97,26 +94,21 @@ class Bootstrap:
             y_train_pred = reg.predict(x_train_boot)
             y_test_pred = reg.predict(x_test)
 
-            # y_train_boot_values[:,i] = y_train_boot
-            # y_train_pred_values[:,i] = y_train_pred
-            # y_test_pred_values[:,i] = y_test_pred
-            # y_test_values[:,i] = y_test
+            y_train_boot_values[:,i] = y_train_boot
+            y_train_pred_values[:,i] = y_train_pred
+            y_test_pred_values[:,i] = y_test_pred
+            y_test_values[:,i] = y_test
 
-            # mse_train[i] = reg.mse(y_train_boot, y_train_pred)
-            # mse_test[i] = reg.mse(y_test, y_test_pred)
+            # # Compute the scores for train and test            
+            # for score in self.scoring_:
+            #     score_train = reg.metrics_[score](y_train_boot, y_train_pred)
+            #     score_test = reg.metrics_[score](y_test, y_test_pred)
 
-            # Compute the scores for train and test            
-            for score in self.scoring_:
-                score_train = reg.metrics_[score](y_train_boot, y_train_pred)
-                score_test = reg.metrics_[score](y_test, y_test_pred)
-
-                self.scores_[f"train_{score}"].append(score_train)
-                self.scores_[f"test_{score}"].append(score_test) 
+            #     self.scores_[f"train_{score}"].append(score_train)
+            #     self.scores_[f"test_{score}"].append(score_test) 
         
-        # self.y_train_boot_values, self.y_train_pred_values = y_train_boot_values, y_train_pred_values
-        # self.y_test_pred_values, self.y_test_values = y_test_pred_values, y_test_values
-        # self.mse_train, self.mse_test = mse_train, mse_test
-
+        self.y_train_boot_values, self.y_train_pred_values = y_train_boot_values, y_train_pred_values
+        self.y_test_pred_values, self.y_test_values = y_test_pred_values, y_test_values
 
 
 

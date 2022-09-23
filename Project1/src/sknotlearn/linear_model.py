@@ -29,7 +29,7 @@ class Model:
 		self.metrics_ = {
 			"mse": self.mse,
 			"r2_score": self.r2_score,
-			"bias": self.bias,
+			"bias2": self.bias2,
 			"var": self.var
 		}
 		
@@ -89,7 +89,7 @@ class Model:
 		y_bar = np.mean(y)
 		return 1 - np.sum((y-y_pred)**2)/np.sum((y-y_bar)**2)
 
-	def bias(self, y:np.ndarray, y_pred:np.ndarray) -> float:
+	def bias2(self, y:np.ndarray, y_pred:np.ndarray) -> float:
 		"""_summary_
 
 		Args:
@@ -99,7 +99,7 @@ class Model:
 		Returns:
 			float: _description_
 		"""
-		return np.mean((y - np.mean(y_pred))**2)**2
+		return (y - np.mean(y_pred))**2
 
 	def var(self, y:np.ndarray, y_pred:np.ndarray) -> float:
 		"""
