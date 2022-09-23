@@ -1,16 +1,35 @@
 import numpy as np
 
+class NoneResampler:
+    def __init__(self, training_data, reg, random_state=321):
+        np.random.seed(random_state=random_state)
+
+        self.training_data, self.reg = training_data, reg
+
+    def run(self, testing_data, scoring):
+        if type(scoring) not in [list, tuple]:
+            scoring = (scoring, )
+        
+        self.reg.fit(self.training_data)
+
+        self.scores_ = {}
+        for score in scoring:
+            assert score in reg.metrics_.keys(), f"The score {score} is not avalible in model {type(reg)}"
+            self.scores_[score] = self.reg.metrics_[score](testing_data)
+
+
+
 class Bootstrap: 
     """
     A class which takes in the relevant data and type of regression as well as the number of rounds to 
     preform the bootstrap. Then preforms a bootstrap said rounds and 'returns' the prediction from train 
     and test data as well as the actual test data.
     """
-    def __init__(self, x_train, x_test, y_train, y_test, reg, random_state=321, rounds=600):
+    def __init__(self, reg, x_train, x_test, y_train, y_test, scoring=("mse"), run=True, random_state=321, rounds=600) -> None:
         """Initiates a bootstrap
 
         Args:
-            x_train (ndarr´ay): Array that corresponds to the model in question. Trainingdata
+            x_train (ndarray): Array that corresponds to the model in question. Trainingdata
             x_test (ndarray): Array that corresponds to the model in question.
             y_train (ndarray): Array that corresponds to the model in question.
             y_test (ndarray): Array that corresponds to the model in question.
@@ -22,28 +41,51 @@ class Bootstrap:
         # Set seed
         np.random.seed(random_state)
 
+        # If scoring is not list/tuple, make it a tuple
+        if type(scoring) not in [list, tuple]:
+            scoring = (scoring, )
+
+        # Compute for both train and test
+        cases = ["train", "test"]
+
+        # Setup scoring dict
+        self.scores_ = {}
+        for case in cases:
+            for score in scoring:
+                assert score in reg.metrics_.keys(), f"The score {score} is not avalible in model {type(reg)}"
+                self.scores_[f"{case}_{score}"] = []
+
+        self.scoring_ = scoring
+
         self.x_train, self.y_train, self.x_test, self.y_test, self.reg = x_train, y_train, x_test, y_test, reg
         self.rounds = rounds
         self.random_state = random_state
+
+        if run: self.run()
+
+
     
-    def __call__(self, no_rounds=None):
+    def run(self, no_rounds=None):
         """Preforms the actual bootstrap
 
         Args:
             no_rounds (int, optional): If rounds should be different from the initial value. 
                                         Can remove this. Defaults to None.
+
+        'Returns':
+
         """
 
         rounds = no_rounds or self.rounds
         x_train, y_train, x_test, y_test, reg = self.x_train, self.y_train, self.x_test, self.y_test, self.reg 
 
-        y_train_boot_values = np.empty((len(y_train),rounds))
-        y_train_pred_values = np.empty((len(y_train),rounds))
-        y_test_pred_values = np.empty((len(y_test),rounds))
-        y_test_values = np.empty((len(y_test),rounds))
+        # y_train_boot_values = np.empty((len(y_train),rounds))
+        # y_train_pred_values = np.empty((len(y_train),rounds))
+        # y_test_pred_values = np.empty((len(y_test),rounds))
+        # y_test_values = np.empty((len(y_test),rounds))
 
-        #mse_train = np.zeros(rounds)
-        #mse_test = np.zeros(rounds)
+        # mse_train = np.zeros(rounds)
+        # mse_test = np.zeros(rounds)
         
         n = len(x_train)
         for i in range(rounds): 
@@ -55,37 +97,28 @@ class Bootstrap:
             y_train_pred = reg.predict(x_train_boot)
             y_test_pred = reg.predict(x_test)
 
-            y_train_boot_values[:,i] = y_train_boot
-            y_train_pred_values[:,i] = y_train_pred
-            y_test_pred_values[:,i] = y_test_pred
-            y_test_values[:,i] = y_test
+            # y_train_boot_values[:,i] = y_train_boot
+            # y_train_pred_values[:,i] = y_train_pred
+            # y_test_pred_values[:,i] = y_test_pred
+            # y_test_values[:,i] = y_test
 
-            #mse_train[i] = reg.mse(y_train_boot, y_train_pred)
-            #mse_test[i] = reg.mse(y_test, y_test_pred)
+            # mse_train[i] = reg.mse(y_train_boot, y_train_pred)
+            # mse_test[i] = reg.mse(y_test, y_test_pred)
+
+            # Compute the scores for train and test            
+            for score in self.scoring_:
+                score_train = reg.metrics_[score](y_train_boot, y_train_pred)
+                score_test = reg.metrics_[score](y_test, y_test_pred)
+
+                self.scores_[f"train_{score}"].append(score_train)
+                self.scores_[f"test_{score}"].append(score_test) 
         
-        #Make global variables:
-        self.y_train_boot_values, self.y_train_pred_values = y_train_boot_values, y_train_pred_values
-        self.y_test_pred_values, self.y_test_values = y_test_pred_values, y_test_values
-        #self.mse_train, self.mse_test = mse_train, mse_test
-    
+        # self.y_train_boot_values, self.y_train_pred_values = y_train_boot_values, y_train_pred_values
+        # self.y_test_pred_values, self.y_test_values = y_test_pred_values, y_test_values
+        # self.mse_train, self.mse_test = mse_train, mse_test
 
-    def mse(self):
-        """Calculates the mse-values of the various bootstrapped datasets (for a given model of a certain 
-        degree). 
-        Returns both for test and train.
 
-        'Returns':
-            self.mse_train (ndarray): An array with a mse-value for each bootstrap. Shape: (rounds,)
-            self.mse_test (ndarray): An array with a mse-value for each bootstrap. Shape: (rounds,)
-        """
-        y_train_boot_values, y_train_pred_values = self.y_train_boot_values, self.y_train_pred_values
-        y_test_pred_values, y_test_values = self.y_test_pred_values, self.y_test_values 
 
-        mse_train = np.mean((y_train_boot_values - y_train_pred_values)**2, axis=0, keepdims=True)
-        mse_test = np.mean((y_test_values - y_test_pred_values)**2, axis=0, keepdims=True)
-
-        #Make global variables 
-        self.mse_train, self.mse_test = mse_train[0], mse_test[0]
 
 
 class KFold_cross_validate:
