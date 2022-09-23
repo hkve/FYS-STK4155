@@ -16,8 +16,78 @@ from sknotlearn.linear_model import LinearRegression
 from sknotlearn.datasets import make_FrankeFunction
 from sknotlearn.resampling import Bootstrap
 
+
+def plot_hist_of_bootstrap(mse_train, mse_test, degree, rounds=600):
+    find_bins = lambda arr, times=25000: int((np.max(arr)-np.min(arr))*times)
+    plt.hist(mse_train, bins=find_bins(mse_train), label='mse for training data')
+    plt.hist(mse_test, alpha=0.75, bins=find_bins(mse_test),  label='mse for test data') #Cannot use density=True because MSE
+    plt.xlabel('MSE')
+    plt.ylabel('Probability')
+    plt.title(f'Model of degree {degree}: Results of MSE when bootstrapping {rounds} times')
+    plt.legend()
+    plt.show()
+
+def hastie_2_11_ex_c(Bootstrap_list, degrees):
+    MSE_train = [BS.scores_["train_mse"] for BS in Bootstrap_list]
+    MSE_test = [BS.scores_["test_mse"] for BS in Bootstrap_list]
+    plt.plot(degrees, np.mean(MSE_train, axis=1), label='train')
+    plt.plot(degrees, np.mean(MSE_test, axis=1), label='test')
+    plt.show()
+
+def plot_bias_var(Bootstrap_list, degrees):
+    MSE = [BS.scores_["test_mse"] for BS in Bootstrap_list]
+    bias =  [BS.scores_["test_bias"] for BS in Bootstrap_list]
+    var =  [BS.scores_["test_var"] for BS in Bootstrap_list]
+
+    plt.plot(degrees, np.mean(MSE, axis=1), label="Error")
+    plt.plot(degrees, np.mean(bias, axis=1), label="Bias")
+    plt.plot(degrees, np.mean(var, axis=1), label="Variance")
+    plt.legend()
+    plt.show()
+
+
+
+if __name__ == "__main__":
+    X, y = make_FrankeFunction(n=600, uniform=True, random_state=4110)
+    scaler = StandardScaler()
+    X = scaler.fit_transform(X)
+
+    degrees = np.arange(1, 12+1)
+    Bootstrap_list = []
+    for deg in degrees: 
+        poly = PolynomialFeatures(degree=deg)
+        X_poly = poly.fit_transform(X)
+        X_train, X_test, y_train, y_test = train_test_split(X_poly, y, random_state=4110)
+        reg = LinearRegression()
+
+        BS = Bootstrap(reg, X_train, X_test, y_train, y_test, random_state = 4110, rounds=200, scoring=("mse", "bias", "var"))
+        Bootstrap_list.append(BS)
+
+    plot_hist_of_bootstrap(Bootstrap_list[4].scores_["train_mse"], Bootstrap_list[4].scores_["test_mse"], 4)
+
+    hastie_2_11_ex_c(Bootstrap_list, degrees)
+
+    plot_bias_var(Bootstrap_list, degrees)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+exit()
 # def mse_from_bootstrap(Bootstrap_list):
 #     """Generate the mse values from the bootstrapped 
+#       Might not work
 
 #     Args:
 #         Bootstraplist (_type_): _description_
@@ -39,47 +109,6 @@ from sknotlearn.resampling import Bootstrap
 #     return mse_test_values, mse_train_values
 
 
-X, y = make_FrankeFunction(n=600, uniform=True, random_state=123)
-scaler = StandardScaler()
-X = scaler.fit_transform(X)
-
-degrees = np.arange(1, 12+1)
-Bootstrap_list = []
-for deg in degrees: 
-    poly = PolynomialFeatures(degree=deg)
-    X_poly = poly.fit_transform(X)
-    X_train, X_test, y_train, y_test = train_test_split(X_poly, y, random_state=123)
-    reg = LinearRegression()
-
-    BS = Bootstrap(X_train, X_test, y_train, y_test, reg, 123)
-    BS(60)
-    BS.mse()
-    Bootstrap_list.append(BS)
-
-
-plt.hist(Bootstrap_list[4].mse_train, bins=20)
-plt.hist(Bootstrap_list[4].mse_test, bins=20, alpha=.6)
-plt.show()
-# print((Bootstrap_list[0].mse_test).shape)
-# print(Bootstrap_list[0].y_test_pred_values.shape, len(Bootstrap_list))
-# print(len(mse_from_bootstrap(Bootstrap_list)[0]))
-# plt.hist(mse_from_bootstrap(Bootstrap_list)[0])
-# plt.hist(mse_from_bootstrap(Bootstrap_list)[1])
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-exit()
 def bootstrap(y_train, x_train, y_test, x_test, rounds, method='SVD'):
     """Will take in x_train which is chosen multiple times 
 

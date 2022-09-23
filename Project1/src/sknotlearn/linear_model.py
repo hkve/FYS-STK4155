@@ -28,7 +28,9 @@ class Model:
 
 		self.metrics_ = {
 			"mse": self.mse,
-			"r2_score": self.r2_score
+			"r2_score": self.r2_score,
+			"bias": self.bias,
+			"var": self.var
 		}
 		
 		assert method in self.methods_.keys(), f"{method = } is not a valid method. Please choose between {self.methods_.keys()}"
@@ -86,6 +88,32 @@ class Model:
 		"""
 		y_bar = np.mean(y)
 		return 1 - np.sum((y-y_pred)**2)/np.sum((y-y_bar)**2)
+
+	def bias(self, y:np.ndarray, y_pred:np.ndarray) -> float:
+		"""_summary_
+
+		Args:
+			y (np.ndarray): _description_
+			y_pred (np.ndarray): _description_
+
+		Returns:
+			float: _description_
+		"""
+		return np.mean((y - np.mean(y_pred))**2)**2
+
+	def var(self, y:np.ndarray, y_pred:np.ndarray) -> float:
+		"""
+		Calculates the variance of y_pred. Takes in y also because it is used as bias/mse (especially in Bootstrap). 
+		This could be done better.
+
+		Args:
+			y (np.ndarray): _description_
+			y_pred (np.ndarray): _description_
+
+		Return:
+			float: 
+		"""
+		return np.var(y_pred)
 
 	def coef_var(self, X, noise_std):
 		"""
