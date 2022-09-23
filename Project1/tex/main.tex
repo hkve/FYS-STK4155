@@ -49,6 +49,7 @@
 
 \renewcommand{\expval}{\operatorname{\mathbb{E}}}
 \renewcommand{\var}{\operatorname{Var}}
+\newcommand{\bias}{\operatorname{Bias}}
 \DeclareMathOperator{\eye}{\mathbb{I}}
 \DeclareMathOperator{\sgn}{sgn}
 
@@ -89,16 +90,17 @@
     \subsection{Statistical introduction to linear regression}
         A way to motivate the process of statistical learning is that we want to develop a process by which we use observed data to inform our belief in a future outcome. Such a process can be developed from the ideas of Bayes' theorem, which we can use to inform us what confidence we should have in the parameters of a given model, given data points we have observed.
         
-        Let $\vec{y}$ denote a vector of a series of measured values $y_i$, $i\in 1, 2,..., n$ at points $X$, where $X$ is a matrix where the rows $x_i$ correspond to the input values for the measurement $y_i$. For completeness we refer to the columns of $X$ as $\vec{x}_a$, $a=1, 2,..., p$.\footnote{Throughout this project, $a, b$ will always index the $p$ features for a model, and $i, j$ the $n$ data points.} Further let $\vec{\theta}$ denote the parameters of our given model -- then Bayes' theorem tells us that our \textit{posteriori} confidence in the parameters $\vec{\theta}$ given the available data follows
+        Let $\vec{y}$ denote a vector of a series of measured values $y_i$, $i\in 1, 2,..., n$ at points $X$, where $X$ is a matrix where the rows $x_i$ correspond to the input values for the measurement $y_i$. For completeness we refer to the columns of $X$ as $\vec{x}_a$, $a=1, 2,..., p$.\footnote{Throughout this project, $a, b$ will always index the $p$ features for a model, and $i, j$ the $n$ data points.} Denoting the parameters of our given model $\vec{\theta}$, then Bayes' theorem tells us that our \textit{posteriori} confidence in $\vec{\theta}$, given the available data, is given by the probabilty
         \begin{align}
-            P(\vec{\theta}|X, \vec{y}) = \frac{P(\vec{y}|X,\vec{\vec{\theta}})P(\vec{\theta})}{P(X,\vec{y})}.
+            P(\vec{\theta}|X, \vec{y}) = \frac{P(\vec{y}|X,\vec{\vec{\theta}})P(\vec{\theta})}{P(X,\vec{y})},
         \end{align}
-        Here $P(X,\vec{y})$ plays the role of a normalisation, and can safely be ignored -- either because we look for values of $\vec{\theta}$ that maximise the probability, or because we assume the probabilities $P(\vec{y}|X,\vec{\theta})$ and $P(\vec{\theta})$ which we then can properly normalise. Now we have a framework through which we can use assumptions about the distributions $P(\vec{y}|X,\vec{\theta})$ and $P(\vec{\theta})$ to give us a probability distribution for the parameters $\vec{\theta}$ that we can maximise.
+        where $P(\vec{y}|X, \vec{\theta})$ is the \textit{likelihood}, and $P(\vec{\theta})$ is our \textit{prior} confidence in $\vec{\theta}$. $P(X,\vec{y})$ plays the role of a normalisation, and can safely be ignored -- either because we look for values of $\vec{\theta}$ that maximise the probability, or because we assume the probabilities $P(\vec{y}|X,\vec{\theta})$ and $P(\vec{\theta})$ which we then can properly normalise. Now we have a framework through which we can build a model by making assumptions about the probability distributions $P(\vec{y}|X,\vec{\theta})$ and $P(\vec{\theta})$ to give us a probability distribution for the parameters $\vec{\theta}$ that we can maximise.
+
 
         \subsubsection{Ordinary least squares}
-            Now we can define the ordinary least squares method by assuming that the data $y$ that we want to make a fit to has a linear noise term that is normally distributed with mean nought. That is, the data is generated as $y(x) = f(x) + \epsilon$, where $f(x)$ is some analytic, non-stochastic function of the data input $x$, and $\epsilon \sim N(0, \sigma^2)$. Further, if we make a model fitting $y(x)$ by a $\tilde{y}(x)$, we should expect the error at every data point $(y_i, x_i)$ to be be normally distributed with the same variance, i.e., independently and identically distributed (i.i.d.). This can be summarised
+            Now we can define the ordinary least squares method by assuming that the data $y$ that we want to make a fit to has a linear noise term that is normally distributed with mean nought. That is, the data is generated as $y(x) = f(x) + \epsilon$, where $f(x)$ is some analytic, non-stochastic function of the data input $x$, and $\epsilon \sim N(0, \sigma^2)$. Further, if we make a model fitting $y(x)$ by a $\hat{y}(x)$, we should expect the error at every data point $(y_i, x_i)$ to be be normally distributed with the same variance, i.e., independently and identically distributed (i.i.d.). This can be summarised
             \begin{align}
-                P(\vec{y}|X, \vec{\theta}) = \prod_{i=1}^{n} \frac{1}{\sqrt{2\pi\sigma^2}} \exp{-\frac{{(y_i-\tilde{y}_i)}^2}{2\sigma^2}}.
+                P(\vec{y}|X, \vec{\theta}) = \prod_{i=1}^{n} \frac{1}{\sqrt{2\pi\sigma^2}} \exp{-\frac{{(y_i-\hat{y}_i)}^2}{2\sigma^2}}.
             \end{align}
             Furthermore, we assume the parameters $\vec{\theta}$ to be distributed evenly, and as such, $P(\vec{\theta})$ just contributed to an overall normalisation. This means that maximising $P(\vec{y}|X, \vec{\beta})$ amounts to the same as maximising $P(\vec{\theta}|X, \vec{y})$, and can be done analytically.
 
@@ -204,13 +206,13 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
     \subsection{Data scaling}
         \comment{This should probably be a subsubsection within something else. Just summing up the thoughts we have thrown around regarding the necessity and function of scaling.}
         \comment{Please read and see if it makes sense at all!}
-        The scaling of the inputs and measurments can roughly be divided into two operations, each with their own set consequences. Let us first consider shifting of the measurements $\vec{y}$ and the inputs $\vec{x}_a$ by their respective means. Effectively, this eliminates a degree of freedom from our model $\hat{f}(x)$ as we set it mean value to nought, and leave out any parameter that would govern this. However, if we shift $\vec{y}$ to have a mean of nought as well, this degree of freedom becomes redundant, and we end up effectively reducing the dimensionality of the model by one.
+        The scaling of the inputs and measurments can roughly be divided into two operations, each with their own set consequences. Let us first consider shifting of the measurements $\vec{y}$ and the inputs $\vec{x}_a$ by their respective means. Effectively, this eliminates a degree of freedom from our model $\hat{f}(x)$ as we set its mean value to nought, and leave out any parameter that would govern the intercept $\hat{f}(0)$. However, if we shift $\vec{y}$ to have a mean of nought as well, this degree of freedom becomes redundant, and we end up effectively reducing the dimensionality of the model by one. Moreover, in regularised models where some norm of the parameters $\norm[p]{\vec{\theta}}$ is penalised, we remove any penalisation of the choice of the intercept. This is natural to do, as the goal of these methods is to reduce the variance of the model, something which is not affected by changing the intercept.
 
         Considering now the rescaling of $\vec{y}$ and $\vec{x}_a$, these affect the fitting of the model more subtely. Looking at it through the lense of dimensionality know that
         \begin{align}
             \dimof{\theta_a} = \dimof{y} / \dimof{x_a}.
         \end{align}
-        From this we can infer that the order of magnitude of a parameter $\theta_a$ is governed by the dimension its corresponding feature $\dimof{x_a}$. This matters in the regularised models where a cost is associated with the norm of the parameters $\norm[p]{\vec{theta}}$, which will be dominated by parameters whose dimension is large. In practice, this means that the fitting will focus more on reducing the magnitude of the parameters whose associated dimension is large, letting the others fluctuate more freely. By making the $x_a$'s dimensionless, the parameters are put on a `level playing field', so to speak. The dimension of $y$ serves to raise or lower the order of magnitude of the all the paramers, and can be adjusted as to avoid numerical truncation errors by avoiding larger floats.
+        From this we can infer that the order of magnitude of a parameter $\theta_a$ is governed by the dimension its corresponding feature $\dimof{x_a}$. This matters in the regularised models where a cost is associated with the norm of the parameters $\norm[p]{\vec{\theta}}$, which will be dominated by parameters whose dimension is large. In practice, this means that the fitting will focus more on reducing the magnitude of the parameters whose associated dimension is large, letting the others fluctuate more freely. By making the $x_a$'s dimensionless, the parameters are put on a `level playing field', so to speak. The dimension of $y$ serves to raise or lower the order of magnitude of the all the parameters equally, and can be adjusted as to avoid numerical truncation errors by avoiding larger floats.
 
 
 \section{Concluding remarks}
@@ -221,27 +223,35 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
 
 \begin{appendix}
     \section{Theoretical proof of concept of the OLS model}
-    \begin{align}
-        \expval(y_i) = \expval\bclosed{X_{ij} \vec{\beta}_j + \epsilon_i} = X_{ij}\vec{\beta}_j + \expval(\epsilon) = X_{ij}\vec{\beta}_j
-    \end{align}
+        \begin{align}
+            \expval(y_i) = \expval\bclosed{X_{ij} \vec{\beta}_j + \epsilon_i} = X_{ij}\vec{\beta}_j + \expval(\epsilon_i) = X_{ij}\vec{\beta}_j
+        \end{align}
+
+        \begin{align} \nonumber
+            \var(y_i) &= \expval\bclosed{\pclosed{y_i-\expval\pclosed{y_i}}^2} = \expval\bclosed{\pclosed{X_{ij}\vec{\beta}_j + \epsilon_i - X_{ij}\vec{\beta}_j}^2} \\
+            &= \expval\pclosed{\epsilon_i^2} = \var\pclosed{\epsilon_i} = \sigma^2
+        \end{align}
+
+        \begin{align} \nonumber
+            \expval(\vec{\betahat}) &= \expval\pclosed{(X^TX)^{-1}X^T \vec{y}} = \expval\pclosed{(X^TX)^{-1}X^T \bclosed{X\vec{\beta} + \vec{\epsilon}} } \\
+            &= \expval\pclosed{\vec{\beta}} + {(X^TX)}^{-1}X^T \expval\pclosed{\vec{\epsilon}} = \vec{\beta}
+        \end{align}
+
+        \begin{align} \nonumber
+            \var(\vec{\betahat}) &= \expval({\vec{\betahat} \vec{\betahat}^T}) - \expval({\vec{\betahat}}) \expval({\vec{\betahat}^T}) \\ \nonumber
+            &= \expval((X^TX)^{-1}X^T \vec{y} \vec{y}^T X (X^TX)^{-1}) - \vec{\beta}\vec{\beta^T} \\ \nonumber
+            &= (X^TX)^{-1}X^T \bclosed{X\vec{\beta}\vec{\beta}^TX^T + \sigma^2 \eye}X (X^TX)^{-1} - \vec{\beta}\vec{\beta}^T \\
+            &= \sigma^2 (X^TX)^{-1},
+        \end{align}
+        where we have used that \(\expval(\vec{y}\vec{y}^T) = \expval\pclosed{(X\vec{\beta}+\vec{\epsilon})(X\vec{\beta}+\vec{\epsilon})^T} = X\vec{\beta}\vec{\beta}^TX^T + \sigma^2 \eye\).
+
+    \section{Bias-variance decomposition of the MSE of a linear model}
 
     \begin{align} \nonumber
-        \var(y_i) &= \expval\bclosed{\pclosed{y_i-\expval\pclosed{y_i}}^2} = \expval\bclosed{\pclosed{X_{ij}\vec{\beta}_j + \epsilon_i - X_{ij}\vec{\beta}_j}^2} \\
-        &= \expval\pclosed{\epsilon_i^2} = \var\pclosed{\epsilon_i} = \sigma^2
+        &\expval\bclosed{(f+\epsilon-\hat{f})^2} = \expval\bclosed{\pclosed{(f+\epsilon-\expval(\hat{f})) - (\hat{f}-\expval(\hat{f}))}^2} \\ \nonumber
+        &= \expval\bclosed{ \pclosed{f+\epsilon-\expval(\hat{f})}^2 + \pclosed{\hat{f}-\expval(\hat{f})}^2 - 2(f+\epsilon-\expval(\hat{f})) (\hat{f}-\expval(\hat{f})) } \\
+        &= \pclosed{\bias(\hat{f})}^2 + \var(\hat{f}) + \sigma^2 - 2\expval\bclosed{\epsilon\hat{f}}
     \end{align}
-
-    \begin{align} \nonumber
-        \expval(\vec{\betahat}) &= \expval\pclosed{(X^TX)^{-1}X^T \vec{y}} = \expval\pclosed{(X^TX)^{-1}X^T \bclosed{X\vec{\beta} + \vec{\epsilon}} } \\
-        &= \expval\pclosed{\vec{\beta}} + {(X^TX)}^{-1}X^T \expval\pclosed{\vec{\epsilon}} = \vec{\beta}
-    \end{align}
-
-    \begin{align} \nonumber
-        \var(\vec{\betahat}) &= \expval({\vec{\betahat} \vec{\betahat}^T}) - \expval({\vec{\betahat}}) \expval({\vec{\betahat}^T}) \\ \nonumber
-        &= \expval((X^TX)^{-1}X^T \vec{y} \vec{y}^T X (X^TX)^{-1}) - \vec{\beta}\vec{\beta^T} \\ \nonumber
-        &= (X^TX)^{-1}X^T \bclosed{X\vec{\beta}\vec{\beta}^TX^T + \sigma^2 \eye}X (X^TX)^{-1} - \vec{\beta}\vec{\beta}^T \\
-        &= \sigma^2 (X^TX)^{-1},
-    \end{align}
-    where we have used that \(\expval(\vec{y}\vec{y}^T) = \expval\pclosed{(X\vec{\beta}+\vec{\epsilon})(X\vec{\beta}+\vec{\epsilon})^T} = X\vec{\beta}\vec{\beta}^TX^T + \sigma^2 \eye\).
 
     \begin{figure*}
         \begin{subfigure}{.5\textwidth}

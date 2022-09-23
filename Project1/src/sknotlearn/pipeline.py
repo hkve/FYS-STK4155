@@ -1,12 +1,14 @@
 '''
 This is very messy, I have just done the first things that have come to mind, and I am rusty...
 '''
+from typing import OrderedDict
 import numpy as np
 import sys
 from os import path
 sys.path.append( path.dirname( path.dirname( path.abspath(__file__) ) ) )
 
-from sknotlearn.linear_model import LinearRegression
+from linear_model import Model, LinearRegression
+import resampling
 
 class Data:
     '''
@@ -166,7 +168,7 @@ class Data:
         '''
         Returns the variance of the y-data
         '''
-        return np.mean((self.y-np.mean(self.y))**2)
+        return np.mean((self.y-self.mean())**2)
 
     def scale(self, scheme="None"):
         return self.scalers_[scheme](self)
@@ -186,7 +188,7 @@ class Data:
         # vectorised scaling
         data_mean = np.mean(data, axis=0)
         data_std = np.std(data, axis=0)
-        data_std = np.where(data_std != 0, data_std, 1) # sets unvaried data-columns to 0
+        data_std = np.where(data_std != 0, data_std, np.inf) # sets unvaried data-columns to 0
         data_scaled = (data - data_mean) / data_std
 
         scaled_data = Data( # packing result into new Data-instance
@@ -202,62 +204,154 @@ class Data:
     }
 
 
-class TrainingFacility: # working title
-    def __init__(self, model, data):
+# class TrainingFacility: # working title
+#     def __init__(self, model, data):
+#         '''
+#         model : a Model class to undergo training etc.
+#         data  : an instance of the Data class
+#         '''
+#         self.model = model
+#         self.data = data
+
+#         self.isFit = False
+#         self.fitmodel = None
+#         self.scaled_data = None
+
+#     def fit_training_data(self, scaler="None", ratio=2/3, random_seed=None):
+#         '''
+#         Fits the model to training data.
+#         NB. Not sure just how I want to implement this bit.
+#         '''
+#         scaled_data = self.data.scale(scheme=scaler)
+#         self.training_data, self.test_data = scaled_data.train_test_split(ratio=ratio, random_seed=random_seed)
+#         y_training, X_training = self.training_data.unpacked()
+#         self.fit_model = self.model(method="pINV").fit(X_training, y_training)
+#         self.isFit = True
+#         return self.fit_model
+
+#     def predict_test_data(self): # This is more proof of concept than useful method.
+#         '''
+#         Returns predicted Data after training.
+#         '''
+#         if self.isFit:
+#             _, X_test = self.test_data.unpacked()
+#             y_predict = self.fit_model.predict(X_test)
+#             result = Data(y_predict, X_test, unscale=self.test_data.unscale)
+#             return result
+#         else:
+#             raise Exception("Cannot make prediction, model has not yet been fitted to data.")
+
+#     def diagnose_statistics(self):
+#         '''
+#         Returns a dictionary with the MSE and R2 of the models predicted data on the training and test data.
+#         '''
+#         y_train, X_train = self.training_data.unpacked()
+#         y_test, X_test = self.test_data.unpacked()
+#         y_train_predicted = self.fit_model.predict(X_train)
+#         y_test_predicted = self.fit_model.predict(X_test)
+
+#         statistics = {
+#             "MSE_train" : self.fit_model.mse(y_train, y_train_predicted),
+#             "R2_train" : self.fit_model.r2_score(y_train, y_train_predicted),
+#             "MSE_test" : self.fit_model.mse(y_test, y_test_predicted),
+#             "R2_test" : self.fit_model.r2_score(y_test, y_test_predicted)
+#         }
+#         return statistics
+
+
+class Pipeline:
+    def __init__(self, model:Model, data:Data, random_seed:int=None) -> None:
         '''
         model : a Model class to undergo training etc.
         data  : an instance of the Data class
         '''
         self.model = model
         self.data = data
+        self.results = {}
+        self.random_seed = random_seed
 
-        self.isFit = False
-        self.fitmodel = None
-        self.scaled_data = None
-        self.unscale_data = lambda scaled_data : None   
+        self.fitting_data = data
+        self.testing_data = data
 
-    def fit_training_data(self, scaler="None", ratio=2/3, random_seed=None):
-        '''
-        Fits the model to training data.
-        NB. Not sure just how I want to implement this bit.
-        '''
-        scaled_data = self.data.scale(scheme=scaler)
-        self.training_data, self.test_data = scaled_data.train_test_split(ratio=ratio, random_seed=random_seed)
-        y_training, X_training = self.training_data.unpacked()
-        self.fit_model = self.model(method="pINV").fit(X_training, y_training)
-        self.isFit = True
-        return self.fit_model
+    def __call__(self, steps:OrderedDict) -> dict:
+        for step in steps.keys():
+            assert steps in self.operations_.keys(), f"{step} is not a valid operation."
+        for step, args in self.steps.items():
+            self.operations_[step](**args)
+        return self.results
 
-    def predict_test_data(self): # This is more proof of concept than useful method.
-        '''
-        Returns predicted Data after training.
-        '''
-        if self.isFit:
-            _, X_test = self.test_data.unpacked()
-            y_predict = self.fit_model.predict(X_test)
-            result = Data(y_predict, X_test, unscale=self.test_data.unscale)
-            return result
-        else:
-            raise Exception("Cannot make prediction, model has not yet been fitted to data.")
+    def scale_data_(self, method:str="None") -> None:
+        self.data = self.data.scaled(method=method)
+        self.fitting_data = self.fitting_data.scaled(method=method)
+        self.testing_data = self.testing_data.scaled(method=method)
 
-    def diagnose_statistics(self):
-        '''
-        Returns a dictionary with the MSE and R2 of the models predicted data on the training and test data.
-        '''
-        y_train, X_train = self.training_data.unpacked()
-        y_test, X_test = self.test_data.unpacked()
-        y_train_predicted = self.fit_model.predict(X_train)
-        y_test_predicted = self.fit_model.predict(X_test)
 
-        statistics = {
-            "MSE_train" : self.fit_model.mse(y_train, y_train_predicted),
-            "R2_train" : self.fit_model.r2_score(y_train, y_train_predicted),
-            "MSE_test" : self.fit_model.mse(y_test, y_test_predicted),
-            "R2_test" : self.fit_model.r2_score(y_test, y_test_predicted)
-        }
-        return statistics
+    def unscale_data_(self) -> None:
+        self.data = self.data.unscaled()
+        self.fitting_data = self.fitting_data.unscaled()
+        self.testing_data = self.testing_data.unscaled()
+
+
+    def train_test_split_(self, ratio:float=2/3) -> None:
+        self.fitting_data, self.testing_data = self.data.train_test_split(ratio=ratio, random_seed=self.random_seed)
+
+    def fit_model_(self) -> None:
+        self.model.fit(self.fitting_data)
+
+    def diagnose_statistics_(self, scoring:dict, resampler:str="None") -> None:
+        resampler = self.resamplers_[resampler](
+            data = self.fitting_data,
+            reg = self.model,
+            run = False,
+            random_state = self.random_seed,
+        )
+        resampler.run(self.testing_data, scoring = scoring)
+        for score in scoring:
+            self.results[score] = resampler.scores_[score]
+
+
+    resamplers_ = {
+        "None" : resampling.NoneResampler,
+        "Bootstrap" : resampling.Bootstrap,
+        "Cross Validate" : resampling.CrossValidate,
+    }
+
+    operations_ = {
+        "fit" : fit_model_,
+        "scale" : scale_data_,
+        "unscale" : unscale_data_,
+        "split" : train_test_split_,
+        "diagnose" : diagnose_statistics_,
+    }
+
+
 
 if __name__ == '__main__':
+    # generating data to stuff down the pipe
+    random_state = 321
+    np.random.seed(random_state)
+
+    x = np.random.uniform(0, 1, size=100)
+    X = np.array([np.ones_like(x), x, x*x]).T
+    y = np.exp(x*x) + 2*np.exp(-2*x) + 0.1*np.random.randn(x.size)
+    data = Data(y, X) # storing the data and design matrix in Data-class
+
+
+    # setting up Pipeline
+    pipe = Pipeline(LinearRegression, data, random_seed=random_state)
+
+    # example of steps
+    steps = OrderedDict()
+    steps["scale"] = {"method" : "Standard"}
+    steps["split"] = {"ratio" : 3/4}
+    steps["fit"] =  {}
+    steps["unscale"] = {}
+    steps["diagnose"] = {"scoring" : ("mse",), "resampler" : "None"}
+
+    pipe(steps)
+
+
+    '''
     # example of use
 
     import matplotlib.pyplot as plt
@@ -297,3 +391,4 @@ if __name__ == '__main__':
     plt.plot(Xsorted[:,1], ysorted)
 
     plt.show()
+    '''

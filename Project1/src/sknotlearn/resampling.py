@@ -1,5 +1,24 @@
 import numpy as np
 
+class NoneResampler:
+    def __init__(self, training_data, reg, random_state=321):
+        np.random.seed(random_state=random_state)
+
+        self.training_data, self.reg = training_data, reg
+
+    def run(self, testing_data, scoring):
+        if type(scoring) not in [list, tuple]:
+            scoring = (scoring, )
+        
+        self.reg.fit(self.training_data)
+
+        self.scores_ = {}
+        for score in scoring:
+            assert score in reg.metrics_.keys(), f"The score {score} is not avalible in model {type(reg)}"
+            self.scores_[score] = self.reg.metrics_[score](testing_data)
+
+
+
 class Bootstrap: 
     """
     A class which takes in the relevant data and type of regression as well as the number of rounds to 
@@ -102,7 +121,7 @@ class Bootstrap:
 
 
 
-class cross_validate:
+class KFold_cross_validate:
     """
     Class to preform k-fold cross validation given a regression instance derived from
     sknotlearn.linear_model.model. Taking X as your designe matrix and y as your target values, preform
@@ -292,5 +311,5 @@ if __name__ == "__main__":
     from linear_model import LinearRegression
 
     reg = LinearRegression()
-    cv = cross_validate(reg, y, X, k=4, scoring=("mse", "r2_score"))
+    cv = KFold_cross_validate(reg, y, X, k=4, scoring=("mse", "r2_score"))
     print(cv["train_mse"].mean(), cv["train_mse"])
