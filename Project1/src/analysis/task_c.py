@@ -15,6 +15,7 @@ import context
 from sknotlearn.linear_model import LinearRegression
 from sknotlearn.datasets import make_FrankeFunction
 from sknotlearn.resampling import Bootstrap
+from sknotlearn.data import Data
 
 """ 
 With the bias and var calculated across the bootstrap
@@ -44,10 +45,13 @@ if __name__ == "__main__":
     for deg in degrees: 
         poly = PolynomialFeatures(degree=deg)
         X_poly = poly.fit_transform(X)
-        X_train, X_test, y_train, y_test = train_test_split(X_poly, y, random_state=4110)
+
+        data = Data(y, X_poly)
+
+        data_train, data_test = data.train_test_split(ratio=3/4, random_state=4110)
         reg = LinearRegression()
 
-        BS = Bootstrap(reg, X_train, X_test, y_train, y_test, random_state = 4110, rounds=20, scoring=("mse"))
+        BS = Bootstrap(reg, data_train, data_test, random_state = 4110, rounds=20, scoring=("mse"))
         Bootstrap_list.append(BS)
 
 
@@ -94,10 +98,11 @@ if __name__ == "__main__":
     for deg in degrees: 
         poly = PolynomialFeatures(degree=deg)
         X_poly = poly.fit_transform(X)
-        X_train, X_test, y_train, y_test = train_test_split(X_poly, y, random_state=4110)
+        data = Data(y, X_poly)
+        data_train, data_test = data.train_test_split(ratio=3/4, random_state=4110)
         reg = LinearRegression()
 
-        BS = Bootstrap(reg, X_train, X_test, y_train, y_test, random_state = 4110, rounds=20, scoring=("mse", "bias2", "var"))
+        BS = Bootstrap(reg, data_train, data_test, random_state = 4110, rounds=20, scoring=("mse", "bias2", "var"))
         Bootstrap_list.append(BS)
 
     plot_hist_of_bootstrap(Bootstrap_list[4].scores_["train_mse"], Bootstrap_list[4].scores_["test_mse"], 4)
