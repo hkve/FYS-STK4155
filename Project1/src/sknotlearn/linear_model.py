@@ -100,7 +100,7 @@ class Model:
 			float: _description_
 		"""
 		y_target, X = data.unpacked()
-		return (y_target - np.mean(self.predict(X)))**2
+		return np.mean(y_target - np.mean(self.predict(X)))**2
 
 	def var(self, data:Data) -> float:
 		"""

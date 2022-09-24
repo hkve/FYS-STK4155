@@ -6,21 +6,23 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from data import Data
 
 class NoneResampler:
-    def __init__(self, training_data, reg, random_state=321):
-        np.random.seed(random_state=random_state)
+    def __init__(self, data, reg, run=False, random_state=321):
+        np.random.seed(random_state)
 
-        self.training_data, self.reg = training_data, reg
+        self.data, self.reg = data, reg
 
     def run(self, testing_data, scoring):
         if type(scoring) not in [list, tuple]:
             scoring = (scoring, )
         
-        self.reg.fit(self.training_data)
+        reg = self.reg
+
+        reg.fit(self.data)
 
         self.scores_ = {}
         for score in scoring:
             assert score in reg.metrics_.keys(), f"The score {score} is not avalible in model {type(reg)}"
-            self.scores_[score] = self.reg.metrics_[score](testing_data)
+            self.scores_[score] = reg.metrics_[score](testing_data)
 
 
 

@@ -8,7 +8,7 @@ import os
 import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from data import Data
-from linear_model import Model, LinearRegression
+from linear_model import Model, LinearRegression, Ridge, Lasso
 import resampling
 
 
@@ -97,7 +97,7 @@ class Pipeline:
         for score in scoring:
             self.results[score] = resampler.scores_[score]
 
-    def fit_parameter_(self, param_name, param_vals, resampler="None") -> None:
+    def fit_parameter_(self, param_name, param_vals, reg_args, resampler="None") -> None:
         """_summary_
 
         Args:
@@ -108,18 +108,22 @@ class Pipeline:
         best_val = param_vals[0]
         best_mse = np.inf
         for val in param_vals[1:]:
-            self.initialize_model_(param_name = val)
-            self.diagnose_statistics_(scoring=("mse"), resampler=resampler)
-            if np.mean(self.results["mse"]) < best_mse:
+            reg_args[param_name] = val
+            self.initialize_model_(reg_args = reg_args)
+            self.diagnose_statistics_(scoring=("mse",), resampler=resampler)
+            mse = np.mean(self.results["mse"])
+            if mse < best_mse:
                 best_val = val
-        self.initialize_model_(param_name = best_val)
+                best_mse = mse
+        reg_args[param_name] = best_val
+        self.initialize_model_(reg_args=reg_args)
         self.results[param_name] = best_val
 
         self.results = original_results
 
     def print_results(self) -> None:
         """Prints the results that have been gathered"""
-        for score, result in self.results:
+        for score, result in self.results.items():
             print(score + f" : {result}")
 
     resamplers_ = {
@@ -152,14 +156,21 @@ if __name__ == '__main__':
 
 
     # setting up Pipeline
-    pipe = Pipeline(LinearRegression, data, random_state=random_state)
+    pipe = Pipeline(Ridge, data, random_state=random_state)
 
     # example of steps
     steps = OrderedDict()
     steps["scale"] = {"scheme" : "Standard"}
     steps["split"] = {"ratio" : 3/4}
-    # steps["init"] =  {}
+    # steps["init"] =  {"reg_args" : {"lmbda" : 1e-3, "method" : "INV"}}
+    steps["tune"] = {
+        "param_name" : "lmbda",
+        "param_vals" : np.logspace(-3,1,5),
+        "reg_args" : {"method" : "INV"}
+    }
     steps["unscale"] = {}
-    # steps["diagnose"] = {"scoring" : ("mse",), "resampler" : "None"}
+    steps["diagnose"] = {"scoring" : ("mse", "bias2", "var"), "resampler" : "None"}
 
+    # performing steps and printing results
     pipe.do(steps)
+    pipe.print_results()
