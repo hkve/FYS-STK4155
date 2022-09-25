@@ -1,4 +1,5 @@
 import numpy as np
+from sklearn.preprocessing import PolynomialFeatures
 
 class Data:
     """Class for storing and handling (y, X) data."""
@@ -202,6 +203,23 @@ class Data:
             _type_: _description_
         """
         return data
+
+    def polynomial(self, degree:int, save_powers:bool=False):
+        """
+        Makes polynomials based on features (columns) in X. Optionally,
+        the ordering of powers can be saved to data object.
+
+        Args:
+            degree (int): Highest degree to include in polynomial
+            save_powers (bool): If the ordering of power should be saved. Defaults to False
+
+        """
+        poly = PolynomialFeatures(degree=degree)
+        self.X = poly.fit_transform(self.X)
+        self.n_features = self.X.shape[-1]
+
+        if save_powers:
+            self.powers_ = poly.powers_
 
     def standard_scaler_(data):
         """Scales y, *X to be N(0, 1)-distributed.
