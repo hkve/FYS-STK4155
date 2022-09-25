@@ -14,8 +14,15 @@ def make_FrankeFunction(n=1000, uniform=True, noise_std=0, random_state=42):
 		x = np.random.uniform(low=0, high=1, size=n)
 		y = np.random.uniform(low=0, high=1, size=n)
 	else:
-		x = np.linspace(0, 1, n)
-		y = np.linspace(0, 1, n)
+		perfect_square = ( int(n) == int(np.sqrt(n))**2)
+		assert perfect_square, f"{n = } is not a perfect square. Thus linspaced points cannot be made"
+
+		x = np.linspace(0, 1, int(np.sqrt(n)))
+		y = np.linspace(0, 1, int(np.sqrt(n)))
+
+		X, Y = np.meshgrid(x, y)
+		x = X.flatten()
+		y = Y.flatten()
 
 	z = FrankeFunction(x, y) + np.random.normal(loc=0, scale=noise_std, size=n)
 
