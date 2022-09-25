@@ -99,7 +99,7 @@ class Model:
 		Returns:
 			float: _description_
 		"""
-		return (y - np.mean(y_pred))**2
+		return np.mean((y - np.mean(y_pred))**2)
 
 	def var(self, y:np.ndarray, y_pred:np.ndarray) -> float:
 		"""
