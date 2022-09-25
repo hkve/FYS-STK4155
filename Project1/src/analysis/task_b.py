@@ -8,6 +8,7 @@ from sklearn.model_selection import train_test_split
 import context
 from sknotlearn.linear_model import LinearRegression
 from sknotlearn.datasets import make_FrankeFunction
+from sknotlearn.data import Data
 
 def plot_mse_and_r2(degrees, mse_train, mse_test, r2_train, r2_test):
 	"""
@@ -57,7 +58,6 @@ def plot_beta_progression(betas, betas_se, powers, degrees=[1,3,5]):
 			labels.append(label)
 		
 		# Plot for degree p
-		print(np.mean(betas_se[p]))
 		ticks = np.arange(len(labels))
 		ax.set_xticks(ticks, labels)
 		ax.plot(ticks, betas[p])
@@ -80,10 +80,10 @@ def solve_a(n=1000, train_size=0.8, noise_std=0.1, random_state=123):
 	5. Plot mse & r2
 	6. Plot chaos beta plot
 	"""
-	X, y = make_FrankeFunction(n=n, uniform=True, random_state=random_state, noise_std=noise_std)
+	D = make_FrankeFunction(n=n, uniform=True, random_state=random_state, noise_std=noise_std)
 
 	scaler = StandardScaler()
-	X = scaler.fit_transform(X)
+	D.X = scaler.fit_transform(D.X)
 	
 	degrees = np.arange(1, 12+1)
 	mse_train = np.zeros_like(degrees, dtype=float)
@@ -97,24 +97,27 @@ def solve_a(n=1000, train_size=0.8, noise_std=0.1, random_state=123):
 	for i, degree in enumerate(degrees):
 		poly = PolynomialFeatures(degree=degree)
 
-		X_poly = poly.fit_transform(X)
+		X_poly = poly.fit_transform(D.X)
+
+		data = Data(D.y, X_poly)
+		data_train, data_test = data.train_test_split(ratio=train_size, random_state=random_state)
 		
 
-		X_train, X_test, y_train, y_test = train_test_split(X_poly, y, train_size=train_size, random_state=random_state)
+		# X_train, X_test, y_train, y_test = train_test_split(X_poly, y, train_size=train_size, random_state=random_state)
 
-		reg = LinearRegression(method="SVD").fit(X_train, y_train)
+		reg = LinearRegression(method="SVD").fit(data_train)
 
-		y_train_pred = reg.predict(X_train)
-		y_test_pred = reg.predict(X_test)
+		# y_train_pred = reg.predict(X_train)
+		# y_test_pred = reg.predict(X_test)
 
-		mse_train[i] = reg.mse(y_train, y_train_pred)
-		mse_test[i] = reg.mse(y_test, y_test_pred)
+		mse_train[i] = reg.mse(data_train)
+		mse_test[i] = reg.mse(data_test)
 
-		r2_train[i] = reg.r2_score(y_train, y_train_pred)
-		r2_test[i] = reg.r2_score(y_test, y_test_pred)
+		r2_train[i] = reg.r2_score(data_train)
+		r2_test[i] = reg.r2_score(data_test)
 
 		betas[degree] = reg.coef_
-		var_beta =	 np.diag(reg.coef_var(X_train, noise_std))
+		var_beta =	 np.diag(reg.coef_var(data_train.X, noise_std))
 		betas_se[degree] = 2*np.sqrt(var_beta)
 		powers[degree] = poly.powers_
 

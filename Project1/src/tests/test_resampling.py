@@ -1,6 +1,7 @@
 import context
 import sknotlearn.linear_model
 from sknotlearn.resampling import KFold_cross_validate
+from sknotlearn.data import Data
 
 import numpy as np
 import sklearn.linear_model
@@ -23,8 +24,10 @@ def test_cross_validation():
     r1 = sknotlearn.linear_model.LinearRegression()
     r2 = sklearn.linear_model.LinearRegression()
 
+    D = Data(y, X)
+
     mse1 = cross_val_score(r2, X, y, scoring="neg_mean_squared_error" , cv=kfold)
-    mse2 = KFold_cross_validate(r1, y, X, k=5, scoring="mse")
+    mse2 = KFold_cross_validate(r1, D, k=5, scoring="mse")
     
 
     tol = 1e-4 # Not necessarily equal fold splitting
