@@ -1,5 +1,6 @@
-import numpy as np
+from data import Data 
 
+import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
@@ -26,16 +27,13 @@ def make_FrankeFunction(n=1000, uniform=True, noise_std=0, random_state=42):
 
 	z = FrankeFunction(x, y) + np.random.normal(loc=0, scale=noise_std, size=n)
 
-	return np.c_[x, y], z
+	return Data(z, np.c_[x,y])
 
-def plot_FrankeFunction(x, y, noise_std=0, filename=None):
-	X, Y = np.meshgrid(x, y)
-	Z = FrankeFunction(X, Y) + np.random.normal(loc=0, scale=noise_std, size=(len(x), len(y)))
-
-	fig = plt.figure()
+def plot_FrankeFunction(D, noise_std=0, filename=None):
 	sns.set_style("white")
-	ax = fig.gca(projection="3d")
-	surf = ax.plot_surface(X, Y, Z, cmap=cm.viridis, linewidth=0, antialiased=False)
+	fig = plt.figure()
+	ax = fig.add_subplot(projection="3d")
+	surf = ax.plot_trisurf(*D.X.T, D.y, cmap=cm.viridis, linewidth=0, antialiased=False)
 
 	ax.set_zlim(-0.10, 1.40)
 	ax.zaxis.set_major_locator(LinearLocator(10))
@@ -64,5 +62,5 @@ def FrankeFunction(x,y):
 	return term1 + term2 + term3 + term4
 
 if __name__ == "__main__":
-	X, y = make_FrankeFunction(n=100)
-	plot_FrankeFunction(*X.T)
+	D = make_FrankeFunction(n=625, uniform=False, noise_std=0.1)
+	plot_FrankeFunction(D)
