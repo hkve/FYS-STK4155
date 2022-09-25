@@ -108,13 +108,13 @@ class Bootstrap:
             y_test_pred_values[:,i] = y_test_pred
             y_test_values[:,i] = y_test
 
-            # # Compute the scores for train and test            
-            # for score in self.scoring_:
-            #     score_train = reg.metrics_[score](y_train_boot, y_train_pred)
-            #     score_test = reg.metrics_[score](y_test, y_test_pred)
+            # Compute the scores for train and test  (Now only used for mse)          
+            for score in self.scoring_:
+                score_train = reg.metrics_[score](y_train_boot, y_train_pred)
+                score_test = reg.metrics_[score](y_test, y_test_pred)
 
-            #     self.scores_[f"train_{score}"].append(score_train)
-            #     self.scores_[f"test_{score}"].append(score_test) 
+                self.scores_[f"train_{score}"].append(score_train)
+                self.scores_[f"test_{score}"].append(score_test) 
         
         self.y_train_boot_values, self.y_train_pred_values = y_train_boot_values, y_train_pred_values
         self.y_test_pred_values, self.y_test_values = y_test_pred_values, y_test_values

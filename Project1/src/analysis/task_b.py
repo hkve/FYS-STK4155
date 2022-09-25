@@ -58,7 +58,6 @@ def plot_beta_progression(betas, betas_se, powers, degrees=[1,3,5]):
 			labels.append(label)
 		
 		# Plot for degree p
-		print(np.mean(betas_se[p]))
 		ticks = np.arange(len(labels))
 		ax.set_xticks(ticks, labels)
 		ax.plot(ticks, betas[p])
@@ -81,10 +80,10 @@ def solve_a(n=1000, train_size=0.8, noise_std=0.1, random_state=123):
 	5. Plot mse & r2
 	6. Plot chaos beta plot
 	"""
-	X, y = make_FrankeFunction(n=n, uniform=True, random_state=random_state, noise_std=noise_std)
+	D = make_FrankeFunction(n=n, uniform=True, random_state=random_state, noise_std=noise_std)
 
 	scaler = StandardScaler()
-	X = scaler.fit_transform(X)
+	D.X = scaler.fit_transform(D.X)
 	
 	degrees = np.arange(1, 12+1)
 	mse_train = np.zeros_like(degrees, dtype=float)
@@ -98,9 +97,9 @@ def solve_a(n=1000, train_size=0.8, noise_std=0.1, random_state=123):
 	for i, degree in enumerate(degrees):
 		poly = PolynomialFeatures(degree=degree)
 
-		X_poly = poly.fit_transform(X)
+		X_poly = poly.fit_transform(D.X)
 
-		data = Data(y, X_poly)
+		data = Data(D.y, X_poly)
 		data_train, data_test = data.train_test_split(ratio=train_size, random_state=random_state)
 		
 
