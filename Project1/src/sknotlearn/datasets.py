@@ -1,3 +1,6 @@
+import os
+import sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from data import Data 
 
 import numpy as np
@@ -29,7 +32,7 @@ def make_FrankeFunction(n=1000, uniform=True, noise_std=0, random_state=42):
 
 	return Data(z, np.c_[x,y])
 
-def plot_FrankeFunction(D, noise_std=0, filename=None):
+def plot_FrankeFunction(D, filename=None):
 	sns.set_style("white")
 	fig = plt.figure()
 	ax = fig.add_subplot(projection="3d")
