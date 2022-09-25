@@ -98,15 +98,15 @@ class Data:
         return self.y, self.X
 
     def sorted(self, axis:int=0):
-        """Returns sorted Data along specified axis. Index 0 refers to y, 1 etc. to features.
+        """Sorts Data along specified axis.
 
         Args:
-            axis (int, optional): _description_. Defaults to 0.
+            axis (int, optional): Feature to sort against. 0 is y, 1 etc. are features. Defaults to 0.
 
         Returns:
-            _type_: _description_
+            Data: sorted Data
         """
-        sorted_idxs = np.argsort(self[axis])
+        sorted_idxs = np.argsort(self[:,axis])
         y_sorted = self.y[sorted_idxs]
         X_sorted = self.X[sorted_idxs,:]
         return Data(y_sorted, X_sorted, unscale=self.unscale)
