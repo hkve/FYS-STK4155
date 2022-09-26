@@ -110,9 +110,9 @@ class Data:
             return Data(self.y/other.y, self.X/other.X)
         else:
             raise TypeError(f"Division not implemented between Data and {type(other)}")
-            
+
     # The remaining methods do stuff
-    def unpacked(self) -> tuple[np.ndarray, np.ndarray]:
+    def unpacked(self): #-> tuple[np.ndarray, np.ndarray]:
 
         """Unpacks the Data into the y and X ndarrays
 

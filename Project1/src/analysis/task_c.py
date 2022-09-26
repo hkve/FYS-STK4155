@@ -69,7 +69,7 @@ if __name__ == "__main__":
         y_test, x_test = data_test.unpacked()
         y_train, x_train = data_train.unpacked()
 
-        BS = Bootstrap(reg, x_train, x_test, y_train, y_test, random_state = 4110, rounds=20, scoring=('no scoring'))
+        BS = Bootstrap(reg, x_train, x_test, y_train, y_test, random_state = 4110, rounds=20, scoring=('mse'))
         Bootstrap_list.append(BS)
 
 
