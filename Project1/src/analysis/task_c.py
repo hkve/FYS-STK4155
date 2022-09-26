@@ -58,6 +58,10 @@ if __name__ == "__main__":
 
 
 exit()
+""" 
+Below here is everything from when we thought we could calculate 
+everything in the class.........
+"""
 def plot_hist_of_bootstrap(mse_train, mse_test, degree, rounds=600):
     find_bins = lambda arr, times=25000: int((np.max(arr)-np.min(arr))*times)
     plt.hist(mse_train, bins=find_bins(mse_train), label='mse for training data')
@@ -127,6 +131,9 @@ if __name__ == "__main__":
 
 
 exit()
+""" 
+Below is from before the class was implemented 
+"""
 # def mse_from_bootstrap(Bootstrap_list):
 #     """Generate the mse values from the bootstrapped 
 #       Might not work

@@ -90,7 +90,7 @@ class Data:
             raise TypeError(f"Division not implemented between Data and {type(other)}")
 
 
-    def unpacked(self) -> tuple[np.ndarray, np.ndarray]:
+    def unpacked(self): #-> tuple[np.ndarray, np.ndarray]: #Fikk feilmelding på denne så fjernet den midlertidig
         """Unpacks the Data into the y and X ndarrays
 
         Returns:
