@@ -215,6 +215,13 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
         From this we can infer that the order of magnitude of a parameter $\theta_a$ is governed by the dimension its corresponding feature $\dimof{x_a}$. This matters in the regularised models where a cost is associated with the norm of the parameters $\norm[p]{\vec{\theta}}$, which will be dominated by parameters whose dimension is large. In practice, this means that the fitting will focus more on reducing the magnitude of the parameters whose associated dimension is large, letting the others fluctuate more freely. By making the $x_a$'s dimensionless, the parameters are put on a `level playing field', so to speak. The dimension of $y$ serves to raise or lower the order of magnitude of the all the parameters equally, and can be adjusted as to avoid numerical truncation errors by avoiding larger floats.
 
 
+    \subsection{Resampling}
+        \comment{Here I am just writing a bit on our discussion about the limit of resampling. Structure of the discussion section is very much not set in any stone.}
+        Resampling a given data set seems on the face of it to be truly the work of magic. Somehow we invoke the law of large samples from the central limit theorem (\comment{Needs to be added}) that our statistical quantities, like the mean value, approaches the true value as the sample size grows. However, that is not exactly what we are doing when we are resampling. To illustrate this, we can think of a coin-flipping experiment where are results are categorically heads or tails. If we perform the experiment an \textit{odd} number of times, we must necessarily end up with either more heads or more tails. If we then continously resample from this dataset, a mean value should by the central limit theorem rather approach the \textit{biased} mean value of the original dataset.
+
+        The value of resampling rather comes from creating a way to emphasise different parts of the original dataset when fitting our model, and consequently comparing what what this does to the predictions of the model. For instance, an overfitted model might contort to accomodate a statistical outlier in the original dataset, and thereby make a poor prediction on new data. However, when resampling, many of the new datasets sampled to make new fits from our model will not include this statistical outlier, and should make predictions not influenced too heavily by this. There should then be a medium where the particular `oddities' in the original dataset can be smoothed over, and the bias of the original dataset is not brought out to the front.
+
+
 \section{Concluding remarks}
 
 
@@ -248,10 +255,14 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
     \section{Bias-variance decomposition of the MSE of a linear model}
 
     \begin{align} \nonumber
-        &\expval\bclosed{(f+\epsilon-\hat{f})^2} = \expval\bclosed{\pclosed{(f+\epsilon-\expval(\hat{f})) - (\hat{f}-\expval(\hat{f}))}^2} \\ \nonumber
-        &= \expval\bclosed{ \pclosed{f+\epsilon-\expval(\hat{f})}^2 + \pclosed{\hat{f}-\expval(\hat{f})}^2 - 2(f+\epsilon-\expval(\hat{f})) (\hat{f}-\expval(\hat{f})) } \\
-        &= \pclosed{\bias(\hat{f})}^2 + \var(\hat{f}) + \sigma^2 - 2\expval\bclosed{\epsilon\hat{f}}
+        &\operatorname{MSE}(\hat{f}) = \expval\bclosed{(f+\epsilon-\hat{f})^2} \\ \nonumber
+        =& \expval\bclosed{\pclosed{(f+\epsilon-\expval(\hat{f}))- (\hat{f}-\expval(\hat{f}))}^2} \\ \nonumber
+        =& \expval\bclosed{\pclosed{f+\epsilon-\expval(\hat{f})}^2} + \expval\bclosed{\pclosed{\hat{f}-\expval(\hat{f})}^2} \\ \nonumber
+        &-2 \expval\bclosed{ (f+\epsilon-\expval(\hat{f})) (\hat{f}-\expval(\hat{f})) } \\ \nonumber
+        =& \pclosed{\expval\bclosed{f+\epsilon-\expval(\hat{f})}}^2 + \expval(\epsilon^2) + \var(\hat{f}) - 2\expval(\epsilon \hat{f}) \\
+        =& \pclosed{\bias(\hat{f})}^2 + \var(\hat{f}) + \sigma^2,
     \end{align}
+    where in the last line, we used that $\expval(\epsilon\hat{f}) = \expval(\epsilon)\expval(\hat{f})=0$.\footnote{At first glance, this might seem odd, as there is noise involved in the fitting of $\hat{f}$ too. However, under the assumption that the noise is i.i.d. between experiments, the noise in the data used to fit $\hat{f}$ is independent of the noise in a test example.}
 
     \begin{figure*}
         \begin{subfigure}{.5\textwidth}
