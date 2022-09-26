@@ -110,8 +110,8 @@ class Bootstrap:
 
             # Compute the scores for train and test  (Now only used for mse)          
             for score in self.scoring_:
-                score_train = reg.metrics_[score](y_train_boot, y_train_pred)
-                score_test = reg.metrics_[score](y_test, y_test_pred)
+                score_train = reg.metrics_[score](data_train_boot)
+                score_test = reg.metrics_[score](data_train_boot)
 
                 self.scores_[f"train_{score}"].append(score_train)
                 self.scores_[f"test_{score}"].append(score_test) 
