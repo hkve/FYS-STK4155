@@ -29,11 +29,21 @@ class Bootstrap2:
         self.training_data, self.reg, self.rounds = training_data, reg, rounds
 
     def run(self, testing_data, scoring):
+        if type(scoring) not in [list, tuple]:
+            scoring = (scoring, )
+
+        self.scores_ = {}
+        for score in scoring:
+            assert score in reg.metrics_.keys(), f"The score {score} is not avalible in model {type(reg)}"
+            self.scores_[score] = self.reg.metrics_[score](testing_data)
+
         y_train, X_train = self.training_data.unpacked()
         y_train, X_train = self.training_data.unpacked()
 
         for i in range(self.rounds):
-            pass 
+            self.training_data.shuffled()
+            self.reg.fit(self.training_data)
+            
 
 
 class Bootstrap: 
@@ -79,7 +89,6 @@ class Bootstrap:
         self.random_state = random_state
 
         if run: self.run()
-
 
     def run(self, no_rounds=None):
         """Preforms the actual bootstrap

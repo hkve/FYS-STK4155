@@ -2,15 +2,36 @@ import numpy as np
 from sklearn.preprocessing import PolynomialFeatures
 
 class Data:
-    """Class for storing and handling (y, X) data."""
+    """Class for storing data y with corresponding design matrix X in a (y, X) type object.
+    Indexing Data object is done as
+        data[i] = Data(y[i], X[i]), giving the i'th data point
+        data[i,j] = y[i] or X[i,j] where j=0 refers to y, and j=1,... refers to the features.
+
+    Public methods:
+    Data is unpacked to its np.ndarrays by
+        y, X = data.unpacked()
+    Data can be scaled by
+        data_scaled = data.scaled(method)
+    Data can be scaled back by
+        data = data_scaled.unscaled()
+    Data can shuffled by
+        data = data.shuffled(with_replacement=True/False)
+    Data can be sorted by feature by
+        data = data.sorted(axis)
+    Data can be split into train and test Data by
+        data_train, data_test = data.train_test_split(ratio)
+    Features can be expanded to polynomials by
+        data.polynomial(degree)"""
     def __init__(self, y:np.ndarray, X:np.ndarray, unscale=None) -> None:
         self.y = np.array(y)
         self.X = np.array(X)
         self.n_features = X.shape[-1]
 
+        # initiating unscale function, defaults to trivial function
         self.unscale = unscale or (lambda data : data)
         assert callable(self.unscale), f"Specified unscaler is not callable (is {type(self.unscaler)})"
 
+    # The following methods are there for indexing and iteration of Data
     def __len__(self) -> int:
         return self.n_features+1
 
@@ -26,7 +47,6 @@ class Data:
         except:
             return Data(self.y[key], self.X[key])
 
-
     def __iter__(self):
         self.i = 0
         yield Data(np.array([self.y[self.i]]), np.array([self.X[self.i]]))
@@ -34,9 +54,11 @@ class Data:
     def __next__(self):
         self.i += 1
 
+    # Printing for debugging.
     def __str__(self):
-        return str(np.concatenate(([self.y], [*self.X.T])).T) # messy, I know
+        return str(np.concatenate(([self.y], [*self.X.T])).T)
 
+    # The following methods are there for arithmetics.
     def __add__(self, other):
         if type(other) in (int, float, np.int64, np.float64):
             return Data(self.y+other, self.X+other)
@@ -88,9 +110,10 @@ class Data:
             return Data(self.y/other.y, self.X/other.X)
         else:
             raise TypeError(f"Division not implemented between Data and {type(other)}")
+            
+    # The remaining methods do stuff
+    def unpacked(self) -> tuple[np.ndarray, np.ndarray]:
 
-
-    def unpacked(self): #-> tuple[np.ndarray, np.ndarray]: #Fikk feilmelding på denne så fjernet den midlertidig
         """Unpacks the Data into the y and X ndarrays
 
         Returns:

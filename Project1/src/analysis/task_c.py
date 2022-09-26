@@ -65,11 +65,11 @@ if __name__ == "__main__":
 
         data_train, data_test = data.train_test_split(ratio=3/4, random_state=4110)
         reg = LinearRegression()
+        
+        y_test, x_test = data_test.unpacked()
+        y_train, x_train = data_train.unpacked()
 
-        y_train, X_train = data_train.unpacked()
-        print(y_train)
-
-        BS = Bootstrap(reg, data_train, data_test, random_state = 4110, rounds=20, scoring=('no scoring'))
+        BS = Bootstrap(reg, x_train, x_test, y_train, y_test, random_state = 4110, rounds=20, scoring=('no scoring'))
         Bootstrap_list.append(BS)
 
 
