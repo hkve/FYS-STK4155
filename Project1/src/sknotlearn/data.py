@@ -21,7 +21,7 @@ class Data:
     Data can be split into train and test Data by
         data_train, data_test = data.train_test_split(ratio)
     Features can be expanded to polynomials by
-        data.polynomial(degree)"""
+        data = data.polynomial(degree)"""
     def __init__(self, y:np.ndarray, X:np.ndarray, unscale=None) -> None:
         self.y = np.array(y)
         self.X = np.array(X)
@@ -236,13 +236,17 @@ class Data:
             degree (int): Highest degree to include in polynomial
             save_powers (bool): If the ordering of power should be saved. Defaults to False
 
+        Returns:
+            Data: at Data-instance with a new design matrix based on polynomials of prior features.
         """
         poly = PolynomialFeatures(degree=degree)
-        self.X = poly.fit_transform(self.X)
-        self.n_features = self.X.shape[-1]
+        X = poly.fit_transform(self.X)
+        out = Data(self.y, X)
 
         if save_powers:
-            self.powers_ = poly.powers_
+            out.powers_ = poly.powers_
+
+        return out
 
     def standard_scaler_(data):
         """Scales y, *X to be N(0, 1)-distributed.
@@ -272,3 +276,13 @@ class Data:
         "None" : none_scaler_,
         "Standard" : standard_scaler_
     }
+
+
+if __name__ == "__main__":
+    random_state = 321
+    np.random.seed(random_state)
+
+    x = np.random.uniform(0, 1, size=100)
+    X = np.array([np.ones_like(x), x, x*x]).T
+    y = np.exp(x*x) + 2*np.exp(-2*x) + 0.1*np.random.randn(x.size)
+    data = Data(y, X) # storing the data and design matrix in Data-class
