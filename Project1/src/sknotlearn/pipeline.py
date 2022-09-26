@@ -99,6 +99,12 @@ class Pipeline:
         # save scores from resampled run
         for score in scoring:
             self.results[score] = resampler.scores_[score]
+        
+        # if train_score: # maybe add as arg?
+        resampler.run(self.fitting_data, scoring=scoring)
+        # save scores from resampled run
+        for score in scoring:
+            self.results["train_"+score] = resampler.scores_[score]
 
     def fit_parameter_(self, param_name:str, param_vals:np.ndarray, reg_args:dict, resampler="None") -> None:
         """Grid search param_name of self.model over param_vals to find the value which which results in lowest MSE on testing_data.
