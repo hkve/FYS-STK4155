@@ -160,23 +160,26 @@ class Data:
         """
         return self.unscale(self)
 
-    def train_test_split(self, ratio:float=2/3, random_state:int=None) -> tuple:
+    def train_test_split(self, ratio:float=2/3, shuffle:bool=True, random_state:int=None) -> tuple:
         """Splits the data into training data and test data according to train_test-ratio.
 
         Args:
             ratio (float, optional): _description_. Defaults to 2/3.
+            shuffle (bool, optional): Whether to shuffle data before splitting. Defaults to True
             random_state (int, optional): _description_. Defaults to None.
 
         Returns:
             tuple: _description_
         """
-        np.random.seed(random_state) # allows control over random seed
-
         size = self.y.size
+        idxs = np.arange(size)
         split_idx = int(size*ratio)
-        shuffled_idxs = np.arange(size); np.random.shuffle(shuffled_idxs)
-        training_idxs = shuffled_idxs[:split_idx]
-        test_idxs = shuffled_idxs[split_idx:]
+        if shuffle:
+            np.random.seed(random_state) # allows control over random seed
+            np.random.shuffle(idxs)
+
+        training_idxs = idxs[:split_idx]
+        test_idxs = idxs[split_idx:]
         training_data = Data(
             self.y[training_idxs],
             self.X[training_idxs],
