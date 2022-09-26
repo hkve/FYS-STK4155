@@ -276,13 +276,3 @@ class Data:
         "None" : none_scaler_,
         "Standard" : standard_scaler_
     }
-
-
-if __name__ == "__main__":
-    random_state = 321
-    np.random.seed(random_state)
-
-    x = np.random.uniform(0, 1, size=100)
-    X = np.array([np.ones_like(x), x, x*x]).T
-    y = np.exp(x*x) + 2*np.exp(-2*x) + 0.1*np.random.randn(x.size)
-    data = Data(y, X) # storing the data and design matrix in Data-class
