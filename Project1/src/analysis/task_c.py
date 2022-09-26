@@ -17,10 +17,22 @@ from sknotlearn.datasets import make_FrankeFunction
 from sknotlearn.resampling import Bootstrap
 from sknotlearn.data import Data
 
-""" 
-With the bias and var calculated across the bootstrap
-"""
+# """ 
+# With the bias and var calculated across the bootstrap
+# (With data-class implemented)
+# """
 
+
+# if __name__ == "__main__":
+#     D = make_FrankeFunction(n=600, uniform=True, random_state=4110)
+#     D.scaled()
+#     y, X = D.unpacked()
+#     print(X.shape)
+
+
+""" 
+Before Data-class was implemented 
+"""
 def bias_from_bootstrap(y, y_pred):
     """Should take in np.ndarrays with the shape: (bootstraps,y-values) NOT for various degrees
 
@@ -33,12 +45,15 @@ def bias_from_bootstrap(y, y_pred):
     """
     return np.mean((y - np.mean(y_pred, axis=1, keepdims=True))**2)
 
+def var_from_bootstrap(y_pred):
+    return np.mean(np.var(y_pred, axis=1, keepdims=True))
+
 
 
 if __name__ == "__main__":
-    X, y = make_FrankeFunction(n=600, uniform=True, random_state=4110)
-    scaler = StandardScaler()
-    X = scaler.fit_transform(X)
+    D = make_FrankeFunction(n=600, uniform=True, random_state=4110)
+    D.scaled()
+    y, X = D.unpacked()
 
     degrees = np.arange(1, 12+1)
     Bootstrap_list = []
@@ -51,7 +66,10 @@ if __name__ == "__main__":
         data_train, data_test = data.train_test_split(ratio=3/4, random_state=4110)
         reg = LinearRegression()
 
-        BS = Bootstrap(reg, data_train, data_test, random_state = 4110, rounds=20, scoring=("mse"))
+        y_train, X_train = data_train.unpacked()
+        print(y_train)
+
+        BS = Bootstrap(reg, data_train, data_test, random_state = 4110, rounds=20, scoring=('no scoring'))
         Bootstrap_list.append(BS)
 
 

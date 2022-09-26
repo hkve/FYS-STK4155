@@ -1,29 +1,39 @@
 import numpy as np
 
-import os
-import sys
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from data import Data
-
 class NoneResampler:
-    def __init__(self, data, reg, run=False, random_state=321):
-        np.random.seed(random_state)
+    def __init__(self, training_data, reg, random_state=321):
+        np.random.seed(random_state=random_state)
 
-        self.data, self.reg = data, reg
+        self.training_data, self.reg = training_data, reg
 
     def run(self, testing_data, scoring):
         if type(scoring) not in [list, tuple]:
             scoring = (scoring, )
         
-        reg = self.reg
-
-        reg.fit(self.data)
+        self.reg.fit(self.training_data)
 
         self.scores_ = {}
         for score in scoring:
             assert score in reg.metrics_.keys(), f"The score {score} is not avalible in model {type(reg)}"
-            self.scores_[score] = reg.metrics_[score](testing_data)
+            self.scores_[score] = self.reg.metrics_[score](testing_data)
 
+class Bootstrap2: 
+    """
+    New class made after the implementation of the Data-class
+    """
+
+    def __init__(self, training_data, reg, rounds=600, random_state=321):
+        #Set randome seed:
+        np.random.seed(random_state=random_state)
+
+        self.training_data, self.reg, self.rounds = training_data, reg, rounds
+
+    def run(self, testing_data, scoring):
+        y_train, X_train = self.training_data.unpacked()
+        y_train, X_train = self.training_data.unpacked()
+
+        for i in range(self.rounds):
+            pass 
 
 
 class Bootstrap: 
@@ -32,12 +42,14 @@ class Bootstrap:
     preform the bootstrap. Then preforms a bootstrap said rounds and 'returns' the prediction from train 
     and test data as well as the actual test data.
     """
-    def __init__(self, reg, data_train, data_test, scoring=("mse"), run=True, random_state=321, rounds=600) -> None:
+    def __init__(self, reg, x_train, x_test, y_train, y_test, scoring=("mse"), run=True, random_state=321, rounds=600) -> None:
         """Initiates a bootstrap
 
         Args:
-            data_train (Data): Data instance that corresponds to the model in question. Trainingdata
-            data_test (Data): Data instance that corresponds to the model in question.
+            x_train (ndarray): Array that corresponds to the model in question. Trainingdata
+            x_test (ndarray): Array that corresponds to the model in question.
+            y_train (ndarray): Array that corresponds to the model in question.
+            y_test (ndarray): Array that corresponds to the model in question.
             reg (class instance (?)): Model, preferably imported from sknotlearn.  
             random_state (int, optional): Seed to set random state. Defaults to 321.
             rounds (int, optional): Rounds of bootstrap. Defaults to 600. This can also be set in call.
@@ -62,16 +74,13 @@ class Bootstrap:
 
         self.scoring_ = scoring
 
-        self.y_train, self.x_train = data_train.unpacked()
-        self.y_test, self.x_test = data_test.unpacked()
-        self.reg = reg
+        self.x_train, self.y_train, self.x_test, self.y_test, self.reg = x_train, y_train, x_test, y_test, reg
         self.rounds = rounds
         self.random_state = random_state
 
         if run: self.run()
 
 
-    
     def run(self, no_rounds=None):
         """Preforms the actual bootstrap
 
@@ -92,14 +101,12 @@ class Bootstrap:
         y_test_values = np.empty((len(y_test),rounds))
         
         n = len(x_train)
-        for i in range(rounds):
+        for i in range(rounds): 
             indices = np.random.randint(0,n,n)
             x_train_boot = x_train[indices]
             y_train_boot = y_train[indices]
 
-            data_train_boot = Data(y_train_boot, x_train_boot)
-
-            reg.fit(data_train_boot)
+            reg.fit(x_train_boot, y_train_boot)
             y_train_pred = reg.predict(x_train_boot)
             y_test_pred = reg.predict(x_test)
 
@@ -130,13 +137,14 @@ class KFold_cross_validate:
     an initial shuffeling of the data can be preform and random_state can be set for 
     reproducibility.
     """
-    def __init__(self, reg, data:Data, k=5, scoring=("mse"), shuffle=True, run=True, random_state=321):
+    def __init__(self, reg, y, X, k=5, scoring=("mse"), shuffle=True, run=True, random_state=321):
         """
         Constructor of class. Sets up scoring dict, set seeds and optionally runs cv. 
 
         Args:
             reg: (Instance derived from sknotlearn.linear_model.model) Instance of regression class used for cv
-            data (Data): Data-instance containing target values and corresponding design matrix
+            y: (np.array) Target values used for cross validation
+            X: (np.array) Design matrix corresponding to y
             k: (int) How many folds should be used. Defaults to 5
             scoring: (str/iterable(str)) What scoring methods should be used for evaluation
             shuffle: (bool) If X and y should be shuffled before creating folds
@@ -165,7 +173,7 @@ class KFold_cross_validate:
         self.scoring_ = scoring
         self.k_ = k
 
-        if run: self.run(reg, data)
+        if run: self.run(reg, X, y)
 
 
     def __str__(self):
@@ -242,26 +250,29 @@ class KFold_cross_validate:
         return start_fold, stop_fold
 
 
-    def run(self, reg, data:Data):
+    def run(self, reg, X, y):
         """
         Main run function. Given reg, X and y, preform the k-fold cross validation algorithm.
 
         Args:
             reg: (Instance derived from sknotlearn.linear_model.model) Instance used for fitting
-            data (Data): Data-instance containing target values and corresponding design matrix
+            X: (np.array) Design matrix corresponding to y
+            y: (np.array) Target values used for cross validation
         """
 
         k, scoring = self.k_, self.scoring_
 
-        # If they should be shuffled, shuffle them
-        if self.shuffle_:
-            data = data.shuffled()
+        n, _ = X.shape
 
-        y, X = data.unpacked()
-        n = y.size
         # Make array containg all indicies
         idx = np.arange(n)
 
+        # If they should be shuffled, shuffle them
+        if self.shuffle_:
+            np.random.shuffle(idx)
+            X = X[idx, :]
+            y = y[idx]
+            idx = np.arange(n) # Redefine since idx is now shuffled
 
         # Get indicies of partitioned folds
         start_fold, stop_fold = self.divide_work_(n, k)
@@ -276,24 +287,19 @@ class KFold_cross_validate:
             train_idx = np.r_[train_idx, idx[stop_fold[i]:]]
         
             # Create (X,y) from train and holdout set
-            data_test = data[test_idx]
-            data_train = data[train_idx]
-            # X_test, y_test = X[test_idx,:], y[test_idx]
-            # X_train, y_train = X[train_idx,:], y[train_idx]
+            X_test, y_test = X[test_idx,:], y[test_idx]
+            X_train, y_train = X[train_idx,:], y[train_idx]
 
-            reg.fit(data_train)
+            reg.fit(X_train, y_train)
 
-            # y_pred_train = reg.predict(X_train)
-            # y_pred_test = reg.predict(X_test)
+            y_pred_train = reg.predict(X_train)
+            y_pred_test = reg.predict(X_test)
 
             # Compute the scores for train and test            
             for score in scoring:
-                # score_train = reg.metrics_[score](y_train, y_pred_train)
-                # score_test = reg.metrics_[score](y_test, y_pred_test)
-                score_train = reg.metrics_[score](data_train)
-                score_test = reg.metrics_[score](data_test)
-
-
+                score_train = reg.metrics_[score](y_train, y_pred_train)
+                score_test = reg.metrics_[score](y_test, y_pred_test)
+                
                 self.scores_[f"test_{score}"].append(score_test)
                 self.scores_[f"train_{score}"].append(score_train)
 
@@ -305,14 +311,13 @@ class KFold_cross_validate:
 if __name__ == "__main__":
     n = 1000
     x = np.random.uniform(-1, 1, n)
-    X = np.c_[np.ones_like(x), x, x**2]
     y = 1 + x**2 + 0.2*np.random.normal(loc=0, scale=1, size=n)
 
-    data = Data(y, X)
 
+    X = np.c_[np.ones_like(x), x, x**2]
 
     from linear_model import LinearRegression
 
     reg = LinearRegression()
-    cv = KFold_cross_validate(reg, data, k=4, scoring=("mse", "r2_score"))
+    cv = KFold_cross_validate(reg, y, X, k=4, scoring=("mse", "r2_score"))
     print(cv["train_mse"].mean(), cv["train_mse"])
