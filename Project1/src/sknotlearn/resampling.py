@@ -17,7 +17,6 @@ class NoneResampler:
         
         reg = self.reg
 
-        print(reg)
         reg.fit(self.data)
 
         self.scores_ = {}
