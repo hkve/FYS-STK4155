@@ -13,7 +13,7 @@ def plot_mse(degrees, train_mse, test_mse):
     fig, ax = plt.subplots()
 
     ax.plot(degrees, train_mse, label="Train mse")
-    ax.plot(degrees, test_mse, label="Test mse")
+    ax.plot(degrees, test_mse, label="Test mse")    
     ax.legend()
 
     plt.show()

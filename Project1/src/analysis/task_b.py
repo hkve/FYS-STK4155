@@ -8,7 +8,9 @@ from sknotlearn.linear_model import LinearRegression
 from sknotlearn.datasets import make_FrankeFunction
 from sknotlearn.data import Data
 
-def plot_mse_and_r2(degrees, mse_train, mse_test, r2_train, r2_test):
+import utils
+
+def plot_mse_and_r2(degrees, mse_train, mse_test, r2_train, r2_test, filename=None):
 	"""
 	Function to plot train/test mse and r2. Simple line plot with mse on the left and r2 on the right
 	"""
@@ -26,20 +28,23 @@ def plot_mse_and_r2(degrees, mse_train, mse_test, r2_train, r2_test):
 	axes[1].legend()
 
 	fig.tight_layout()
+	if filename is not None: plt.savefig(utils.make_figs_path(filename), dpi=300)
+
 	plt.show()
 
 
-def plot_beta_progression(betas, betas_se, powers, degrees=[1,3,5]):
+def plot_beta_progression(betas, betas_se, powers, degrees=[1,3,5], filename=None):
 	"""
 	Function to plot the evolution of of fitted paramters based on different polynomial degrees. Betas and powers are 
 	dicts with keys as poly power (1,2,3 ...) as created by the script. Beta values are the beta values (duh) and powers an array of (x,y) powers for
 	the different parameters. 
 	"""
 	sns.set_style("darkgrid")
-	fig, axes = plt.subplots(nrows=1, ncols=len(degrees))
+	fig, axes = plt.subplots(nrows=1, ncols=len(degrees), figsize=(14,5), gridspec_kw={'width_ratios': degrees})
 
-	axes[0].set(ylabel="Coef size")
-	axes[1].set(xlabel=r"Coef of $x^i y^j$")
+	axes[0].set_ylabel(r"$\beta$", fontsize=14)
+	# axes[1].set_xlabel(r"Coef of $x^i y^j$", fontsize=14)
+	fig.supxlabel(r"Coef of $x^i y^j$")
 
 	for ax, p in zip(axes, degrees):
 		# Make labels like 1, x, y, xy ...
@@ -57,12 +62,12 @@ def plot_beta_progression(betas, betas_se, powers, degrees=[1,3,5]):
 		
 		# Plot for degree p
 		ticks = np.arange(len(labels))
-		ax.set_xticks(ticks, labels)
-		ax.plot(ticks, betas[p])
+		ax.set_xticks(ticks, labels, rotation=90)
+		ax.plot(ticks, betas[p], c="k", ls="--", marker=".")
 		ax.fill_between(ticks, (betas[p]-2*betas_se[p]), (betas[p]+2*betas_se[p]), color='r', alpha=.3)
 
-
 	fig.tight_layout()
+	if filename is not None: plt.savefig(utils.make_figs_path(filename), dpi=300)
 	plt.show()
 
 
@@ -112,5 +117,5 @@ def solve_a(n=1000, train_size=0.8, noise_std=0.1, random_state=123):
 if __name__ == "__main__":
 	params1, params2 = solve_a(n=600, noise_std=0.1, random_state=321, train_size=2/3)
 
-	plot_mse_and_r2(*params1)
-	plot_beta_progression(*params2)
+	# plot_mse_and_r2(*params1, filename="mse_and_r2_linreg")
+	plot_beta_progression(*params2, filename="linreg_coefs")
