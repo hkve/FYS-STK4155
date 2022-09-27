@@ -30,28 +30,33 @@ from sknotlearn.data import Data
 #     print(X.shape)
 
 
-""" 
-Before Data-class was implemented 
-"""
-def bias_from_bootstrap(y, y_pred):
-    """Should take in np.ndarrays with the shape: (bootstraps,y-values) NOT for various degrees
+def plot_bias_var(bootstraps, degrees):
+    mse = [BS.mse_test for BS in bootstraps]
+    bias = [BS.bias_test for BS in bootstraps]
+    var = [BS.var_test for BS in bootstraps]
+    proj_mse = [BS.projected_mse for BS in bootstraps]
 
-    Args:
-        y (_type_): _description_
-        y_pred (_type_): _description_
+    plt.plot(degrees, mse, label='MSE')
+    plt.plot(degrees, bias, label=r'Bias$^2$')
+    plt.plot(degrees, var, label='Variance')
+    plt.plot(degrees, proj_mse, '--', label='Projected mse')
+    plt.legend()
+    plt.show()
 
-    Returns:
-        _type_: _description_
-    """
-    return np.mean((y - np.mean(y_pred, axis=1, keepdims=True))**2)
 
-def var_from_bootstrap(y_pred):
-    return np.mean(np.var(y_pred, axis=1, keepdims=True))
+def plot_mse(bootstraps, degrees):
+    mse_train = [BS.mse_train for BS in bootstraps]
+    mse_test = [BS.mse_test for BS in bootstraps]
+
+    plt.plot(degrees, mse_train)
+    plt.plot(degrees, mse_test)
+    plt.show()
+
 
 
 
 if __name__ == "__main__":
-    D = make_FrankeFunction(n=600, uniform=True, random_state=4110)
+    D = make_FrankeFunction(n=600, uniform=True, random_state=321, noise_std=0.1)
     D.scaled()
     y, X = D.unpacked()
 
@@ -63,14 +68,18 @@ if __name__ == "__main__":
 
         data = Data(y, X_poly)
 
-        data_train, data_test = data.train_test_split(ratio=3/4, random_state=4110)
+        data_train, data_test = data.train_test_split(ratio=3/4, random_state=321)
         reg = LinearRegression()
-        
-        y_test, x_test = data_test.unpacked()
-        y_train, x_train = data_train.unpacked()
 
-        BS = Bootstrap(reg, x_train, x_test, y_train, y_test, random_state = 4110, rounds=20, scoring=('mse'))
+        BS = Bootstrap(reg, data_train, data_test, random_state = 321, rounds=7)
         Bootstrap_list.append(BS)
+    
+    plot_mse(Bootstrap_list, degrees)
+    plot_bias_var(Bootstrap_list, degrees)
+
+    
+
+    
 
 
 

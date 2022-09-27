@@ -230,7 +230,7 @@ class Data:
         """
         return data
 
-    def polynomial(self, degree:int, save_powers:bool=False):
+    def polynomial(self, degree:int, return_powers:bool=False):
         """
         Makes polynomials based on features (columns) in X. Optionally,
         the ordering of powers can be saved to data object.
@@ -245,11 +245,11 @@ class Data:
         poly = PolynomialFeatures(degree=degree)
         X = poly.fit_transform(self.X)
         out = Data(self.y, X)
-
-        if save_powers:
-            out.powers_ = poly.powers_
-
-        return out
+        
+        if return_powers:
+            return out, poly.powers_
+        else:
+            return out
 
     def standard_scaler_(data):
         """Scales y, *X to be N(0, 1)-distributed.
