@@ -206,10 +206,10 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
     With the intent to compute more accurate measures for goodness of fit (such as MSE and $R^2$) to evaluate our model, we 
     artificially increase the data sample by repeatedly fitting the model on subsamples of our data. This approach is called resampling and consists of a variety of methods. In this project we have utilized \textit{Bootstrapping} and \textit{k-fold Cross-validation}. 
 
-        \subsubsection{Bootstrap}
+        \subsubsection*{Bootstrap}
         The method of bootstrapping consists of creating a so-called bootstrapped dataset where the data points are sampled with replacement from the original sample. Then the model is trained and the relevant measures for goodness of fit calculated on the bootstrapped data. This process is repeated a certain number of times. The mean of the measures is then calculated across the bootstrapped models. Through the central limit theorem this mean is assumed to be the more accurate measure for goodness of fit and therefore a better evaluation of our model.  
 
-        \subsubsection{Cross-validation}
+        \subsubsection*{Cross-validation}
         With the intent to compute more accurate measures for goodness of fit (such as MSE and $R^2$), we 
         artificially increase the data sample by fitting the model on partitioned subsamples (which we will call \textit{folds}). Using some folds
         for fitting the model and others for computing metrics, we can get multiple values for the same measure by changing which folds are used for fitting 
@@ -222,7 +222,42 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
 
 
 \section{Results}
+    \comment{Not sure about section ordering here - Håkon}
+    \subsection{Ordinary least squares}
+    We begin by calulating the $MSE$ and $R^2$ score (ref eq?) fitted to the Franke function for different polynomial degrees. This can be seen in figure \ref{fig:res:OLS_mse_noresample} and \ref{fig:res:OLS_R2_noresample} respectivly. 
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=\linewidth]{OLS_mse_noresample.pdf}
+        \caption{Showing the $MSE$ score for OLS, calculated on the train and test sample for different polynomial degrees.}
+        \label{fig:res:OLS_mse_noresample}
+    \end{figure}
 
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=\linewidth]{OLS_r2_noresample.pdf}
+        \caption{Showing the $R^2$ score for OLS, calculated on the train and test sample for different polynomial degrees.}
+        \label{fig:res:OLS_R2_noresample}
+    \end{figure}
+
+    To investigate the stability of our fits with varying polynomial degrees, we also plot coeficient values with varying polynomial degree. In figure \ref{fig:res:OLS_beta_values_plot} we see these plotted for $p = 1,2,3$ with $\pm 2\sigma$ regions. These are calulated using the diagonal $\sigma^2_{\beta,i} = \var{(\hat{\beta})_{ii}}$. Additionally, in figure \ref{fig:res:OLS_beta_values_table} we see the absoulte values of these coeficients tabulized for $p \in [1,5]$.
+
+    \begin{figure*}
+        \begin{subfigure}{\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{linreg_coefs_plots.pdf}
+            \caption{Showing values of polynomial coeficients for degree 1, 3 and 5 from left to right. The shaded regions are given by $\pm 2\sigma_\beta$. Note the different y-axes.} 
+            \label{fig:res:OLS_beta_values_plot}
+        \end{subfigure}
+        \begin{subfigure}{\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{linreg_coefs_table.pdf}
+            \caption{Showing $|\beta_{ij}|$ corresponding to the term $x^i y^j$ present in the fit.}
+            \label{fig:res:OLS_beta_values_table}    
+        \end{subfigure}
+    \end{figure*}
+
+    \subsection{Ridge}
+    \subsection{Lasso}
 \section{Discussion}
     \subsection{Data scaling}
         \comment{This should probably be a subsubsection within something else. Just summing up the thoughts we have thrown around regarding the necessity and function of scaling.}
@@ -287,26 +322,26 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
 
     \begin{figure*}
         \begin{subfigure}{.5\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{franke_functions_0.pdf}
-        \caption{$\sigma = 0$}
+            \centering
+            \includegraphics[width=\linewidth]{franke_functions_0.pdf}
+            \caption{$\sigma = 0$}
+            \end{subfigure}
+        \hfill
+        \begin{subfigure}{.5\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{franke_functions_0_01.pdf}
+            \caption{$\sigma = 0.01$}
         \end{subfigure}
         \hfill
         \begin{subfigure}{.5\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{franke_functions_0_01.pdf}
-        \caption{$\sigma = 0.01$}
-        \end{subfigure}
-        \hfill
-        \begin{subfigure}{.5\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{franke_functions_0_1.pdf}
-        \caption{$\sigma = 0.1$}
+            \centering
+            \includegraphics[width=\linewidth]{franke_functions_0_1.pdf}
+            \caption{$\sigma = 0.1$}
         \end{subfigure}
         \begin{subfigure}{.5\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{franke_functions_0_2.pdf}
-        \caption{$\sigma = 0.2$}
+            \centering
+            \includegraphics[width=\linewidth]{franke_functions_0_2.pdf}
+            \caption{$\sigma = 0.2$}
         \end{subfigure}
 
 
