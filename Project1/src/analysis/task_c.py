@@ -48,10 +48,10 @@ def plot_bias_var(Bootstrap_list, degrees):
     proj_mse = [BS.projected_mse for BS in Bootstrap_list]
 
     sns.set_style('darkgrid')
-    plt.plot(degrees, mse, label='MSE', c=sns.color_palette('colorblind')[0])
-    plt.plot(degrees, bias, label=r'Bias$^2$', c=sns.color_palette('colorblind')[3])
-    plt.plot(degrees, var, label='Variance', c=sns.color_palette('colorblind')[2])
-    # plt.plot(degrees, proj_mse, '--', label='Projected mse', c='salmon')
+    plt.plot(degrees, mse, label='MSE', c=sns.color_palette('husl')[-1], lw=2)
+    plt.plot(degrees, bias, label=r'Bias$^2$', c=sns.color_palette('husl')[-3], lw=2)
+    plt.plot(degrees, var, label='Variance', c=sns.color_palette('husl')[-2], lw=2)
+    plt.plot(degrees, proj_mse, '--', label='Projected mse', c=sns.color_palette('colorblind')[1], lw=2)
     plt.legend()
     plt.show()
 
@@ -70,7 +70,8 @@ if __name__ == "__main__":
     D.scaled()
     y, X = D.unpacked()
 
-    print(sns.color_palette('colorblind')[0])
+    print(len(sns.color_palette('husl')))
+
 
 
     # #For various rounds:

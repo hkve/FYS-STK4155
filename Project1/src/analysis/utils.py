@@ -1,4 +1,5 @@
 import pathlib as pl
+import seaborn as sns
 
 def make_figs_path(filename):
     cur_path = pl.Path(__file__)
@@ -19,8 +20,8 @@ def make_figs_path(filename):
     return str(figs_path)
 
 colors = [
-    "mediumorchid",
-    "steelblue",
-    "mediumturquoise",
-    "limegreen",
+    sns.color_palette('husl')[-1],
+    sns.color_palette('husl')[-3],
+    sns.color_palette('husl')[-2],
+    sns.color_palette('husl', 8)[0],
 ]
