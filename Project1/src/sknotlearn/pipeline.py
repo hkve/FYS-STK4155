@@ -81,7 +81,7 @@ class Pipeline:
         """
         self.fitted_model = self.model(**reg_args)
 
-    def diagnose_statistics_(self, scoring:tuple[str], resampler:str="None") -> None:
+    def diagnose_statistics_(self, scoring, resampler:str="None") -> None:
         """Uses specified resampling method to fit pre-initialised Model to fitting_data and extract specified statistical metrics from predictions made on testing_data.
 
         Args:

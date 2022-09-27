@@ -25,14 +25,13 @@ class NoneResampler:
             self.scores_[score] = reg.metrics_[score](testing_data)
 
 
-
 class Bootstrap: 
     """
     A class which takes in the relevant data and type of regression as well as the number of rounds to 
     preform the bootstrap. Then preforms a bootstrap said rounds and 'returns' the prediction from train 
     and test data as well as the actual test data.
     """
-    def __init__(self, reg, data_train, data_test, scoring=("mse"), run=True, random_state=321, rounds=600) -> None:
+    def __init__(self, reg, data_train, data_test, run=True, random_state=321, rounds=600) -> None:
         """Initiates a bootstrap
 
         Args:
@@ -46,30 +45,28 @@ class Bootstrap:
         # Set seed
         np.random.seed(random_state)
 
-        # If scoring is not list/tuple, make it a tuple
-        if type(scoring) not in [list, tuple]:
-            scoring = (scoring, )
+        # # If scoring is not list/tuple, make it a tuple
+        # if type(scoring) not in [list, tuple]:
+        #     scoring = (scoring, )
 
-        # Compute for both train and test
-        cases = ["train", "test"]
+        # # Compute for both train and test
+        # cases = ["train", "test"]
 
-        # Setup scoring dict
-        self.scores_ = {}
-        for case in cases:
-            for score in scoring:
-                assert score in reg.metrics_.keys(), f"The score {score} is not avalible in model {type(reg)}"
-                self.scores_[f"{case}_{score}"] = []
+        # # Setup scoring dict
+        # self.scores_ = {}
+        # for case in cases:
+        #     for score in scoring:
+        #         assert score in reg.metrics_.keys(), f"The score {score} is not avalible in model {type(reg)}"
+        #         self.scores_[f"{case}_{score}"] = []
 
-        self.scoring_ = scoring
+        # self.scoring_ = scoring
 
-        self.y_train, self.x_train = data_train.unpacked()
-        self.y_test, self.x_test = data_test.unpacked()
         self.reg = reg
         self.rounds = rounds
         self.random_state = random_state
+        self.data_train, self.data_test = data_train, data_test
 
         if run: self.run()
-
 
     
     def run(self, no_rounds=None):
@@ -82,14 +79,16 @@ class Bootstrap:
         'Returns':
 
         """
+        y_train, x_train = self.data_train.unpacked()
+        y_test, x_test = self.data_test.unpacked()
 
         rounds = no_rounds or self.rounds
-        x_train, y_train, x_test, y_test, reg = self.x_train, self.y_train, self.x_test, self.y_test, self.reg 
+        reg = self.reg 
 
-        y_train_boot_values = np.empty((len(y_train),rounds))
-        y_train_pred_values = np.empty((len(y_train),rounds))
-        y_test_pred_values = np.empty((len(y_test),rounds))
-        y_test_values = np.empty((len(y_test),rounds))
+        y_train_boot_values = np.zeros((y_train.size,rounds))
+        y_train_pred_values = np.zeros((y_train.size,rounds))
+        y_test_pred_values = np.zeros((y_test.size,rounds))
+        y_test_values = np.zeros((y_test.size,rounds))
         
         n = len(x_train)
         for i in range(rounds):
@@ -108,16 +107,18 @@ class Bootstrap:
             y_test_pred_values[:,i] = y_test_pred
             y_test_values[:,i] = y_test
 
-            # # Compute the scores for train and test            
-            # for score in self.scoring_:
-            #     score_train = reg.metrics_[score](y_train_boot, y_train_pred)
-            #     score_test = reg.metrics_[score](y_test, y_test_pred)
-
-            #     self.scores_[f"train_{score}"].append(score_train)
-            #     self.scores_[f"test_{score}"].append(score_test) 
+        mse_train = np.mean(np.mean((y_train_boot_values - y_train_pred_values)**2, axis=1))
+        mse_test = np.mean(np.mean((y_test_values - y_test_pred_values)**2, axis=1))
         
-        self.y_train_boot_values, self.y_train_pred_values = y_train_boot_values, y_train_pred_values
-        self.y_test_pred_values, self.y_test_values = y_test_pred_values, y_test_values
+        bias_test = np.mean((y_test_values - np.mean(y_test_pred_values, axis=1, keepdims=True))**2)
+        var_test = np.mean(np.var(y_test_pred_values, axis=1))
+
+        projected_mse = bias_test + var_test
+
+        self.mse_train, self.mse_test, self.bias_test, self.var_test = mse_train, mse_test, bias_test, var_test
+        self.projected_mse = projected_mse
+        
+
 
 
 
