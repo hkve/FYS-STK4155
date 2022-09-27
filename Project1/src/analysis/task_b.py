@@ -1,12 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.preprocessing import PolynomialFeatures, StandardScaler
-from sklearn.model_selection import train_test_split
 
 # Custom stuff
 import context
-from sknotlearn.linear_model import LinearRegression, Ridge
+from sknotlearn.linear_model import LinearRegression
 from sknotlearn.datasets import make_FrankeFunction
 from sknotlearn.data import Data
 
@@ -95,7 +93,7 @@ def solve_a(n=1000, train_size=0.8, noise_std=0.1, random_state=123):
 		Dp = Dp.scaled(scheme="Standard")
 
 		Dp_train, Dp_test = Dp.train_test_split(ratio=train_size, random_state=random_state)
-		reg = Ridge(method="INV", lmbda=1e-5).fit(Dp_train)
+		reg = LinearRegression(method="pINV", lmbda=1e-5).fit(Dp_train)
 
 		mse_train[i] = reg.mse(Dp_train)
 		mse_test[i] = reg.mse(Dp_test)
