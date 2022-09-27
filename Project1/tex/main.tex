@@ -48,6 +48,7 @@
 \newcommand{\dimof}[1]{\bigl[#1\bigr]}
 
 \renewcommand{\expval}{\operatorname{\mathbb{E}}}
+\DeclareMathOperator{\mse}{\operatorname{MSE}}
 \renewcommand{\var}{\operatorname{Var}}
 \newcommand{\bias}{\operatorname{Bias}}
 \DeclareMathOperator{\eye}{\mathbb{I}}
@@ -92,8 +93,12 @@
     We will assume that the measurements $y_i$ are generated from an exact function $f(x)$ with stochastic noise $\epsilon$ added, such that $y_i = f(x_i) + \epsilon$. Throughout this project, we will assume that the noise is normally distributed with mean 0 and some standard deviation (std) $\sigma$; $\epsilon \sim \operatorname{N}(0,\sigma^2)$. Furthermore, we will assume that the noise between different measurements is independent and identically distributed (i.i.d.). Our job then is to model an $\hat{f}(x)$ that we want to be close to $f(x)$.
 
     \subsection{Error assesement and model optimisation}
-        When we want to create a statistically informed model that is able to predict future measurements, we need to develop a metric for how well our model fits the data we already have. That is, we want to optimise our parameters $\vec{\theta}$ such that $\hat{f}(x) \approx f(x)$.
-        %MSE and R2?? Can Bias and Variance also be included here?? -Anna
+        When we want to create a statistically informed model that is able to predict future measurements, we need to develop a metric for how well our model fits the data we already have. That is, we want to optimise our parameters $\vec{\theta}$ such that $\hat{f}(x) \approx f(x)$. To estimate how well we acheive this with our given dataset $\mathcal{D}$, we will start with the mean squared error (MSE). Given a model which predicts values $\vec{\hat{y}}$, the mean squared error is given by
+        \begin{align}
+            \boxed{
+                \mse(\vec{\hat{y}}) = \frac{1}{n} \sum_{i=1}^n (y_i-\hat{y}_i)^2 = (\vec{y} - \vec{\hat{y}})^2
+            }
+        \end{align}
 
     \subsection{Statistical introduction to linear regression}
         A way to motivate the process of statistical learning is that we want to develop a process by which we use observed data to inform our belief in a future outcome. Such a process can be developed from the ideas of Bayes' theorem, which we can use to inform us what confidence we should have in the parameters of a given model, given data points we have observed.
