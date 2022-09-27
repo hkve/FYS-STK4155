@@ -17,3 +17,10 @@ def make_figs_path(filename):
     figs_path /= filename
 
     return str(figs_path)
+
+colors = [
+    "mediumorchid",
+    "steelblue",
+    "mediumturquoise",
+    "limegreen",
+]

@@ -1,3 +1,4 @@
+from ctypes import util
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -14,16 +15,18 @@ def plot_mse_and_r2(degrees, mse_train, mse_test, r2_train, r2_test, filename=No
 	"""
 	Function to plot train/test mse and r2. Simple line plot with mse on the left and r2 on the right
 	"""
+
+	line_colors = utils.line_colors
 	sns.set_style("darkgrid")
 	fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(12,6))
-	axes[0].plot(degrees, mse_train, c="b", label="train")
-	axes[0].plot(degrees, mse_test, c="r", label="test")
+	axes[0].plot(degrees, mse_train, c=line_colors[0], label="train")
+	axes[0].plot(degrees, mse_test, c=line_colors[1], label="test")
 	axes[0].set(xlabel="degree", ylabel="MSE")
 	axes[0].legend()
 
 
-	axes[1].plot(degrees, r2_train, c="b", label="train")
-	axes[1].plot(degrees, r2_test, c="r", label="test")
+	axes[1].plot(degrees, r2_train, c=line_colors[0], label="train")
+	axes[1].plot(degrees, r2_test, c=line_colors[1], label="test")
 	axes[1].set(xlabel="degree", ylabel=r"$R^2$")
 	axes[1].legend()
 
@@ -43,8 +46,7 @@ def plot_beta_progression(betas, betas_se, powers, degrees=[1,3,5], filename=Non
 	fig, axes = plt.subplots(nrows=1, ncols=len(degrees), figsize=(14,5), gridspec_kw={'width_ratios': degrees})
 
 	axes[0].set_ylabel(r"$\beta$", fontsize=14)
-	# axes[1].set_xlabel(r"Coef of $x^i y^j$", fontsize=14)
-	fig.supxlabel(r"Coef of $x^i y^j$")
+	fig.supxlabel(r"$\beta$ corresponding to $x^i y^j$", fontsize=14)
 
 	for ax, p in zip(axes, degrees):
 		# Make labels like 1, x, y, xy ...
@@ -117,5 +119,5 @@ def solve_a(n=1000, train_size=0.8, noise_std=0.1, random_state=123):
 if __name__ == "__main__":
 	params1, params2 = solve_a(n=600, noise_std=0.1, random_state=321, train_size=2/3)
 
-	# plot_mse_and_r2(*params1, filename="mse_and_r2_linreg")
+	plot_mse_and_r2(*params1, filename="mse_and_r2_linreg")
 	plot_beta_progression(*params2, filename="linreg_coefs")
