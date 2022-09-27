@@ -1,7 +1,9 @@
+from cmath import isnan
 from ctypes import util
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+from matplotlib.colors import LogNorm
 
 # Custom stuff
 import context
@@ -77,8 +79,49 @@ def plot_beta_progression(betas, betas_se, powers, degrees=[1,3,5], filename=Non
 	plt.show()
 
 
-def plot_beta_heatmap(betas, powers, filename=None):
-	pass
+def plot_beta_heatmap(betas, beta_se, powers, degrees=[1,2,3,4,5], filename=None):
+	"""
+	Shows table like view of beta coefs. This shows the absoulte value of beta since log requires them to be positive.
+
+	To use darkgrid (which looks strange), comment/uncomment as instructed
+	"""
+	h, w = len(degrees), len(betas[degrees[-1]])
+	betas_mat = np.zeros((h, w))
+
+
+	for i, p in enumerate(degrees):
+		labels = make_power_labels(p, powers)
+		w_p = len(betas[p])
+
+		betas_mat[i, :w_p] = betas[p]
+
+	betas_mat = abs(betas_mat)
+	# betas_mat = np.where(betas_mat < 1e-2, np.nan, betas_mat)
+
+	print(betas_mat)
+	sns.set_style("white") # and comment out this
+	fig, ax = plt.subplots(figsize=(12,5))
+	
+	im = ax.imshow(betas_mat, cmap="viridis", norm=LogNorm(vmin=np.nanmin(betas_mat)+1e-2, vmax=np.nanmax(betas_mat)))
+
+	# Show all ticks and label them with the respective list entries
+	ax.set_xticks(np.arange(len(labels)), labels=labels)
+	ax.set_yticks(np.arange(len(degrees)), labels=degrees)
+	bar = fig.colorbar(im, pad=0.01, shrink=0.55, aspect=6)
+	
+
+	for i in range(len(degrees)):
+		for j in range(len(labels)):
+			value = betas_mat[i, j]
+			# if np.isnan(value):
+			# 	continue
+			ax.text(j, i, f"{value:.1f}",
+						ha="center", va="center", color="w")
+	
+	fig.tight_layout()
+	if filename is not None: plt.savefig(make_figs_path(filename), dpi=300)
+	plt.show()
+
 
 def solve_a(n=1000, train_size=0.8, noise_std=0.1, random_state=123):
 	"""
@@ -127,4 +170,5 @@ if __name__ == "__main__":
 	params1, params2 = solve_a(n=600, noise_std=0.1, random_state=321, train_size=2/3)
 
 	plot_mse_and_r2(*params1, filename="mse_and_r2_linreg")
-	plot_beta_progression(*params2, filename="linreg_coefs")
+	plot_beta_progression(*params2, filename="linreg_coefs_plots")
+	plot_beta_heatmap(*params2, filename="linreg_coefs_table")
