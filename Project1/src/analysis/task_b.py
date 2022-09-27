@@ -8,30 +8,44 @@ import context
 from sknotlearn.linear_model import LinearRegression
 from sknotlearn.datasets import make_FrankeFunction
 from sknotlearn.data import Data
+from utils import make_figs_path, colors
 
-import utils
+
+
+def make_power_labels(p, powers):
+	labels = ["1"]
+	for exponents in powers[p][1:]:
+		label = r"$"
+		for exponent, symbol in zip(exponents, ["x", "y"]):
+			if exponent > 0:
+				label += symbol
+			if exponent > 1:
+				label += ("^{" + str(exponent) + "}")
+		
+		label += "$"
+		labels.append(label)
+
+	return labels
 
 def plot_mse_and_r2(degrees, mse_train, mse_test, r2_train, r2_test, filename=None):
 	"""
 	Function to plot train/test mse and r2. Simple line plot with mse on the left and r2 on the right
 	"""
-
-	line_colors = utils.line_colors
 	sns.set_style("darkgrid")
 	fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(12,6))
-	axes[0].plot(degrees, mse_train, c=line_colors[0], label="train")
-	axes[0].plot(degrees, mse_test, c=line_colors[1], label="test")
+	axes[0].plot(degrees, mse_train, c=colors[0], label="train")
+	axes[0].plot(degrees, mse_test, c=colors[1], label="test")
 	axes[0].set(xlabel="degree", ylabel="MSE")
 	axes[0].legend()
 
 
-	axes[1].plot(degrees, r2_train, c=line_colors[0], label="train")
-	axes[1].plot(degrees, r2_test, c=line_colors[1], label="test")
+	axes[1].plot(degrees, r2_train, c=colors[0], label="train")
+	axes[1].plot(degrees, r2_test, c=colors[1], label="test")
 	axes[1].set(xlabel="degree", ylabel=r"$R^2$")
 	axes[1].legend()
 
 	fig.tight_layout()
-	if filename is not None: plt.savefig(utils.make_figs_path(filename), dpi=300)
+	if filename is not None: plt.savefig(make_figs_path(filename), dpi=300)
 
 	plt.show()
 
@@ -50,17 +64,7 @@ def plot_beta_progression(betas, betas_se, powers, degrees=[1,3,5], filename=Non
 
 	for ax, p in zip(axes, degrees):
 		# Make labels like 1, x, y, xy ...
-		labels = ["1"]
-		for exponents in powers[p][1:]:
-			label = r"$"
-			for exponent, symbol in zip(exponents, ["x", "y"]):
-				if exponent > 0:
-					label += symbol
-				if exponent > 1:
-					label += ("^{" + str(exponent) + "}")
-			
-			label += "$"
-			labels.append(label)
+		labels = make_power_labels(p, powers)
 		
 		# Plot for degree p
 		ticks = np.arange(len(labels))
@@ -69,9 +73,12 @@ def plot_beta_progression(betas, betas_se, powers, degrees=[1,3,5], filename=Non
 		ax.fill_between(ticks, (betas[p]-2*betas_se[p]), (betas[p]+2*betas_se[p]), color='r', alpha=.3)
 
 	fig.tight_layout()
-	if filename is not None: plt.savefig(utils.make_figs_path(filename), dpi=300)
+	if filename is not None: plt.savefig(make_figs_path(filename), dpi=300)
 	plt.show()
 
+
+def plot_beta_heatmap(betas, powers, filename=None):
+	pass
 
 def solve_a(n=1000, train_size=0.8, noise_std=0.1, random_state=123):
 	"""
