@@ -17,42 +17,52 @@ from sknotlearn.datasets import make_FrankeFunction
 from sknotlearn.resampling import Bootstrap
 from sknotlearn.data import Data
 
-# """ 
-# With the bias and var calculated across the bootstrap
-# (With data-class implemented)
-# """
+""" 
+With the bias and var calculated across the bootstrap
+(With data-class implemented)
+"""
 
+def plot_hist_of_bootstrap(Bootstrap_, degree):
+    """Generate the histogram of the mse-values of a certain model with a given number 
+    of bootstrap rounds
 
-# if __name__ == "__main__":
-#     D = make_FrankeFunction(n=600, uniform=True, random_state=4110)
-#     D.scaled()
-#     y, X = D.unpacked()
-#     print(X.shape)
+    Args:
+        Bootstraps (_type_): bootstrap of a certain degree
+    """
+    mse_train = Bootstrap_.mse_train_values
+    mse_test = Bootstrap_.mse_test_values
 
+    find_bins = lambda arr, times=250: np.abs(int((np.max(arr)-np.min(arr))*times))
+    plt.hist(mse_train, label='mse for training data')
+    plt.hist(mse_test, alpha=0.75,  label='mse for test data') #Cannot use density=True because MSE
+    plt.xlabel('MSE')
+    plt.ylabel('Probability')
+    plt.title(f'Model of degree {degree}: Results of MSE when bootstrapping {Bootstrap_.rounds} times')
+    plt.legend()
+    plt.show()
 
-def plot_bias_var(bootstraps, degrees):
-    mse = [BS.mse_test for BS in bootstraps]
-    bias = [BS.bias_test for BS in bootstraps]
-    var = [BS.var_test for BS in bootstraps]
-    proj_mse = [BS.projected_mse for BS in bootstraps]
+def plot_bias_var(Bootstrap_list, degrees):
+    mse = [BS.mse_test for BS in Bootstrap_list]
+    bias = [BS.bias_test for BS in Bootstrap_list]
+    var = [BS.var_test for BS in Bootstrap_list]
+    proj_mse = [BS.projected_mse for BS in Bootstrap_list]
 
-    plt.plot(degrees, mse, label='MSE')
-    plt.plot(degrees, bias, label=r'Bias$^2$')
-    plt.plot(degrees, var, label='Variance')
-    plt.plot(degrees, proj_mse, '--', label='Projected mse')
+    sns.set_style('darkgrid')
+    plt.plot(degrees, mse, label='MSE', c=sns.color_palette('colorblind')[0])
+    plt.plot(degrees, bias, label=r'Bias$^2$', c=sns.color_palette('colorblind')[3])
+    plt.plot(degrees, var, label='Variance', c=sns.color_palette('colorblind')[2])
+    # plt.plot(degrees, proj_mse, '--', label='Projected mse', c='salmon')
     plt.legend()
     plt.show()
 
 
-def plot_mse(bootstraps, degrees):
-    mse_train = [BS.mse_train for BS in bootstraps]
-    mse_test = [BS.mse_test for BS in bootstraps]
+def plot_mse(Bootstrap_list, degrees):
+    mse_train = [BS.mse_train for BS in Bootstrap_list]
+    mse_test = [BS.mse_test for BS in Bootstrap_list]
 
     plt.plot(degrees, mse_train)
     plt.plot(degrees, mse_test)
     plt.show()
-
-
 
 
 if __name__ == "__main__":
@@ -60,6 +70,28 @@ if __name__ == "__main__":
     D.scaled()
     y, X = D.unpacked()
 
+    print(sns.color_palette('colorblind')[0])
+
+
+    # #For various rounds:
+    # #Need to fix bins as well as subplots
+    # rounds = np.arange(100, 1000+1, 200)
+    # Bootstrap_list_rounds = []
+    # for round in rounds:
+    #     poly = PolynomialFeatures(degree=7)
+    #     X_poly = poly.fit_transform(X)
+
+    #     data = Data(y, X_poly)
+
+    #     data_train, data_test = data.train_test_split(ratio=3/4, random_state=321)
+    #     reg = LinearRegression()
+
+    #     BS = Bootstrap(reg, data_train, data_test, random_state = 321, rounds=round)
+    #     Bootstrap_list_rounds.append(BS)
+    #     plot_hist_of_bootstrap(BS, 7)
+
+   
+    #For various degrees
     degrees = np.arange(1, 12+1)
     Bootstrap_list = []
     for deg in degrees: 
@@ -71,10 +103,11 @@ if __name__ == "__main__":
         data_train, data_test = data.train_test_split(ratio=3/4, random_state=321)
         reg = LinearRegression()
 
-        BS = Bootstrap(reg, data_train, data_test, random_state = 321, rounds=7)
+        BS = Bootstrap(reg, data_train, data_test, random_state = 321, rounds=70)
         Bootstrap_list.append(BS)
-    
-    plot_mse(Bootstrap_list, degrees)
+
+    # plot_hist_of_bootstrap(Bootstrap_list[7], 7)
+    # plot_mse(Bootstrap_list, degrees)
     plot_bias_var(Bootstrap_list, degrees)
 
     
@@ -82,22 +115,16 @@ if __name__ == "__main__":
     
 
 
-
+"""
+OLD!!!:
+"""
 
 exit()
 """ 
 Below here is everything from when we thought we could calculate 
 everything in the class.........
 """
-def plot_hist_of_bootstrap(mse_train, mse_test, degree, rounds=600):
-    find_bins = lambda arr, times=25000: int((np.max(arr)-np.min(arr))*times)
-    plt.hist(mse_train, bins=find_bins(mse_train), label='mse for training data')
-    plt.hist(mse_test, alpha=0.75, bins=find_bins(mse_test),  label='mse for test data') #Cannot use density=True because MSE
-    plt.xlabel('MSE')
-    plt.ylabel('Probability')
-    plt.title(f'Model of degree {degree}: Results of MSE when bootstrapping {rounds} times')
-    plt.legend()
-    plt.show()
+
 
 def hastie_2_11_ex_c(Bootstrap_list, degrees):
     MSE_train = [BS.scores_["train_mse"] for BS in Bootstrap_list]

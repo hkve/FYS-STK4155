@@ -79,11 +79,11 @@ class Bootstrap:
         'Returns':
 
         """
-        y_train, x_train = self.data_train.unpacked()
-        y_test, x_test = self.data_test.unpacked()
-
         rounds = no_rounds or self.rounds
         reg = self.reg 
+
+        y_train, x_train = self.data_train.unpacked()
+        y_test, x_test = self.data_test.unpacked()
 
         y_train_boot_values = np.zeros((y_train.size,rounds))
         y_train_pred_values = np.zeros((y_train.size,rounds))
@@ -107,20 +107,23 @@ class Bootstrap:
             y_test_pred_values[:,i] = y_test_pred
             y_test_values[:,i] = y_test
 
-        mse_train = np.mean(np.mean((y_train_boot_values - y_train_pred_values)**2, axis=1))
-        mse_test = np.mean(np.mean((y_test_values - y_test_pred_values)**2, axis=1))
-        
+        #Calculate the mse across rounds:
+        mse_train_values = np.mean((y_train_boot_values - y_train_pred_values)**2, axis=0)
+        mse_test_values = np.mean((y_test_values - y_test_pred_values)**2, axis=0)
+        #Bias-Variance-decomposition:
+        mse_train = np.mean(mse_train_values)
+        mse_test = np.mean(mse_test_values)
         bias_test = np.mean((y_test_values - np.mean(y_test_pred_values, axis=1, keepdims=True))**2)
         var_test = np.mean(np.var(y_test_pred_values, axis=1))
-
         projected_mse = bias_test + var_test
 
+        #Save as global variables:
         self.mse_train, self.mse_test, self.bias_test, self.var_test = mse_train, mse_test, bias_test, var_test
         self.projected_mse = projected_mse
+        self.mse_train_values, self.mse_test_values = mse_train_values, mse_test_values
+
+    
         
-
-
-
 
 
 class KFold_cross_validate:
