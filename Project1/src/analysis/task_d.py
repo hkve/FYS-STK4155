@@ -30,9 +30,8 @@ def task_d(n=600, k=5, random_state=321):
         Dp = Dp.scaled(scheme="Standard")
 
         reg = LinearRegression()
-        resampler = KFold_cross_validate(reg, D, k=k, scoring="mse", random_state=random_state)
+        resampler = KFold_cross_validate(reg, Dp, k=k, scoring="mse", random_state=random_state)
 
-        print(resampler["test_mse"].mean())
         train_mse[i] = resampler["train_mse"].mean()
         test_mse[i] = resampler["test_mse"].mean()
         

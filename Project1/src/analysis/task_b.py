@@ -93,7 +93,7 @@ def solve_a(n=1000, train_size=0.8, noise_std=0.1, random_state=123):
 		Dp = Dp.scaled(scheme="Standard")
 
 		Dp_train, Dp_test = Dp.train_test_split(ratio=train_size, random_state=random_state)
-		reg = LinearRegression(method="pINV", lmbda=1e-5).fit(Dp_train)
+		reg = LinearRegression(method="pINV").fit(Dp_train)
 
 		mse_train[i] = reg.mse(Dp_train)
 		mse_test[i] = reg.mse(Dp_test)
@@ -106,9 +106,11 @@ def solve_a(n=1000, train_size=0.8, noise_std=0.1, random_state=123):
 		betas_se[degree] = 2*np.sqrt(var_beta)
 
 	# Show mse and r2 score 
-	plot_mse_and_r2(degrees, mse_train, mse_test, r2_train, r2_test)
-	
-	plot_beta_progression(betas, betas_se, powers)
+
+	return (degrees, mse_train, mse_test, r2_train, r2_test), (betas, betas_se, powers)	
 
 if __name__ == "__main__":
-	solve_a(n=600, noise_std=0.1, random_state=321, train_size=2/3)
+	params1, params2 = solve_a(n=600, noise_std=0.1, random_state=321, train_size=2/3)
+
+	plot_mse_and_r2(*params1)
+	plot_beta_progression(*params2)
