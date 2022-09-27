@@ -30,24 +30,6 @@ from sknotlearn.data import Data
 #     print(X.shape)
 
 
-""" 
-Before Data-class was implemented 
-"""
-def bias_from_bootstrap(y, y_pred):
-    """Should take in np.ndarrays with the shape: (bootstraps,y-values) NOT for various degrees
-
-    Args:
-        y (_type_): _description_
-        y_pred (_type_): _description_
-
-    Returns:
-        _type_: _description_
-    """
-    return np.mean((y - np.mean(y_pred, axis=1, keepdims=True))**2)
-
-def var_from_bootstrap(y_pred):
-    return np.mean(np.var(y_pred, axis=1, keepdims=True))
-
 def plot_bias_var(bootstraps, degrees):
     mse = [BS.mse_test for BS in bootstraps]
     bias = [BS.bias_test for BS in bootstraps]
