@@ -206,12 +206,12 @@ class Ridge(Model):
 	Implementation of Ridge Regression. Can preform coefficient estimation using both direct matrix inversion of X.T @ X 
 	and trough SVD decomposition.  
 	"""
-	def __init__(self, lmbda, **kwargs):
+	def __init__(self, lmbda, method="INV"):
 		"""
 		Simply call Models constructor. Key-word arguments are passed to Model constructor.  
 		"""
 		self.lmbda = lmbda
-		Model.__init__(self, **kwargs)
+		Model.__init__(self, method)
 
 		self.methods_ = {
 			"INV" : self.fit_matrix_inv,
@@ -288,14 +288,14 @@ class Lasso(Model):
 	Implementation of Ridge Regression. Can preform coefficient estimation using both direct matrix inversion of X.T @ X 
 	and trough SVD decomposition.  
 	"""
-	def __init__(self, lmbda, **kwargs):
+	def __init__(self, lmbda, method="cMIN"):
 		"""
 		Simply call Models constructor. Key-word arguments are passed to Model constructor.  
 		"""
 		if lmbda == 0:
 			self.fit_cost_min = LinearRegression.fit_matrix_psuedo_inv # if lmbda=0 revert to OLS.
 		self.lmbda = lmbda
-		Model.__init__(self, method="cMIN", **kwargs)
+		Model.__init__(self, method)
 
 		self.methods_ = {
 			"cMIN" : self.fit_cost_min

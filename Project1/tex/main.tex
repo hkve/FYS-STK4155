@@ -138,60 +138,61 @@
         where $P(\vec{y}|X, \vec{\theta})$ is the \textit{likelihood}, and $P(\vec{\theta})$ is our \textit{prior} confidence in $\vec{\theta}$. $P(X,\vec{y})$ plays the role of a normalisation, and can safely be ignored -- either because we look for values of $\vec{\theta}$ that maximise the probability, or because we assume the probabilities $P(\vec{y}|X,\vec{\theta})$ and $P(\vec{\theta})$ which we then can properly normalise. Now we have a framework through which we can build a model by making assumptions about the probability distributions $P(\vec{y}|X,\vec{\theta})$ and $P(\vec{\theta})$ to give us a probability distribution for the parameters $\vec{\theta}$ that we can maximise.
 
 
-        \subsubsection{Ordinary least squares}
-            Now we can define the ordinary least squares method by assuming that the data $y$ that we want to make a fit to has a linear noise term that is normally distributed with mean nought. That is, the data is generated as $y(x) = f(x) + \epsilon$, where $f(x)$ is some analytic, non-stochastic function of the data input $x$, and $\epsilon \distas \normal{0}{\sigma^2}$. Further, if we make a model fitting $y(x)$ by a $\hat{y}(x)$, we should expect the error at every data point $(y_i, x_i)$ to be be normally distributed with the same variance, i.e., independently and identically distributed (i.i.d.). This can be summarised
-            \begin{align}
-                P(\vec{y}|X, \vec{\theta}) = \prod_{i=1}^{n} \frac{1}{\sqrt{2\pi\sigma^2}} \exp{-\frac{{(y_i-\hat{y}_i)}^2}{2\sigma^2}}.
-            \end{align}
-            Furthermore, we assume the parameters $\vec{\theta}$ to be distributed evenly, and as such, $P(\vec{\theta})$ just contributed to an overall normalisation. This means that maximising $P(\vec{y}|X, \vec{\theta})$ amounts to the same as maximising $P(\vec{\theta}|X, \vec{y})$, and can be done analytically.
+    \subsection{Ordinary least squares}
+        Now we can define the ordinary least squares method by assuming that the data $y$ that we want to make a fit to has a linear noise term that is normally distributed with mean nought. That is, the data is generated as $y(x) = f(x) + \epsilon$, where $f(x)$ is some analytic, non-stochastic function of the data input $x$, and $\epsilon \sim N(0, \sigma^2)$. Further, if we make a model fitting $y(x)$ by a $\hat{y}(x)$, we should expect the error at every data point $(y_i, x_i)$ to be be normally distributed with the same variance, i.e., independently and identically distributed (i.i.d.). This can be summarised
+        \begin{align}
+            P(\vec{y}|X, \vec{\theta}) = \prod_{i=1}^{n} \frac{1}{\sqrt{2\pi\sigma^2}} \exp{-\frac{{(y_i-\hat{y}_i)}^2}{2\sigma^2}}.
+        \end{align}
+        Furthermore, we assume the parameters $\vec{\theta}$ to be distributed evenly, and as such, $P(\vec{\theta})$ just contributed to an overall normalisation. This means that maximising $P(\vec{y}|X, \vec{\theta})$ amounts to the same as maximising $P(\vec{\theta}|X, \vec{y})$, and can be done analytically.
 
-            Knowing that the Gaussian distribution has a single extremum that is a maximum, we can find the values for $\vec{\theta}$ maximising the probability as
-            \begin{align} \nonumber
-                \d[\theta_k]{P(\vec{y}|X,\vec{\theta})} &= 0 \\
-                \Rightarrow \prod_{i=1}^{n} \frac{1}{\sqrt{2\pi\sigma^2}} \frac{1}{\sigma^2} X_{ib}(y_i-X_{ia}\theta_a) \exp{-\frac{{(y_i - X_{ia}\theta_a)}^2}{2\sigma^2}} &= 0,
-            \end{align}
-            which as we can see, is maximisable point by point. This means that the optimal parameters $\msub{\vec{\hat{\theta}}}{OLS}$ that maximise $P(\vec{y}|X, \vec{\theta})$ can be found as
-            \begin{align}
-                \boxed{
-                \msub{\vec{\hat{\theta}}}{OLS} = \pclosed{X^TX}^{-1} X^T \vec{y}.
-                }
-            \end{align}
+        Knowing that the Gaussian distribution has a single extremum that is a maximum, we can find the values for $\vec{\theta}$ maximising the probability as
+        \begin{align} \nonumber
+            \d[\theta_k]{P(\vec{y}|X,\vec{\theta})} &= 0 \\
+            \Rightarrow \prod_{i=1}^{n} \frac{1}{\sqrt{2\pi\sigma^2}} \frac{1}{\sigma^2} X_{ib}(y_i-X_{ia}\theta_a) \exp{-\frac{{(y_i - X_{ia}\theta_a)}^2}{2\sigma^2}} &= 0,
+        \end{align}
+        which as we can see, is maximisable point by point. This means that the optimal parameters $\msub{\vec{\hat{\theta}}}{OLS}$ that maximise $P(\vec{y}|X, \vec{\theta})$ can be found as
+        \begin{align}
+            \boxed{
+            \msub{\vec{\hat{\theta}}}{OLS} = \pclosed{X^TX}^{-1} X^T \vec{y}.
+            }
+        \end{align}
 
-        \comment{Should this be a subsubsection? -Anna}
-        \subsection{Ridge and LASSO regression}
-            So far, we have assumed that the parameters $\vec{\theta}$ are uniformly distributed, and as such have no \textit{bias} towards any particular value. In practice, this means that the OLS model will contort to fit itself to all values in the data. As such, a motivation for adding a bias could be for the sake of stability in the fit. These methods are called \textit{regularised} methods. An example is ridge regression, where one assumes that the parameters are normally distributed, such that parameter values far from the mean are thought less likely to occurr. This in practice means that the model is less willing to contort to outliers in the dataset, trading it for a bias towards certain parameter values. Assuming the probability distrbution for $\vec{\theta}$
-            \begin{align}
-                P(\vec{\theta}) = \prod_{a=1}^{p} \frac{1}{\sqrt{2\pi\tau^2}} \exp{-\frac{\theta_a^2}{2\tau^2}},
-            \end{align}
-            with a derivative with respect to $\theta_b$
-            \begin{align}
-                \d[\theta_b]{P(\vec{\theta})} = -\prod_{a=1}^{p} \frac{1}{\sqrt{2\pi\tau^2}} \frac{1}{\tau^2} \theta_b \exp{-\frac{\theta_a^2}{2\tau^2}} = -\frac{1}{\tau^2} \theta_b P(\vec{\theta}),
-            \end{align}
-            the condition for maximising $P(\vec{\theta}|X, \vec{y})$ becomes
-            \begin{align} \nonumber
-                \d[\vec{\theta}]{P(\vec{y}|X, \vec{\theta})} P(\vec{\theta}) + P(\vec{y}|X, \vec{\theta}) \d[\vec{\theta}]{P(\vec{\theta})} &= 0 \\
-                \pclosed{ \frac{1}{\sigma^2} X^T(\vec{y}-X\vec{\theta}) - \frac{1}{\tau^2} \vec{\theta} } P(\vec{y}|X,\vec{\theta}) P(\vec{\theta}) &= 0.
-            \end{align}
-            Rewriting with a parameter $\lambda = \sigma^2/\tau^2$, the optimal parameters $\msub{\vec{\hat{\theta}}}{ridge}$ are given by
-            \begin{align}
-                \boxed{
-                \msub{\vec{\hat{\theta}}}{ridge} = \pclosed{X^TX + \lambda \eye}^{-1} X^T \vec{y}.
-                }
-            \end{align}
-            This has the added bonus of ensuring that $X^TX + \lambda \eye$ is always invertible, as $\det(\lambda \eye) \neq 0$ for $\lambda>0$.
+    \comment{Should this be a subsubsection? -Anna}
+    \subsection{Ridge regression}
+        So far, we have assumed that the parameters $\vec{\theta}$ are uniformly distributed, and as such have no \textit{bias} towards any particular value. In practice, this means that the OLS model will contort to fit itself to all values in the data. As such, a motivation for adding a bias could be for the sake of stability in the fit. These methods are called \textit{regularised} methods. An example is ridge regression, where one assumes that the parameters are normally distributed, such that parameter values far from the mean are thought less likely to occurr. This in practice means that the model is less willing to contort to outliers in the dataset, trading it for a bias towards certain parameter values. Assuming the probability distrbution for $\vec{\theta}$
+        \begin{align}
+            P(\vec{\theta}) = \prod_{a=1}^{p} \frac{1}{\sqrt{2\pi\tau^2}} \exp{-\frac{\theta_a^2}{2\tau^2}},
+        \end{align}
+        with a derivative with respect to $\theta_b$
+        \begin{align}
+            \d[\theta_b]{P(\vec{\theta})} = -\prod_{a=1}^{p} \frac{1}{\sqrt{2\pi\tau^2}} \frac{1}{\tau^2} \theta_b \exp{-\frac{\theta_a^2}{2\tau^2}} = -\frac{1}{\tau^2} \theta_b P(\vec{\theta}),
+        \end{align}
+        the condition for maximising $P(\vec{\theta}|X, \vec{y})$ becomes
+        \begin{align} \nonumber
+            \d[\vec{\theta}]{P(\vec{y}|X, \vec{\theta})} P(\vec{\theta}) + P(\vec{y}|X, \vec{\theta}) \d[\vec{\theta}]{P(\vec{\theta})} &= 0 \\
+            \pclosed{ \frac{1}{\sigma^2} X^T(\vec{y}-X\vec{\theta}) - \frac{1}{\tau^2} \vec{\theta} } P(\vec{y}|X,\vec{\theta}) P(\vec{\theta}) &= 0.
+        \end{align}
+        Rewriting with a parameter $\lambda = \sigma^2/\tau^2$, the optimal parameters $\msub{\vec{\hat{\theta}}}{ridge}$ are given by
+        \begin{align}
+            \boxed{
+            \msub{\vec{\hat{\theta}}}{ridge} = \pclosed{X^TX + \lambda \eye}^{-1} X^T \vec{y}.
+            }
+        \end{align}
+        This has the added bonus of ensuring that $X^TX + \lambda \eye$ is always invertible, as $\det(\lambda \eye) \neq 0$ for $\lambda>0$.
 
 
-            LASSO regression builds on the same ideas as ridge regression, by assumes rather a Laplace distribution $L(0, \tau)$ for the parameters $\vec{\theta}$. This gives
-            \begin{align}
-                P(\vec{\theta}) = \prod_{a=1}^{p} \frac{1}{2\tau} \exp{-\frac{|\theta_a|}{\tau}},
-            \end{align}
-            which as we can see is not differentiable at $\theta_a = 0$. This means that the optimisation of this the probability $P(\vec{\theta}|X, \vec{y})$ is not necessarily possible analytically without putting bounds on the data $X, \vec{y}$, and even numerical algorithms like gradient descent will encounter run into trouble. Furthermore, it is not optimisable point by point, unless bounds like $X^TX$ being diagonal are enforced, which makes LASSO generally less used. Nevertheless, we can coax a cost function out of the probability that is minimalisable. Letting the cost function be written $\msub{C}{lasso}(\vec{\theta}) = -A\log\pclosed{P(\vec{\theta|X,\vec{y}})} + B$  we can choose the constants $A, B$ such that
-            \begin{align}
-                \boxed{
-                    \msub{C}{lasso}(\vec{\vec{\theta}}) = \norm[2]{ \vec{y} - X\vec{\theta} }^2 + \lambda \norm[1]{\vec{\theta}},
-                }
-            \end{align}
-            where $\lambda = \frac{2\sigma^2}{\tau}$ and $\norm[p]{\vec{v}} = \pclosed{\sum_k |v_k|^p}^{\sfrac{1}{p}}$ denotes the $L_p$ norm of the vector $\vec{v} \in \mathbb{R}^k$.
+    \subsection{LASSO regression}
+        LASSO regression builds on the same ideas as ridge regression, by assumes rather a Laplace distribution $L(0, \tau)$ for the parameters $\vec{\theta}$. This gives
+        \begin{align}
+            P(\vec{\theta}) = \prod_{a=1}^{p} \frac{1}{2\tau} \exp{-\frac{|\theta_a|}{\tau}},
+        \end{align}
+        which as we can see is not differentiable at $\theta_i = 0$. This means that the optimisation of this the probability $P(\vec{\theta}|X, \vec{y})$ is not necessarily possible analytically without putting bounds on the data $X, \vec{y}$, and even numerical algorithms like gradient descent will encounter run into trouble. Furthermore, it is not optimisable point by point, unless bounds like $X^TX$ being diagonal are enforced, which makes LASSO generally less used. Nevertheless, we can coax a cost function out of the probability that is minimalisable. Letting the cost function be written $\msub{C}{lasso}(\vec{\theta}) = -A\log\pclosed{P(\vec{\theta|X,\vec{y}})} + B$  we can choose the constants $A, B$ such that
+        \begin{align}
+            \boxed{
+                \msub{C}{lasso}(\vec{\vec{\theta}}) = \norm[2]{ \vec{y} - X\vec{\theta} }^2 + \lambda \norm[1]{\vec{\theta}},
+            }
+        \end{align}
+        where $\lambda = \frac{2\sigma^2}{\tau}$ and $\norm[p]{\vec{v}} = \pclosed{\sum_k |v_k|^p}^{\sfrac{1}{p}}$ denotes the $L_p$ norm of the vector $\vec{v} \in \mathbb{R}^k$.
 
     % Should we at some point mention the hessian matrix and the C of Ridge being convex (Hessian is positive definite) -Anna
 
@@ -277,7 +278,7 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
         \begin{subfigure}{\textwidth}
             \centering
             \includegraphics[width=\linewidth]{linreg_coefs_table.pdf}
-            \caption{Showing $|\beta_{ij}|$ corresponding to the term $x^i y^j$ present in the fit.}
+            \caption{Showing $\beta_{ij}$ corresponding to the term $x^i y^j$ present in the fit.}
             \label{fig:res:OLS_beta_values_table}    
         \end{subfigure}
     \end{figure*}
