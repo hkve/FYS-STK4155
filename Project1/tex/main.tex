@@ -101,20 +101,20 @@
         The central limit theorem tells us that when sampling a series of quantities $\cclosed{z_i|i=1,...,n}$ with independent and identical distributions with a mean $\mu$ and variance $\sigma^2<\infty$, the distribution of the sample mean $\bar{z}_n = \frac{1}{n}\sum_{i=1}^n z_i$ will approach a normal distrbution. Explicitly, we have (\comment{I don't know whether to box this - CM})
         \begin{align}
             \boxed{
-                \lim_{n\to\infty} \sqrt{n}(\bar{x}_n-\mu) \distas \normal{0}{\sigma^2}.
+                \lim_{n\to\infty} \sqrt{n}(\bar{z}_n-\mu) \distas \normal{0}{\sigma^2}.
             }
         \end{align}
-        In practice that for some notion of a large sample size $n$, the approximation of the sample mean as being distributed as
+        In practice, for some notion of a large sample size $n$, the approximation of the sample mean as being distributed as
         \begin{align}
             \bar{z}_n \distas \normal{\mu}{\frac{\sigma^2}{n}}
         \end{align}
-        becomes sound. Colloquially we say the sample mean approaches the true mean $\mu$. This is powerful, as it means not only that the sample mean becomes better as the sample size grows, but any quantity derived from its distribution is also determined more precisely. This lays the foundation for statistical informed models. \comment{Wild-ish claim here, but I was not sure how to `motivate' this section on CLM so that it doesn't seem to random, without going too big. Any input is appreciated. -CM}
+        becomes sound. Colloquially we say the sample mean approaches the true mean $\mu$. This is powerful, as it means not only that the sample mean becomes better as the sample size grows, but quantities derived from its distribution are also determined more precisely. This lays the foundation for statistically informed models such as regression methods. \comment{Wild-ish claim here, but I was not sure how to `motivate' this section on CLM so that it doesn't seem to random, without going too big. Any input is appreciated. -CM}
 
 
 
 
     \subsubsection{New section for MSE}
-        When we want to create a statistically informed model that is able to predict future measurements, we need to develop a metric for how well our model fits the data we already have. That is, we want to optimise our parameters $\vec{\theta}$ such that $\hat{f}(x) \approx f(x)$. To estimate how well we acheive this with our given dataset $\mathcal{D}$, we will start with the mean squared error (MSE). Given a model which predicts values $\vec{\hat{y}}$, the mean squared error is given by
+        When we want to create a statistically informed model that is able to predict the outcome of future measurements, we need to develop a metric for how well our model fits the data we already have. That is, we want to optimise our parameters $\vec{\theta}$ such that $\hat{f}(x) \approx f(x)$. To estimate how well we acheive this with our given dataset $\mathcal{D}$, we will start with the mean squared error (MSE). Given a model which predicts values $\vec{\hat{y}}$, the mean squared error is given by
         \begin{align}
             \boxed{
                 \mse(\vec{\hat{y}}) = \frac{1}{n} \sum_{i=1}^n (y_i-\hat{y}_i)^2 = \frac{1}{n} (\vec{y} - \vec{\hat{y}})^2.
@@ -123,7 +123,7 @@
 
         \comment{something something...}
 
-        Now the MSE can be decomposed into its \textit{bias} and \textit{variance}, which are quantities that can tell us more about exactly what our model is doing wrong. To set up this decomposition, we consider a situation where we have fitted a series of models to $L$ different datasets, with parameters $\vec{\hat{\theta}}^\ell$, with $\ell=1,...,L$, and predictions $\vec{\hat{y}}^\ell$ on the dataset we want to compare to. The sample mean squared error can then be decomposed into
+        The MSE can be decomposed into its \textit{bias} and \textit{variance}, which are quantities that can tell us more about exactly what our model is doing wrong. To set up this decomposition, we consider a situation where we have fitted a series of models to $L$ different datasets, with parameters $\vec{\hat{\theta}}^\ell$, with $\ell=1,...,L$, and predictions $\vec{\hat{y}}^\ell$ on the dataset we want to compare to. The sample mean squared error can then be decomposed into
         \begin{align}
             \mse(\hat{y}_i) = \pclosed{\bias(\hat{y}_i)}^2 + \var(\hat{y}_i),
         \end{align}
@@ -141,26 +141,26 @@
     \subsection{Statistical introduction to linear regression}
         A way to motivate the process of statistical learning is that we want to develop a process by which we use observed data to inform our belief in a future outcome. Such a process can be developed from the ideas of Bayes' theorem, which we can use to inform us what confidence we should have in the parameters of a given model, given data points we have observed.
         
-        Bayes' theorem tells us that our \textit{posteriori} confidence in $\vec{\theta}$, given the available data, is given by the probabilty
+        Bayes' theorem tells us that our \textit{posteriori} confidence in the parameters $\vec{\theta}$, given the available data $\mathcal{D}=(\vec{y}, X)$, is given by the probability
         \begin{align}
             P(\vec{\theta}|X, \vec{y}) = \frac{P(\vec{y}|X,\vec{\vec{\theta}})P(\vec{\theta})}{P(X,\vec{y})},
         \end{align}
-        where $P(\vec{y}|X, \vec{\theta})$ is the \textit{likelihood}, and $P(\vec{\theta})$ is our \textit{prior} confidence in $\vec{\theta}$. $P(X,\vec{y})$ plays the role of a normalisation, and can safely be ignored -- either because we look for values of $\vec{\theta}$ that maximise the probability, or because we assume the probabilities $P(\vec{y}|X,\vec{\theta})$ and $P(\vec{\theta})$ which we then can properly normalise. Now we have a framework through which we can build a model by making assumptions about the probability distributions $P(\vec{y}|X,\vec{\theta})$ and $P(\vec{\theta})$ to give us a probability distribution for the parameters $\vec{\theta}$ that we can maximise.
+        where $P(\vec{y}|X, \vec{\theta})$ is the \textit{likelihood}, and $P(\vec{\theta})$ is our \textit{prior} confidence in $\vec{\theta}$. $P(X,\vec{y})$ plays the role of a normalisation, and can safely be ignored -- either because we look for values of $\vec{\theta}$ that maximise the probability, or because we assume the probabilities $P(\vec{y}|X,\vec{\theta})$ and $P(\vec{\theta})$ which we can then properly normalise. Now we have a framework through which we can build a model by making assumptions about the probability distributions $P(\vec{y}|X,\vec{\theta})$ and $P(\vec{\theta})$ to give us a probability distribution for the parameters $\vec{\theta}$ that we can maximise.
 
 
     \subsection{Ordinary least squares}
-        Now we can define the ordinary least squares method by assuming that the data $y$ that we want to make a fit to has a linear noise term that is normally distributed with mean nought. That is, the data is generated as $y(x) = f(x) + \epsilon$, where $f(x)$ is some analytic, non-stochastic function of the data input $x$, and $\epsilon \distas \normal{0}{\sigma^2}$. Further, if we make a model fitting $y(x)$ by a $\hat{y}(x)$, we should expect the error at every data point $(y_i, x_i)$ to be be normally distributed with the same variance, i.e., independently and identically distributed (i.i.d.). This can be summarised
+        We define the ordinary least squares method by assuming that the data $y(x)$ that we want to make a fit to has a linear noise term that is normally distributed with mean nought. That is, the data is generated as $y(x) = f(x) + \epsilon$, where $f(x)$ is some analytic, non-stochastic function of the data input $x$, and $\epsilon \distas \normal{0}{\sigma^2}$ for some $\sigma^2>0$. Further, if we make a model fitting $y(x)$ by a $\hat{y}(x)$, we should expect the error at every data point $(y_i, x_i)$ to be be normally distributed with the same variance, i.e., independently and identically distributed (i.i.d.). This can be summarised
         \begin{align}
             P(\vec{y}|X, \vec{\theta}) = \prod_{i=1}^{n} \frac{1}{\sqrt{2\pi\sigma^2}} \exp{-\frac{{(y_i-\hat{y}_i)}^2}{2\sigma^2}}.
         \end{align}
-        Furthermore, we assume the parameters $\vec{\theta}$ to be distributed evenly, and as such, $P(\vec{\theta})$ just contributed to an overall normalisation. This means that maximising $P(\vec{y}|X, \vec{\theta})$ amounts to the same as maximising $P(\vec{\theta}|X, \vec{y})$, and can be done analytically.
+        Furthermore, we assume the parameters $\vec{\theta}$ to be distributed uniformly, and as such, $P(\vec{\theta})$ just contributes to an overall normalisation. This means that maximising $P(\vec{y}|X, \vec{\theta})$ amounts to the same as maximising $P(\vec{\theta}|X, \vec{y})$, and can be done analytically.
 
-        Knowing that the Gaussian distribution has a single extremum that is a maximum, we can find the values for $\vec{\theta}$ maximising the probability as
+        Knowing that the Gaussian distribution has a single extremum that is a maximum, we can find the values for $\vec{\theta}$ maximising the probability from
         \begin{align} \nonumber
             \d[\theta_k]{P(\vec{y}|X,\vec{\theta})} &= 0 \\
             \Rightarrow \prod_{i=1}^{n} \frac{1}{\sqrt{2\pi\sigma^2}} \frac{1}{\sigma^2} X_{ib}(y_i-X_{ia}\theta_a) \exp{-\frac{{(y_i - X_{ia}\theta_a)}^2}{2\sigma^2}} &= 0,
         \end{align}
-        which as we can see, is maximisable point by point. This means that the optimal parameters $\msub{\vec{\hat{\theta}}}{OLS}$ that maximise $P(\vec{y}|X, \vec{\theta})$ can be found as
+        which as we can see, is maximisable point by point. This means that the optimal parameters $\msub{\vec{\hat{\theta}}}{OLS}$ that maximise $P(\vec{y}|X, \vec{\theta})$ are given analytically by
         \begin{align}
             \boxed{
             \msub{\vec{\hat{\theta}}}{OLS} = \pclosed{X^TX}^{-1} X^T \vec{y}.
@@ -170,7 +170,7 @@
     \comment{Should this be a subsubsection? -Anna}\\
     \comment{Definitely! -CM \& H}
     \subsection{Ridge regression}
-        So far, we have assumed that the parameters $\vec{\theta}$ are uniformly distributed, and as such have no \textit{bias} towards any particular value. In practice, this means that the OLS model will contort to fit itself to all values in the data. As such, a motivation for adding a bias could be for the sake of stability in the fit. These methods are called \textit{regularised} methods. An example is ridge regression, where one assumes that the parameters are normally distributed, such that parameter values far from the mean are thought less likely to occurr. This in practice means that the model is less willing to contort to outliers in the dataset, trading it for a bias towards certain parameter values. Assuming the probability distrbution for $\vec{\theta}$
+        So far, we have assumed that the parameters $\vec{\theta}$ are uniformly distributed, and as such have no \textit{bias} towards any particular value. In practice, this means that the OLS model will contort to fit itself to all values in the data. As such, a motivation for adding a bias could be for the sake of stability in the fit. These methods are called \textit{regularised} methods. An example is ridge regression, where one assumes that the parameters are normally distributed, such that parameter values far from the mean are thought less likely to occur. This in practice means that the model is less willing to contort to outliers in the dataset, trading it for a bias towards certain parameter values. Assuming the probability distrbution for $\vec{\theta}$
         \begin{align}
             P(\vec{\theta}) = \prod_{a=1}^{p} \frac{1}{\sqrt{2\pi\tau^2}} \exp{-\frac{\theta_a^2}{2\tau^2}},
         \end{align}
@@ -253,16 +253,14 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
         for fitting the model and others for computing metrics, we can get multiple values for the same measure by changing which folds are used for fitting 
         and which are used for calculating measures. This is the basic idea of cross validation.
         \newline\newline
-        In this report, we will use the famouse \textit{k-fold Cross-validation} technique. Consider a data sample $D = (\vec{y}, X)$, consisting of $n$ data points. Initially we partion $D$ into $k$ folds $D_i$, $i = 1, ... , k$ of equal size.   
-        For each fold $D_i$, a model is fitted using every fold \textit{except} $D_i$, which we write as $D_{-i}$. With this model, we calcualte the different measures 
-        using $D_i$, which was not used to fit the model. When this is done for all $k$ folds, we take the mean of the measures to get the 
+        In this report, we will use the famous \textit{k-fold Cross-validation} technique. Considering the dataset $\mathcal{D} = (\vec{y}, X)$, consisting of $n$ data points: Initially we partition $\mathcal{D}$ into $k$ folds $\mathcal{D}_i$, $i = 1, ... , k$, of equal size. For each fold $\mathcal{D}_i$, a model is fitted using every fold \textit{except} $\mathcal{D}_i$, which we denote $\mathcal{D}_{-i}$. With this model, we calculate the different statitistical measures of the model on $\mathcal{D}_i$, which was not used to fit the model. When this is done for all $k$ folds, we take the mean of the measures to get the 
         final goodness of fit. 
 
 
 \section{Results}
     \comment{Not sure about section ordering here - Håkon}
     \subsection{Ordinary least squares}
-    We begin by calulating the $MSE$ and $R^2$ score (ref eq?) fitted to the Franke function for different polynomial degrees. This can be seen in Figure \ref{fig:res:OLS_mse_noresample} and \ref{fig:res:OLS_R2_noresample} respectivly. 
+    We begin by calulating the $MSE$ and $R^2$ score (ref eq?) fitted to the Franke function for different polynomial degrees. This can be seen in Figure \ref{fig:res:OLS_mse_noresample} and \ref{fig:res:OLS_R2_noresample} respectively. 
     \begin{figure}[H]
         \centering
         \includegraphics[width=\linewidth]{OLS_mse_noresample.pdf}
@@ -358,7 +356,7 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
             =& \pclosed{\expval\bclosed{f+\epsilon-\expval(\hat{f})}}^2 + \expval(\epsilon^2) + \var(\hat{f}) - 2\expval(\epsilon \hat{f}) \\
             =& \pclosed{\bias(\hat{f})}^2 + \var(\hat{f}) + \sigma^2,
         \end{align}
-        where in the last line, we used that $\expval(\epsilon\hat{f}) = \expval(\epsilon)\expval(\hat{f})=0$.\footnote{At first glance, this might seem odd, as there is noise involved in the fitting of $\hat{f}$ too. However, under the assumption that the noise is i.i.d. between experiments, the noise in the data used to fit $\hat{f}$ is independent of the noise in a test example. It is worth noting that this would not be true if we were comparing with the same data used to fit the model, which explains the optimism of the training MSE. \comment{This last part here might be put into the discussion perhaps?}}
+        where in the last line, we used that $\expval(\epsilon\hat{f}) = \expval(\epsilon)\expval(\hat{f})=0$.\footnote{At first glance, this might seem odd, as there is noise involved in the fitting of $\hat{f}$ too. However, under the assumption that the noise is i.i.d. between experiments, the noise in the data used to fit $\hat{f}$ is independent of the noise in a test sample. It is worth noting that this would not be true if we were comparing with the same data used to fit the model, which explains the optimism of the training MSE. \comment{This last part here might be put into the discussion perhaps?}}
 
     \begin{figure*}
         \begin{subfigure}{.5\textwidth}
