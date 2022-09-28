@@ -11,14 +11,14 @@ from sknotlearn.datasets import make_FrankeFunction
 from sknotlearn.data import Data
 from utils import make_figs_path, colors
 
-def plot_heatmap(lmbdas_grid, degrees_grid, MSEs):
+def plot_heatmap(degrees_grid, lmbdas_grid, MSEs):
     fig, ax = plt.subplots()
 
     ax.contourf(degrees_grid, lmbdas_grid, MSEs)
     ax.set_yscale("log")
     plt.show()
 
-def make_mse_grid(Method, lmbdas, degrees):
+def make_mse_grid(Method, degrees, lmbdas):
     train_size = 2/3
     random_state = 321
     noise_std = 0.1
@@ -37,15 +37,15 @@ def make_mse_grid(Method, lmbdas, degrees):
             reg = Method(lmbda=lmbda).fit(Dp_train)
             MSEs[i,j] = reg.mse(Dp_test)
 
-    lmbdas_grid, degrees_grid = np.meshgrid(lmbdas, degrees, indexing="ij")
-    return lmbdas_grid, degrees_grid, MSEs
+    degrees_grid, lmbdas_grid = np.meshgrid(degrees, lmbdas, indexing="ij")
+    return degrees_grid, lmbdas_grid, MSEs
 
 
 if __name__ == "__main__":
-    n_lmbdas = 12
-    n_degrees = 12
+    n_lmbdas = 50
+    n_degrees = 20
     lmbdas = np.logspace(-6, 1, n_lmbdas)
     degrees = np.arange(1, n_degrees+1)
 
-    lmbdas_grid, degrees_grid, MSEs = make_mse_grid(Ridge, lmbdas, degrees)
-    plot_heatmap(lmbdas_grid, degrees_grid, MSEs)
+    degrees_grid, lmbdas_grid,  MSEs = make_mse_grid(Ridge, degrees, lmbdas)
+    plot_heatmap(degrees_grid, lmbdas_grid, MSEs)
