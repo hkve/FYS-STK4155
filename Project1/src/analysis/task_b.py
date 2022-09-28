@@ -1,5 +1,3 @@
-from cmath import isnan
-from ctypes import util
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -68,13 +66,14 @@ def plot_beta_progression(betas, betas_se, powers, degrees=[1,3,5], filename=Non
 	axes[0].set_ylabel(r"$\beta$", fontsize=14)
 	fig.supxlabel(r"$\beta$ corresponding to $x^i y^j$", fontsize=14)
 
-	for ax, p in zip(axes, degrees):
+	x = [0,0,60]
+	for ax, p, x_ in zip(axes, degrees, x):
 		# Make labels like 1, x, y, xy ...
 		labels = make_power_labels(p, powers)
 		
 		# Plot for degree p
 		ticks = np.arange(len(labels))
-		ax.set_xticks(ticks, labels, rotation=90)
+		ax.set_xticks(ticks, labels, rotation=x_)
 		ax.plot(ticks, betas[p], c="k", ls="--", marker=".")
 		ax.fill_between(ticks, (betas[p]-2*betas_se[p]), (betas[p]+2*betas_se[p]), color='r', alpha=.3)
 
@@ -99,13 +98,13 @@ def plot_beta_heatmap(betas, beta_se, powers, degrees=[1,2,3,4,5], filename=None
 
 		betas_mat[i, :w_p] = betas[p]
 
-	betas_mat = abs(betas_mat)
+	betas_mat_ = abs(betas_mat)
 	# betas_mat = np.where(betas_mat < 1e-2, np.nan, betas_mat)
 
 	sns.set_style("white") # and comment out this
 	fig, ax = plt.subplots(figsize=(12,5))
 	
-	im = ax.imshow(betas_mat, cmap="viridis", norm=LogNorm(vmin=np.nanmin(betas_mat)+1e-2, vmax=np.nanmax(betas_mat)))
+	im = ax.imshow(betas_mat_, cmap="viridis", norm=LogNorm(vmin=np.nanmin(betas_mat_)+1e-2, vmax=np.nanmax(betas_mat_)))
 
 	# Show all ticks and label them with the respective list entries
 	ax.set_xticks(np.arange(len(labels)), labels=labels)
@@ -173,6 +172,6 @@ def solve_a(n=1000, train_size=0.8, noise_std=0.1, random_state=123):
 if __name__ == "__main__":
 	params1, params2 = solve_a(n=600, noise_std=0.1, random_state=321, train_size=2/3)
 
-	plot_mse_and_r2(*params1, filenames=["OLS_mse_noresample", "OLS_R2_noresample"])
-	plot_beta_progression(*params2, filename="linreg_coefs_plots")
+	# plot_mse_and_r2(*params1, filenames=["OLS_mse_noresample", "OLS_R2_noresample"])
+	# plot_beta_progression(*params2, filename="linreg_coefs_plots")
 	plot_beta_heatmap(*params2, filename="linreg_coefs_table")
