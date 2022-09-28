@@ -32,7 +32,7 @@
 
 % Commands
 
-\newcommand{\comment}[1]{\textcolor{red}{#1}\\}
+\newcommand{\comment}[1]{\textcolor{red}{#1}}
 
 \newcommand{\integral}[1]{\ensuremath{\int\!\mathrm{d}#1\,}}
 \renewcommand{\d}[2][x]{\ensuremath{\frac{\mathrm{d}#2}{\mathrm{d}#1}}}
@@ -98,13 +98,23 @@
 
     \comment{Here I am lost as to the order and division of things. - Carl Martin, ca. 2000 AD}
     \subsubsection{Central Limit Theorem}
-            
+        The central limit theorem tells us that when sampling a series of quantities $\cclosed{z_i|i=1,...,n}$ with independent and identical distributions with a mean $\mu$ and variance $\sigma^2<\infty$, the distribution of the sample mean $\bar{z}_n = \frac{1}{n}\sum_{i=1}^n z_i$ will approach a normal distrbution. Explicitly, we have (\comment{I don't know whether to box this - CM})
         \begin{align}
-            \lim_{n\to\infty} \sqrt{n}(\bar{x}_n-\mu) \distas \normal{0}{\sigma^2}
+            \boxed{
+                \lim_{n\to\infty} \sqrt{n}(\bar{x}_n-\mu) \distas \normal{0}{\sigma^2}.
+            }
         \end{align}
+        In practice that for some notion of a large sample size $n$, the approximation of the sample mean as being distributed as
+        \begin{align}
+            \bar{z}_n \distas \normal{\mu}{\frac{\sigma^2}{n}}
+        \end{align}
+        becomes sound. Colloquially we say the sample mean approaches the true mean $\mu$. This is powerful, as it means not only that the sample mean becomes better as the sample size grows, but any quantity derived from its distribution is also determined more precisely. This lays the foundation for statistical informed models. \comment{Wild-ish claim here, but I was not sure how to `motivate' this section on CLM so that it doesn't seem to random, without going too big. Any input is appreciated. -CM}
 
 
-    When we want to create a statistically informed model that is able to predict future measurements, we need to develop a metric for how well our model fits the data we already have. That is, we want to optimise our parameters $\vec{\theta}$ such that $\hat{f}(x) \approx f(x)$. To estimate how well we acheive this with our given dataset $\mathcal{D}$, we will start with the mean squared error (MSE). Given a model which predicts values $\vec{\hat{y}}$, the mean squared error is given by
+
+
+    \subsubsection{New section for MSE}
+        When we want to create a statistically informed model that is able to predict future measurements, we need to develop a metric for how well our model fits the data we already have. That is, we want to optimise our parameters $\vec{\theta}$ such that $\hat{f}(x) \approx f(x)$. To estimate how well we acheive this with our given dataset $\mathcal{D}$, we will start with the mean squared error (MSE). Given a model which predicts values $\vec{\hat{y}}$, the mean squared error is given by
         \begin{align}
             \boxed{
                 \mse(\vec{\hat{y}}) = \frac{1}{n} \sum_{i=1}^n (y_i-\hat{y}_i)^2 = \frac{1}{n} (\vec{y} - \vec{\hat{y}})^2.
@@ -139,7 +149,7 @@
 
 
     \subsection{Ordinary least squares}
-        Now we can define the ordinary least squares method by assuming that the data $y$ that we want to make a fit to has a linear noise term that is normally distributed with mean nought. That is, the data is generated as $y(x) = f(x) + \epsilon$, where $f(x)$ is some analytic, non-stochastic function of the data input $x$, and $\epsilon \sim N(0, \sigma^2)$. Further, if we make a model fitting $y(x)$ by a $\hat{y}(x)$, we should expect the error at every data point $(y_i, x_i)$ to be be normally distributed with the same variance, i.e., independently and identically distributed (i.i.d.). This can be summarised
+        Now we can define the ordinary least squares method by assuming that the data $y$ that we want to make a fit to has a linear noise term that is normally distributed with mean nought. That is, the data is generated as $y(x) = f(x) + \epsilon$, where $f(x)$ is some analytic, non-stochastic function of the data input $x$, and $\epsilon \distas \normal{0}{\sigma^2}$. Further, if we make a model fitting $y(x)$ by a $\hat{y}(x)$, we should expect the error at every data point $(y_i, x_i)$ to be be normally distributed with the same variance, i.e., independently and identically distributed (i.i.d.). This can be summarised
         \begin{align}
             P(\vec{y}|X, \vec{\theta}) = \prod_{i=1}^{n} \frac{1}{\sqrt{2\pi\sigma^2}} \exp{-\frac{{(y_i-\hat{y}_i)}^2}{2\sigma^2}}.
         \end{align}
@@ -157,7 +167,8 @@
             }
         \end{align}
 
-    \comment{Should this be a subsubsection? -Anna}
+    \comment{Should this be a subsubsection? -Anna}\\
+    \comment{Definitely! -CM \& H}
     \subsection{Ridge regression}
         So far, we have assumed that the parameters $\vec{\theta}$ are uniformly distributed, and as such have no \textit{bias} towards any particular value. In practice, this means that the OLS model will contort to fit itself to all values in the data. As such, a motivation for adding a bias could be for the sake of stability in the fit. These methods are called \textit{regularised} methods. An example is ridge regression, where one assumes that the parameters are normally distributed, such that parameter values far from the mean are thought less likely to occurr. This in practice means that the model is less willing to contort to outliers in the dataset, trading it for a bias towards certain parameter values. Assuming the probability distrbution for $\vec{\theta}$
         \begin{align}
