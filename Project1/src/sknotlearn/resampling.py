@@ -54,16 +54,14 @@ class Bootstrap:
         if run: self.run()
 
     
-    def run(self, no_rounds=None):
-        """Preforms the actual bootstrap
+    def run(self, no_rounds=None) -> None:
+        """Preforms the actual bootstrap. Stores the various models trained on the bootstrapped data in arrays 
 
         Args:
-            no_rounds (int, optional): If rounds should be different from the initial value. 
-                                        Can remove this. Defaults to None.
-
-        'Returns':
-
+            no_rounds (int, ): If rounds should be different from the initial value. 
+                            Can remove this. Defaults to None.
         """
+
         rounds = no_rounds or self.rounds
         reg = self.reg 
 

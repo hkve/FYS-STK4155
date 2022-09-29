@@ -28,7 +28,8 @@ def plot_hist_of_bootstrap(Bootstrap_, degree):
     of bootstrap rounds
 
     Args:
-        Bootstraps (_type_): bootstrap of a certain degree
+        Bootstrap_ (Bootstrap): bootstrap of a certain degree
+        degree (int): Degree of the model which is bootstrapped
     """
     mse_train = Bootstrap_.mse_train_values
     mse_test = Bootstrap_.mse_test_values
@@ -36,26 +37,33 @@ def plot_hist_of_bootstrap(Bootstrap_, degree):
     find_bins = lambda arr, times=800: np.abs(int((np.max(arr)-np.min(arr))*times))
 
     sns.set_style('darkgrid')
-    plt.hist(mse_train, bins=find_bins(mse_train), label='mse for training data', color=colors[2], density=True)
-    plt.hist(mse_test, bins=find_bins(mse_test), alpha=0.6,  label='mse for test data', color=colors[1], density=True) #Cannot use density=True because MSE
+    plt.hist(mse_train, bins=find_bins(mse_train), label='mse for training data', color=colors[1], density=True)
+    plt.hist(mse_test, bins=find_bins(mse_test), alpha=0.6,  label='mse for test data', color=colors[0], density=True)
     plt.xlabel('MSE')
     plt.ylabel('Probability density')
-    # plt.xlim([0,0.03])
     plt.title(f'Results of MSE when bootstrapping {Bootstrap_.rounds} times')
     plt.legend()
-    plt.savefig(make_figs_path(f'hist_bootstrap_{Bootstrap_.rounds}.pdf'), dpi=300)
+    plt.savefig(make_figs_path(f'hist_bootstrap_{Bootstrap_.rounds}_scaled_of_degree_{degree}.pdf'), dpi=300)
     plt.show()
 
 def plot_bias_var(Bootstrap_list, degrees):
+    """Plotting the bias-variance decomposition of the mse value across various polynomial degrees. 
+
+    Args:
+        Bootstrap_list (list): List consisting of instances of the class Bootstrap. Each element of the class responds to a certain polynomial degree and each element has been bootstrapped the same number of rounds.  
+        degrees (array): Array of the polynomial degrees 
+    """
+    #extracting the mean values for each degree: 
     mse = [BS.mse_test for BS in Bootstrap_list]
     bias = [BS.bias_test for BS in Bootstrap_list]
     var = [BS.var_test for BS in Bootstrap_list]
     proj_mse = [BS.projected_mse for BS in Bootstrap_list]
-
+    
+    #Plotting:
     sns.set_style('darkgrid')
-    plt.plot(degrees, mse, label='MSE', c=colors[0], lw=2.5)
+    plt.plot(degrees, mse, label='MSE', c=colors[2], lw=2.5)
     plt.plot(degrees, bias, label=r'Bias$^2$', c=colors[1], lw=2.5)
-    plt.plot(degrees, var, label='Variance', c=colors[2], lw=2.5)
+    plt.plot(degrees, var, label='Variance', c=colors[0], lw=2.5)
     plt.plot(degrees, proj_mse, '--', label='Projected mse', c=colors[3], lw=3)
     plt.xlabel('Polynomial degree')
     plt.ylabel('Score')
@@ -66,12 +74,20 @@ def plot_bias_var(Bootstrap_list, degrees):
 
 
 def plot_mse(Bootstrap_list, degrees):
+    """Plotting the training and test mse for the various polynomial degrees. 
+
+    Args:
+        Bootstrap_list (list): List consisting of instances of the class Bootstrap. Each element of the class responds to a certain polynomial degree and each element has been bootstrapped the same number of rounds.
+        degrees (array): Array of the polynomial degrees 
+    """
+    #Extracting the mean value for each degree:
     mse_train = [BS.mse_train for BS in Bootstrap_list]
     mse_test = [BS.mse_test for BS in Bootstrap_list]
 
+    #Plotting: 
     sns.set_style('darkgrid')
-    plt.plot(degrees, mse_train, label='Train MSE', c=colors[1], lw=2.5, alpha=0.75)
-    plt.plot(degrees, mse_test, label='Test MSE', c=colors[2], lw=2.5)
+    plt.plot(degrees, mse_train, label='Train MSE', c=colors[0], lw=2.5, alpha=0.75)
+    plt.plot(degrees, mse_test, label='Test MSE', c=colors[1], lw=2.5)
     plt.xlabel('Polynomial degree')
     plt.ylabel('MSE value')
     plt.legend()
@@ -86,7 +102,8 @@ if __name__ == "__main__":
     y, X = D.unpacked()
 
     #For various rounds:
-    rounds = np.array([30, 90, 120, 150])
+    rounds = np.array([30, 120, 210, 300])
+    rounds = np.arange(30, 1000+1, (1001-30)//3)
     Bootstrap_list_rounds = []
     for i, round in enumerate(rounds):
         poly = PolynomialFeatures(degree=7)
@@ -100,7 +117,7 @@ if __name__ == "__main__":
         BS = Bootstrap(reg, data_train, data_test, random_state = 321, rounds=round)
         Bootstrap_list_rounds.append(BS)
         plot_hist_of_bootstrap(BS, 7)
-   
+
     #For various degrees
     degrees = np.arange(1, 12+1)
     Bootstrap_list = []
@@ -108,7 +125,7 @@ if __name__ == "__main__":
         poly = PolynomialFeatures(degree=deg)
         X_poly = poly.fit_transform(X)
 
-        data = Data(y, X_poly)
+        data = Data(y, X_poly).scaled(scheme='Standard')
 
         data_train, data_test = data.train_test_split(ratio=3/4, random_state=321)
         reg = LinearRegression()
@@ -116,8 +133,8 @@ if __name__ == "__main__":
         BS = Bootstrap(reg, data_train, data_test, random_state = 321, rounds=70)
         Bootstrap_list.append(BS)
 
-    # plot_mse(Bootstrap_list, degrees)
-    # plot_bias_var(Bootstrap_list, degrees)
+    plot_mse(Bootstrap_list, degrees)
+    plot_bias_var(Bootstrap_list, degrees)
 
     
 
