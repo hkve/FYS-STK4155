@@ -75,7 +75,7 @@
 ]
 
 \section{Introduction}
-    In this project, we will introduce some of the most important general properties of machine learning models in the context of linear regression. Specifically the mean squared error (MSE), the bias, and the variance of data predictions are essential in evaluating the quality of a statistical model. We look at the phenomena of underfitting and overfitting, and explore them in the context of bias-variance trade-off. The three models we will use explicitly are Ordinary Linear Regression (OLS), Ridge regression and Least-Absolute-Shrinkage-and-Selection-Operation (LASSO) regression. These will first be tested on the 2D Franke function, and later on real geographical terrain data.
+    In this project, we will introduce some of the most important general properties of machine learning models in the context of linear regression. Specifically the mean squared error (MSE), the bias, and the variance of data predictions are essential in evaluating the quality of a statistical model. We look at the phenomena of underfitting and overfitting, and explore them in the context of bias-variance trade-off. The three models we will use explicitly are Ordinary Least Squares (OLS), Ridge regression and Least-Absolute-Shrinkage-and-Selection-Operation (LASSO) regression. These will first be tested on the 2D Franke function, and later on real geographical terrain data.
 
     The aforementioned models will be explored using resampling techniques, which will be employed to extract the relevant statistical quantities in an accurate way. We will use the standard methods of Bootstrapping and Cross Validation and compare the results we get between them across the three linear models.
 
@@ -108,22 +108,27 @@
         \begin{align}
             \bar{z}_n \distas \normal{\mu}{\frac{\sigma^2}{n}}
         \end{align}
-        becomes sound. Colloquially we say the sample mean approaches the true mean $\mu$. This is powerful, as it means not only that the sample mean becomes better as the sample size grows, but quantities derived from its distribution are also determined more precisely. This lays the foundation for statistically informed models such as regression methods. \comment{Wild-ish claim here, but I was not sure how to `motivate' this section on CLM so that it doesn't seem to random, without going too big. Any input is appreciated. -CM}
+        becomes sound. Colloquially we say the sample mean approaches the true mean $\mu$. This is powerful, as it means not only that the sample mean becomes better as the sample size grows, but quantities derived from its distribution are also determined more precisely. This lays the foundation for statistically informed models such as regression methods. \comment{Wild-ish claim here, but I was not sure how to `motivate' this section on CLM so that it doesn't seem too random, without going too big. Any input is appreciated. -CM}
 
 
 
 
     \subsubsection{New section for MSE}
-        When we want to create a statistically informed model that is able to predict the outcome of future measurements, we need to develop a metric for how well our model fits the data we already have. That is, we want to optimise our parameters $\vec{\theta}$ such that $\hat{f}(x) \approx f(x)$. To estimate how well we acheive this with our given dataset $\mathcal{D}$, we will start with the mean squared error (MSE). Given a model which predicts values $\vec{\hat{y}}$, the mean squared error is given by
+        When we want to create a statistically informed model that is able to predict the outcome of future measurements, we need to develop a metric for how well our model fits the data we already have. That is, we want to optimise our parameters $\vec{\theta}$ such that $\hat{f}(x) \approx f(x)$. We call this the goodness of fit. To estimate how well we acheive this with our given dataset $\mathcal{D}$, we will start with the mean squared error (MSE). Given a model which predicts values $\vec{\hat{y}}$, the mean squared error is given by
         \begin{align}
             \boxed{
                 \mse(\vec{\hat{y}}) = \frac{1}{n} \sum_{i=1}^n (y_i-\hat{y}_i)^2 = \frac{1}{n} (\vec{y} - \vec{\hat{y}})^2.
             }
         \end{align}
 
-        \comment{something something...}
+        Another popular statistical measure we will use to evaluate the goodness of fit is the $R^2$-score, calculated as
+        \begin{align}
+            R^2(\vec{\hat{y}}) = 1 - \frac{\sum_{i=1}^n (y_i-\hat{y}_i)^2}{\sum_{i=1}^n (y_i-\bar{y})^2} = 1 - \frac{(\vec{y}-\vec{\hat{y}})^2}{(\vec{y}-\bar{y})^2},
+        \end{align}
+        where $\bar{y} = \frac{1}{n}\sum_{i=1}^n y_i$ is the sample mean of the observed data.
 
-        The MSE can be decomposed into its \textit{bias} and \textit{variance}, which are quantities that can tell us more about exactly what our model is doing wrong. To set up this decomposition, we consider a situation where we have fitted a series of models to $L$ different datasets, with parameters $\vec{\hat{\theta}}^\ell$, with $\ell=1,...,L$, and predictions $\vec{\hat{y}}^\ell$ on the dataset we want to compare to. The sample mean squared error can then be decomposed into
+
+        To get further insight into the validity of our model, we can decompose the MSE into its \textit{bias} and \textit{variance}, which are quantities that can tell us more about exactly what our model is doing wrong. To set up this decomposition, we consider a situation where we have fitted a model to a series of $L$ different datasets, with parameters $\vec{\hat{\theta}}^\ell$, with $\ell=1,...,L$, and predictions $\vec{\hat{y}}^\ell$ on the dataset we want to compare to. The sample mean squared error at each observed point can then be decomposed into
         \begin{align}
             \mse(\hat{y}_i) = \pclosed{\bias(\hat{y}_i)}^2 + \var(\hat{y}_i),
         \end{align}
@@ -134,7 +139,7 @@
                 \var(\hat{y}_i) &= \frac{1}{L}\sum_{\ell=1}^L \pclosed{\hat{y}_i^\ell - \frac{1}{L} \sum_{m=1}^L \hat{y}_i^m }^2,
             \end{align}
         \end{subequations}
-        are the sample bias and sample variance of the model at the predicted point. The decomposition is shown explicitly in Appendix \ref{app:sec:bvdecomp}.
+        are the sample bias and sample variance of the model at the predicted point. This decomposition is done in more detail in Appendix \ref{app:sec:bvdecomp}. 
         
 
 
@@ -163,7 +168,7 @@
         which as we can see, is maximisable point by point. This means that the optimal parameters $\msub{\vec{\hat{\theta}}}{OLS}$ that maximise $P(\vec{y}|X, \vec{\theta})$ are given analytically by
         \begin{align}
             \boxed{
-            \msub{\vec{\hat{\theta}}}{OLS} = \pclosed{X^TX}^{-1} X^T \vec{y}.
+                \msub{\vec{\hat{\theta}}}{OLS} = \pclosed{X^TX}^{-1} X^T \vec{y}.
             }
         \end{align}
 
@@ -231,14 +236,23 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
     
     \subsection{Linear regression}
     \comment{not sure about how we should divide these subsections, but I wanted to write a bit about data scaling}
-    Before fitting the regularised models to the sampled data, we will scale the data using the $Z$-score normalisation. This scales the inputs $x_i$ and the targets $\vec{y}$ such that they have a mean value of $0$ with a standard deviation $1$. In effect, we rescale
-    \begin{subequations}
+        When fitting our models to the data, we base our models on simple polynomial expansions of the arguments of the function generating the data. We are fitting scalar function with to arguments $x$ and $y$, so our design matrix is constructed as
         \begin{align}
-            \vec{y}^\text{scaled} &= \frac{\vec{y}-\bar{y}}{\bar{\sigma}_{\vec{y}}}, \\
-            \vec{x}_a^\text{scaled} &= \frac{\vec{x}_a - \bar{x}_a}{\bar{\sigma}_{\vec{x}_a}},
+            X = \begin{pmatrix}
+                1 & x_1 & y_1 & x^2_1 & x_1y_1 & y_1^2 & \cdots & x_1^p & \cdots & y_1^p \\
+                \vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \ddots & \vdots \\
+                1 & x_n & y_n & x^n_n & x_ny_n & y_n^2 & \cdots & x_n^p & \cdots & y_n^p
+            \end{pmatrix}
         \end{align}
-    \end{subequations}
-    where $\bar{z} = \frac{1}{n} \sum_{i=1}^n z_n$ detotes the sample mean of $\vec{z}$ and $\sigma_{\vec{z}}^2 = \frac{1}{n} \sum_{i=1}^n {(z_i-\bar{z})}^2$ denotes the sample std of $\vec{z}$.
+    
+        Before fitting the models to the sampled data, we will scale the data using the $Z$-score normalisation. This scales the inputs $x_i$ and the targets $\vec{y}$ such that they have a mean value of $0$ with a standard deviation $1$. In effect, we rescale
+        \begin{subequations}
+            \begin{align}
+                \vec{y} &\to \frac{\vec{y}-\bar{y}}{\bar{\sigma}_{\vec{y}}}, \\
+                \vec{x} &\to \frac{\vec{x}_a - \bar{x}_a}{\bar{\sigma}_{\vec{x}_a}},
+            \end{align}
+        \end{subequations}
+        where $\bar{z} = \frac{1}{n} \sum_{i=1}^n z_n$ denotes the sample mean of $\vec{z}$ and $\sigma_{\vec{z}}^2 = \frac{1}{n} \sum_{i=1}^n {(z_i-\bar{z})}^2$ denotes the sample std of $\vec{z}$.
 
     \subsection{Resampling techniques}
     With the intent to compute more accurate measures for goodness of fit (such as MSE and $R^2$) to evaluate our model, we 
