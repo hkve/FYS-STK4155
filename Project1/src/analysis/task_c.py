@@ -16,6 +16,7 @@ from sknotlearn.linear_model import LinearRegression
 from sknotlearn.datasets import make_FrankeFunction
 from sknotlearn.resampling import Bootstrap
 from sknotlearn.data import Data
+from utils import make_figs_path, colors
 
 """ 
 With the bias and var calculated across the bootstrap
@@ -32,13 +33,17 @@ def plot_hist_of_bootstrap(Bootstrap_, degree):
     mse_train = Bootstrap_.mse_train_values
     mse_test = Bootstrap_.mse_test_values
 
-    find_bins = lambda arr, times=250: np.abs(int((np.max(arr)-np.min(arr))*times))
-    plt.hist(mse_train, label='mse for training data')
-    plt.hist(mse_test, alpha=0.75,  label='mse for test data') #Cannot use density=True because MSE
+    find_bins = lambda arr, times=800: np.abs(int((np.max(arr)-np.min(arr))*times))
+
+    sns.set_style('darkgrid')
+    plt.hist(mse_train, bins=find_bins(mse_train), label='mse for training data', color=colors[2], density=True)
+    plt.hist(mse_test, bins=find_bins(mse_test), alpha=0.6,  label='mse for test data', color=colors[1], density=True) #Cannot use density=True because MSE
     plt.xlabel('MSE')
-    plt.ylabel('Probability')
-    plt.title(f'Model of degree {degree}: Results of MSE when bootstrapping {Bootstrap_.rounds} times')
+    plt.ylabel('Probability density')
+    # plt.xlim([0,0.03])
+    plt.title(f'Results of MSE when bootstrapping {Bootstrap_.rounds} times')
     plt.legend()
+    plt.savefig(make_figs_path(f'hist_bootstrap_{Bootstrap_.rounds}.pdf'), dpi=300)
     plt.show()
 
 def plot_bias_var(Bootstrap_list, degrees):
@@ -48,11 +53,15 @@ def plot_bias_var(Bootstrap_list, degrees):
     proj_mse = [BS.projected_mse for BS in Bootstrap_list]
 
     sns.set_style('darkgrid')
-    plt.plot(degrees, mse, label='MSE', c=sns.color_palette('husl')[-1], lw=2)
-    plt.plot(degrees, bias, label=r'Bias$^2$', c=sns.color_palette('husl')[-3], lw=2)
-    plt.plot(degrees, var, label='Variance', c=sns.color_palette('husl')[-2], lw=2)
-    plt.plot(degrees, proj_mse, '--', label='Projected mse', c=sns.color_palette('colorblind')[1], lw=2)
+    plt.plot(degrees, mse, label='MSE', c=colors[0], lw=2.5)
+    plt.plot(degrees, bias, label=r'Bias$^2$', c=colors[1], lw=2.5)
+    plt.plot(degrees, var, label='Variance', c=colors[2], lw=2.5)
+    plt.plot(degrees, proj_mse, '--', label='Projected mse', c=colors[3], lw=3)
+    plt.xlabel('Polynomial degree')
+    plt.ylabel('Score')
+    plt.title('Bias-Variance Decomposition of the MSE')
     plt.legend()
+    plt.savefig(make_figs_path(f'Bias_var_decomp.pdf'), dpi=300)
     plt.show()
 
 
@@ -60,8 +69,14 @@ def plot_mse(Bootstrap_list, degrees):
     mse_train = [BS.mse_train for BS in Bootstrap_list]
     mse_test = [BS.mse_test for BS in Bootstrap_list]
 
-    plt.plot(degrees, mse_train)
-    plt.plot(degrees, mse_test)
+    sns.set_style('darkgrid')
+    plt.plot(degrees, mse_train, label='Train MSE', c=colors[1], lw=2.5, alpha=0.75)
+    plt.plot(degrees, mse_test, label='Test MSE', c=colors[2], lw=2.5)
+    plt.xlabel('Polynomial degree')
+    plt.ylabel('MSE value')
+    plt.legend()
+    plt.title('Training and Test MSE')
+    plt.savefig(make_figs_path(f'train_test_mse.pdf'), dpi=300)
     plt.show()
 
 
@@ -70,27 +85,21 @@ if __name__ == "__main__":
     D.scaled()
     y, X = D.unpacked()
 
-    print(len(sns.color_palette('husl')))
+    #For various rounds:
+    rounds = np.array([30, 90, 120, 150])
+    Bootstrap_list_rounds = []
+    for i, round in enumerate(rounds):
+        poly = PolynomialFeatures(degree=7)
+        X_poly = poly.fit_transform(X)
 
+        data = Data(y, X_poly).scaled(scheme='Standard')
 
+        data_train, data_test = data.train_test_split(ratio=3/4, random_state=321)
+        reg = LinearRegression()
 
-    # #For various rounds:
-    # #Need to fix bins as well as subplots
-    # rounds = np.arange(100, 1000+1, 200)
-    # Bootstrap_list_rounds = []
-    # for round in rounds:
-    #     poly = PolynomialFeatures(degree=7)
-    #     X_poly = poly.fit_transform(X)
-
-    #     data = Data(y, X_poly)
-
-    #     data_train, data_test = data.train_test_split(ratio=3/4, random_state=321)
-    #     reg = LinearRegression()
-
-    #     BS = Bootstrap(reg, data_train, data_test, random_state = 321, rounds=round)
-    #     Bootstrap_list_rounds.append(BS)
-    #     plot_hist_of_bootstrap(BS, 7)
-
+        BS = Bootstrap(reg, data_train, data_test, random_state = 321, rounds=round)
+        Bootstrap_list_rounds.append(BS)
+        plot_hist_of_bootstrap(BS, 7)
    
     #For various degrees
     degrees = np.arange(1, 12+1)
@@ -107,9 +116,8 @@ if __name__ == "__main__":
         BS = Bootstrap(reg, data_train, data_test, random_state = 321, rounds=70)
         Bootstrap_list.append(BS)
 
-    # plot_hist_of_bootstrap(Bootstrap_list[7], 7)
     # plot_mse(Bootstrap_list, degrees)
-    plot_bias_var(Bootstrap_list, degrees)
+    # plot_bias_var(Bootstrap_list, degrees)
 
     
 

@@ -23,5 +23,5 @@ colors = [
     sns.color_palette('husl')[-1],
     sns.color_palette('husl')[-3],
     sns.color_palette('husl')[-2],
-    sns.color_palette('husl', 8)[0],
+    'mediumorchid'
 ]

@@ -31,39 +31,24 @@ class Bootstrap:
     preform the bootstrap. Then preforms a bootstrap said rounds and 'returns' the prediction from train 
     and test data as well as the actual test data.
     """
-    def __init__(self, reg, data_train, data_test, run=True, random_state=321, rounds=600) -> None:
-        """Initiates a bootstrap
+    def __init__(self, reg, data_train, data_test, run=True, random_state=321, rounds=600):
+        """
+        Constructor of class. Saves global variables and maybe calls run. 
 
         Args:
-            data_train (Data): Data instance that corresponds to the model in question. Trainingdata
-            data_test (Data): Data instance that corresponds to the model in question.
-            reg (class instance (?)): Model, preferably imported from sknotlearn.  
-            random_state (int, optional): Seed to set random state. Defaults to 321.
-            rounds (int, optional): Rounds of bootstrap. Defaults to 600. This can also be set in call.
+            reg (Instance derived from sknotlearn.linear_model.model): Instance of regression class used for cv
+            data_train (Data): Data instance that corresponds to the model in question. Training data. This data should be scaled.
+            data_test (Data): Data instance that corresponds to the model in question. Testing data. This data should be scaled.
+            run (bool): Whether the method run should be called and the bootstrap excecuted. Defaults to True.
+            random_state (int): Used to set seed. Defaults to 321.
+            rounds (int): Rounds of bootstrap. Defaults to 600.
         """
 
         # Set seed
         np.random.seed(random_state)
 
-        # # If scoring is not list/tuple, make it a tuple
-        # if type(scoring) not in [list, tuple]:
-        #     scoring = (scoring, )
-
-        # # Compute for both train and test
-        # cases = ["train", "test"]
-
-        # # Setup scoring dict
-        # self.scores_ = {}
-        # for case in cases:
-        #     for score in scoring:
-        #         assert score in reg.metrics_.keys(), f"The score {score} is not avalible in model {type(reg)}"
-        #         self.scores_[f"{case}_{score}"] = []
-
-        # self.scoring_ = scoring
-
-        self.reg = reg
-        self.rounds = rounds
-        self.random_state = random_state
+        #Save global variables
+        self.reg, self.rounds, self.random_state = reg, rounds, random_state
         self.data_train, self.data_test = data_train, data_test
 
         if run: self.run()
@@ -85,6 +70,7 @@ class Bootstrap:
         y_train, x_train = self.data_train.unpacked()
         y_test, x_test = self.data_test.unpacked()
 
+        # Create the arrays for storing the models trained on the bootstrapped data:
         y_train_boot_values = np.zeros((y_train.size,rounds))
         y_train_pred_values = np.zeros((y_train.size,rounds))
         y_test_pred_values = np.zeros((y_test.size,rounds))
@@ -93,23 +79,22 @@ class Bootstrap:
         n = len(x_train)
         for i in range(rounds):
             indices = np.random.randint(0,n,n)
-            x_train_boot = x_train[indices]
-            y_train_boot = y_train[indices]
+            x_boot = x_train[indices]
+            y_boot = y_train[indices]
 
-            data_train_boot = Data(y_train_boot, x_train_boot)
+            data_boot = Data(y_boot, x_boot)
 
-            reg.fit(data_train_boot)
-            y_train_pred = reg.predict(x_train_boot)
-            y_test_pred = reg.predict(x_test)
+            reg.fit(data_boot)
 
-            y_train_boot_values[:,i] = y_train_boot
-            y_train_pred_values[:,i] = y_train_pred
-            y_test_pred_values[:,i] = y_test_pred
+            y_train_boot_values[:,i] = y_boot
+            y_train_pred_values[:,i] = reg.predict(x_boot)
+            y_test_pred_values[:,i] = reg.predict(x_test)
             y_test_values[:,i] = y_test
 
         #Calculate the mse across rounds:
         mse_train_values = np.mean((y_train_boot_values - y_train_pred_values)**2, axis=0)
         mse_test_values = np.mean((y_test_values - y_test_pred_values)**2, axis=0)
+
         #Bias-Variance-decomposition:
         mse_train = np.mean(mse_train_values)
         mse_test = np.mean(mse_test_values)
