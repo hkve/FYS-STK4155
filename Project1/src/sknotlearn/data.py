@@ -1,3 +1,4 @@
+from random import random
 import numpy as np
 from sklearn.preprocessing import PolynomialFeatures
 
@@ -11,9 +12,13 @@ class Data:
     Data is unpacked to its np.ndarrays by
         y, X = data.unpacked()
     Data can be scaled by
-        data_scaled = data.scaled(method)
+        scaled_data = data.scaled(method)
+    Data can scale other Data same as self by
+        other_scaled_data = scaled_data.scale(other_data)
     Data can be scaled back by
         data = data_scaled.unscaled()
+    Data can unscale other Data same as self by
+        other_data = data.unscale(other_scaled_data)
     Data can shuffled by
         data = data.shuffled(with_replacement=True/False)
     Data can be sorted by feature by
@@ -21,8 +26,9 @@ class Data:
     Data can be split into train and test Data by
         data_train, data_test = data.train_test_split(ratio)
     Features can be expanded to polynomials by
-        data = data.polynomial(degree)"""
-    def __init__(self, y:np.ndarray, X:np.ndarray, unscale=None) -> None:
+        data = data.polynomial(degree)
+    """
+    def __init__(self, y:np.ndarray, X:np.ndarray, unscale=None, scale=None) -> None:
         self.y = np.array(y)
         self.X = np.array(X)
         self.n_features = X.shape[-1]
@@ -30,6 +36,11 @@ class Data:
         # initiating unscale function, defaults to trivial function
         self.unscale = unscale or (lambda data : data)
         assert callable(self.unscale), f"Specified unscaler is not callable (is {type(self.unscaler)})"
+
+        # initiating scale function, defaults to trivial function
+        self.scale = scale or (lambda data : data)
+        assert callable(self.unscale), f"Specified scaler is not callable (is {type(self.unscaler)})"
+
 
     # The following methods are there for indexing and iteration of Data
     def __len__(self) -> int:
@@ -139,24 +150,24 @@ class Data:
         """Returns shuffled Data.
 
         Args:
-            with_replacement (bool, optional): _description_. Defaults to False.
-            random_state (int, optional): _description_. Defaults to None.
+            with_replacement (bool, optional): Whether to drawn data randomly with replacement. Defaults to False.
+            random_state (int, optional): Specifies random seed to use for numpy.random module. Defaults to None.
 
         Returns:
-            _type_: _description_
+            Data: with order of rows drawn randomly
         """
-        np.random.seed(random_state)
         if with_replacement:
-            shuffled_idxs = np.random.randint(0, self.y.size, self.y.size)
+            shuffled_idxs = np.random.randint(0, self.y.size, self.y.size, random_state=random_state)
         else:
-            shuffled_idxs = np.arange(self.y.size); np.random.shuffle(shuffled_idxs)
+            shuffled_idxs = np.arange(self.y.size)
+            np.random.shuffle(shuffled_idxs, random_state=random_state)
         return Data(self.y[shuffled_idxs], self.X[shuffled_idxs], unscale=self.unscale)
     
     def unscaled(self):
         """Returns unscaled Data
 
         Returns:
-            _type_: _description_
+            Data: Inverted scaling that has been done to Data prior
         """
         return self.unscale(self)
 
@@ -164,19 +175,18 @@ class Data:
         """Splits the data into training data and test data according to train_test-ratio.
 
         Args:
-            ratio (float, optional): _description_. Defaults to 2/3.
+            ratio (float, optional): Ratio of training to test data. Defaults to 2/3.
             shuffle (bool, optional): Whether to shuffle data before splitting. Defaults to True
-            random_state (int, optional): _description_. Defaults to None.
+            random_state (int, optional): Random seed to pass on to numpy.random module. Defaults to None.
 
         Returns:
-            tuple: _description_
+            tuple[Data]: Split Data into train and test Data-instances
         """
         size = self.y.size
         idxs = np.arange(size)
         split_idx = int(size*ratio)
         if shuffle:
-            np.random.seed(random_state) # allows control over random seed
-            np.random.shuffle(idxs)
+            np.random.shuffle(idxs, random_state=random_state)
 
         training_idxs = idxs[:split_idx]
         test_idxs = idxs[split_idx:]
@@ -212,10 +222,10 @@ class Data:
         """Returns scaled Data.
 
         Args:
-            scheme (str, optional): _description_. Defaults to "None".
+            scheme (str, optional): Choice of scaler. Defaults to "None".
 
         Returns:
-            Data: _description_
+            Data: Return scaled version of self by specified scaling scheme.
         """
         return self.scalers_[scheme](self)
 
@@ -223,10 +233,10 @@ class Data:
         """Does not scale y, *X.
 
         Args:
-            data (_type_): _description_
+            data (Data): Data to scale
 
         Returns:
-            _type_: _description_
+            Data: Same Data unscaled
         """
         return data
 
@@ -255,23 +265,31 @@ class Data:
         """Scales y, *X to be N(0, 1)-distributed.
 
         Args:
-            data (_type_): _description_
+            data (Data): Data to scale
 
         Returns:
-            _type_: _description_
+            Data: Scaled Data
         """
         # extracting data from Data-class to more versatile numpy array
-        data = np.concatenate(([data.y], [*data.X.T])).T
+        data_array = np.concatenate(([data.y], [*data.X.T])).T
         # vectorised scaling
-        data_mean = np.mean(data, axis=0)
-        data_std = np.std(data, axis=0)
+        data_mean = np.mean(data_array, axis=0)
+        data_std = np.std(data_array, axis=0)
         data_std = np.where(data_std != 0, data_std, 1) # sets unvaried data-columns to 0
-        data_scaled = (data - data_mean) / data_std
+        data_scaled = (data_array - data_mean) / data_std
 
-        scaled_data = Data( # packing result into new Data-instance
+        # function to replicate exact scaling done here
+        def fit_scaler(data):
+            out = (data - data_mean) / data_std
+            out.unscale = lambda data_ : data_*data_std + data_mean
+            return out
+
+        # packing result into new Data-instance
+        scaled_data = Data(
             data_scaled[:,0],
             data_scaled[:,1:],
-            unscale = lambda data : data*data_std + data_mean # teching new Data how to unscale
+            unscale = lambda data : data*data_std + data_mean, # teching new Data how to unscale
+            scale = fit_scaler, # teaching new Data how to scale other Data the same way.
         )
         return scaled_data
     
