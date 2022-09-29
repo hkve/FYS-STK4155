@@ -11,11 +11,34 @@ from sknotlearn.datasets import make_FrankeFunction
 from sknotlearn.data import Data
 from utils import make_figs_path, colors
 
+def dump(filename, degrees_grid, lmbdas_grid, MSEs):
+    with open(f"{filename}.npz", "wb") as fp: 
+        np.save(fp, degrees_grid)
+        np.save(fp, lmbdas_grid)
+        np.save(fp, MSEs)
+    
+
+def load(filename):
+    with open(f"{filename}.npz", "rb") as fp:
+        degrees_grid = np.load(fp)
+        lmbdas_grid = np.load(fp)
+        MSEs = np.load(fp)
+
+    return degrees_grid, lmbdas_grid, MSEs
+
 def plot_heatmap(degrees_grid, lmbdas_grid, MSEs):
+    n_levels = 50
+    
+    levels = np.linspace(np.min(MSEs), np.max(MSEs), n_levels)
+
     fig, ax = plt.subplots()
 
-    ax.contourf(degrees_grid, lmbdas_grid, MSEs)
+    cont = ax.contourf(degrees_grid, lmbdas_grid, MSEs, levels=levels, cmap="viridis")
+    cbar = fig.colorbar(cont)
+
     ax.set_yscale("log")
+    ax.set_xlabel("Polynomial degree", fontsize=14)
+    ax.set_ylabel(r"Log$_{10}(\lambda)$", fontsize=14)
     plt.show()
 
 def make_mse_grid(Method, degrees, lmbdas):
@@ -34,6 +57,7 @@ def make_mse_grid(Method, degrees, lmbdas):
         Dp_train, Dp_test = Dp.train_test_split(ratio=train_size, random_state=random_state)
 
         for j, lmbda in enumerate(lmbdas):
+            # Add resampling option here
             reg = Method(lmbda=lmbda).fit(Dp_train)
             MSEs[i,j] = reg.mse(Dp_test)
 
@@ -42,10 +66,19 @@ def make_mse_grid(Method, degrees, lmbdas):
 
 
 if __name__ == "__main__":
-    n_lmbdas = 50
+    n_lmbdas = 20
     n_degrees = 20
     lmbdas = np.logspace(-6, 1, n_lmbdas)
     degrees = np.arange(1, n_degrees+1)
 
-    degrees_grid, lmbdas_grid,  MSEs = make_mse_grid(Ridge, degrees, lmbdas)
-    plot_heatmap(degrees_grid, lmbdas_grid, MSEs)
+    # Ridge
+    params = make_mse_grid(Ridge, degrees, lmbdas)
+    dump("ridge_grid2", *params)
+    params = load("ridge_grid2")
+    plot_heatmap(*params)
+
+    # Lasso
+    # params = make_mse_grid(Lasso, degrees, lmbdas)
+    # dump("lasso_grid", *params)
+    # params = load("lasso_grid")
+    # plot_heatmap(*params)
