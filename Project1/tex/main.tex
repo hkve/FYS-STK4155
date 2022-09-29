@@ -242,10 +242,10 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
 
     \subsection{Resampling techniques}
     With the intent to compute more accurate measures for goodness of fit (such as MSE and $R^2$) to evaluate our model, we 
-    artificially increase the data sample by repeatedly fitting the model on subsamples of our data. This approach is called resampling and consists of a variety of methods. In this project we have utilised \textit{Bootstrapping} and \textit{k-fold Cross-validation}. 
+    artificially increase the data sample by repeatedly fitting the model on subsamples of our data. This approach is called resampling and consists of a variety of methods. In this project we have applied \textit{Bootstrapping} and \textit{k-fold Cross-validation}. 
 
         \subsubsection*{Bootstrap}
-        The method of bootstrapping consists of creating a so-called bootstrapped dataset where the data points are sampled with replacement from the original sample. Then the model is trained and the relevant measures for goodness of fit calculated on the bootstrapped data. This process is repeated a certain number of times. The mean of the measures is then calculated across the bootstrapped models. Through the central limit theorem this mean is assumed to be the more accurate measure for goodness of fit and therefore a better evaluation of our model.  
+        Bootstrapping consists of generating new training data by sampling data points from the original training data with replacement; meaning the same data points can be selected more than once. The new set of training data is called a bootstrapped dataset and is used to train the model. Then the relevant measures of goodness of fit is calculated. This process of resampling and calculating measures is repeated a certain number of times, giving a distribution of these measures. The mean of the measures is then calculated across the bootstrapped models. Through the central limit theorem this mean is assumed to be the more accurate measure for goodness of fit and therefore a better evaluation of the model in question.  
 
         \subsubsection*{Cross-validation}
         With the intent to compute more accurate measures for goodness of fit (such as MSE and $R^2$), we 
