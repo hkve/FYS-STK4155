@@ -156,11 +156,12 @@ class Data:
         Returns:
             Data: with order of rows drawn randomly
         """
+        np.random.seed(random_state)
         if with_replacement:
-            shuffled_idxs = np.random.randint(0, self.y.size, self.y.size, random_state=random_state)
+            shuffled_idxs = np.random.randint(0, self.y.size, self.y.size)
         else:
             shuffled_idxs = np.arange(self.y.size)
-            np.random.shuffle(shuffled_idxs, random_state=random_state)
+            np.random.shuffle(shuffled_idxs)
         return Data(self.y[shuffled_idxs], self.X[shuffled_idxs], unscale=self.unscale)
     
     def unscaled(self):
@@ -186,7 +187,8 @@ class Data:
         idxs = np.arange(size)
         split_idx = int(size*ratio)
         if shuffle:
-            np.random.shuffle(idxs, random_state=random_state)
+            np.random.seed(random_state)
+            np.random.shuffle(idxs,)
 
         training_idxs = idxs[:split_idx]
         test_idxs = idxs[split_idx:]
