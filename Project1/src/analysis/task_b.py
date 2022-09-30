@@ -33,7 +33,7 @@ def plot_mse_and_r2(degrees, mse_train, mse_test, r2_train, r2_test, filenames=N
 	"""
 	sns.set_style("darkgrid")
 	fig, ax = plt.subplots()
-	ax.plot(degrees, mse_train, c=colors[0], label="Train")
+	ax.plot(degrees, mse_train, c=colors[0], label="Train", alpha=0.75)
 	ax.plot(degrees, mse_test, c=colors[1], label="Test")
 	ax.set_xlabel(r"Polynomial degree", fontsize=14)
 	ax.set_ylabel(r"$MSE$", fontsize=14)
@@ -44,7 +44,7 @@ def plot_mse_and_r2(degrees, mse_train, mse_test, r2_train, r2_test, filenames=N
 	plt.show()
 
 	fig, ax = plt.subplots()
-	ax.plot(degrees, r2_train, c=colors[0], label="Train")
+	ax.plot(degrees, r2_train, c=colors[0], label="Train", alpha=0.75)
 	ax.plot(degrees, r2_test, c=colors[1], label="Test")
 	ax.set_xlabel(r"Polynomial degree", fontsize=14)
 	ax.set_ylabel(r"$R^2$-score", fontsize=14)
@@ -74,8 +74,8 @@ def plot_beta_progression(betas, betas_se, powers, degrees=[1,3,5], filename=Non
 		# Plot for degree p
 		ticks = np.arange(len(labels))
 		ax.set_xticks(ticks, labels, rotation=x_)
-		ax.plot(ticks, betas[p], c="k", ls="--", marker=".")
-		ax.fill_between(ticks, (betas[p]-2*betas_se[p]), (betas[p]+2*betas_se[p]), color='r', alpha=.3)
+		ax.plot(ticks, betas[p], c=colors[0], ls="--", marker=".")
+		ax.fill_between(ticks, (betas[p]-2*betas_se[p]), (betas[p]+2*betas_se[p]), color=colors[0], alpha=.3)
 
 	fig.tight_layout()
 	if filename is not None: plt.savefig(make_figs_path(filename), dpi=300)
@@ -150,9 +150,10 @@ def solve_a(n=1000, train_size=0.8, noise_std=0.1, random_state=123):
 
 	for i, degree in enumerate(degrees):
 		Dp, powers[degree] = D.polynomial(degree=degree, return_powers=True)
-		Dp = Dp.scaled(scheme="Standard")
-
 		Dp_train, Dp_test = Dp.train_test_split(ratio=train_size, random_state=random_state)
+
+		Dp_train = Dp_train.scaled(scheme="Standard")
+		Dp_test = Dp_train.scale(Dp_test)
 		reg = LinearRegression(method="pINV").fit(Dp_train)
 
 		mse_train[i] = reg.mse(Dp_train)
@@ -172,6 +173,6 @@ def solve_a(n=1000, train_size=0.8, noise_std=0.1, random_state=123):
 if __name__ == "__main__":
 	params1, params2 = solve_a(n=600, noise_std=0.1, random_state=321, train_size=2/3)
 
-	# plot_mse_and_r2(*params1, filenames=["OLS_mse_noresample", "OLS_R2_noresample"])
-	# plot_beta_progression(*params2, filename="linreg_coefs_plots")
+	plot_mse_and_r2(*params1, filenames=["OLS_mse_noresample", "OLS_R2_noresample"])
+	plot_beta_progression(*params2, filename="linreg_coefs_plots")
 	plot_beta_heatmap(*params2, filename="linreg_coefs_table")
