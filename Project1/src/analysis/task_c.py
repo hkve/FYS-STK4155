@@ -23,6 +23,8 @@ With the bias and var calculated across the bootstrap
 (With data-class implemented)
 """
 
+#TODO: Size on titles and labels 
+
 def plot_hist_of_bootstrap(Bootstrap_, degree):
     """Generate the histogram of the mse-values of a certain model with a given number 
     of bootstrap rounds
@@ -39,8 +41,8 @@ def plot_hist_of_bootstrap(Bootstrap_, degree):
     sns.set_style('darkgrid')
     plt.hist(mse_train, bins=find_bins(mse_train), label='mse for training data', color=colors[1], density=True)
     plt.hist(mse_test, bins=find_bins(mse_test), alpha=0.6,  label='mse for test data', color=colors[0], density=True)
-    plt.xlabel('MSE')
-    plt.ylabel('Probability density')
+    plt.xlabel('MSE', fontsize=24)
+    plt.ylabel('Probability density', fontsize=24)
     plt.title(f'Results of MSE when bootstrapping {Bootstrap_.rounds} times')
     plt.legend()
     plt.savefig(make_figs_path(f'hist_bootstrap_{Bootstrap_.rounds}_scaled_of_degree_{degree}.pdf'), dpi=300)
@@ -65,8 +67,8 @@ def plot_bias_var(Bootstrap_list, degrees):
     plt.plot(degrees, bias, label=r'Bias$^2$', c=colors[1], lw=2.5)
     plt.plot(degrees, var, label='Variance', c=colors[0], lw=2.5)
     plt.plot(degrees, proj_mse, '--', label='Projected mse', c=colors[3], lw=3)
-    plt.xlabel('Polynomial degree')
-    plt.ylabel('Score')
+    plt.xlabel('Polynomial degree', fontsize=24)
+    plt.ylabel('Score', fontsize=24)
     plt.title('Bias-Variance Decomposition of the MSE')
     plt.legend()
     plt.savefig(make_figs_path(f'Bias_var_decomp.pdf'), dpi=300)
@@ -84,21 +86,42 @@ def plot_mse(Bootstrap_list, degrees):
     mse_train = [BS.mse_train for BS in Bootstrap_list]
     mse_test = [BS.mse_test for BS in Bootstrap_list]
 
+    #Extracting the models which sum to the mean 
+    mse_trains = np.array([BS.mse_train_values for BS in Bootstrap_list])
+    mse_tests = np.array([BS.mse_test_values for BS in Bootstrap_list])
+
     #Plotting: 
     sns.set_style('darkgrid')
+    plt.plot(degrees, mse_trains, c=colors[0], lw=.5, alpha=0.3)
+    plt.plot(degrees, mse_tests, c=colors[1], lw=.5, alpha=0.3)
+
     plt.plot(degrees, mse_train, label='Train MSE', c=colors[0], lw=2.5, alpha=0.75)
     plt.plot(degrees, mse_test, label='Test MSE', c=colors[1], lw=2.5)
-    plt.xlabel('Polynomial degree')
-    plt.ylabel('MSE value')
+
+    plt.ylim([0,0.6])
+    plt.xlabel('Polynomial degree', fontsize=24)
+    plt.ylabel('MSE value', fontsize=24)
     plt.legend()
     plt.title('Training and Test MSE')
     plt.savefig(make_figs_path(f'train_test_mse.pdf'), dpi=300)
     plt.show()
 
+def solve_c(y, X, degree, rounds, scale_scheme='Standard', ratio=3/4, random_state=321 ):
+    poly = PolynomialFeatures(degree=degree)
+    X_poly = poly.fit_transform(X)
+
+    data = Data(y, X_poly)
+    data_train, data_test = data.train_test_split(ratio=ratio, random_state=random_state)
+    data_train = data_train.scaled(scheme=scale_scheme)
+    data_test = data_train.scale(data_test)
+    reg = LinearRegression()
+
+    BS = Bootstrap(reg, data_train, data_test, random_state = random_state, rounds=rounds)
+    return BS
+
 
 if __name__ == "__main__":
     D = make_FrankeFunction(n=600, uniform=True, random_state=321, noise_std=0.1)
-    D.scaled()
     y, X = D.unpacked()
 
     #For various rounds:
@@ -106,15 +129,16 @@ if __name__ == "__main__":
     rounds = np.arange(30, 1000+1, (1001-30)//3)
     Bootstrap_list_rounds = []
     for i, round in enumerate(rounds):
-        poly = PolynomialFeatures(degree=7)
-        X_poly = poly.fit_transform(X)
+        # poly = PolynomialFeatures(degree=7)
+        # X_poly = poly.fit_transform(X)
 
-        data = Data(y, X_poly).scaled(scheme='Standard')
+        # data = Data(y, X_poly).scaled(scheme='Standard')
 
-        data_train, data_test = data.train_test_split(ratio=3/4, random_state=321)
-        reg = LinearRegression()
+        # data_train, data_test = data.train_test_split(ratio=3/4, random_state=321)
+        # reg = LinearRegression()
 
-        BS = Bootstrap(reg, data_train, data_test, random_state = 321, rounds=round)
+        # BS = Bootstrap(reg, data_train, data_test, random_state = 321, rounds=round)
+        BS = solve_c(y, X, degree=7, rounds=round)
         Bootstrap_list_rounds.append(BS)
         plot_hist_of_bootstrap(BS, 7)
 
@@ -122,15 +146,18 @@ if __name__ == "__main__":
     degrees = np.arange(1, 12+1)
     Bootstrap_list = []
     for deg in degrees: 
-        poly = PolynomialFeatures(degree=deg)
-        X_poly = poly.fit_transform(X)
+        # poly = PolynomialFeatures(degree=deg)
+        # X_poly = poly.fit_transform(X)
 
-        data = Data(y, X_poly).scaled(scheme='Standard')
+        # #TODO: NB! Sjekk om du kan skalere FØR splitting!!!!
+        # data = Data(y, X_poly).scaled(scheme='Standard')
 
-        data_train, data_test = data.train_test_split(ratio=3/4, random_state=321)
-        reg = LinearRegression()
+        # data_train, data_test = data.train_test_split(ratio=3/4, random_state=321)
 
-        BS = Bootstrap(reg, data_train, data_test, random_state = 321, rounds=70)
+        # reg = LinearRegression()
+
+        # BS = Bootstrap(reg, data_train, data_test, random_state = 321, rounds=70)
+        BS = solve_c(y, X, degree=deg, rounds=70)
         Bootstrap_list.append(BS)
 
     plot_mse(Bootstrap_list, degrees)
