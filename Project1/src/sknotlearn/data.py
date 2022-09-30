@@ -67,7 +67,7 @@ class Data:
 
     # Printing for debugging.
     def __str__(self):
-        return str(np.concatenate(([self.y], [*self.X.T])).T)
+        return str(np.c_[self.y, self.X])
 
     # The following methods are there for arithmetics.
     def __add__(self, other):
@@ -273,7 +273,7 @@ class Data:
             Data: Scaled Data
         """
         # extracting data from Data-class to more versatile numpy array
-        data_array = np.concatenate(([data.y], [*data.X.T])).T
+        data_array = np.c_[data.y, data.X]
         # vectorised scaling
         data_mean = np.mean(data_array, axis=0)
         data_std = np.std(data_array, axis=0)
