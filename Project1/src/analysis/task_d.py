@@ -8,15 +8,8 @@ from sknotlearn.resampling import KFold_cross_validate
 from sknotlearn.datasets import make_FrankeFunction
 from sknotlearn.data import Data
 
-def plot_mse(degrees, train_mse, test_mse):
-    sns.set_style("darkgrid")
-    fig, ax = plt.subplots()
+from task_b import plot_train_test
 
-    ax.plot(degrees, train_mse, label="Train mse")
-    ax.plot(degrees, test_mse, label="Test mse")    
-    ax.legend()
-
-    plt.show()
 
 def task_d(n=600, k=5, random_state=321):    
     degrees = np.arange(1, 12)
@@ -35,7 +28,12 @@ def task_d(n=600, k=5, random_state=321):
         train_mse[i] = resampler["train_mse"].mean()
         test_mse[i] = resampler["test_mse"].mean()
         
-    plot_mse(degrees, train_mse, test_mse)
 
+    return degrees, train_mse, test_mse
 if __name__ == "__main__":
-    task_d(random_state=321)
+    ks = [5,7,10]
+    filename = "OLS_mse_kfoldcross"
+
+    for k in ks:
+        degrees, train_mse, test_mse = task_d(k=k, random_state=321)
+        plot_train_test(degrees, train_mse, test_mse, filename=f"{filename}{k}", title=f"OLS k = {k} Cross-validation")
