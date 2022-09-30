@@ -36,7 +36,9 @@ def plot_train_test(degrees, train, test, filename = None, **kwargs):
 	opt = { # Plotting options
 		"xlabel": r"Polynomial degree",
 		"ylabel": r"$MSE$",
-		"fontsize": 14
+		"fontsize": 14,
+		"title": "OLS no resampling",
+		"title_fontsize": 16
 	}
 
 	opt.update(kwargs)
@@ -45,6 +47,7 @@ def plot_train_test(degrees, train, test, filename = None, **kwargs):
 	fig, ax = plt.subplots()
 	ax.plot(degrees, train, c=colors[0], label="Train", alpha=0.75)
 	ax.plot(degrees, test, c=colors[1], label="Test")
+	ax.set_title(opt["title"], fontsize=opt["title_fontsize"])
 	ax.set_xlabel(opt["xlabel"], fontsize=opt["fontsize"])
 	ax.set_ylabel(opt["ylabel"], fontsize=opt["fontsize"])
 	ax.legend(fontsize=opt["fontsize"])
@@ -64,6 +67,7 @@ def plot_beta_progression(betas, betas_se, powers, degrees=[1,3,5], filename=Non
 	fig, axes = plt.subplots(nrows=1, ncols=len(degrees), figsize=(14,5), gridspec_kw={'width_ratios': degrees})
 
 	axes[0].set_ylabel(r"$\beta$", fontsize=14)
+	fig.suptitle("OLS coefficients", fontsize=16)
 	fig.supxlabel(r"$\beta$ corresponding to $x^i y^j$", fontsize=14)
 
 	x = [0,0,60]
@@ -113,6 +117,7 @@ def plot_beta_heatmap(betas, beta_se, powers, degrees=[1,2,3,4,5], filename=None
 	cbar.set_label(r"$|\beta|$", fontsize=14)
 	ax.set_xlabel(r"$\beta$ corresponding to $x^i y^j$", fontsize=14)
 	ax.set_ylabel(r"Polynomial degree", fontsize=14)
+	ax.set_title("OLS coefficients", fontsize=16)
 
 	for i in range(len(degrees)):
 		for j in range(len(labels)):
@@ -174,7 +179,7 @@ if __name__ == "__main__":
 	params1, params2 = solve_a(n=600, noise_std=0.1, random_state=321, train_size=2/3)
 	degrees, mse_train, mse_test, r2_train, r2_test = params1
 
-	plot_train_test(degrees, mse_train, mse_test, filename="OLS_mse_noresample")
-	plot_train_test(degrees, r2_train, r2_test, filename="OLS_R2_noresample", ylabel=r"$R^2$-score")
+	# plot_train_test(degrees, mse_train, mse_test, filename="OLS_mse_noresample")
+	# plot_train_test(degrees, r2_train, r2_test, filename="OLS_R2_noresample", ylabel=r"$R^2$-score")
 	plot_beta_progression(*params2, filename="linreg_coefs_plots")
 	plot_beta_heatmap(*params2, filename="linreg_coefs_table")
