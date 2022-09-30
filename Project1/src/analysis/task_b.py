@@ -1,3 +1,4 @@
+from email.policy import default
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -27,32 +28,31 @@ def make_power_labels(p, powers):
 
 	return labels
 
-def plot_mse_and_r2(degrees, mse_train, mse_test, r2_train, r2_test, filenames=None):
+
+def plot_train_test(degrees, train, test, filename = None, **kwargs):
 	"""
 	Function to plot train/test mse and r2. Simple line plot with mse on the left and r2 on the right
 	"""
+	opt = { # Plotting options
+		"xlabel": r"Polynomial degree",
+		"ylabel": r"$MSE$",
+		"fontsize": 14
+	}
+
+	opt.update(kwargs)
+
 	sns.set_style("darkgrid")
 	fig, ax = plt.subplots()
-	ax.plot(degrees, mse_train, c=colors[0], label="Train", alpha=0.75)
-	ax.plot(degrees, mse_test, c=colors[1], label="Test")
-	ax.set_xlabel(r"Polynomial degree", fontsize=14)
-	ax.set_ylabel(r"$MSE$", fontsize=14)
-	ax.legend(fontsize=14)
+	ax.plot(degrees, train, c=colors[0], label="Train", alpha=0.75)
+	ax.plot(degrees, test, c=colors[1], label="Test")
+	ax.set_xlabel(opt["xlabel"], fontsize=opt["fontsize"])
+	ax.set_ylabel(opt["ylabel"], fontsize=opt["fontsize"])
+	ax.legend(fontsize=opt["fontsize"])
 
 	fig.tight_layout()
-	if filenames is not None: plt.savefig(make_figs_path(filenames[0]), dpi=300)
+	if filename is not None: plt.savefig(make_figs_path(filename), dpi=300)
 	plt.show()
 
-	fig, ax = plt.subplots()
-	ax.plot(degrees, r2_train, c=colors[0], label="Train", alpha=0.75)
-	ax.plot(degrees, r2_test, c=colors[1], label="Test")
-	ax.set_xlabel(r"Polynomial degree", fontsize=14)
-	ax.set_ylabel(r"$R^2$-score", fontsize=14)
-	ax.legend(fontsize=14)
-
-	fig.tight_layout()
-	if filenames is not None: plt.savefig(make_figs_path(filenames[1]), dpi=300)
-	plt.show()
 
 def plot_beta_progression(betas, betas_se, powers, degrees=[1,3,5], filename=None):
 	"""
@@ -172,7 +172,9 @@ def solve_a(n=1000, train_size=0.8, noise_std=0.1, random_state=123):
 
 if __name__ == "__main__":
 	params1, params2 = solve_a(n=600, noise_std=0.1, random_state=321, train_size=2/3)
+	degrees, mse_train, mse_test, r2_train, r2_test = params1
 
-	plot_mse_and_r2(*params1, filenames=["OLS_mse_noresample", "OLS_R2_noresample"])
+	plot_train_test(degrees, mse_train, mse_test, filename="OLS_mse_noresample")
+	plot_train_test(degrees, r2_train, r2_test, filename="OLS_R2_noresample", ylabel=r"$R^2$-score")
 	plot_beta_progression(*params2, filename="linreg_coefs_plots")
 	plot_beta_heatmap(*params2, filename="linreg_coefs_table")
