@@ -119,11 +119,13 @@
             \boxed{
                 \mse(\vec{\hat{y}}) = \frac{1}{n} \sum_{i=1}^n (y_i-\hat{y}_i)^2 = \frac{1}{n} (\vec{y} - \vec{\hat{y}})^2.
             }
+            \label{eq:theo:mse}
         \end{align}
 
         Another popular statistical measure we will use to evaluate the goodness of fit is the $R^2$-score, calculated as
         \begin{align}
             R^2(\vec{\hat{y}}) = 1 - \frac{\sum_{i=1}^n (y_i-\hat{y}_i)^2}{\sum_{i=1}^n (y_i-\bar{y})^2} = 1 - \frac{(\vec{y}-\vec{\hat{y}})^2}{(\vec{y}-\bar{y})^2},
+            \label{eq:theo:r2}
         \end{align}
         where $\bar{y} = \frac{1}{n}\sum_{i=1}^n y_i$ is the sample mean of the observed data.
 
@@ -232,7 +234,7 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
         f_4(x,y) &= -\frac{1}{5}\exptext{ -(9x-4)^2 - (9y-7)^2} \nonumber
     \end{align}
 
-    And $\epsilon$ is some stochastic noise $\epsilon \distas \normal{0}{\sigma^2}$. By visual inspection, we can fine tune $\sigma$ to create data that looks like noisy digital terrain data.
+    And $\epsilon$ is some stochastic noise $\epsilon \distas \normal{0}{\sigma^2}$. By visual inspection, we can fine tune $\sigma$ to create data that looks like noisy digital terrain data. For all fits to the Franke function we used $N = 600$ uniformly distributed points $x,y \distas \mathcal{U}(0,1)$ with a noise level of $\sigma = 0.1$, which is discussed in \ref{app:sec:frankefunction N and sigma}.   
     
     \subsection{Linear regression}
     \comment{not sure about how we should divide these subsections, but I wanted to write a bit about data scaling}
@@ -369,6 +371,8 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
         \end{align}
         where in the last line, we used that $\expval(\epsilon\hat{f}) = \expval(\epsilon)\expval(\hat{f})=0$.\footnote{At first glance, this might seem odd, as there is noise involved in the fitting of $\hat{f}$ too. However, under the assumption that the noise is i.i.d. between experiments, the noise in the data used to fit $\hat{f}$ is independent of the noise in a test sample. It is worth noting that this would not be true if we were comparing with the same data used to fit the model, which explains the optimism of the training MSE. \comment{This last part here might be put into the discussion perhaps?}}
 
+    \section{Parameters for artifical data} \label{app:sec:frankefunction N and sigma}
+    To fairly compare between methods, a constant number of sampled points $N$ from the Franke function (equation \ref{eq:met:Franke_Function}) and the noise magnitude $\sigma$ needs to be set. We decided that $N = 600$ points should be sufficient to get enough data points in both the train and test set, while still being small enough to not bring in too much computational complexity. The points $(x,y)$ are drawn from a uniform distribution $x,y \distas \mathcal{U}(0,1)$ limited to their domain. Trough visual inspection, we decided on $\sigma = 0.1$ for the noise $\epsilon \distas \normal{0}{\sigma^2}$. We found that this scale gave our function plenty of noise, while still being recognizable (figure \ref{fig:app:frankefunction varying noise}).   
     \begin{figure*}
         \begin{subfigure}{.5\textwidth}
             \centering
@@ -391,10 +395,10 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
             \centering
             \includegraphics[width=\linewidth]{franke_functions_0_2.pdf}
             \caption{$\sigma = 0.2$}
+
         \end{subfigure}
-
-
-        \centerline{Showing Franke function with increasing noise, from \textit{a} to \textit{d}, $\sigma \in \{ 0, 0.01, 0.1, 0.2\}$. All figures plotted with 625 equidistant $(x,y)$ points.}
+    
+        \caption{Showing Franke function with increasing noise, from \textit{a} to \textit{d}, $\sigma \in \{ 0, 0.01, 0.1, 0.2\}$. All figures plotted with $N = 625$ equidistant $(x,y)$ points.}\label{fig:app:frankefunction varying noise}
     \end{figure*}
 
 
