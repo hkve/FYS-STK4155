@@ -234,7 +234,7 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
         f_4(x,y) &= -\frac{1}{5}\exptext{ -(9x-4)^2 - (9y-7)^2} \nonumber
     \end{align}
 
-    And $\epsilon$ is some stochastic noise $\epsilon \distas \normal{0}{\sigma^2}$. By visual inspection, we can fine tune $\sigma$ to create data that looks like noisy digital terrain data. For all fits to the Franke function we used $N = 600$ uniformly distributed points $x,y \distas \mathcal{U}(0,1)$ with a noise level of $\sigma = 0.1$, which is discussed in \ref{app:sec:frankefunction N and sigma}.   
+    And $\epsilon$ is some stochastic noise $\epsilon \distas \normal{0}{\sigma^2}$. By visual inspection, we can fine tune $\sigma$ to create data that looks like noisy digital terrain data. For all fits to the Franke function we used $n = 600$ uniformly distributed points $x,y \distas \mathcal{U}(0,1)$ with a noise level of $\sigma = 0.1$, which is discussed in \ref{app:sec:frankefunction N and sigma}.   
     
     \subsection{Linear regression}
     \comment{not sure about how we should divide these subsections, but I wanted to write a bit about data scaling}
@@ -398,7 +398,7 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
 
         \end{subfigure}
     
-        \caption{Showing Franke function with increasing noise, from \textit{a} to \textit{d}, $\sigma \in \{ 0, 0.01, 0.1, 0.2\}$. All figures plotted with $N = 625$ equidistant $(x,y)$ points.}\label{fig:app:frankefunction varying noise}
+        \caption{Showing Franke function with increasing noise, from \textit{a} to \textit{d}, $\sigma \in \{ 0, 0.01, 0.1, 0.2\}$. All figures plotted with $n = 625$ equidistant $(x,y)$ points.}\label{fig:app:frankefunction varying noise}
     \end{figure*}
 
 
