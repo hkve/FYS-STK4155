@@ -59,7 +59,7 @@
 \newcommand{\betahat}{\hat{\beta}}
 \newcommand{\msub}[2]{\ensuremath{{#1}_\text{#2}}}
 
-\newcommand{\Håkon}{$\mathcal{H}$}
+\newcommand{\Hakon}{$\mathcal{H}$}
 \newcommand{\Carl}{$\mathbb{CM}$}
 \newcommand{\Anna}{$\mathfrak{Anna}$}
 
@@ -100,9 +100,9 @@
 
     \subsection{Error assesement and model optimisation}
 
-    \comment{Here I am lost as to the order and division of things. - Carl Martin, ca. 2000 AD. I think the devision and ordering makes sense. Mabye shuffle CLT around? - \Håkon}
+    \comment{Here I am lost as to the order and division of things. - Carl Martin, ca. 2000 AD. I think the devision and ordering makes sense. Mabye shuffle CLT around? - \Hakon}
     \subsubsection{Central Limit Theorem}
-        The central limit theorem tells us that when sampling a series of quantities $\cclosed{z_i|i=1,...,n}$ with independent and identical distributions with a mean $\mu$ and variance $\sigma^2<\infty$, the distribution of the sample mean $\bar{z}_n = \frac{1}{n}\sum_{i=1}^n z_i$ will approach a normal distrbution. Explicitly, we have (\comment{I don't know whether to box this - \Carl, I think no box - \Håkon, agree - \Carl})
+        The central limit theorem tells us that when sampling a series of quantities $\cclosed{z_i|i=1,...,n}$ with independent and identical distributions with a mean $\mu$ and variance $\sigma^2<\infty$, the distribution of the sample mean $\bar{z}_n = \frac{1}{n}\sum_{i=1}^n z_i$ will approach a normal distrbution. Explicitly, we have (\comment{I don't know whether to box this - \Carl, I think no box - \Hakon, agree - \Carl})
         \begin{align}\label{eq:theo:CLM}
             \lim_{n\to\infty} \sqrt{n}(\bar{z}_n-\mu) \distas \normal{0}{\sigma^2}.
         \end{align}
@@ -110,13 +110,13 @@
         \begin{align}
             \bar{z}_n \distas \normal{\mu}{\frac{\sigma^2}{n}}
         \end{align}
-        becomes sound. Colloquially we say the sample mean approaches the true mean $\mu$. This is powerful, as it means not only that the sample mean becomes better as the sample size grows, but quantities derived from its distribution are also determined more precisely. Note also that this holds with only very weak restrictions on the distribution of the $z_i$'s -- their sample mean will approach normal distribution regardles. Together, This lays the foundation for statistically informed models such as regression methods. \comment{Wild-ish claim here, but I was not sure how to `motivate' this section on CLM so that it doesn't seem too random, without going too big. Any input is appreciated. -\Carl, I think this makes sens (not too wild). Mabye explicitly state that this happends  even if $z_i$ are not themselves normally distributed. - \Håkon, Good idea! -\Carl}
+        becomes sound. Colloquially we say the sample mean approaches the true mean $\mu$. This is powerful, as it means not only that the sample mean becomes better as the sample size grows, but quantities derived from its distribution are also determined more precisely. Note also that this holds with only very weak restrictions on the distribution of the $z_i$'s -- their sample mean will approach normal distribution regardles. Together, This lays the foundation for statistically informed models such as regression methods. \comment{Wild-ish claim here, but I was not sure how to `motivate' this section on CLM so that it doesn't seem too random, without going too big. Any input is appreciated. -\Carl, I think this makes sens (not too wild). Mabye explicitly state that this happends  even if $z_i$ are not themselves normally distributed. - \Hakon, Good idea! -\Carl}
 
 
 
 
     \subsubsection{Measure for goodness of fit}
-        \comment{Title suggestions, "measures for goodness of fit". Then say we simply call these "metrics" to not clutter other sections with long words. - \Håkon, Sold! -\Carl}
+        \comment{Title suggestions, "measures for goodness of fit". Then say we simply call these "metrics" to not clutter other sections with long words. - \Hakon, Sold! -\Carl}
         When we want to create a statistically informed model that is able to predict the outcome of future measurements, we need to develop metrics for how well our model fits the data we already have. That is, we want to optimise our parameters $\vec{\theta}$ such that $\hat{f}(x) \approx f(x)$. We call this the goodness of fit. To estimate how well we acheive this with our given dataset $\mathcal{D}$, we will start with the mean squared error (MSE). Given a model which predicts values $\vec{\hat{y}}$, the mean squared error is given by
         \begin{align}
             \boxed{
@@ -131,7 +131,7 @@
             R^2(\vec{\hat{y}}) = 1 - \frac{\sum_{i=1}^n (y_i-\hat{y}_i)^2}{\sum_{i=1}^n (y_i-\bar{y})^2} = 1 - \frac{(\vec{y}-\vec{\hat{y}})^2}{(\vec{y}-\bar{y})^2},
             \label{eq:theo:r2}
         \end{align}
-        \comment{Mabye something about $R^2 \in (-\infty, 1]$, where $R^2 = 1$ is a perfect fit, $R^2 = 0$ is equal to predicting the mean $\bar{y}$ all the time and $R^2 < 0$ is even worse. - \Håkon, agree - \Carl}
+        \comment{Mabye something about $R^2 \in (-\infty, 1]$, where $R^2 = 1$ is a perfect fit, $R^2 = 0$ is equal to predicting the mean $\bar{y}$ all the time and $R^2 < 0$ is even worse. - \Hakon, agree - \Carl}
         where $\bar{y} = \frac{1}{n}\sum_{i=1}^n y_i$ is the sample mean of the observed data. This metric falls on the interval $(-\infty, 1]$, where 1 denotes the perfect fit, 0 correspond to a constant prediction of $\bar{y}$, and negative values corresponds to worse prediction than this.
 
 
@@ -161,7 +161,7 @@
 
 
     \subsection{Ordinary least squares}
-        We define the ordinary least squares method by assuming that the data $y(x)$ that we want to make a fit to has a linear noise term that is normally distributed with zero mean \comment{Dont be posh -\Håkon, Sorry, I am a noughty boy -\Carl}. That is, the data is generated as $y(x) = f(x) + \epsilon$, where $f(x)$ is some analytic, non-stochastic function of the data input $x$, and $\epsilon \distas \normal{0}{\sigma^2}$ for some $\sigma^2>0$. Further, if we make a model fitting $y(x)$ by a $\hat{y}(x)$, we should expect the error at every data point $(y_i, x_i)$ to be be normally distributed with the same variance, i.e., independently and identically distributed (i.i.d.). This can be summarised
+        We define the ordinary least squares method by assuming that the data $y(x)$ that we want to make a fit to has a linear noise term that is normally distributed with zero mean \comment{Dont be posh -\Hakon, Sorry, I am a noughty boy -\Carl}. That is, the data is generated as $y(x) = f(x) + \epsilon$, where $f(x)$ is some analytic, non-stochastic function of the data input $x$, and $\epsilon \distas \normal{0}{\sigma^2}$ for some $\sigma^2>0$. Further, if we make a model fitting $y(x)$ by a $\hat{y}(x)$, we should expect the error at every data point $(y_i, x_i)$ to be be normally distributed with the same variance, i.e., independently and identically distributed (i.i.d.). This can be summarised
         \begin{align}
             P(\vec{y}|X, \vec{\theta}) = \prod_{i=1}^{n} \frac{1}{\sqrt{2\pi\sigma^2}} \exp{-\frac{{(y_i-\hat{y}_i)}^2}{2\sigma^2}}.
         \end{align}
@@ -180,7 +180,7 @@
         \end{align}
 
     \subsection{Ridge regression}
-        So far, we have assumed that the parameters $\vec{\theta}$ are uniformly distributed, and as such have no \textit{bias} towards any particular value. In practice, this means that the OLS model will contort to fit itself to all values in the data. As such, a motivation for adding a bias could be for the sake of stability in the fit. These methods are called \textit{regularised} methods. An example is ridge regression, where one assumes that the parameters are normally distributed, such that parameter values far from the mean are thought less likely to occur. This in practice means that the model is less willing to contort to outliers in the dataset, trading it for a bias towards certain parameter values. Assuming the probability distrbution for $\vec{\theta}$ \comment{What is $\tau$ here? Just a $\sigma \xrightarrow{} \tau$? -\Håkon, Yes exactly, using $\tau$ as in the literature to avoid confusion with noise $\sigma$. $\tau$ is also used in LASSO where it does not correspond to the std. -\Carl}
+        So far, we have assumed that the parameters $\vec{\theta}$ are uniformly distributed, and as such have no \textit{bias} towards any particular value. In practice, this means that the OLS model will contort to fit itself to all values in the data. As such, a motivation for adding a bias could be for the sake of stability in the fit. These methods are called \textit{regularised} methods. An example is ridge regression, where one assumes that the parameters are normally distributed, such that parameter values far from the mean are thought less likely to occur. This in practice means that the model is less willing to contort to outliers in the dataset, trading it for a bias towards certain parameter values. Assuming the probability distrbution for $\vec{\theta}$ \comment{What is $\tau$ here? Just a $\sigma \xrightarrow{} \tau$? -\Hakon, Yes exactly, using $\tau$ as in the literature to avoid confusion with noise $\sigma$. $\tau$ is also used in LASSO where it does not correspond to the std. -\Carl}
         \begin{align}
             P(\vec{\theta}) = \prod_{a=1}^{p} \frac{1}{\sqrt{2\pi\tau^2}} \exp{-\frac{\theta_a^2}{2\tau^2}},
         \end{align}
@@ -276,7 +276,7 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
 
 
 \section{Results}
-    \comment{Not sure about section ordering here - Håkon}
+    \comment{Not sure about section ordering here - Hakon}
     \subsection{Ordinary least squares}
     We begin by calulating the $MSE$ and $R^2$ score (eq. \ref{eq:theo:mse}, \ref{eq:theo:r2}) fitted to the Franke function for different polynomial degrees. This can be seen in Figure \ref{fig:res:OLS_mse_noresample} and \ref{fig:res:OLS_R2_noresample} respectively. Based on the $MSE$ calculated for the test data, the optimal degree was found to be $p_{opt} = 5$ with $MSE \approx 0.134$  
     \begin{figure}[H]
