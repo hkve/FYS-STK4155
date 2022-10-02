@@ -13,7 +13,7 @@ class Model:
 	in addition to some metric such as mse and r^2 score. This class is not suppose to be used for
 	actual fitting.
 	"""
-	def __init__(self, method="SVD"):
+	def __init__(self, method="pINV"):
 		"""
 		Default constructor takes optional method argument, deciding how the model coefficients should
 		be fitted. 
