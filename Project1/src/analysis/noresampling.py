@@ -6,7 +6,7 @@ from matplotlib.colors import LogNorm
 
 # Custom stuff
 import context
-from sknotlearn.linear_model import LinearRegression
+from sknotlearn.linear_model import LinearRegression, Ridge, Lasso
 from sknotlearn.datasets import make_FrankeFunction
 from sknotlearn.data import Data
 from utils import make_figs_path, colors
@@ -131,7 +131,7 @@ def plot_beta_heatmap(betas, beta_se, powers, degrees=[1,2,3,4,5], filename=None
 	plt.show()
 
 
-def solve_a(n=1000, train_size=0.8, noise_std=0.1, random_state=123):
+def run_no_resampling(Model, degrees, n=1000, train_size=0.8, noise_std=0.1, random_state=123, lmbda=None):
 	"""
 	Function to preform what I assume task b is asking. R2 and MSE (test and train) for polynomials (1,5)
 
@@ -144,7 +144,6 @@ def solve_a(n=1000, train_size=0.8, noise_std=0.1, random_state=123):
 	"""
 	D = make_FrankeFunction(n=n, uniform=True, random_state=random_state, noise_std=noise_std)
 
-	degrees = np.arange(1, 12+1)
 	mse_train = np.zeros_like(degrees, dtype=float)
 	mse_test = np.zeros_like(degrees, dtype=float)
 	r2_train = np.zeros_like(degrees, dtype=float)
@@ -159,8 +158,13 @@ def solve_a(n=1000, train_size=0.8, noise_std=0.1, random_state=123):
 
 		Dp_train = Dp_train.scaled(scheme="Standard")
 		Dp_test = Dp_train.scale(Dp_test)
-		reg = LinearRegression(method="pINV").fit(Dp_train)
-
+		
+		if Model in [Ridge, Lasso]:
+			assert lmbda is not None, f"When using {Model = }, please pass a lambda value"
+			reg = Model(lmbda=lmbda).fit(Dp_train)
+		else:
+			reg = Model().fit(Dp_train)
+		
 		mse_train[i] = reg.mse(Dp_train)
 		mse_test[i] = reg.mse(Dp_test)
 
@@ -173,13 +177,25 @@ def solve_a(n=1000, train_size=0.8, noise_std=0.1, random_state=123):
 
 	# Show mse and r2 score 
 
-	return (degrees, mse_train, mse_test, r2_train, r2_test), (betas, betas_se, powers)	
+	return (mse_train, mse_test, r2_train, r2_test), (betas, betas_se, powers)	
 
 if __name__ == "__main__":
-	params1, params2 = solve_a(n=600, noise_std=0.1, random_state=321, train_size=2/3)
-	degrees, mse_train, mse_test, r2_train, r2_test = params1
+	# Set the number of degrees you want to try:
+	degrees = np.arange(1, 12+1)
+	
+	# Slicing [:3] is just a very hacky way if you only want to plot some
+	Models = [LinearRegression, Ridge, Lasso][:3]
+	lmbdas = [None, 0.1, 0.1][:3]
+	names = ["OLS", "Ridge", "Lasso"][:3]
 
-	# plot_train_test(degrees, mse_train, mse_test, filename="OLS_mse_noresample")
-	# plot_train_test(degrees, r2_train, r2_test, filename="OLS_R2_noresample", ylabel=r"$R^2$-score")
-	plot_beta_progression(*params2, filename="linreg_coefs_plots")
-	plot_beta_heatmap(*params2, filename="linreg_coefs_table")
+	for Model, lmbda, name in zip(Models, lmbdas, names):
+		params1, params2 = run_no_resampling(Model, degrees,n=600, noise_std=0.1, random_state=321, train_size=2/3, lmbda=0.1)
+		mse_train, mse_test, r2_train, r2_test = params1
+
+		title = f"{name} no resampling"
+		plot_train_test(degrees, mse_train, mse_test, filename=f"{name}_mse_noresample", title=title)
+		plot_train_test(degrees, r2_train, r2_test, filename=f"{name}_R2_noresample", ylabel=r"$R^2$-score", title=title)
+
+		if Model == LinearRegression:
+			plot_beta_progression(*params2, filename="OLS_coefs_plots")
+			plot_beta_heatmap(*params2, filename="OLS_coefs_table")
