@@ -124,7 +124,7 @@
             }
             \label{eq:theo:mse}
         \end{align}
-        and is a strictly positive measure, that we want to minimise.
+        and is a strictly positive metric that we want to minimise.
 
         Another popular metric we will use to evaluate the goodness of fit is the $R^2$-score, calculated as
         \begin{align}
@@ -132,7 +132,7 @@
             \label{eq:theo:r2}
         \end{align}
         \comment{Mabye something about $R^2 \in (-\infty, 1]$, where $R^2 = 1$ is a perfect fit, $R^2 = 0$ is equal to predicting the mean $\bar{y}$ all the time and $R^2 < 0$ is even worse. - \Håkon, agree - \Carl}
-        where $\bar{y} = \frac{1}{n}\sum_{i=1}^n y_i$ is the sample mean of the observed data. This metric falls on the interval $(-\infty, 1]$, where 1 denotes the perfect fit, 0 corresponds to a constant prediction of $\bar{y}$, and negative values corresponds to worse prediction than this.
+        where $\bar{y} = \frac{1}{n}\sum_{i=1}^n y_i$ is the sample mean of the observed data. This metric falls on the interval $(-\infty, 1]$, where 1 denotes the perfect fit, 0 correspond to a constant prediction of $\bar{y}$, and negative values corresponds to worse prediction than this.
 
 
         To get further insight into the validity of our model, we can decompose the MSE into its \textit{bias} and \textit{variance}, which are quantities that can tell us more about exactly what our model is doing wrong. To set up this decomposition, we consider a situation where we have fitted a model to a series of $L$ different datasets, with parameters $\vec{\hat{\theta}}^\ell$, with $\ell=1,...,L$, and predictions $\vec{\hat{y}}^\ell$ on the dataset we want to compare to. The sample mean squared error at each observed point can then be decomposed into
@@ -180,7 +180,7 @@
         \end{align}
 
     \subsection{Ridge regression}
-        So far, we have assumed that the parameters $\vec{\theta}$ are uniformly distributed, and as such have no \textit{bias} towards any particular value. In practice, this means that the OLS model will contort to fit itself to all values in the data. As such, a motivation for adding a bias could be for the sake of stability in the fit. These methods are called \textit{regularised} methods. An example is ridge regression, where one assumes that the parameters are normally distributed, such that parameter values far from the mean are thought less likely to occur. This in practice means that the model is less willing to contort to outliers in the dataset, trading it for a bias towards certain parameter values. Assuming the probability distrbution for $\vec{\theta}$ \comment{What is $\tau$ here? Just a $\sigma \xrightarrow{} \tau$? -\Håkon, Yes exactly, using $\tau$ as in the literature to avoid confusion with noise $\sigma$. $\tau$ is also be used in LASSO where it does not correspond to the std. -\Carl}
+        So far, we have assumed that the parameters $\vec{\theta}$ are uniformly distributed, and as such have no \textit{bias} towards any particular value. In practice, this means that the OLS model will contort to fit itself to all values in the data. As such, a motivation for adding a bias could be for the sake of stability in the fit. These methods are called \textit{regularised} methods. An example is ridge regression, where one assumes that the parameters are normally distributed, such that parameter values far from the mean are thought less likely to occur. This in practice means that the model is less willing to contort to outliers in the dataset, trading it for a bias towards certain parameter values. Assuming the probability distrbution for $\vec{\theta}$ \comment{What is $\tau$ here? Just a $\sigma \xrightarrow{} \tau$? -\Håkon, Yes exactly, using $\tau$ as in the literature to avoid confusion with noise $\sigma$. $\tau$ is also used in LASSO where it does not correspond to the std. -\Carl}
         \begin{align}
             P(\vec{\theta}) = \prod_{a=1}^{p} \frac{1}{\sqrt{2\pi\tau^2}} \exp{-\frac{\theta_a^2}{2\tau^2}},
         \end{align}
