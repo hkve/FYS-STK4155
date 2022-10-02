@@ -235,9 +235,9 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
     \end{align}
 
     And $\epsilon$ is some stochastic noise $\epsilon \distas \normal{0}{\sigma^2}$. By visual inspection, we can fine tune $\sigma$ to create data that looks like noisy digital terrain data. For all fits to the Franke function we used $n = 600$ uniformly distributed points $x,y \distas \mathcal{U}(0,1)$ with a noise level of $\sigma = 0.1$, which is discussed in \ref{app:sec:frankefunction N and sigma}.   
-    
+
     \subsection{Linear regression}
-    \comment{not sure about how we should divide these subsections, but I wanted to write a bit about data scaling}
+    \comment{not sure about how we should divide these subsections, but I wanted to write a bit about data scaling - CM. Since we compose this design matrix and preform scaling for all models, mabye give this section a  more general name and write about train test splitting}
         When fitting our models to the data, we base our models on simple polynomial expansions of the arguments of the function generating the data. We are fitting scalar function with to arguments $x$ and $y$, so our design matrix is constructed as
         \begin{align}
             X = \begin{pmatrix}
@@ -255,6 +255,8 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
             \end{align}
         \end{subequations}
         where $\bar{z} = \frac{1}{n} \sum_{i=1}^n z_n$ denotes the sample mean of $\vec{z}$ and $\sigma_{\vec{z}}^2 = \frac{1}{n} \sum_{i=1}^n {(z_i-\bar{z})}^2$ denotes the sample std of $\vec{z}$.
+        \newline\newline
+        To get a propper assesement of our model, we will split the dataset into a \textit{training set} and \textit{testing set}. The training set is used to fit the actual model, giving our coefficient estimates $\vec{\hat{\theta}}$. The training set is used to evaluate the metrics $MSE$ and $R^2$ scores on data which was not used in fitting the model. This is done to avoid \textit{overfitting}, where our model begings to fit the noise of the dataset, instead of the assumption of the underlying function $\hat{f}(x)$.   
 
     \subsection{Resampling techniques}
     With the intent to compute more accurate measures for goodness of fit (such as MSE and $R^2$) to evaluate our model, we 
@@ -273,7 +275,7 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
 \section{Results}
     \comment{Not sure about section ordering here - Håkon}
     \subsection{Ordinary least squares}
-    We begin by calulating the $MSE$ and $R^2$ score (eq. \ref{eq:theo:mse}, \ref{eq:theo:r2}) fitted to the Franke function for different polynomial degrees. This can be seen in Figure \ref{fig:res:OLS_mse_noresample} and \ref{fig:res:OLS_R2_noresample} respectively. 
+    We begin by calulating the $MSE$ and $R^2$ score (eq. \ref{eq:theo:mse}, \ref{eq:theo:r2}) fitted to the Franke function for different polynomial degrees. This can be seen in Figure \ref{fig:res:OLS_mse_noresample} and \ref{fig:res:OLS_R2_noresample} respectively. Based on the $MSE$ calculated for the test data, the optimal degree was found to be $p_{opt} = 5$ with $MSE \approx 0.134$  
     \begin{figure}[H]
         \centering
         \includegraphics[width=\linewidth]{OLS_mse_noresample.pdf}
