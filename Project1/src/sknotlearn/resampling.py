@@ -105,6 +105,8 @@ class Bootstrap:
         self.projected_mse = projected_mse
         self.mse_train_values, self.mse_test_values = mse_train_values, mse_test_values
 
+
+
     
         
 
