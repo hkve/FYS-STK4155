@@ -67,18 +67,18 @@ def make_mse_grid(Method, degrees, lmbdas):
 
 if __name__ == "__main__":
     n_lmbdas = 20
-    n_degrees = 20
+    n_degrees = 12
     lmbdas = np.logspace(-6, 1, n_lmbdas)
     degrees = np.arange(1, n_degrees+1)
 
     # Ridge
-    params = make_mse_grid(Ridge, degrees, lmbdas)
-    dump("ridge_grid2", *params)
-    params = load("ridge_grid2")
-    plot_heatmap(*params)
+    # params = make_mse_grid(Ridge, degrees, lmbdas)
+    # dump("ridge_grid2", *params)
+    # params = load("ridge_grid2")
+    # plot_heatmap(*params)
 
     # Lasso
     # params = make_mse_grid(Lasso, degrees, lmbdas)
     # dump("lasso_grid", *params)
-    # params = load("lasso_grid")
-    # plot_heatmap(*params)
+    params = load("lasso_grid")
+    plot_heatmap(*params)
