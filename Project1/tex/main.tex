@@ -59,6 +59,10 @@
 \newcommand{\betahat}{\hat{\beta}}
 \newcommand{\msub}[2]{\ensuremath{{#1}_\text{#2}}}
 
+\newcommand{\Håkon}{$\mathcal{H}$}
+\newcommand{\Carl}{$\mathbb{CM}$}
+\newcommand{\Anna}{$\mathfrak{Anna}$}
+
 \title{Bias-variance tradeoff in simple linear models} % very much working title
 \author{Anna Aasen, Carl Martin Fevang, Håkon Kvernmoen}
 \date{\today}
@@ -77,7 +81,7 @@
 \section{Introduction}
     In this project, we will introduce some of the most important general properties of machine learning models in the context of linear regression. Specifically the mean squared error (MSE), the bias, and the variance of data predictions are essential in evaluating the quality of a statistical model. We look at the phenomena of underfitting and overfitting, and explore them in the context of bias-variance trade-off. The three models we will use explicitly are Ordinary Least Squares (OLS), Ridge regression and Least-Absolute-Shrinkage-and-Selection-Operation (LASSO) regression. These will first be tested on the 2D Franke function, and later on real geographical terrain data.
 
-    The aforementioned models will be explored using resampling techniques, which will be employed to extract the relevant statistical quantities in an accurate way. We will use the standard methods of Bootstrapping and Cross Validation and compare the results we get between them across the three linear models.
+    The aforementioned models will be explored using resampling techniques, which will be employed to extract the relevant statistical quantities in an accurate way. We will use the standard methods of Bootstrapping and k-fold Cross Validation and compare the results we get between them across the three linear models.
 
     All the models will be applied by fitting a two-dimensional polynomial expansion to the observed data.
 
@@ -96,36 +100,39 @@
 
     \subsection{Error assesement and model optimisation}
 
-    \comment{Here I am lost as to the order and division of things. - Carl Martin, ca. 2000 AD}
+    \comment{Here I am lost as to the order and division of things. - Carl Martin, ca. 2000 AD. I think the devision and ordering makes sense. Mabye shuffle CLT around? - \Håkon}
     \subsubsection{Central Limit Theorem}
-        The central limit theorem tells us that when sampling a series of quantities $\cclosed{z_i|i=1,...,n}$ with independent and identical distributions with a mean $\mu$ and variance $\sigma^2<\infty$, the distribution of the sample mean $\bar{z}_n = \frac{1}{n}\sum_{i=1}^n z_i$ will approach a normal distrbution. Explicitly, we have (\comment{I don't know whether to box this - CM})
-        \begin{align}
-            \boxed{
-                \lim_{n\to\infty} \sqrt{n}(\bar{z}_n-\mu) \distas \normal{0}{\sigma^2}.
-            }
+        The central limit theorem tells us that when sampling a series of quantities $\cclosed{z_i|i=1,...,n}$ with independent and identical distributions with a mean $\mu$ and variance $\sigma^2<\infty$, the distribution of the sample mean $\bar{z}_n = \frac{1}{n}\sum_{i=1}^n z_i$ will approach a normal distrbution. Explicitly, we have (\comment{I don't know whether to box this - \Carl, I think no box - \Håkon, agree - \Carl})
+        \begin{align}\label{eq:theo:CLM}
+            \lim_{n\to\infty} \sqrt{n}(\bar{z}_n-\mu) \distas \normal{0}{\sigma^2}.
         \end{align}
         In practice, for some notion of a large sample size $n$, the approximation of the sample mean as being distributed as
         \begin{align}
             \bar{z}_n \distas \normal{\mu}{\frac{\sigma^2}{n}}
         \end{align}
-        becomes sound. Colloquially we say the sample mean approaches the true mean $\mu$. This is powerful, as it means not only that the sample mean becomes better as the sample size grows, but quantities derived from its distribution are also determined more precisely. This lays the foundation for statistically informed models such as regression methods. \comment{Wild-ish claim here, but I was not sure how to `motivate' this section on CLM so that it doesn't seem too random, without going too big. Any input is appreciated. -CM}
+        becomes sound. Colloquially we say the sample mean approaches the true mean $\mu$. This is powerful, as it means not only that the sample mean becomes better as the sample size grows, but quantities derived from its distribution are also determined more precisely. Note also that this holds with only very weak restrictions on the distribution of the $z_i$'s -- their sample mean will approach normal distribution regardles. Together, This lays the foundation for statistically informed models such as regression methods. \comment{Wild-ish claim here, but I was not sure how to `motivate' this section on CLM so that it doesn't seem too random, without going too big. Any input is appreciated. -\Carl, I think this makes sens (not too wild). Mabye explicitly state that this happends  even if $z_i$ are not themselves normally distributed. - \Håkon, Good idea! -\Carl}
 
 
 
 
-    \subsubsection{New section for MSE}
-        When we want to create a statistically informed model that is able to predict the outcome of future measurements, we need to develop a metric for how well our model fits the data we already have. That is, we want to optimise our parameters $\vec{\theta}$ such that $\hat{f}(x) \approx f(x)$. We call this the goodness of fit. To estimate how well we acheive this with our given dataset $\mathcal{D}$, we will start with the mean squared error (MSE). Given a model which predicts values $\vec{\hat{y}}$, the mean squared error is given by
+    \subsubsection{Measure for goodness of fit}
+        \comment{Title suggestions, "measures for goodness of fit". Then say we simply call these "metrics" to not clutter other sections with long words. - \Håkon, Sold! -\Carl}
+        When we want to create a statistically informed model that is able to predict the outcome of future measurements, we need to develop metrics for how well our model fits the data we already have. That is, we want to optimise our parameters $\vec{\theta}$ such that $\hat{f}(x) \approx f(x)$. We call this the goodness of fit. To estimate how well we acheive this with our given dataset $\mathcal{D}$, we will start with the mean squared error (MSE). Given a model which predicts values $\vec{\hat{y}}$, the mean squared error is given by
         \begin{align}
             \boxed{
-                \mse(\vec{\hat{y}}) = \frac{1}{n} \sum_{i=1}^n (y_i-\hat{y}_i)^2 = \frac{1}{n} (\vec{y} - \vec{\hat{y}})^2.
+                \mse(\vec{\hat{y}}) = \frac{1}{n} \sum_{i=1}^n (y_i-\hat{y}_i)^2 = \frac{1}{n} (\vec{y} - \vec{\hat{y}})^2,
             }
+            \label{eq:theo:mse}
         \end{align}
+        and is a strictly positive metric that we want to minimise.
 
-        Another popular statistical measure we will use to evaluate the goodness of fit is the $R^2$-score, calculated as
+        Another popular metric we will use to evaluate the goodness of fit is the $R^2$-score, calculated as
         \begin{align}
             R^2(\vec{\hat{y}}) = 1 - \frac{\sum_{i=1}^n (y_i-\hat{y}_i)^2}{\sum_{i=1}^n (y_i-\bar{y})^2} = 1 - \frac{(\vec{y}-\vec{\hat{y}})^2}{(\vec{y}-\bar{y})^2},
+            \label{eq:theo:r2}
         \end{align}
-        where $\bar{y} = \frac{1}{n}\sum_{i=1}^n y_i$ is the sample mean of the observed data.
+        \comment{Mabye something about $R^2 \in (-\infty, 1]$, where $R^2 = 1$ is a perfect fit, $R^2 = 0$ is equal to predicting the mean $\bar{y}$ all the time and $R^2 < 0$ is even worse. - \Håkon, agree - \Carl}
+        where $\bar{y} = \frac{1}{n}\sum_{i=1}^n y_i$ is the sample mean of the observed data. This metric falls on the interval $(-\infty, 1]$, where 1 denotes the perfect fit, 0 correspond to a constant prediction of $\bar{y}$, and negative values corresponds to worse prediction than this.
 
 
         To get further insight into the validity of our model, we can decompose the MSE into its \textit{bias} and \textit{variance}, which are quantities that can tell us more about exactly what our model is doing wrong. To set up this decomposition, we consider a situation where we have fitted a model to a series of $L$ different datasets, with parameters $\vec{\hat{\theta}}^\ell$, with $\ell=1,...,L$, and predictions $\vec{\hat{y}}^\ell$ on the dataset we want to compare to. The sample mean squared error at each observed point can then be decomposed into
@@ -154,7 +161,7 @@
 
 
     \subsection{Ordinary least squares}
-        We define the ordinary least squares method by assuming that the data $y(x)$ that we want to make a fit to has a linear noise term that is normally distributed with mean nought. That is, the data is generated as $y(x) = f(x) + \epsilon$, where $f(x)$ is some analytic, non-stochastic function of the data input $x$, and $\epsilon \distas \normal{0}{\sigma^2}$ for some $\sigma^2>0$. Further, if we make a model fitting $y(x)$ by a $\hat{y}(x)$, we should expect the error at every data point $(y_i, x_i)$ to be be normally distributed with the same variance, i.e., independently and identically distributed (i.i.d.). This can be summarised
+        We define the ordinary least squares method by assuming that the data $y(x)$ that we want to make a fit to has a linear noise term that is normally distributed with zero mean \comment{Dont be posh -\Håkon, Sorry, I am a noughty boy -\Carl}. That is, the data is generated as $y(x) = f(x) + \epsilon$, where $f(x)$ is some analytic, non-stochastic function of the data input $x$, and $\epsilon \distas \normal{0}{\sigma^2}$ for some $\sigma^2>0$. Further, if we make a model fitting $y(x)$ by a $\hat{y}(x)$, we should expect the error at every data point $(y_i, x_i)$ to be be normally distributed with the same variance, i.e., independently and identically distributed (i.i.d.). This can be summarised
         \begin{align}
             P(\vec{y}|X, \vec{\theta}) = \prod_{i=1}^{n} \frac{1}{\sqrt{2\pi\sigma^2}} \exp{-\frac{{(y_i-\hat{y}_i)}^2}{2\sigma^2}}.
         \end{align}
@@ -172,10 +179,8 @@
             }
         \end{align}
 
-    \comment{Should this be a subsubsection? -Anna}\\
-    \comment{Definitely! -CM \& H}
     \subsection{Ridge regression}
-        So far, we have assumed that the parameters $\vec{\theta}$ are uniformly distributed, and as such have no \textit{bias} towards any particular value. In practice, this means that the OLS model will contort to fit itself to all values in the data. As such, a motivation for adding a bias could be for the sake of stability in the fit. These methods are called \textit{regularised} methods. An example is ridge regression, where one assumes that the parameters are normally distributed, such that parameter values far from the mean are thought less likely to occur. This in practice means that the model is less willing to contort to outliers in the dataset, trading it for a bias towards certain parameter values. Assuming the probability distrbution for $\vec{\theta}$
+        So far, we have assumed that the parameters $\vec{\theta}$ are uniformly distributed, and as such have no \textit{bias} towards any particular value. In practice, this means that the OLS model will contort to fit itself to all values in the data. As such, a motivation for adding a bias could be for the sake of stability in the fit. These methods are called \textit{regularised} methods. An example is ridge regression, where one assumes that the parameters are normally distributed, such that parameter values far from the mean are thought less likely to occur. This in practice means that the model is less willing to contort to outliers in the dataset, trading it for a bias towards certain parameter values. Assuming the probability distrbution for $\vec{\theta}$ \comment{What is $\tau$ here? Just a $\sigma \xrightarrow{} \tau$? -\Håkon, Yes exactly, using $\tau$ as in the literature to avoid confusion with noise $\sigma$. $\tau$ is also used in LASSO where it does not correspond to the std. -\Carl}
         \begin{align}
             P(\vec{\theta}) = \prod_{a=1}^{p} \frac{1}{\sqrt{2\pi\tau^2}} \exp{-\frac{\theta_a^2}{2\tau^2}},
         \end{align}
@@ -202,7 +207,7 @@
         \begin{align}
             P(\vec{\theta}) = \prod_{a=1}^{p} \frac{1}{2\tau} \exp{-\frac{|\theta_a|}{\tau}},
         \end{align}
-        which as we can see is not differentiable at $\theta_i = 0$. This means that the optimisation of this the probability $P(\vec{\theta}|X, \vec{y})$ is not necessarily possible analytically without putting bounds on the data $X, \vec{y}$, and even numerical algorithms like gradient descent will encounter run into trouble. Furthermore, it is not optimisable point by point, unless bounds like $X^TX$ being diagonal are enforced, which makes LASSO generally less used. Nevertheless, we can coax a cost function out of the probability that is minimalisable. Letting the cost function be written $\msub{C}{lasso}(\vec{\theta}) = -A\log\pclosed{P(\vec{\theta|X,\vec{y}})} + B$  we can choose the constants $A, B$ such that
+        which as we can see is not differentiable at $\theta_i = 0$. This means that the optimisation of this the probability $P(\vec{\theta}|X, \vec{y})$ is not necessarily possible analytically without putting bounds on the data $X, \vec{y}$, and even numerical algorithms like gradient descent will encounter trouble. Furthermore, it is not optimisable point by point, unless bounds like $X^TX$ being diagonal are enforced, which makes LASSO generally less used. Nevertheless, we can coax a cost function out of the probability that is minimalisable. Letting the cost function be written $\msub{C}{lasso}(\vec{\theta}) = -A\log\pclosed{P(\vec{\theta|X,\vec{y}})} + B$  we can choose the constants $A, B$ such that
         \begin{align}
             \boxed{
                 \msub{C}{lasso}(\vec{\vec{\theta}}) = \norm[2]{ \vec{y} - X\vec{\theta} }^2 + \lambda \norm[1]{\vec{\theta}},
@@ -210,7 +215,7 @@
         \end{align}
         where $\lambda = \frac{2\sigma^2}{\tau}$ and $\norm[p]{\vec{v}} = \pclosed{\sum_k |v_k|^p}^{\sfrac{1}{p}}$ denotes the $L_p$ norm of the vector $\vec{v} \in \mathbb{R}^k$.
 
-    % Should we at some point mention the hessian matrix and the C of Ridge being convex (Hessian is positive definite) -Anna
+    \comment{Should we at some point mention the hessian matrix and the C of Ridge being convex (Hessian is positive definite) -\Anna}
 
 \section{Method}
 Something general about initially fitting Franke data using OLS, ridge and lasso. Then moving on to real terrain data something something.
@@ -232,10 +237,10 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
         f_4(x,y) &= -\frac{1}{5}\exptext{ -(9x-4)^2 - (9y-7)^2} \nonumber
     \end{align}
 
-    And $\epsilon$ is some stochastic noise $\epsilon \distas \normal{0}{\sigma^2}$. By visual inspection, we can fine tune $\sigma$ to create data that looks like noisy digital terrain data.
-    
+    And $\epsilon$ is some stochastic noise $\epsilon \distas \normal{0}{\sigma^2}$. By visual inspection, we can fine tune $\sigma$ to create data that looks like noisy digital terrain data. For all fits to the Franke function we used $n = 600$ uniformly distributed points $x,y \distas \mathcal{U}(0,1)$ with a noise level of $\sigma = 0.1$, which is discussed in \ref{app:sec:frankefunction N and sigma}.   
+
     \subsection{Linear regression}
-    \comment{not sure about how we should divide these subsections, but I wanted to write a bit about data scaling}
+    \comment{not sure about how we should divide these subsections, but I wanted to write a bit about data scaling - CM. Since we compose this design matrix and preform scaling for all models, mabye give this section a  more general name and write about train test splitting}
         When fitting our models to the data, we base our models on simple polynomial expansions of the arguments of the function generating the data. We are fitting scalar function with to arguments $x$ and $y$, so our design matrix is constructed as
         \begin{align}
             X = \begin{pmatrix}
@@ -253,6 +258,8 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
             \end{align}
         \end{subequations}
         where $\bar{z} = \frac{1}{n} \sum_{i=1}^n z_n$ denotes the sample mean of $\vec{z}$ and $\sigma_{\vec{z}}^2 = \frac{1}{n} \sum_{i=1}^n {(z_i-\bar{z})}^2$ denotes the sample std of $\vec{z}$.
+        \newline\newline
+        To get a propper assesement of our model, we will split the dataset into a \textit{training set} and \textit{testing set}. The training set is used to fit the actual model, giving our coefficient estimates $\vec{\hat{\theta}}$. The training set is used to evaluate the metrics $MSE$ and $R^2$ scores on data which was not used in fitting the model. This is done to avoid \textit{overfitting}, where our model begings to fit the noise of the dataset, instead of the assumption of the underlying function $\hat{f}(x)$.   
 
     \subsection{Resampling techniques}
     With the intent to compute more accurate measures for goodness of fit (such as MSE and $R^2$) to evaluate our model, we 
@@ -271,7 +278,7 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
 \section{Results}
     \comment{Not sure about section ordering here - Håkon}
     \subsection{Ordinary least squares}
-    We begin by calulating the $MSE$ and $R^2$ score (ref eq?) fitted to the Franke function for different polynomial degrees. This can be seen in Figure \ref{fig:res:OLS_mse_noresample} and \ref{fig:res:OLS_R2_noresample} respectively. 
+    We begin by calulating the $MSE$ and $R^2$ score (eq. \ref{eq:theo:mse}, \ref{eq:theo:r2}) fitted to the Franke function for different polynomial degrees. This can be seen in Figure \ref{fig:res:OLS_mse_noresample} and \ref{fig:res:OLS_R2_noresample} respectively. Based on the $MSE$ calculated for the test data, the optimal degree was found to be $p_{opt} = 5$ with $MSE \approx 0.134$  
     \begin{figure}[H]
         \centering
         \includegraphics[width=\linewidth]{OLS_mse_noresample.pdf}
@@ -321,7 +328,7 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
 
     \subsection{Resampling}
         \comment{Here I am just writing a bit on our discussion about the limit of resampling. Structure of the discussion section is very much not set in any stone.}
-        Resampling a given data set seems on the face of it to be truly the work of magic. Somehow we invoke the law of large samples from the central limit theorem (\comment{needs to be added}) that our statistical quantities, like the mean value, approaches the true value as the sample size grows. However, that is not exactly what we are doing when we are resampling. To illustrate this, we can think of a coin-flipping experiment where are results are categorically heads or tails. If we perform the experiment an \textit{odd} number of times, we must necessarily end up with either more heads or more tails. If we then continously resample from this dataset, a mean value should by the central limit theorem rather approach the \textit{biased} mean value of the original dataset.
+        Resampling a given data set seems on the face of it to be truly the work of magic. Somehow we invoke the law of large samples from the central limit theorem~\eqref{eq:theo:CLM} that our statistical quantities, like the mean value, approaches the true value as the sample size grows. However, that is not exactly what we are doing when we are resampling. To illustrate this, we can think of a coin-flipping experiment where are results are categorically heads or tails. If we perform the experiment an \textit{odd} number of times, we must necessarily end up with either more heads or more tails. If we then continously resample from this dataset, a mean value should by the central limit theorem rather approach the \textit{biased} mean value of the original dataset.
 
         The value of resampling rather comes from creating a way to emphasise different parts of the original dataset when fitting our model, and consequently comparing what what this does to the predictions of the model. For instance, an overfitted model might contort to accomodate a statistical outlier in the original dataset, and thereby make a poor prediction on new data. However, when resampling, many of the new datasets sampled to make new fits from our model will not include this statistical outlier, and should make predictions not influenced too heavily by this. There should then be a medium where the particular `oddities' in the original dataset can be smoothed over, and the bias of the original dataset is not brought out to the front.
 
@@ -369,6 +376,8 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
         \end{align}
         where in the last line, we used that $\expval(\epsilon\hat{f}) = \expval(\epsilon)\expval(\hat{f})=0$.\footnote{At first glance, this might seem odd, as there is noise involved in the fitting of $\hat{f}$ too. However, under the assumption that the noise is i.i.d. between experiments, the noise in the data used to fit $\hat{f}$ is independent of the noise in a test sample. It is worth noting that this would not be true if we were comparing with the same data used to fit the model, which explains the optimism of the training MSE. \comment{This last part here might be put into the discussion perhaps?}}
 
+    \section{Parameters for artifical data} \label{app:sec:frankefunction N and sigma}
+    To fairly compare between methods, a constant number of sampled points $N$ from the Franke function (equation \ref{eq:met:Franke_Function}) and the noise magnitude $\sigma$ needs to be set. We decided that $N = 600$ points should be sufficient to get enough data points in both the train and test set, while still being small enough to not bring in too much computational complexity. The points $(x,y)$ are drawn from a uniform distribution $x,y \distas \mathcal{U}(0,1)$ limited to their domain. Trough visual inspection, we decided on $\sigma = 0.1$ for the noise $\epsilon \distas \normal{0}{\sigma^2}$. We found that this scale gave our function plenty of noise, while still being recognizable (figure \ref{fig:app:frankefunction varying noise}).   
     \begin{figure*}
         \begin{subfigure}{.5\textwidth}
             \centering
@@ -391,10 +400,10 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
             \centering
             \includegraphics[width=\linewidth]{franke_functions_0_2.pdf}
             \caption{$\sigma = 0.2$}
+
         \end{subfigure}
-
-
-        \centerline{Showing Franke function with increasing noise, from \textit{a} to \textit{d}, $\sigma \in \{ 0, 0.01, 0.1, 0.2\}$. All figures plotted with 625 equidistant $(x,y)$ points.}
+    
+        \caption{Showing Franke function with increasing noise, from \textit{a} to \textit{d}, $\sigma \in \{ 0, 0.01, 0.1, 0.2\}$. All figures plotted with $n = 625$ equidistant $(x,y)$ points.}\label{fig:app:frankefunction varying noise}
     \end{figure*}
 
 

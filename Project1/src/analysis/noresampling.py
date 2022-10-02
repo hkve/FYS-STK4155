@@ -176,7 +176,7 @@ def run_no_resampling(Model, degrees, n=1000, train_size=0.8, noise_std=0.1, ran
 		betas_se[degree] = 2*np.sqrt(var_beta)
 
 	# Show mse and r2 score 
-
+	print(f"Found best degree p = {degrees[np.argmin(mse_test)]} with MSE = {np.min(mse_test)} for {Model.__name__}")
 	return (mse_train, mse_test, r2_train, r2_test), (betas, betas_se, powers)	
 
 if __name__ == "__main__":
