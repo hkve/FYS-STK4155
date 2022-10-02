@@ -280,7 +280,7 @@ class Ridge(Model):
 			H = matrix(2*z[0] * (X.T@X + self.lmbda*np.eye(X.shape[-1], X.shape[-1])))
 			return f, Df, H
 
-		self.coef_ = solvers.cp(F)['x']
+		self.coef_ = np.array(solvers.cp(F)['x']).ravel()
 		return self
 
 class Lasso(Model):
