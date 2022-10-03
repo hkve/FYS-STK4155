@@ -279,7 +279,7 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
 \section{Results}
     \comment{Proposed structure: OLS, Ridge Lasso, Terrain data \Hakon}
     \subsection{Ordinary least squares}
-    We begin by calulating the $MSE$ and $R^2$ score (eq. \ref{eq:theo:mse}, \ref{eq:theo:r2}) fitted to the Franke function for different polynomial degrees. This can be seen in Figure \ref{fig:res:OLS_mse_noresample} and \ref{fig:res:OLS_R2_noresample} respectively. Based on the $MSE$ calculated for the test data, the optimal degree was found to be $p_{opt} = 5$ with $MSE \approx 0.134$  
+    We begin by calulating the $MSE$ and $R^2$ score (eq. \ref{eq:theo:mse}, \ref{eq:theo:r2}) fitted to the Franke function for different polynomial degrees. This can be seen in Figure \ref{fig:res:OLS_mse_noresample} and \ref{fig:res:OLS_R2_noresample} respectively. Based on the $MSE$ calculated for the test data, the optimal degree was found to be $p_{opt} = 5$ with $MSE \approx 0.134$. We observe that the train $MSE$ decreases steadily with higher $p$, while the test $MSE$ decreases until we reach $p_{opt}$, after which it increases. The opposite relationship is seen for the $R^2$ score.   
     \begin{figure}[H]
         \centering
         \includegraphics[width=\linewidth]{OLS_mse_noresample.pdf}
@@ -311,7 +311,7 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
         \end{subfigure}
     \end{figure*}
 
-    The metrics thus far has only been calculated without the use of any resampling techniques. To see how this influences $MSE$, we apply k-fold Cross-validation and plot the averaged train- and test $MSE$ across the different folds. 
+    The metrics thus far has only been calculated without the use of any resampling techniques. To see how this influences $MSE$, we apply k-fold Cross-validation and plot the averaged train- and test $MSE$ across the different folds. This is presented in figure \ref{fig:res:OLS_mse_kfold}. Just as in the case without resampling, the train $MSE$ decreases with $p$. For the test $MSE$, 
     
     \begin{figure}[H]
         \centering
@@ -320,6 +320,8 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
         \label{fig:res:OLS_mse_kfold}
     \end{figure}
     \subsection{Ridge}
+    We now repeat the same analysis for Ridge regression.    
+
     \subsection{Lasso}
     
 \section{Discussion}
