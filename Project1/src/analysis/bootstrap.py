@@ -100,6 +100,7 @@ def plot_mse(Bootstrap_list, degrees):
     plt.plot(degrees, mse_train, label='Train MSE', c=colors[0], lw=2.5, alpha=0.75)
     plt.plot(degrees, mse_test, label='Test MSE', c=colors[1], lw=2.5)
 
+    plt.xlim([1,15])
     plt.ylim([0,0.6])
     plt.xlabel('Polynomial degree', fontsize=fontsize_lab)
     plt.ylabel('MSE value', fontsize=fontsize_lab)
@@ -128,7 +129,7 @@ def plot_mse_across_rounds(Bootstrap_list_rounds, rounds):
     plt.show()
 
 
-def solve_c(y, X, degree, rounds, reg, scale_scheme='Standard', ratio=3/4, random_state=321 ):
+def solve_c(y, X, degree, rounds, reg, scale_scheme='Standard', ratio=3/4, random_state=321):
     poly = PolynomialFeatures(degree=degree)
     X_poly = poly.fit_transform(X)
 
@@ -140,96 +141,82 @@ def solve_c(y, X, degree, rounds, reg, scale_scheme='Standard', ratio=3/4, rando
     BS = Bootstrap(reg, data_train, data_test, random_state = random_state, rounds=rounds)
     return BS
 
-# def run_bootstrap(model, lmbda=None):
-#     #For various rounds:
-#     rounds = np.arange(30, 1000+1, (1001-30)//10)
-#     Bootstrap_list_rounds = []
-#     for i, round in enumerate(rounds):
-#         if model in [Ridge, Lasso]:
-#             reg = model(lmbda = lmbda)
-#         else: 
-#             reg = model()
-#         BS = solve_c(y, X, degree=7, rounds=round, reg=reg)
-#         Bootstrap_list_rounds.append(BS)
-#         if model == LinearRegression:
-#             pass 
-#             # plot_hist_of_bootstrap(BS, 7)
-#     plot_mse_across_rounds(Bootstrap_list_rounds, rounds)
+def run_bootstrap_rounds(model, rounds, degree, lmbda=None):
+    """Bootstraps for various number of bootstrap rounds. Plots histogram (if OLS) and mse across rounds
 
-#     #For various degrees
-#     degrees = np.arange(1, 12+1)
-#     Bootstrap_list = []
-#     for deg in degrees: 
-#         BS = solve_c(y, X, degree=deg, rounds=70, reg=reg)
-#         Bootstrap_list.append(BS)
+    Args:
+        model (_type_): _description_
+        rounds (_type_): _description_
+        degree (_type_): _description_
+        lmbda (_type_, optional): _description_. Defaults to None.
+    """
+    Bootstrap_list_rounds = []
+    for round in rounds:
+        if model in [Ridge, Lasso]:
+            reg = model(lmbda = lmbda)
+        else: 
+            reg = model()
 
-#     plot_mse(Bootstrap_list, degrees)
-#     plot_bias_var(Bootstrap_list, degrees)
+        BS = solve_c(y, X, degree=degree, rounds=round, reg=reg)
+        Bootstrap_list_rounds.append(BS)
+
+        if model == LinearRegression and round in rounds[::rounds.shape//4]:
+            pass
+            plot_hist_of_bootstrap(BS, 7)
+
+    plot_mse_across_rounds(Bootstrap_list_rounds, rounds)
+
+
+def run_bootstrap_degrees(model, round, degrees, lmbdas=None):
+    #For various degrees
+    Bootstrap_list = []
+    for i, deg in enumerate(degrees): 
+        if model in [Ridge, Lasso]:
+            reg = model(lmbda = lmbdas[i])
+        else: 
+            reg = model()
+
+        BS = solve_c(y, X, degree=deg, rounds=round, reg=reg)
+        Bootstrap_list.append(BS)
+
+    plot_mse(Bootstrap_list, degrees)
+    plot_bias_var(Bootstrap_list, degrees)
+
 
 
 if __name__ == "__main__":
+    # ns = [60, 600, 1000]
+    # ns = [600]
+    # for n in ns:
     D = make_FrankeFunction(n=600, uniform=True, random_state=321, noise_std=0.1)
     y, X = D.unpacked()
+
+    rounds = np.arange(30, 1000+1, (1001-30)//10)
+    degrees = np.arange(1, 15+1)
+    round = 400
 
 
 ###
 #Linreg
 ###
 
-    #For various rounds:
-    rounds = np.array([30, 120, 210, 300])
-    rounds = np.arange(30, 1000+1, (1001-30)//10)
-    Bootstrap_list_rounds = []
-    for i, round in enumerate(rounds):
-        BS = solve_c(y, X, degree=7, rounds=round, reg=LinearRegression())
-        Bootstrap_list_rounds.append(BS)
-        # plot_hist_of_bootstrap(BS, 7)
-    plot_mse_across_rounds(Bootstrap_list_rounds, rounds)
+    # run_bootstrap_rounds(LinearRegression, rounds, degree=7)
+    # run_bootstrap_degrees(LinearRegression, round, degrees)
 
-    #For various degrees
-    degrees = np.arange(1, 12+1)
-    Bootstrap_list = []
-    for deg in degrees: 
-        BS = solve_c(y, X, degree=deg, rounds=70, reg=LinearRegression())
-        Bootstrap_list.append(BS)
 
-    plot_mse(Bootstrap_list, degrees)
-    plot_bias_var(Bootstrap_list, degrees)
-    
-    exit()
 
 ###
 #Ridge
 ###
     #Find the best lambda and degree:
-    degrees_grid, lmbdas_grid, MSEs = load("ridge_grid2")
+    degrees_grid, lmbdas_grid, MSEs = load("ridge_grid")
     
     optimal_lmbdas = lmbdas_grid[0, np.argmin(MSEs, axis=1)]
     optimal_lmbda = lmbdas_grid[np.unravel_index(np.argmin(MSEs), MSEs.shape)]
     optimal_degree = (np.unravel_index(np.argmin(MSEs), MSEs.shape))[1]
 
-    #For various rounds:
-    rounds = np.array([30, 120, 210, 300])
-    rounds = np.arange(30, 1000+1, (1001-30)//10)
-    Bootstrap_list_rounds = []
-    for i, round in enumerate(rounds):
-        BS = solve_c(y, X, degree=optimal_degree, rounds=round, reg=Ridge(lmbda = optimal_lmbda))
-        Bootstrap_list_rounds.append(BS)
-        # plot_hist_of_bootstrap(BS, 7)
-    plot_mse_across_rounds(Bootstrap_list_rounds, rounds)
-
-    #For various degrees
-    degrees = np.arange(1, 12+1)
-    lmbdas = []
-    Bootstrap_list = []
-    for i, deg in enumerate(degrees): 
-        BS = solve_c(y, X, degree=deg, rounds=70, reg=Ridge(lmbda = optimal_lmbdas[i]))
-        Bootstrap_list.append(BS)
-
-    plot_mse(Bootstrap_list, degrees)
-    plot_bias_var(Bootstrap_list, degrees)
-
-
+    # run_bootstrap_rounds(Ridge, rounds, degree=optimal_degree, lmbda=optimal_lmbda)
+    # run_bootstrap_degrees(Ridge, round, degrees, lmbdas=optimal_lmbdas)
 
 ###
 #LASSO
@@ -242,6 +229,10 @@ if __name__ == "__main__":
     optimal_lmbda = lmbdas_grid[np.unravel_index(np.argmin(MSEs), MSEs.shape)]
     optimal_degree = (np.unravel_index(np.argmin(MSEs), MSEs.shape))[1]
 
+    run_bootstrap_rounds(Lasso, rounds, degree=optimal_degree, lmbda=optimal_lmbda)
+    run_bootstrap_degrees(Lasso, round, degrees, lmbdas=optimal_lmbdas)
+
+    exit()
     #For various rounds:
     rounds = np.array([30, 120, 210, 300])
     rounds = np.arange(30, 1000+1, (1001-30)//10)
