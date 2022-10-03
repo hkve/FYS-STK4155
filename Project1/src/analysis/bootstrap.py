@@ -195,6 +195,8 @@ if __name__ == "__main__":
 
     plot_mse(Bootstrap_list, degrees)
     plot_bias_var(Bootstrap_list, degrees)
+    
+    exit()
 
 ###
 #Ridge
