@@ -13,10 +13,11 @@ def plot_train_mse_kfold(degrees, mse_across_folds, title="OLS", filename=None):
     sns.set_style("darkgrid")
     fig, ax = plt.subplots(figsize=(7,5.5))
 
+    alphas = [.75,1,1]
     for i, (k, mses) in enumerate(mse_across_folds.items()):
         train_mse, test_mse = mses
-        ax.plot(degrees, train_mse, c=colors[i], ls="--", label=rf"Train $k = ${k}")
-        ax.plot(degrees, test_mse, c=colors[i], label=rf"Test $k = ${k}")
+        ax.plot(degrees, train_mse, c=colors[i], alpha=alphas[i], ls="--", label=rf"Train $k = ${k}", lw=2.5)
+        ax.plot(degrees, test_mse, c=colors[i], alpha=alphas[i], label=rf"Test $k = ${k}", lw=2.5)
 
     ks = list(mse_across_folds.keys())
     ax.set_xlabel("Polynomial degrees", fontsize=14)
@@ -49,7 +50,7 @@ def run_Kfold_cross_validate(Model, degrees, n=600, k=5, random_state=321, lmbda
         train_mse[i] = resampler["train_mse"].mean()
         test_mse[i] = resampler["test_mse"].mean()
         
-
+    print(f"{Model.__name__}: {k = } Optimal p = {degrees[np.argmin(test_mse)]} with MSE = {np.min(test_mse)}")
     return train_mse, test_mse
 
 
@@ -58,9 +59,9 @@ if __name__ == "__main__":
     degrees = np.arange(1, 12+1)
     
     # Slicing [:3] is just a very hacky way if you only want to plot some
-    Models = [LinearRegression, Ridge, Lasso][1:]
-    lmbdas = [None, 0.1, 0.1][1:]
-    names =  ["OLS", "Ridge", "Lasso"][1:]
+    Models = [LinearRegression, Ridge, Lasso][:3]
+    lmbdas = [None, 0.1, 0.1][:3]
+    names =  ["OLS", "Ridge", "Lasso"][:3]
 
     mse_across_folds = {}
 
