@@ -137,9 +137,7 @@ class KFold_cross_validate:
         if type(scoring) not in [list, tuple]:
             scoring = (scoring, )
         
-        # Set seed
-        np.random.seed(random_state)
-
+        
         # Compute for both train and test
         cases = ["train", "test"]
 
@@ -150,6 +148,7 @@ class KFold_cross_validate:
                 assert score in reg.metrics_.keys(), f"The score {score} is not avalible in model {type(reg)}"
                 self.scores_[f"{case}_{score}"] = []
 
+        self.random_state = random_state
         self.shuffle_ = shuffle
         self.scoring_ = scoring
         self.k_ = k
@@ -244,7 +243,7 @@ class KFold_cross_validate:
 
         # If they should be shuffled, shuffle them
         if self.shuffle_:
-            data = data.shuffled()
+            data = data.shuffled(random_state=self.random_state)
 
         y, X = data.unpacked()
         n = y.size
