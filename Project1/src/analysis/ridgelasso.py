@@ -1,3 +1,4 @@
+from random import random
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -7,6 +8,7 @@ from matplotlib.colors import LogNorm
 import context
 from sknotlearn.linear_model import Ridge, Lasso
 from sknotlearn.datasets import make_FrankeFunction
+from sknotlearn.resampling import KFold_cross_validate
 from sknotlearn.data import Data
 from utils import make_figs_path, colors
 
@@ -64,14 +66,21 @@ def make_mse_grid(Method, degrees, lmbdas):
     MSEs = np.zeros((h,w))
 
     for i, degree in enumerate(degrees):
-        Dp = D.polynomial(degree=degree)
-        Dp = Dp.scaled(scheme="Standard")
+        Dp = D.polynomial(degree=degree).scaled(scheme="Standard")
         Dp_train, Dp_test = Dp.train_test_split(ratio=train_size, random_state=random_state)
 
         for j, lmbda in enumerate(lmbdas):
             # Add resampling option here
-            reg = Method(lmbda=lmbda).fit(Dp_train)
-            MSEs[i,j] = reg.mse(Dp_test)
+            resampler = KFold_cross_validate(
+                reg = Method(lmbda=lmbda),
+                data = Dp,
+                k = 5,
+                scoring = ("mse"),
+                shuffle = False,
+                run=True,
+                random_state=321,
+            )
+            MSEs[i,j] = np.mean(resampler.scores_["test_mse"])
 
     degrees_grid, lmbdas_grid = np.meshgrid(degrees, lmbdas, indexing="ij")
     return degrees_grid, lmbdas_grid, MSEs
