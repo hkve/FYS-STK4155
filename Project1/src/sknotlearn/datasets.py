@@ -34,30 +34,30 @@ def make_FrankeFunction(n=1000, uniform=True, noise_std=0, random_state=42):
 
 	return Data(z, np.c_[x,y])
 
-def plot_FrankeFunction(D, filename=None):
+def plot_FrankeFunction(D, angle=(18, 45), filename=None, Franke=True):
 	sns.set_style("white")
 	fig = plt.figure()
 	ax = fig.add_subplot(projection="3d")
 	surf = ax.plot_trisurf(*D.X.T, D.y, cmap=cm.viridis, linewidth=0, antialiased=False)
 
-	#TODO: Change limits
-	# ax.set_zlim(-0.10, 1.40)
-	# ax.zaxis.set_major_locator(LinearLocator(10))
-	# ax.zaxis.set_major_formatter(FormatStrFormatter("%.02f"))
+	#TODO: Add limits
+	if Franke:
+		ax.set_zlim(-0.10, 1.40)
+		ax.zaxis.set_major_locator(LinearLocator(10))
+		ax.zaxis.set_major_formatter(FormatStrFormatter("%.02f"))
 
 	ax.set_xlabel("x", fontsize=14)
 	ax.set_ylabel("y", fontsize=14)
 	ax.set_zlabel(r"$F (x,y)$", fontsize=14, rotation=90)
 	fig.colorbar(surf, shrink=0.5, aspect=5)
 	
-	#TODO: Change angle
-	polar_angle = 18 # This is "theta" is physics convention of spherical coordinates
-	azimuthal_angle = 45 # "phi"
-	ax.view_init(polar_angle, azimuthal_angle)
+	ax.view_init(*angle)
 	
+	plt.tight_layout()
+
 	if filename:
 		plt.savefig(filename, dpi=300)
-
+	
 	plt.show()
 
 def FrankeFunction(x,y):
@@ -67,13 +67,14 @@ def FrankeFunction(x,y):
 	term4 = -0.2*np.exp(-(9*x-4)**2 - (9*y-7)**2)
 	return term1 + term2 + term3 + term4
 
-def load_terrain(filename="SRTM_data_mot"):
+
+def load_terrain(filename="SRTM_data_mot.tif"):
 	l = np.arange(30)
 	X, Y = np.meshgrid(l,l)	
 	x = X.flatten()
 	y = Y.flatten()
 
-	z = imread(filename+".tif")[1740:1800:2, 1600:1660:2] 
+	z = imread(filename)[1740:1800:2, 1600:1660:2] 
 	z = z.flatten()
 	
 	return Data(z, np.c_[x,y])
@@ -92,6 +93,5 @@ if __name__ == "__main__":
 	D = make_FrankeFunction(n=625, uniform=False, noise_std=0.1)
 	# plot_FrankeFunction(D)
 
-
 	D = load_terrain()
-	plot_FrankeFunction(D)
+	plot_FrankeFunction(D, angle=(22,-55), Franke=False)
