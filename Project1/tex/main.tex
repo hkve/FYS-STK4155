@@ -220,60 +220,65 @@
 \section{Method}
 Something general about initially fitting Franke data using OLS, ridge and lasso. Then moving on to real terrain data something something.
     
-    \subsection{Franke function}
+    \subsection{Datasets}
+        \subsubsection{Franke function}
 
-    For the initial testing of our implemented fitting routines, we will use the so called \textit{Franke function}. Being able to control the number of sample points and noise levels will serve as a good examination of our models advantages and disadvantaged. Defined for $x, y \in [0,1]$
+            For the initial testing of our implemented fitting routines, we will use the so called \textit{Franke function}. Being able to control the number of sample points and noise levels will serve as a good examination of our models advantages and disadvantaged. Defined for $x, y \in [0,1]$
 
-    \begin{align}
-        F(x,y) = f_1(x,y) + f_2(x,y) + f_3(x,y) + f_4(x,y) + \epsilon \label{eq:met:Franke_Function}
-    \end{align}
-
-    Where the $f_i(x,y)$ are Gaussian functions, constructed to mimic the shape of a hill top landscape. More concretely, these are defined as:
-
-    \begin{align} \nonumber
-        f_1(x,y) &= \frac{3}{4}\exptext{ -\frac{(9x-2)^2}{4} - \frac{(9y-2)^2}{4} } \nonumber \\
-        f_2(x,y) &= \frac{3}{4}\exptext{ -\frac{(9x+1)^2}{49} - \frac{(9y+1)}{10}} \nonumber \\
-        f_3(x,y) &= \frac{1}{2}\exptext{ -\frac{(9x-7)^2}{4} - \frac{(9y-3)^2}{4}} \nonumber \\
-        f_4(x,y) &= -\frac{1}{5}\exptext{ -(9x-4)^2 - (9y-7)^2} \nonumber
-    \end{align}
-
-    And $\epsilon$ is some stochastic noise $\epsilon \distas \normal{0}{\sigma^2}$. By visual inspection, we can fine tune $\sigma$ to create data that looks like noisy digital terrain data. For all fits to the Franke function we used $n = 600$ uniformly distributed points $x,y \distas \mathcal{U}(0,1)$ with a noise level of $\sigma = 0.1$, which is discussed in \ref{app:sec:frankefunction N and sigma}.   
-
-    \subsection{Linear regression}
-    \comment{not sure about how we should divide these subsections, but I wanted to write a bit about data scaling - \Carl. Since we compose this design matrix and preform scaling for all models, mabye give this section a  more general name and write about train test splitting -\Hakon}
-        When fitting our models to the data, we base our models on simple polynomial expansions of the arguments of the function generating the data. We are fitting scalar function with to arguments $x$ and $y$, so our design matrix is constructed as
-        \begin{align}
-            X = \begin{pmatrix}
-                1 & x_1 & y_1 & x^2_1 & x_1y_1 & y_1^2 & \cdots & x_1^p & \cdots & y_1^p \\
-                \vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \ddots & \vdots \\
-                1 & x_n & y_n & x^n_n & x_ny_n & y_n^2 & \cdots & x_n^p & \cdots & y_n^p
-            \end{pmatrix}
-        \end{align}
-    
-        Before fitting the models to the sampled data, we will scale the data using the $Z$-score normalisation. This scales the inputs $x_i$ and the targets $\vec{y}$ such that they have a mean value of $0$ with a standard deviation $1$. In effect, we rescale
-        \begin{subequations}
             \begin{align}
-                \vec{y} &\to \frac{\vec{y}-\bar{y}}{\bar{\sigma}_{\vec{y}}}, \\
-                \vec{x}_a &\to \frac{\vec{x}_a - \bar{x}_a}{\bar{\sigma}_{\vec{x}_a}},
+                F(x,y) = f_1(x,y) + f_2(x,y) + f_3(x,y) + f_4(x,y) + \epsilon \label{eq:met:Franke_Function}
             \end{align}
-        \end{subequations}
-        where $\bar{z} = \frac{1}{n} \sum_{i=1}^n z_n$ denotes the sample mean of $\vec{z}$ and $\sigma_{\vec{z}}^2 = \frac{1}{n} \sum_{i=1}^n {(z_i-\bar{z})}^2$ denotes the sample std of $\vec{z}$. When we calculate $MSE$ scores to compare between models and resampling techniques, we will use the scaled $\vec{y}$.
-        \newline\newline
-        \comment{Just wrote down some thoughts, think this should be present in the method section before the resampling part. \Hakon}
-        To get a proper assessment of our model, we will split the dataset into a \textit{training set} and \textit{testing set}. The training set is used to fit the model, giving our coefficient estimates $\vec{\hat{\theta}}$. Using the fitted model and the training data, we can calculate metrics to quantify how good our model replicates this data. In the case that our model perfectly predicts the training data $\vec{y}$ based on $X$, the calculated metrics $MSE$ and $R^2$ (eq. \ref{eq:theo:mse}, \ref{eq:theo:r2}) should be 0 and 1 respectively. However, using these scores to assess the goodness of our fit has an underlying problem. Since the model has seen the training data to estimate $\vec{\hat{\theta}}$, we can run into problems where the model begins to fit the $\epsilon$ values and not the (assumed) underlying function $\hat{f}(x)$. This phenomenon is called \textit{overfitting}. To mediate this, we calculate our metrics based on the training data which was not used for fitting. This serves as a way to estimate the errors on data which the model has not seen before. For the artificial data made using the Franke function, we went for a split where $\sfrac{2}{3}$ of the data is used for the training set, while other $\sfrac{1}{3}$ is reserved for the training set.           
+
+            Where the $f_i(x,y)$ are Gaussian functions, constructed to mimic the shape of a hill top landscape. More concretely, these are defined as:
+
+            \begin{align} \nonumber
+                f_1(x,y) &= \frac{3}{4}\exptext{ -\frac{(9x-2)^2}{4} - \frac{(9y-2)^2}{4} } \nonumber \\
+                f_2(x,y) &= \frac{3}{4}\exptext{ -\frac{(9x+1)^2}{49} - \frac{(9y+1)}{10}} \nonumber \\
+                f_3(x,y) &= \frac{1}{2}\exptext{ -\frac{(9x-7)^2}{4} - \frac{(9y-3)^2}{4}} \nonumber \\
+                f_4(x,y) &= -\frac{1}{5}\exptext{ -(9x-4)^2 - (9y-7)^2} \nonumber
+            \end{align}
+
+            And $\epsilon$ is some stochastic noise $\epsilon \distas \normal{0}{\sigma^2}$. By visual inspection, we can fine tune $\sigma$ to create data that looks like noisy digital terrain data. For all fits to the Franke function we used $n = 600$ uniformly distributed points $x,y \distas \mathcal{U}(0,1)$ with a noise level of $\sigma = 0.1$, which is discussed in \ref{app:sec:frankefunction N and sigma}.   
+
+        \subsubsection{Terrain data}
+            \comment{Here we put the terrain we extracted with coordinates etc.}
+
+        \subsection{Linear regression}
+            \comment{not sure about how we should divide these subsections, but I wanted to write a bit about data scaling - \Carl. Since we compose this design matrix and preform scaling for all models, mabye give this section a  more general name and write about train test splitting -\Hakon}
+            When fitting our models to the data, we base our models on simple polynomial expansions of the arguments of the function generating the data. We are fitting scalar function with to arguments $x$ and $y$, so our design matrix is constructed as
+            \begin{align}
+                X = \begin{pmatrix}
+                    1 & x_1 & y_1 & x^2_1 & x_1y_1 & y_1^2 & \cdots & x_1^p & \cdots & y_1^p \\
+                    \vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \ddots & \vdots \\
+                    1 & x_n & y_n & x^n_n & x_ny_n & y_n^2 & \cdots & x_n^p & \cdots & y_n^p
+                \end{pmatrix}
+            \end{align}
+        
+            Before fitting the models to the sampled data, we will scale the data using the $Z$-score normalisation. This scales the inputs $x_i$ and the targets $\vec{y}$ such that they have a mean value of $0$ with a standard deviation $1$. In effect, we rescale
+            \begin{subequations}
+                \begin{align}
+                    \vec{y} &\to \frac{\vec{y}-\bar{y}}{\bar{\sigma}_{\vec{y}}}, \\
+                    \vec{x}_a &\to \frac{\vec{x}_a - \bar{x}_a}{\bar{\sigma}_{\vec{x}_a}},
+                \end{align}
+            \end{subequations}
+            where $\bar{z} = \frac{1}{n} \sum_{i=1}^n z_n$ denotes the sample mean of $\vec{z}$ and $\sigma_{\vec{z}}^2 = \frac{1}{n} \sum_{i=1}^n {(z_i-\bar{z})}^2$ denotes the sample std of $\vec{z}$. When we calculate $MSE$ scores to compare between models and resampling techniques, we will use the scaled $\vec{y}$.
+            \newline\newline
+            \comment{Just wrote down some thoughts, think this should be present in the method section before the resampling part. \Hakon}
+            To get a proper assessment of our model, we will split the dataset into a \textit{training set} and \textit{testing set}. The training set is used to fit the model, giving our coefficient estimates $\vec{\hat{\theta}}$. Using the fitted model and the training data, we can calculate metrics to quantify how good our model replicates this data. In the case that our model perfectly predicts the training data $\vec{y}$ based on $X$, the calculated metrics $MSE$ and $R^2$ (eq. \ref{eq:theo:mse}, \ref{eq:theo:r2}) should be 0 and 1 respectively. However, using these scores to assess the goodness of our fit has an underlying problem. Since the model has seen the training data to estimate $\vec{\hat{\theta}}$, we can run into problems where the model begins to fit the $\epsilon$ values and not the (assumed) underlying function $f(x)$. This phenomenon is called \textit{overfitting}. To mediate this, we calculate our metrics based on a testing data which was not used for fitting. This serves as a way to estimate the errors on data which the model has not seen before. For the artificial data made using the Franke function, we went for a split where $\sfrac{2}{3}$ of the data is used for the training set, while other $\sfrac{1}{3}$ is reserved for the testing set.           
+
 
     \subsection{Resampling techniques}
-    With the intent to compute more accurate measures for goodness of fit (such as MSE and $R^2$) to evaluate our model, we 
-    artificially increase the data sample by repeatedly fitting the model on subsamples of our data. This approach is called resampling and consists of a variety of methods. In this project we have applied \textit{Bootstrapping} and \textit{k-fold Cross-validation}. 
+        With the intent to compute more accurate measures for goodness of fit (such as MSE and $R^2$) to evaluate our model, we 
+        artificially increase the data sample by repeatedly fitting the model on subsamples of our data. This approach is called resampling and consists of a variety of methods. In this project we have applied \textit{Bootstrapping} and \textit{k-fold Cross-validation}. 
 
         \subsubsection*{Bootstrap}
-        Bootstrapping consists of generating new training data by sampling data points from the original training data with replacement; meaning the same data points can be selected more than once. The new set of training data is called a bootstrapped dataset and is used to train the model. Then the relevant measures of goodness of fit is calculated. This process of resampling and calculating measures is repeated a certain number of times (rounds), giving a distribution of these measures. The mean of the measures is then calculated across the bootstrapped models. Through the central limit theorem this mean is assumed to be the more accurate measure for goodness of fit and therefore a better evaluation of the model in question.  
+            Bootstrapping consists of generating new training data by sampling data points from the original training data with replacement; meaning the same data points can be selected more than once. The new set of training data is called a bootstrapped dataset and is used to train the model. Then the relevant measures of goodness of fit is calculated. This process of resampling and calculating measures is repeated a certain number of times (rounds), giving a distribution of these measures. The mean of the measures is then calculated across the bootstrapped models. Through the central limit theorem this mean is assumed to be the more accurate measure for goodness of fit and therefore a better evaluation of the model in question.  
 
         \subsubsection*{Cross-validation}
-        Cross-validation consist of partitioning the dataset into different subsets (which we will call \textit{folds}). By using some folds for fitting the model and others for computing metrics, we can get multiple values for the same measure by changing which folds are used for fitting and which are used for calculating measures. This differs from Bootstrapping since no points used for fitting are used for calculating measures for goodness of fit.
-        \newline\newline
-        In this report, we will use the famous \textit{k-fold Cross-validation} technique. Considering the dataset $\mathcal{D} = (\vec{y}, X)$, consisting of $n$ data points: Initially we partition $\mathcal{D}$ into $k$ folds $\mathcal{D}_i$, $i = 1, \ldots , k$, of equal size. For each fold $\mathcal{D}_i$, a model is fitted using every fold \textit{except} $\mathcal{D}_i$, which we denote $\mathcal{D}_{-i}$. With this model, we calculate the different statitistical measures of the model on $\mathcal{D}_i$, which was not used to fit the model. When this is done for all $k$ folds, we take the mean of the measures to get the 
-        final goodness of fit. 
+            Cross-validation consist of partitioning the dataset into different subsets (which we will call \textit{folds}). By using some folds for fitting the model and others for computing metrics, we can get multiple values for the same measure by changing which folds are used for fitting and which are used for calculating measures. This differs from Bootstrapping since no points used for fitting are used for calculating measures for goodness of fit.
+            \newline\newline
+            In this report, we will use the famous \textit{k-fold Cross-validation} technique. Considering the dataset $\mathcal{D} = (\vec{y}, X)$, consisting of $n$ data points: Initially we partition $\mathcal{D}$ into $k$ folds $\mathcal{D}_i$, $i = 1, \ldots , k$, of equal size. For each fold $\mathcal{D}_i$, a model is fitted using every fold \textit{except} $\mathcal{D}_i$, which we denote $\mathcal{D}_{-i}$. With this model, we calculate the different statitistical measures of the model on $\mathcal{D}_i$, which was not used to fit the model. When this is done for all $k$ folds, we take the mean of the measures to get the 
+            final goodness of fit. 
 
 
 \section{Results}
