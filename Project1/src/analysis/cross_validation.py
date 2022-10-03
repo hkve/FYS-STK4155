@@ -7,9 +7,26 @@ from sknotlearn.linear_model import LinearRegression, Ridge, Lasso
 from sknotlearn.resampling import KFold_cross_validate
 from sknotlearn.datasets import make_FrankeFunction
 from sknotlearn.data import Data
+from utils import make_figs_path, colors
 
-from noresampling import plot_train_test
+def plot_train_mse_kfold(degrees, mse_across_folds, title="OLS", filename=None):
+    sns.set_style("darkgrid")
+    fig, ax = plt.subplots(figsize=(7,5.5))
 
+    for i, (k, mses) in enumerate(mse_across_folds.items()):
+        train_mse, test_mse = mses
+        ax.plot(degrees, train_mse, c=colors[i], ls="--", label=rf"Train $k = ${k}")
+        ax.plot(degrees, test_mse, c=colors[i], label=rf"Test $k = ${k}")
+
+    ks = list(mse_across_folds.keys())
+    ax.set_xlabel("Polynomial degrees", fontsize=14)
+    ax.set_ylabel(r"$MSE$", fontsize=14)
+    ax.legend(fontsize=14)
+    ax.set_title(rf"{title} Cross validation, $k \in [{ks[0]},{ks[-1]}]$", fontsize=16)
+
+    fig.tight_layout()
+    if filename is not None: plt.savefig(make_figs_path(filename), dpi=300)
+    plt.show()
 
 def run_Kfold_cross_validate(Model, degrees, n=600, k=5, random_state=321, lmbda=None):    
     train_mse = np.zeros_like(degrees, dtype=float)
@@ -39,13 +56,17 @@ def run_Kfold_cross_validate(Model, degrees, n=600, k=5, random_state=321, lmbda
 if __name__ == "__main__":
     ks = [5,7,10]
     degrees = np.arange(1, 12+1)
-
+    
     # Slicing [:3] is just a very hacky way if you only want to plot some
-    Models = [LinearRegression, Ridge, Lasso][:3]
-    lmbdas = [None, 0.1, 0.1][:3]
-    names =  ["OLS", "Ridge", "Lasso"][:3]
+    Models = [LinearRegression, Ridge, Lasso][1:]
+    lmbdas = [None, 0.1, 0.1][1:]
+    names =  ["OLS", "Ridge", "Lasso"][1:]
+
+    mse_across_folds = {}
 
     for Model, lmbda, name in zip(Models, lmbdas, names):
         for k in ks:
             train_mse, test_mse = run_Kfold_cross_validate(Model, degrees, k=k, random_state=321, lmbda=lmbda)
-            plot_train_test(degrees, train_mse, test_mse, filename=f"{name}_mse_kfoldcross_k{k}", title=f"{name} k = {k} Cross-validation")
+            mse_across_folds[k] = [train_mse, test_mse]
+        
+        plot_train_mse_kfold(degrees, mse_across_folds, name, filename=f"{name}_mse_kfold")

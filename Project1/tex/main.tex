@@ -311,6 +311,14 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
         \end{subfigure}
     \end{figure*}
 
+    The metrics thus far has only been calculated without the use of any resampling techniques. To see how this influences $MSE$, we apply k-fold Cross-validation and plot the averaged train- and test $MSE$ across the different folds. 
+    
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=\linewidth]{OLS_mse_kfold.pdf}
+        \caption{$MSE$ values as a function of polynomial degrees, calculated using k-fold Cross validation for $k = 5, 7$ and $10$. }
+        \label{fig:res:OLS_mse_kfold}
+    \end{figure}
     \subsection{Ridge}
     \subsection{Lasso}
     
