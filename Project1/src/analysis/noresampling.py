@@ -43,8 +43,8 @@ def plot_train_test(degrees, train, test, filename = None, **kwargs):
 
 	sns.set_style("darkgrid")
 	fig, ax = plt.subplots()
-	ax.plot(degrees, train, c=colors[0], label="Train", alpha=0.75)
-	ax.plot(degrees, test, c=colors[1], label="Test")
+	ax.plot(degrees, train, c=colors[0], label="Train", alpha=0.75, lw=2.5)
+	ax.plot(degrees, test, c=colors[1], label="Test", lw=2.5)
 	ax.set_title(opt["title"], fontsize=opt["title_fontsize"])
 	ax.set_xlabel(opt["xlabel"], fontsize=opt["fontsize"])
 	ax.set_ylabel(opt["ylabel"], fontsize=opt["fontsize"])
@@ -76,7 +76,7 @@ def plot_beta_progression(betas, betas_se, powers, degrees=[1,3,5], filename=Non
 		# Plot for degree p
 		ticks = np.arange(len(labels))
 		ax.set_xticks(ticks, labels, rotation=x_)
-		ax.plot(ticks, betas[p], c=colors[0], ls="--", marker=".")
+		ax.plot(ticks, betas[p], c=colors[0], ls="--", marker=".", lw=2.5)
 		ax.fill_between(ticks, (betas[p]-2*betas_se[p]), (betas[p]+2*betas_se[p]), color=colors[0], alpha=.3)
 
 	fig.tight_layout()
