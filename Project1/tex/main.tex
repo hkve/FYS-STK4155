@@ -59,7 +59,7 @@
 \newcommand{\betahat}{\hat{\beta}}
 \newcommand{\msub}[2]{\ensuremath{{#1}_\text{#2}}}
 
-\newcommand{\Håkon}{$\mathcal{H}$}
+\newcommand{\Hakon}{$\mathcal{H}$}
 \newcommand{\Carl}{$\mathbb{CM}$}
 \newcommand{\Anna}{$\mathfrak{Anna}$}
 
@@ -96,13 +96,13 @@
 \section{Theory}
     Before we delve into to details of the theory section, it is useful to take a moment to define the quantities we will be dealing with. Let $\vec{y}$ denote a vector of a series of measured values $y_i$, $i\in 1, 2,..., n$ at points $X$, where $X$ is a matrix where the rows $x_i$ correspond to the input values that produced the measurement $y_i$. For completeness we refer to the columns of $X$ as $\vec{x}_a$, $a=1, 2,..., p$.\footnote{Throughout this project, $a, b$ will always index the $p$ features for a model, and $i, j$ the $n$ data points.} Together, these form the dataset $\mathcal{D} = \cclosed{(y_i, x_i)}$. Another important set of values is $\vec{\theta}$ which contains the parameters that will define the model we will use to predict the data.
 
-    We will assume that the measurements $y_i$ are generated from an exact function $f(x)$ with stochastic noise $\epsilon$ added, such that $y_i = f(x_i) + \epsilon$. Throughout this project, we will assume that the noise is normally distributed with mean 0 and some standard deviation (std) $\sigma$; $\epsilon \distas \normal{0}{\sigma^2}$. Furthermore, we will assume that the noise between different measurements is independent and identically distributed (i.i.d.). Our job then is to model an $\hat{f}(x)$ that we want to be close to $f(x)$.
+    We will assume that the measurements $y_i$ are generated from an exact function $f(x)$ with stochastic noise $\epsilon$ added, such that $y_i = f(x_i) + \epsilon$. Throughout this project, we will assume that the noise is normally distributed with zero mean and some standard deviation (std) $\sigma$; $\epsilon \distas \normal{0}{\sigma^2}$. Furthermore, we will assume that the noise between different measurements is independent and identically distributed (i.i.d.). Our job then is to model an $\hat{f}(x)$ that we want to be close to $f(x)$.
 
     \subsection{Error assesement and model optimisation}
 
-    \comment{Here I am lost as to the order and division of things. - Carl Martin, ca. 2000 AD. I think the devision and ordering makes sense. Mabye shuffle CLT around? - \Håkon}
+    \comment{Here I am lost as to the order and division of things. - Carl Martin, ca. 2000 AD. I think the devision and ordering makes sense. Mabye shuffle CLT around? - \Hakon}
     \subsubsection{Central Limit Theorem}
-        The central limit theorem tells us that when sampling a series of quantities $\cclosed{z_i|i=1,...,n}$ with independent and identical distributions with a mean $\mu$ and variance $\sigma^2<\infty$, the distribution of the sample mean $\bar{z}_n = \frac{1}{n}\sum_{i=1}^n z_i$ will approach a normal distrbution. Explicitly, we have (\comment{I don't know whether to box this - \Carl, I think no box - \Håkon, agree - \Carl})
+        The central limit theorem tells us that when sampling a series of quantities $\cclosed{z_i|i=1,\ldots,n}$ with independent and identical distributions with a mean $\mu$ and variance $\sigma^2<\infty$, the distribution of the sample mean $\bar{z}_n = \frac{1}{n}\sum_{i=1}^n z_i$ will approach a normal distrbution. Explicitly, we have (\comment{I don't know whether to box this - \Carl, I think no box - \Hakon, agree - \Carl})
         \begin{align}\label{eq:theo:CLM}
             \lim_{n\to\infty} \sqrt{n}(\bar{z}_n-\mu) \distas \normal{0}{\sigma^2}.
         \end{align}
@@ -110,14 +110,14 @@
         \begin{align}
             \bar{z}_n \distas \normal{\mu}{\frac{\sigma^2}{n}}
         \end{align}
-        becomes sound. Colloquially we say the sample mean approaches the true mean $\mu$. This is powerful, as it means not only that the sample mean becomes better as the sample size grows, but quantities derived from its distribution are also determined more precisely. Note also that this holds with only very weak restrictions on the distribution of the $z_i$'s -- their sample mean will approach normal distribution regardles. Together, This lays the foundation for statistically informed models such as regression methods. \comment{Wild-ish claim here, but I was not sure how to `motivate' this section on CLM so that it doesn't seem too random, without going too big. Any input is appreciated. -\Carl, I think this makes sens (not too wild). Mabye explicitly state that this happends  even if $z_i$ are not themselves normally distributed. - \Håkon, Good idea! -\Carl}
+        becomes sound. Colloquially we say the sample mean approaches the true mean $\mu$. This is powerful, as it means not only that the sample mean becomes better as the sample size grows, but quantities derived from its distribution are also determined more precisely. Note also that this holds with only very weak restrictions on the distribution of the $z_i$'s -- their sample mean will approach normal distribution regardles. Together, this lays the foundation for statistically informed models such as regression methods. \comment{Wild-ish claim here, but I was not sure how to `motivate' this section on CLM so that it doesn't seem too random, without going too big. Any input is appreciated. -\Carl, I think this makes sens (not too wild). Mabye explicitly state that this happends  even if $z_i$ are not themselves normally distributed. - \Hakon, Good idea! -\Carl}
 
 
 
 
     \subsubsection{Measure for goodness of fit}
-        \comment{Title suggestions, "measures for goodness of fit". Then say we simply call these "metrics" to not clutter other sections with long words. - \Håkon, Sold! -\Carl}
-        When we want to create a statistically informed model that is able to predict the outcome of future measurements, we need to develop metrics for how well our model fits the data we already have. That is, we want to optimise our parameters $\vec{\theta}$ such that $\hat{f}(x) \approx f(x)$. We call this the goodness of fit. To estimate how well we acheive this with our given dataset $\mathcal{D}$, we will start with the mean squared error (MSE). Given a model which predicts values $\vec{\hat{y}}$, the mean squared error is given by
+        \comment{Title suggestions, "measures for goodness of fit". Then say we simply call these "metrics" to not clutter other sections with long words. - \Hakon, Sold! -\Carl}
+        When we want to create a statistically informed model that is able to predict the outcome of future measurements, we need to develop metrics for how well our model fits the data we already have. That is, given a model parametrised by parametrs $\vec{\theta}$, we want to optimise them such that $\hat{f}(x) \approx f(x)$. We call this the goodness of fit. To estimate how well we acheive this with our given dataset $\mathcal{D}$, we will start with the mean squared error (MSE). Given a model which predicts values $\vec{\hat{y}}$, the mean squared error is given by
         \begin{align}
             \boxed{
                 \mse(\vec{\hat{y}}) = \frac{1}{n} \sum_{i=1}^n (y_i-\hat{y}_i)^2 = \frac{1}{n} (\vec{y} - \vec{\hat{y}})^2,
@@ -131,7 +131,7 @@
             R^2(\vec{\hat{y}}) = 1 - \frac{\sum_{i=1}^n (y_i-\hat{y}_i)^2}{\sum_{i=1}^n (y_i-\bar{y})^2} = 1 - \frac{(\vec{y}-\vec{\hat{y}})^2}{(\vec{y}-\bar{y})^2},
             \label{eq:theo:r2}
         \end{align}
-        \comment{Mabye something about $R^2 \in (-\infty, 1]$, where $R^2 = 1$ is a perfect fit, $R^2 = 0$ is equal to predicting the mean $\bar{y}$ all the time and $R^2 < 0$ is even worse. - \Håkon, agree - \Carl}
+        \comment{Mabye something about $R^2 \in (-\infty, 1]$, where $R^2 = 1$ is a perfect fit, $R^2 = 0$ is equal to predicting the mean $\bar{y}$ all the time and $R^2 < 0$ is even worse. - \Hakon, agree - \Carl}
         where $\bar{y} = \frac{1}{n}\sum_{i=1}^n y_i$ is the sample mean of the observed data. This metric falls on the interval $(-\infty, 1]$, where 1 denotes the perfect fit, 0 correspond to a constant prediction of $\bar{y}$, and negative values corresponds to worse prediction than this.
 
 
@@ -153,15 +153,15 @@
     \subsection{Statistical introduction to linear regression}
         A way to motivate the process of statistical learning is that we want to develop a process by which we use observed data to inform our belief in a future outcome. Such a process can be developed from the ideas of Bayes' theorem, which we can use to inform us what confidence we should have in the parameters of a given model, given data points we have observed.
         
-        Bayes' theorem tells us that our \textit{posteriori} confidence in the parameters $\vec{\theta}$, given the available data $\mathcal{D}=(\vec{y}, X)$, is given by the probability
+        Bayes' theorem tells us that our \textit{posteriori} confidence in the parameters $\vec{\theta}$, given the available dataset $\mathcal{D}=(\vec{y}, X)$, is given by the probability
         \begin{align}
             P(\vec{\theta}|X, \vec{y}) = \frac{P(\vec{y}|X,\vec{\vec{\theta}})P(\vec{\theta})}{P(X,\vec{y})},
         \end{align}
-        where $P(\vec{y}|X, \vec{\theta})$ is the \textit{likelihood}, and $P(\vec{\theta})$ is our \textit{prior} confidence in $\vec{\theta}$. $P(X,\vec{y})$ plays the role of a normalisation, and can safely be ignored -- either because we look for values of $\vec{\theta}$ that maximise the probability, or because we assume the probabilities $P(\vec{y}|X,\vec{\theta})$ and $P(\vec{\theta})$ which we can then properly normalise. Now we have a framework through which we can build a model by making assumptions about the probability distributions $P(\vec{y}|X,\vec{\theta})$ and $P(\vec{\theta})$ to give us a probability distribution for the parameters $\vec{\theta}$ that we can maximise.
+        where $P(\vec{y}|X, \vec{\theta})$ is the \textit{likelihood} of observing the values $\vec{y}$ at points $X$ given parameters $\vec{\theta}$, and $P(\vec{\theta})$ is our \textit{prior} confidence in $\vec{\theta}$, before the data was seen. $P(X,\vec{y})$ plays the role of a normalisation, and can safely be ignored -- either because we look for values of $\vec{\theta}$ that maximise the probability, or because we assume the probabilities $P(\vec{y}|X,\vec{\theta})$ and $P(\vec{\theta})$ which we can then properly normalise. Now we have a framework through which we can build a model by making assumptions about the probability distributions $P(\vec{y}|X,\vec{\theta})$ and $P(\vec{\theta})$ to give us a probability distribution for the parameters $\vec{\theta}$ that we can maximise.
 
 
     \subsection{Ordinary least squares}
-        We define the ordinary least squares method by assuming that the data $y(x)$ that we want to make a fit to has a linear noise term that is normally distributed with zero mean \comment{Dont be posh -\Håkon, Sorry, I am a noughty boy -\Carl}. That is, the data is generated as $y(x) = f(x) + \epsilon$, where $f(x)$ is some analytic, non-stochastic function of the data input $x$, and $\epsilon \distas \normal{0}{\sigma^2}$ for some $\sigma^2>0$. Further, if we make a model fitting $y(x)$ by a $\hat{y}(x)$, we should expect the error at every data point $(y_i, x_i)$ to be be normally distributed with the same variance, i.e., independently and identically distributed (i.i.d.). This can be summarised
+        We define the ordinary least squares method by assuming that the data $y(x)$ that we want to make a fit to has a linear noise term that is normally distributed with zero mean \comment{Dont be posh -\Hakon, Sorry, I am a noughty boy -\Carl}. That is, the data is generated as $y(x) = f(x) + \epsilon$, where $f(x)$ is some analytic, non-stochastic function of the data input $x$, and $\epsilon \distas \normal{0}{\sigma^2}$ for some $\sigma^2>0$. Further, if we make a model fitting $y(x)$ by a $\hat{y}(x)$, we should expect the error at every data point $(y_i, x_i)$ to be be normally distributed with the same variance, i.e., independently and identically distributed (i.i.d.). This can be summarised
         \begin{align}
             P(\vec{y}|X, \vec{\theta}) = \prod_{i=1}^{n} \frac{1}{\sqrt{2\pi\sigma^2}} \exp{-\frac{{(y_i-\hat{y}_i)}^2}{2\sigma^2}}.
         \end{align}
@@ -180,7 +180,7 @@
         \end{align}
 
     \subsection{Ridge regression}
-        So far, we have assumed that the parameters $\vec{\theta}$ are uniformly distributed, and as such have no \textit{bias} towards any particular value. In practice, this means that the OLS model will contort to fit itself to all values in the data. As such, a motivation for adding a bias could be for the sake of stability in the fit. These methods are called \textit{regularised} methods. An example is ridge regression, where one assumes that the parameters are normally distributed, such that parameter values far from the mean are thought less likely to occur. This in practice means that the model is less willing to contort to outliers in the dataset, trading it for a bias towards certain parameter values. Assuming the probability distrbution for $\vec{\theta}$ \comment{What is $\tau$ here? Just a $\sigma \xrightarrow{} \tau$? -\Håkon, Yes exactly, using $\tau$ as in the literature to avoid confusion with noise $\sigma$. $\tau$ is also used in LASSO where it does not correspond to the std. -\Carl}
+        So far, we have assumed that the parameters $\vec{\theta}$ are uniformly distributed, and as such have no \textit{bias} towards any particular value. In practice, this means that the OLS model will contort to fit itself to all values in the data. As such, a motivation for adding a bias could be for the sake of stability in the fit. These methods are called \textit{regularised} methods. An example is ridge regression, where one assumes that the parameters are normally distributed, such that parameter values far from the mean are thought less likely to occur. This in practice means that the model is less willing to contort to outliers in the dataset, trading it for a bias towards certain parameter values. Assuming the probability distrbution for $\vec{\theta}$ \comment{What is $\tau$ here? Just a $\sigma \xrightarrow{} \tau$? -\Hakon, Yes exactly, using $\tau$ as in the literature to avoid confusion with noise $\sigma$. $\tau$ is also used in LASSO where it does not correspond to the std. -\Carl}
         \begin{align}
             P(\vec{\theta}) = \prod_{a=1}^{p} \frac{1}{\sqrt{2\pi\tau^2}} \exp{-\frac{\theta_a^2}{2\tau^2}},
         \end{align}
@@ -203,11 +203,11 @@
 
 
     \subsection{LASSO regression}
-        LASSO regression builds on the same ideas as ridge regression, by assumes rather a Laplace distribution $L(0, \tau)$ for the parameters $\vec{\theta}$. This gives
+        LASSO regression builds on the same ideas as ridge regression, but rather assumes parameters $\vec{\theta}$ are distributed according to the Laplace distribution $L(0, \tau)$. This looks like
         \begin{align}
             P(\vec{\theta}) = \prod_{a=1}^{p} \frac{1}{2\tau} \exp{-\frac{|\theta_a|}{\tau}},
         \end{align}
-        which as we can see is not differentiable at $\theta_i = 0$. This means that the optimisation of this the probability $P(\vec{\theta}|X, \vec{y})$ is not necessarily possible analytically without putting bounds on the data $X, \vec{y}$, and even numerical algorithms like gradient descent will encounter trouble. Furthermore, it is not optimisable point by point, unless bounds like $X^TX$ being diagonal are enforced, which makes LASSO generally less used. Nevertheless, we can coax a cost function out of the probability that is minimalisable. Letting the cost function be written $\msub{C}{lasso}(\vec{\theta}) = -A\log\pclosed{P(\vec{\theta|X,\vec{y}})} + B$  we can choose the constants $A, B$ such that
+        which as we can see is not differentiable at $\theta_i = 0$. This means that the optimisation of the probability $P(\vec{\theta}|X, \vec{y})$ is not necessarily possible analytically without putting bounds on the data $X, \vec{y}$, and even numerical algorithms like gradient descent will encounter trouble. Moreover, it is not optimisable point by point, unless bounds like $X^TX$ being diagonal are enforced. This makes LASSO generally more cumbersome. Nevertheless, we can coax a cost function out of the probability, which is minimalisable. Letting the cost function be written $\msub{C}{lasso}(\vec{\theta}) = -A\log\pclosed{P(\vec{\theta|X,\vec{y}})} + B$  we can choose the constants $A, B$ such that
         \begin{align}
             \boxed{
                 \msub{C}{lasso}(\vec{\vec{\theta}}) = \norm[2]{ \vec{y} - X\vec{\theta} }^2 + \lambda \norm[1]{\vec{\theta}},
@@ -240,7 +240,7 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
     And $\epsilon$ is some stochastic noise $\epsilon \distas \normal{0}{\sigma^2}$. By visual inspection, we can fine tune $\sigma$ to create data that looks like noisy digital terrain data. For all fits to the Franke function we used $n = 600$ uniformly distributed points $x,y \distas \mathcal{U}(0,1)$ with a noise level of $\sigma = 0.1$, which is discussed in \ref{app:sec:frankefunction N and sigma}.   
 
     \subsection{Linear regression}
-    \comment{not sure about how we should divide these subsections, but I wanted to write a bit about data scaling - CM. Since we compose this design matrix and preform scaling for all models, mabye give this section a  more general name and write about train test splitting}
+    \comment{not sure about how we should divide these subsections, but I wanted to write a bit about data scaling - \Carl. Since we compose this design matrix and preform scaling for all models, mabye give this section a  more general name and write about train test splitting -\Hakon}
         When fitting our models to the data, we base our models on simple polynomial expansions of the arguments of the function generating the data. We are fitting scalar function with to arguments $x$ and $y$, so our design matrix is constructed as
         \begin{align}
             X = \begin{pmatrix}
@@ -254,12 +254,13 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
         \begin{subequations}
             \begin{align}
                 \vec{y} &\to \frac{\vec{y}-\bar{y}}{\bar{\sigma}_{\vec{y}}}, \\
-                \vec{x} &\to \frac{\vec{x}_a - \bar{x}_a}{\bar{\sigma}_{\vec{x}_a}},
+                \vec{x}_a &\to \frac{\vec{x}_a - \bar{x}_a}{\bar{\sigma}_{\vec{x}_a}},
             \end{align}
         \end{subequations}
-        where $\bar{z} = \frac{1}{n} \sum_{i=1}^n z_n$ denotes the sample mean of $\vec{z}$ and $\sigma_{\vec{z}}^2 = \frac{1}{n} \sum_{i=1}^n {(z_i-\bar{z})}^2$ denotes the sample std of $\vec{z}$.
+        where $\bar{z} = \frac{1}{n} \sum_{i=1}^n z_n$ denotes the sample mean of $\vec{z}$ and $\sigma_{\vec{z}}^2 = \frac{1}{n} \sum_{i=1}^n {(z_i-\bar{z})}^2$ denotes the sample std of $\vec{z}$. When we calculate $MSE$ scores to compare between models and resampling techniques, we will use the scaled $\vec{y}$.
         \newline\newline
-        To get a propper assesement of our model, we will split the dataset into a \textit{training set} and \textit{testing set}. The training set is used to fit the actual model, giving our coefficient estimates $\vec{\hat{\theta}}$. The training set is used to evaluate the metrics $MSE$ and $R^2$ scores on data which was not used in fitting the model. This is done to avoid \textit{overfitting}, where our model begings to fit the noise of the dataset, instead of the assumption of the underlying function $\hat{f}(x)$.   
+        \comment{Just wrote down some thoughts, think this should be present in the method section before the resampling part. \Hakon}
+        To get a proper assessment of our model, we will split the dataset into a \textit{training set} and \textit{testing set}. The training set is used to fit the model, giving our coefficient estimates $\vec{\hat{\theta}}$. Using the fitted model and the training data, we can calculate metrics to quantify how good our model replicates this data. In the case that our model perfectly predicts the training data $\vec{y}$ based on $X$, the calculated metrics $MSE$ and $R^2$ (eq. \ref{eq:theo:mse}, \ref{eq:theo:r2}) should be 0 and 1 respectively. However, using these scores to assess the goodness of our fit has an underlying problem. Since the model has seen the training data to estimate $\vec{\hat{\theta}}$, we can run into problems where the model begins to fit the $\epsilon$ values and not the (assumed) underlying function $\hat{f}(x)$. This phenomenon is called \textit{overfitting}. To mediate this, we calculate our metrics based on the training data which was not used for fitting. This serves as a way to estimate the errors on data which the model has not seen before. For the artificial data made using the Franke function, we went for a split where $\sfrac{2}{3}$ of the data is used for the training set, while other $\sfrac{1}{3}$ is reserved for the training set.           
 
     \subsection{Resampling techniques}
     With the intent to compute more accurate measures for goodness of fit (such as MSE and $R^2$) to evaluate our model, we 
@@ -276,7 +277,7 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
 
 
 \section{Results}
-    \comment{Not sure about section ordering here - Håkon}
+    \comment{Proposed structure: OLS, Ridge Lasso, Terrain data \Hakon}
     \subsection{Ordinary least squares}
     We begin by calulating the $MSE$ and $R^2$ score (eq. \ref{eq:theo:mse}, \ref{eq:theo:r2}) fitted to the Franke function for different polynomial degrees. This can be seen in Figure \ref{fig:res:OLS_mse_noresample} and \ref{fig:res:OLS_R2_noresample} respectively. Based on the $MSE$ calculated for the test data, the optimal degree was found to be $p_{opt} = 5$ with $MSE \approx 0.134$  
     \begin{figure}[H]

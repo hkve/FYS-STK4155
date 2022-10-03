@@ -1,4 +1,3 @@
-from email.policy import default
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -10,7 +9,6 @@ from sknotlearn.linear_model import LinearRegression, Ridge, Lasso
 from sknotlearn.datasets import make_FrankeFunction
 from sknotlearn.data import Data
 from utils import make_figs_path, colors
-
 
 
 def make_power_labels(p, powers):
@@ -185,11 +183,11 @@ if __name__ == "__main__":
 	
 	# Slicing [:3] is just a very hacky way if you only want to plot some
 	Models = [LinearRegression, Ridge, Lasso][:3]
-	lmbdas = [None, 0.1, 0.1][:3]
+	lmbdas = [None, 1e-3, 1e-3][:3]
 	names = ["OLS", "Ridge", "Lasso"][:3]
 
 	for Model, lmbda, name in zip(Models, lmbdas, names):
-		params1, params2 = run_no_resampling(Model, degrees,n=600, noise_std=0.1, random_state=321, train_size=2/3, lmbda=0.1)
+		params1, params2 = run_no_resampling(Model, degrees,n=600, noise_std=0.1, random_state=321, train_size=2/3, lmbda=lmbda)
 		mse_train, mse_test, r2_train, r2_test = params1
 
 		title = f"{name} no resampling"
