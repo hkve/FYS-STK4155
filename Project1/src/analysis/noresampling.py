@@ -1,4 +1,3 @@
-from email.policy import default # interesting
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -10,7 +9,6 @@ from sknotlearn.linear_model import LinearRegression, Ridge, Lasso
 from sknotlearn.datasets import make_FrankeFunction
 from sknotlearn.data import Data
 from utils import make_figs_path, colors
-
 
 
 def make_power_labels(p, powers):
