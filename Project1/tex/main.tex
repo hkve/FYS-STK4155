@@ -240,7 +240,7 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
     And $\epsilon$ is some stochastic noise $\epsilon \distas \normal{0}{\sigma^2}$. By visual inspection, we can fine tune $\sigma$ to create data that looks like noisy digital terrain data. For all fits to the Franke function we used $n = 600$ uniformly distributed points $x,y \distas \mathcal{U}(0,1)$ with a noise level of $\sigma = 0.1$, which is discussed in \ref{app:sec:frankefunction N and sigma}.   
 
     \subsection{Linear regression}
-    \comment{not sure about how we should divide these subsections, but I wanted to write a bit about data scaling - \Carl. Since we compose this design matrix and preform scaling for all models, mabye give this section a  more general name and write about train test splitting}
+    \comment{not sure about how we should divide these subsections, but I wanted to write a bit about data scaling - \Carl. Since we compose this design matrix and preform scaling for all models, mabye give this section a  more general name and write about train test splitting -\Hakon}
         When fitting our models to the data, we base our models on simple polynomial expansions of the arguments of the function generating the data. We are fitting scalar function with to arguments $x$ and $y$, so our design matrix is constructed as
         \begin{align}
             X = \begin{pmatrix}
@@ -254,13 +254,13 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
         \begin{subequations}
             \begin{align}
                 \vec{y} &\to \frac{\vec{y}-\bar{y}}{\bar{\sigma}_{\vec{y}}}, \\
-                \vec{x} &\to \frac{\vec{x}_a - \bar{x}_a}{\bar{\sigma}_{\vec{x}_a}},
+                \vec{x}_a &\to \frac{\vec{x}_a - \bar{x}_a}{\bar{\sigma}_{\vec{x}_a}},
             \end{align}
         \end{subequations}
-        where $\bar{z} = \frac{1}{n} \sum_{i=1}^n z_n$ denotes the sample mean of $\vec{z}$ and $\sigma_{\vec{z}}^2 = \frac{1}{n} \sum_{i=1}^n {(z_i-\bar{z})}^2$ denotes the sample std of $\vec{z}$.
+        where $\bar{z} = \frac{1}{n} \sum_{i=1}^n z_n$ denotes the sample mean of $\vec{z}$ and $\sigma_{\vec{z}}^2 = \frac{1}{n} \sum_{i=1}^n {(z_i-\bar{z})}^2$ denotes the sample std of $\vec{z}$. When we calculate $MSE$ scores to compare between models and resampling techniques, we will use the scaled $\vec{y}$.
         \newline\newline
         \comment{Just wrote down some thoughts, think this should be present in the method section before the resampling part. \Hakon}
-        To get a proper assessment of our model, we will split the dataset into a \textit{training set} and \textit{testing set}. The training set is used to fit the model, giving our coefficient estimates $\vec{\hat{\theta}}$. Using the fitted model and the training data, we can calculate metrics to quantify how good our model replicates this data. In the case that our model perfectly predicts the training data $\vec{y}$ based on $X$, the calculated metrics $MSE$ and $R^2$ (eq. \ref{eq:theo:mse}, \ref{eq:theo:r2}) should be 0 and 1 respectively. However, using these scores to assess the goodness of our fit has an underlying problem. Since the model has seen the training data to estimate $\vec{\hat{\theta}}$, we can run into problems where the model begins to fit the $\epsilon$ values and not the (assumed) underlying function $\hat{f}(x)$. This phenomenon is called \textit{overfitting}. To mediate this, we calculate our metrics based on the training data which was not used for fitting. This serves as a way to estimate the errors on data which the model has not seen before.          
+        To get a proper assessment of our model, we will split the dataset into a \textit{training set} and \textit{testing set}. The training set is used to fit the model, giving our coefficient estimates $\vec{\hat{\theta}}$. Using the fitted model and the training data, we can calculate metrics to quantify how good our model replicates this data. In the case that our model perfectly predicts the training data $\vec{y}$ based on $X$, the calculated metrics $MSE$ and $R^2$ (eq. \ref{eq:theo:mse}, \ref{eq:theo:r2}) should be 0 and 1 respectively. However, using these scores to assess the goodness of our fit has an underlying problem. Since the model has seen the training data to estimate $\vec{\hat{\theta}}$, we can run into problems where the model begins to fit the $\epsilon$ values and not the (assumed) underlying function $\hat{f}(x)$. This phenomenon is called \textit{overfitting}. To mediate this, we calculate our metrics based on the training data which was not used for fitting. This serves as a way to estimate the errors on data which the model has not seen before. For the artificial data made using the Franke function, we went for a split where $\sfrac{2}{3}$ of the data is used for the training set, while other $\sfrac{1}{3}$ is reserved for the training set.           
 
     \subsection{Resampling techniques}
     With the intent to compute more accurate measures for goodness of fit (such as MSE and $R^2$) to evaluate our model, we 
@@ -277,7 +277,7 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
 
 
 \section{Results}
-    \comment{Not sure about section ordering here - \Hakon}
+    \comment{Proposed structure: OLS, Ridge Lasso, Terrain data \Hakon}
     \subsection{Ordinary least squares}
     We begin by calulating the $MSE$ and $R^2$ score (eq. \ref{eq:theo:mse}, \ref{eq:theo:r2}) fitted to the Franke function for different polynomial degrees. This can be seen in Figure \ref{fig:res:OLS_mse_noresample} and \ref{fig:res:OLS_R2_noresample} respectively. Based on the $MSE$ calculated for the test data, the optimal degree was found to be $p_{opt} = 5$ with $MSE \approx 0.134$  
     \begin{figure}[H]
