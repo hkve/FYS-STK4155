@@ -50,9 +50,10 @@
 
 \newcommand{\distas}{\overset{d}{\sim}}
 \renewcommand{\expval}{\operatorname{\mathbb{E}}}
-\DeclareMathOperator{\mse}{\operatorname{MSE}}
+\DeclareMathOperator{\mse}{MSE}
 \renewcommand{\var}{\operatorname{Var}}
 \newcommand{\bias}{\operatorname{Bias}}
+\DeclareMathOperator{\Rsquared}{R^2}
 \DeclareMathOperator{\eye}{\mathbb{I}}
 \DeclareMathOperator{\sgn}{sgn}
 
@@ -79,9 +80,9 @@
 ]
 
 \section{Introduction}
-    In this project, we will introduce some of the most important general properties of machine learning models in the context of linear regression. Specifically the mean squared error (MSE), the bias, and the variance of data predictions are essential in evaluating the quality of a statistical model. We look at the phenomena of underfitting and overfitting, and explore them in the context of bias-variance trade-off. The three models we will use explicitly are Ordinary Least Squares (OLS), Ridge regression and Least-Absolute-Shrinkage-and-Selection-Operation (LASSO) regression. These will first be tested on the 2D Franke function, and later on real geographical terrain data.
+    In this project, we will introduce some of the most important general properties of machine learning models in the context of linear regression. Specifically the mean squared error (MSE), the bias, and the variance of data predictions are essential in evaluating the quality of a statistical model. We look at the phenomena of underfitting and overfitting, and explore them in the context of bias-variance trade-off. The three models we will use explicitly are Ordinary Least Squares (OLS), Ridge regression and Least-Absolute-Shrinkage-and-Selection-Operation (Lasso) regression. These will first be tested on the 2D Franke function, and later on real geographical terrain data.
 
-    The aforementioned models will be explored using resampling techniques, which will be employed to extract the relevant statistical quantities in an accurate way. We will use the standard methods of Bootstrapping and k-fold Cross Validation and compare the results we get between them across the three linear models.
+    The aforementioned models will be explored using resampling techniques, which will be employed to extract the relevant statistical quantities in an accurate way. We will use the standard methods of Bootstrapping and $k$-fold Cross Validation and compare the results we get between them across the three linear models.
 
     All the models will be applied by fitting a two-dimensional polynomial expansion to the observed data.
 
@@ -126,12 +127,12 @@
         \end{align}
         and is a strictly positive metric that we want to minimise.
 
-        Another popular metric we will use to evaluate the goodness of fit is the $R^2$-score, calculated as
+        Another popular metric we will use to evaluate the goodness of fit is the $\Rsquared$-score, calculated as
         \begin{align}
-            R^2(\vec{\hat{y}}) = 1 - \frac{\sum_{i=1}^n (y_i-\hat{y}_i)^2}{\sum_{i=1}^n (y_i-\bar{y})^2} = 1 - \frac{(\vec{y}-\vec{\hat{y}})^2}{(\vec{y}-\bar{y})^2},
+            \Rsquared(\vec{\hat{y}}) = 1 - \frac{\sum_{i=1}^n (y_i-\hat{y}_i)^2}{\sum_{i=1}^n (y_i-\bar{y})^2} = 1 - \frac{(\vec{y}-\vec{\hat{y}})^2}{(\vec{y}-\bar{y})^2},
             \label{eq:theo:r2}
         \end{align}
-        \comment{Mabye something about $R^2 \in (-\infty, 1]$, where $R^2 = 1$ is a perfect fit, $R^2 = 0$ is equal to predicting the mean $\bar{y}$ all the time and $R^2 < 0$ is even worse. - \Hakon, agree - \Carl}
+        \comment{Mabye something about $\Rsquared \in (-\infty, 1]$, where $\Rsquared = 1$ is a perfect fit, $\Rsquared = 0$ is equal to predicting the mean $\bar{y}$ all the time and $\Rsquared < 0$ is even worse. - \Hakon, agree - \Carl}
         where $\bar{y} = \frac{1}{n}\sum_{i=1}^n y_i$ is the sample mean of the observed data. This metric falls on the interval $(-\infty, 1]$, where 1 denotes the perfect fit, 0 correspond to a constant prediction of $\bar{y}$, and negative values corresponds to worse prediction than this.
 
 
@@ -180,7 +181,7 @@
         \end{align}
 
     \subsection{Ridge regression}
-        So far, we have assumed that the parameters $\vec{\theta}$ are uniformly distributed, and as such have no \textit{bias} towards any particular value. In practice, this means that the OLS model will contort to fit itself to all values in the data. As such, a motivation for adding a bias could be for the sake of stability in the fit. These methods are called \textit{regularised} methods. An example is ridge regression, where one assumes that the parameters are normally distributed, such that parameter values far from the mean are thought less likely to occur. This in practice means that the model is less willing to contort to outliers in the dataset, trading it for a bias towards certain parameter values. Assuming the probability distrbution for $\vec{\theta}$ \comment{What is $\tau$ here? Just a $\sigma \xrightarrow{} \tau$? -\Hakon, Yes exactly, using $\tau$ as in the literature to avoid confusion with noise $\sigma$. $\tau$ is also used in LASSO where it does not correspond to the std. -\Carl}
+        So far, we have assumed that the parameters $\vec{\theta}$ are uniformly distributed, and as such have no \textit{bias} towards any particular value. In practice, this means that the OLS model will contort to fit itself to all values in the data. As such, a motivation for adding a bias could be for the sake of stability in the fit. These methods are called \textit{regularised} methods. An example is ridge regression, where one assumes that the parameters are normally distributed, such that parameter values far from the mean are thought less likely to occur. This in practice means that the model is less willing to contort to outliers in the dataset, trading it for a bias towards certain parameter values. Assuming the probability distrbution for $\vec{\theta}$ \comment{What is $\tau$ here? Just a $\sigma \xrightarrow{} \tau$? -\Hakon, Yes exactly, using $\tau$ as in the literature to avoid confusion with noise $\sigma$. $\tau$ is also used in Lasso where it does not correspond to the std. -\Carl}
         \begin{align}
             P(\vec{\theta}) = \prod_{a=1}^{p} \frac{1}{\sqrt{2\pi\tau^2}} \exp{-\frac{\theta_a^2}{2\tau^2}},
         \end{align}
@@ -202,12 +203,12 @@
         This has the added bonus of ensuring that $X^TX + \lambda \eye$ is always invertible, as $\det(\lambda \eye) \neq 0$ for $\lambda>0$.
 
 
-    \subsection{LASSO regression}
-        LASSO regression builds on the same ideas as ridge regression, but rather assumes parameters $\vec{\theta}$ are distributed according to the Laplace distribution $L(0, \tau)$. This looks like
+    \subsection{Lasso regression}
+        Lasso regression builds on the same ideas as ridge regression, but rather assumes parameters $\vec{\theta}$ are distributed according to the Laplace distribution $L(0, \tau)$. This looks like
         \begin{align}
             P(\vec{\theta}) = \prod_{a=1}^{p} \frac{1}{2\tau} \exp{-\frac{|\theta_a|}{\tau}},
         \end{align}
-        which as we can see is not differentiable at $\theta_i = 0$. This means that the optimisation of the probability $P(\vec{\theta}|X, \vec{y})$ is not necessarily possible analytically without putting bounds on the data $X, \vec{y}$, and even numerical algorithms like gradient descent will encounter trouble. Moreover, it is not optimisable point by point, unless bounds like $X^TX$ being diagonal are enforced. This makes LASSO generally more cumbersome. Nevertheless, we can coax a cost function out of the probability, which is minimalisable. Letting the cost function be written $\msub{C}{lasso}(\vec{\theta}) = -A\log\pclosed{P(\vec{\theta|X,\vec{y}})} + B$  we can choose the constants $A, B$ such that
+        which as we can see is not differentiable at $\theta_i = 0$. This means that the optimisation of the probability $P(\vec{\theta}|X, \vec{y})$ is not necessarily possible analytically without putting bounds on the data $X, \vec{y}$, and even numerical algorithms like gradient descent will encounter trouble. Moreover, it is not optimisable point by point, unless bounds like $X^TX$ being diagonal are enforced. This makes Lasso generally more cumbersome. Nevertheless, we can coax a cost function out of the probability, which is minimalisable. Letting the cost function be written $\msub{C}{lasso}(\vec{\theta}) = -A\log\pclosed{P(\vec{\theta|X,\vec{y}})} + B$  we can choose the constants $A, B$ such that
         \begin{align}
             \boxed{
                 \msub{C}{lasso}(\vec{\vec{\theta}}) = \norm[2]{ \vec{y} - X\vec{\theta} }^2 + \lambda \norm[1]{\vec{\theta}},
@@ -261,15 +262,15 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
                     \vec{x}_a &\to \frac{\vec{x}_a - \bar{x}_a}{\bar{\sigma}_{\vec{x}_a}},
                 \end{align}
             \end{subequations}
-            where $\bar{z} = \frac{1}{n} \sum_{i=1}^n z_n$ denotes the sample mean of $\vec{z}$ and $\sigma_{\vec{z}}^2 = \frac{1}{n} \sum_{i=1}^n {(z_i-\bar{z})}^2$ denotes the sample std of $\vec{z}$. When we calculate $MSE$ scores to compare between models and resampling techniques, we will use the scaled $\vec{y}$.
+            where $\bar{z} = \frac{1}{n} \sum_{i=1}^n z_n$ denotes the sample mean of $\vec{z}$ and $\sigma_{\vec{z}}^2 = \frac{1}{n} \sum_{i=1}^n {(z_i-\bar{z})}^2$ denotes the sample std of $\vec{z}$. When we calculate MSE scores to compare between models and resampling techniques, we will use the scaled $\vec{y}$.
             \newline\newline
             \comment{Just wrote down some thoughts, think this should be present in the method section before the resampling part. \Hakon}
-            To get a proper assessment of our model, we will split the dataset into a \textit{training set} and \textit{testing set}. The training set is used to fit the model, giving our coefficient estimates $\vec{\hat{\theta}}$. Using the fitted model and the training data, we can calculate metrics to quantify how good our model replicates this data. In the case that our model perfectly predicts the training data $\vec{y}$ based on $X$, the calculated metrics $MSE$ and $R^2$ (eq. \ref{eq:theo:mse}, \ref{eq:theo:r2}) should be 0 and 1 respectively. However, using these scores to assess the goodness of our fit has an underlying problem. Since the model has seen the training data to estimate $\vec{\hat{\theta}}$, we can run into problems where the model begins to fit the $\epsilon$ values and not the (assumed) underlying function $f(x)$. This phenomenon is called \textit{overfitting}. To mediate this, we calculate our metrics based on a testing data which was not used for fitting. This serves as a way to estimate the errors on data which the model has not seen before. For the artificial data made using the Franke function, we went for a split where $\sfrac{2}{3}$ of the data is used for the training set, while other $\sfrac{1}{3}$ is reserved for the testing set.           
+            To get a proper assessment of our model, we will split the dataset into a \textit{training set} and \textit{testing set}. The training set is used to fit the model, giving our coefficient estimates $\vec{\hat{\theta}}$. Using the fitted model and the training data, we can calculate metrics to quantify how good our model replicates this data. In the case that our model perfectly predicts the training data $\vec{y}$ based on $X$, the calculated metrics MSE and $\Rsquared$ (Eq. \eqref{eq:theo:mse}, \ref{eq:theo:r2}) should be 0 and 1 respectively. However, using these scores to assess the goodness of our fit has an underlying problem. Since the model has seen the training data to estimate $\vec{\hat{\theta}}$, we can run into problems where the model begins to fit the $\epsilon$ values and not the (assumed) underlying function $f(x)$. This phenomenon is called \textit{overfitting}. To mediate this, we calculate our metrics based on a testing data which was not used for fitting. This serves as a way to estimate the errors on data which the model has not seen before. For the artificial data made using the Franke function, we went for a split where $\sfrac{2}{3}$ of the data is used for the training set, while other $\sfrac{1}{3}$ is reserved for the testing set.           
 
 
     \subsection{Resampling techniques}
-        With the intent to compute more accurate measures for goodness of fit (such as MSE and $R^2$) to evaluate our model, we 
-        artificially increase the data sample by repeatedly fitting the model on subsamples of our data. This approach is called resampling and consists of a variety of methods. In this project we have applied \textit{Bootstrapping} and \textit{k-fold Cross-validation}. 
+        With the intent to compute more accurate measures for goodness of fit (such as MSE and $\Rsquared$) to evaluate our model, we 
+        artificially increase the data sample by repeatedly fitting the model on subsamples of our data. This approach is called resampling and consists of a variety of methods. In this project we have applied \textit{Bootstrapping} and \textit{$k$-fold Cross-validation}. 
 
         \subsubsection*{Bootstrap}
             Bootstrapping consists of generating new training data by sampling data points from the original training data with replacement; meaning the same data points can be selected more than once. The new set of training data is called a bootstrapped dataset and is used to train the model. Then the relevant measures of goodness of fit is calculated. This process of resampling and calculating measures is repeated a certain number of times (rounds), giving a distribution of these measures. The mean of the measures is then calculated across the bootstrapped models. Through the central limit theorem this mean is assumed to be the more accurate measure for goodness of fit and therefore a better evaluation of the model in question.  
@@ -277,29 +278,29 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
         \subsubsection*{Cross-validation}
             Cross-validation consist of partitioning the dataset into different subsets (which we will call \textit{folds}). By using some folds for fitting the model and others for computing metrics, we can get multiple values for the same measure by changing which folds are used for fitting and which are used for calculating measures. This differs from Bootstrapping since no points used for fitting are used for calculating measures for goodness of fit.
             \newline\newline
-            In this report, we will use the famous \textit{k-fold Cross-validation} technique. Considering the dataset $\mathcal{D} = (\vec{y}, X)$, consisting of $n$ data points: Initially we partition $\mathcal{D}$ into $k$ folds $\mathcal{D}_i$, $i = 1, \ldots , k$, of equal size. For each fold $\mathcal{D}_i$, a model is fitted using every fold \textit{except} $\mathcal{D}_i$, which we denote $\mathcal{D}_{-i}$. With this model, we calculate the different statitistical measures of the model on $\mathcal{D}_i$, which was not used to fit the model. When this is done for all $k$ folds, we take the mean of the measures to get the 
+            In this report, we will use the famous \textit{$k$-fold Cross-validation} technique. Considering the dataset $\mathcal{D} = (\vec{y}, X)$, consisting of $n$ data points: Initially we partition $\mathcal{D}$ into $k$ folds $\mathcal{D}_i$, $i = 1, \ldots , k$, of equal size. For each fold $\mathcal{D}_i$, a model is fitted using every fold \textit{except} $\mathcal{D}_i$, which we denote $\mathcal{D}_{-i}$. With this model, we calculate the different statitistical measures of the model on $\mathcal{D}_i$, which was not used to fit the model. When this is done for all $k$ folds, we take the mean of the measures to get the 
             final goodness of fit. 
 
 
 \section{Results}
     \comment{Proposed structure: OLS, Ridge Lasso, Terrain data \Hakon}
     \subsection{Ordinary least squares}
-    We begin by calulating the $MSE$ and $R^2$ score (eq. \ref{eq:theo:mse}, \ref{eq:theo:r2}) fitted to the Franke function for different polynomial degrees. This can be seen in Figure \ref{fig:res:OLS_mse_noresample} and \ref{fig:res:OLS_R2_noresample} respectively. Based on the $MSE$ calculated for the test data, the optimal degree was found to be $p_{opt} = 5$ with $MSE \approx 0.134$. We observe that the train $MSE$ decreases steadily with higher $p$, while the test $MSE$ decreases until we reach $p_{opt}$, after which it increases. The opposite relationship is seen for the $R^2$ score.   
-    \begin{figure}[H]
-        \centering
-        \includegraphics[width=\linewidth]{OLS_mse_noresample.pdf}
-        \caption{Showing the $MSE$ score for OLS, calculated on the train and test sample for different polynomial degrees.}
-        \label{fig:res:OLS_mse_noresample}
-    \end{figure}
+        We begin by calulating the MSE and $\Rsquared$ score (Eqs. \eqref{eq:theo:mse}, \eqref{eq:theo:r2}) fitted to the Franke function for different polynomial degrees. This can be seen in Figure \ref{fig:res:OLS_mse_noresample} and \ref{fig:res:OLS_R2_noresample} respectively. Based on the MSE calculated for the test data, the optimal degree was found to be $\msub{p}{opt} = 5$ with $\mse \approx 0.134$. We observe that the train MSE decreases steadily with higher $p$, while the test MSE decreases until we reach $\msub{p}{opt}$, after which it increases. The opposite relationship is seen for the $\Rsquared$ score.   
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\linewidth]{OLS_mse_noresample.pdf}
+            \caption{Showing the MSE score for OLS, calculated on the train and test sample for different polynomial degrees.}
+            \label{fig:res:OLS_mse_noresample}
+        \end{figure}
 
-    \begin{figure}[H]
-        \centering
-        \includegraphics[width=\linewidth]{OLS_r2_noresample.pdf}
-        \caption{Showing the $R^2$ score for OLS, calculated on the train and test sample for different polynomial degrees.}
-        \label{fig:res:OLS_R2_noresample}
-    \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\linewidth]{OLS_r2_noresample.pdf}
+            \caption{Showing the $\Rsquared$ score for OLS, calculated on the train and test sample for different polynomial degrees.}
+            \label{fig:res:OLS_R2_noresample}
+        \end{figure}
 
-    To investigate the stability of our fits with varying polynomial degrees, we also plot coefficient values with varying polynomial degree. In figure \ref{fig:res:OLS_beta_values_plot} we see these plotted for $p = 1,2,3$ with 95\% confidence intervals. These are calculated using the diagonal $\sigma^2_{\beta,a} = \var{(\hat{\beta})_{aa}}$. Additionally, in figure \ref{fig:res:OLS_beta_values_table} we see the absolute values of these coefficients tabulated for $p \in [1,5]$.
+        To investigate the stability of our fits with varying polynomial degrees, we also plot coefficient values with varying polynomial degree. In Figure \ref{fig:res:OLS_beta_values_plot} we see these plotted for $p = 1,2,3$ with 95\% confidence intervals. These are calculated using the diagonal $\sigma^2_{\theta_a} = \var{(\hat{\beta})_{aa}}$. Additionally, in Figure \ref{fig:res:OLS_beta_values_table} we see the absolute values of these coefficients tabulated for $p \in [1,5]$.
 
     \begin{figure*}
         \begin{subfigure}{\textwidth}
@@ -316,27 +317,27 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
         \end{subfigure}
     \end{figure*}
 
-    The metrics thus far has only been calculated without the use of any resampling techniques. To see how this influences $MSE$, we apply k-fold Cross-validation and plot the averaged train- and test $MSE$ across the different folds. This is presented in figure \ref{fig:res:OLS_mse_kfold}. The optimal polynomial degrees and $MSE$ values based on the training data is presented in table 
+    The metrics thus far has only been calculated without the use of any resampling techniques. To see how this influences MSE, we apply $k$-fold Cross-validation and plot the averaged train- and test MSE across the different folds. This is presented in Figure \ref{fig:res:OLS_mse_kfold}. The optimal polynomial degrees and MSE values based on the training data is presented in table 
     
     \begin{table}[H]
         \centering
         \begin{tabular}{l|ll}
-        $k$ & $p_{opt}$ & $MSE$ \\
+        $k$ & $\msub{p}{opt}$ & MSE \\
         \hline
         5   & 6         & 0.136 \\
         7   & 7         & 0.134 \\
         10  & 7         & 0.136
         \end{tabular}
-        \caption{Showing the optimal degrees $p_{opt}$ and $MSE$ values calculate on the test data using Cross validation with $k = 5, 7$ and $10$.}
+        \caption{Showing the optimal degrees $\msub{p}{opt}$ and MSE values calculate on the test data using Cross validation with $k = 5, 7$ and $10$.}
         \label{res:tab:OLS_kfold_optimal}
     \end{table}
     
-    Just as in the case without resampling, the train $MSE$ decreases with $p$. For the test $MSE$, the increase after the various $p_{opt}$ values is smaller, but the general trend is the same.  
+    Just as in the case without resampling, the train MSE decreases with $p$. For the test MSE, the increase after the various $\msub{p}{opt}$ values is smaller, but the general trend is the same.  
     
     \begin{figure}[H]
         \centering
         \includegraphics[width=\linewidth]{OLS_mse_kfold.pdf}
-        \caption{$MSE$ values as a function of polynomial degrees, calculated using k-fold Cross validation for $k = 5, 7$ and $10$. }
+        \caption{MSE values as a function of polynomial degrees, calculated using $k$-fold Cross validation for $k = 5, 7$ and $10$. }
         \label{fig:res:OLS_mse_kfold}
     \end{figure}
 
@@ -346,16 +347,16 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
         \caption{FILL ME}
         \label{fig:res:OLS_bias_variance_tradeoff}
     \end{figure}
-    \subsection{Ridge}
+    \subsection{Ridge and Lasso}
     We now repeat the same analysis for Ridge regression.
 
-    \subsection{Lasso}
+    \subsection{Alpine terrain data}
     
 \section{Discussion}
     \subsection{Data scaling}
         \comment{This should probably be a subsubsection within something else. Just summing up the thoughts we have thrown around regarding the necessity and function of scaling.}
         \comment{Please read and see if it makes sense at all!}
-        The scaling of the inputs and measurments can roughly be divided into two operations, each with their own set consequences. Let us first consider shifting of the measurements $\vec{y}$ and the inputs $\vec{x}_a$ by their respective means. Effectively, this eliminates a degree of freedom from our model $\hat{f}(x)$ as we set its mean value to nought, and leave out any parameter that would govern the intercept $\hat{f}(0)$. However, if we shift $\vec{y}$ to have a mean of nought as well, this degree of freedom becomes redundant, and we end up effectively reducing the dimensionality of the model by one. Moreover, in regularised models where some norm of the parameters $\norm[p]{\vec{\theta}}$ is penalised, we remove any penalisation of the choice of the intercept. This is natural to do, as the goal of these methods is to reduce the variance of the model, something which is not affected by changing the intercept.
+        The scaling of the inputs and measurments can roughly be divided into two operations, each with their own set consequences. Let us first consider shifting of the measurements $\vec{y}$ and the inputs $\vec{x}_a$ by their respective means. Effectively, this eliminates a degree of freedom from our model $\hat{f}(x)$ as we set its mean value to zero, and leave out any parameter that would govern the intercept $\hat{f}(0)$. However, if we shift $\vec{y}$ to have zero mean as well, this degree of freedom becomes redundant, and we end up effectively reducing the dimensionality of the model by one. Moreover, in regularised models where some norm of the parameters $\norm[p]{\vec{\theta}}$ is penalised, we remove any penalisation of the choice of the intercept. This is natural to do, as the goal of these methods is to reduce the variance of the model, something which is not affected by changing the intercept.
 
         Considering now the rescaling of $\vec{y}$ and $\vec{x}_a$, these affect the fitting of the model more subtely. Looking at it through the lense of dimensionality know that
         \begin{align}
@@ -364,7 +365,7 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
         From this we can infer that the order of magnitude of a parameter $\theta_a$ is governed by the dimension its corresponding feature $\dimof{x_a}$. This matters in the regularised models where a cost is associated with the norm of the parameters $\norm[p]{\vec{\theta}}$, which will be dominated by parameters whose dimension is large. In practice, this means that the fitting will focus more on reducing the magnitude of the parameters whose associated dimension is large, letting the others fluctuate more freely. By making the $x_a$'s dimensionless, the parameters are put on a `level playing field', so to speak. The dimension of $y$ serves to raise or lower the order of magnitude of the all the parameters equally, and can be adjusted as to avoid numerical truncation errors by avoiding larger floats.
 
     \subsection{OLS}
-    Looking back at figure \ref{fig:res:OLS_mse_noresample} and \ref{fig:res:OLS_R2_noresample} showing the $MSE$ and $R^2$ scores calculated using the train and test set, we recognize a common sign of overfitting moving past $p_{opt} = 5$. When moving into this region, we introduce many new degrees of freedom to the fit. This allows our model to accurately recreate the exact points present in the training set, but at the cost of fitting the added noise $\epsilon$ and/or assuming a too complex structure to the underlying function. This can be seen by the large $MSE$ values calculated on the test data, telling us that our model preforms poorly on data which it has not seen.     
+    Looking back at Figure \ref{fig:res:OLS_mse_noresample} and \ref{fig:res:OLS_R2_noresample} showing the MSE and $\Rsquared$ scores calculated using the train and test set, we recognise a common sign of overfitting when moving past $\msub{p}{opt} = 5$. In this region, we introduce many new degrees of freedom to the fit, which allows our model to accurately recreate the exact points present in the training set, but at the cost of fitting the added noise $\epsilon$ and/or assuming a too complex structure to the underlying function. This can be seen by the large MSE values calculated on the test data, telling us that our model preforms poorly on data which it has not yet been exposed to.     
 
     \subsection{Resampling}
         \comment{Here I am just writing a bit on our discussion about the limit of resampling. Structure of the discussion section is very much not set in any stone.}
@@ -415,7 +416,7 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
         where in the last line, we used that $\expval(\epsilon\hat{f}) = \expval(\epsilon)\expval(\hat{f})=0$.\footnote{At first glance, this might seem odd, as there is noise involved in the fitting of $\hat{f}$ too. However, under the assumption that the noise is i.i.d. between experiments, the noise in the data used to fit $\hat{f}$ is independent of the noise in a test sample. It is worth noting that this would not be true if we were comparing with the same data used to fit the model, which explains the optimism of the training MSE. \comment{This last part here might be put into the discussion perhaps?}}
 
     \section{Parameters for artifical data} \label{app:sec:frankefunction N and sigma}
-    To fairly compare between methods, a constant number of sampled points $N$ from the Franke function (equation \ref{eq:met:Franke_Function}) and the noise magnitude $\sigma$ needs to be set. We decided that $N = 600$ points should be sufficient to get enough data points in both the train and test set, while still being small enough to not bring in too much computational complexity. The points $(x,y)$ are drawn from a uniform distribution $x,y \distas \mathcal{U}(0,1)$ limited to their domain. Trough visual inspection, we decided on $\sigma = 0.1$ for the noise $\epsilon \distas \normal{0}{\sigma^2}$. We found that this scale gave our function plenty of noise, while still being recognizable (figure \ref{fig:app:frankefunction varying noise}).   
+    To fairly compare between methods, a constant number of sampled points $N$ from the Franke function (equation \ref{eq:met:Franke_Function}) and the noise magnitude $\sigma$ needs to be set. We decided that $N = 600$ points should be sufficient to get enough data points in both the train and test set, while still being small enough to not bring in too much computational complexity. The points $(x,y)$ are drawn from a uniform distribution $x,y \distas \mathcal{U}(0,1)$ limited to their domain. Trough visual inspection, we decided on $\sigma = 0.1$ for the noise $\epsilon \distas \normal{0}{\sigma^2}$. We found that this scale gave our function plenty of noise, while still being recognizable (Figure \ref{fig:app:frankefunction varying noise}).   
     \begin{figure*}
         \begin{subfigure}{.5\textwidth}
             \centering

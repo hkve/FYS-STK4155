@@ -44,7 +44,7 @@ def plot_heatmap(degrees_grid, lmbdas_grid, MSEs, model=None):
 
     cont = ax.contourf(degrees_grid, lmbdas_grid, MSEs, levels=levels, cmap="viridis")
     ax.scatter(degrees_grid[:,0], best_lmbdas, marker="x", s=40, color="r", alpha=0.4)
-    ax.scatter(best_degree, best_lmbda, marker="x", s=160, color="r", alpha=0.6)
+    ax.scatter(best_degree, best_lmbda, marker="X", s=160, color="r", alpha=0.6)
     ax.text(best_degree-1.7, best_lmbda*1.7, f"$({best_degree:n}, {best_lmbda:.0E})$", color="w")
     cbar = fig.colorbar(cont, pad=0.01, aspect=6)
     cbar.set_label("MSE", fontsize=14)
@@ -94,13 +94,13 @@ if __name__ == "__main__":
     degrees = np.arange(1, n_degrees+1)
 
     # Ridge
-    params = make_mse_grid(Ridge, degrees, lmbdas)
-    dump("ridge_grid", *params)
-    # params = load("ridge_grid")
-    # plot_heatmap(*params)
+    # params = make_mse_grid(Ridge, degrees, lmbdas)
+    # dump("ridge_grid", *params)
+    params = load("ridge_grid")
+    plot_heatmap(*params, model="Ridge")
 
     # Lasso
     # params = make_mse_grid(Lasso, degrees, lmbdas)
     # dump("lasso_grid", *params)
     params = load("lasso_grid")
-    plot_heatmap(*params, model="LASSO")
+    plot_heatmap(*params, model="Lasso")
