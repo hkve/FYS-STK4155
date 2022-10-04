@@ -1,14 +1,8 @@
-from code import interact
-from statistics import variance
 import numpy as np
-from time import time
 from scipy.stats import norm
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.preprocessing import PolynomialFeatures, StandardScaler
-from sklearn.model_selection import train_test_split
-from sklearn.utils import resample
-from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import PolynomialFeatures
 
 # Custom stuff
 import context
@@ -58,6 +52,7 @@ def plot_hist_of_bootstrap(Bootstrap_, degree, model=LinearRegression):
     plt.savefig(make_figs_path(f'BS:hist_bootstraped_{Bootstrap_.rounds}_rounds_of_degree_{degree}.pdf'), dpi=300)
     plt.show()
 
+
 def plot_mse_across_rounds(Bootstrap_list_rounds, rounds, model=LinearRegression):
     """Plotting the mean of the MSE as a function of rounds
 
@@ -72,7 +67,7 @@ def plot_mse_across_rounds(Bootstrap_list_rounds, rounds, model=LinearRegression
     plt.fill_between(rounds, mse+mse_std, mse-mse_std, color=colors[1], alpha=.3)
     plt.xlabel('Bootstrap rounds', fontsize=fontsize_lab)
     plt.ylabel('MSE value', fontsize=fontsize_lab)
-    plt.title(f'MSE across rounds: {model_names[model]}')
+    plt.title(f'MSE across rounds: {model_names[model]}', fontsize=fontsize_tit)
     plt.savefig(make_figs_path(f'BS:mse_across_rounds_{model_names[model]}.pdf'), dpi=300)
     plt.show()
 
@@ -149,14 +144,14 @@ def solve_c(y, X, degree, rounds, reg, scale_scheme='Standard', ratio=3/4, rando
     BS = Bootstrap(reg, data_train, data_test, random_state = random_state, rounds=rounds)
     return BS
 
-def run_bootstrap_rounds(model, rounds, degree, lmbda=None):
-    """Bootstraps for various number of bootstrap rounds. Plots histogram (if OLS) and mse across rounds
+def bootstrap_across_rounds(model, rounds, degree, lmbda=None):
+    """Function for doing the analysis of bootstrap across rounds given a certain model. Plots histogram (if OLS) and mse across rounds. 
 
     Args:
-        model (_type_): _description_
-        rounds (_type_): _description_
-        degree (_type_): _description_
-        lmbda (_type_, optional): _description_. Defaults to None.
+        model (_type_): Model for linear regression
+        rounds (ndarray): Number of bootstrap rounds 
+        degree (int): Polynomial degree of model
+        lmbda (int, optional): Lambda implemented in the Ridge and Lasso model. Defaults to None. 
     """
     Bootstrap_list_rounds = []
     for round in rounds:
@@ -169,13 +164,20 @@ def run_bootstrap_rounds(model, rounds, degree, lmbda=None):
         Bootstrap_list_rounds.append(BS)
 
         if model == LinearRegression and round in [30,102,408,606]:
-            # pass
-            plot_hist_of_bootstrap(BS, degree, model)
+            pass
+            # plot_hist_of_bootstrap(BS, degree, model)
+    plot_mse_across_rounds(Bootstrap_list_rounds, rounds, model)
 
-    # plot_mse_across_rounds(Bootstrap_list_rounds, rounds, model)
 
+def bootstrap_across_degrees(model, round, degrees, lmbdas=None):
+    """Function for doing the analysis of bootstrap across degrees given a certain model and number of bootstrap rounds. This includes test/train mse and bias-variance-decomposition. The function calls plot functions.
 
-def run_bootstrap_degrees(model, round, degrees, lmbdas=None):
+    Args:
+        model (_type_): Model for linear regression
+        round (int): number of bootstrap rounds
+        degrees (ndarray): degress on which to preform the analysis
+        lmbdas (ndarray, optional): array with same size as degrees. Each element of lmbdas corresponds to a polynomial degree. For Ridge and Lasso.  Defaults to None.
+    """
     #For various degrees
     Bootstrap_list = []
     for i, deg in enumerate(degrees): 
@@ -190,6 +192,13 @@ def run_bootstrap_degrees(model, round, degrees, lmbdas=None):
     plot_train_test_mse(Bootstrap_list, degrees)
     plot_bias_var(Bootstrap_list, degrees)
 
+    return Bootstrap_list
+
+
+def comparison(models=[LinearRegression, Ridge, Lasso]):
+    #Plotting the train/test for various models
+    for model in models:
+        pass 
 
 
 if __name__ == "__main__":
@@ -207,9 +216,8 @@ if __name__ == "__main__":
 #Linreg
 ###
 
-    run_bootstrap_rounds(LinearRegression, rounds, degree=7) #Chose deg=7 rather randomly 
-    # run_bootstrap_degrees(LinearRegression, round, degrees)
-
+    # bootstrap_across_rounds(LinearRegression, rounds, degree=7) #Chose deg=7 rather 'randomly' 
+    # BS_list_OLS = bootstrap_across_degrees(LinearRegression, round, degrees)
 
 ###
 #Ridge
@@ -221,8 +229,8 @@ if __name__ == "__main__":
     optimal_lmbda = lmbdas_grid[np.unravel_index(np.argmin(MSEs), MSEs.shape)]
     optimal_degree = (np.unravel_index(np.argmin(MSEs), MSEs.shape))[1]
 
-    # run_bootstrap_rounds(Ridge, rounds, degree=optimal_degree, lmbda=optimal_lmbda) #Shows that round=400 gives the stabilized state
-    # run_bootstrap_degrees(Ridge, round, degrees, lmbdas=optimal_lmbdas)
+    # bootstrap_across_rounds(Ridge, rounds, degree=optimal_degree, lmbda=optimal_lmbda) #Shows that round=400 gives the stabilized state
+    # BS_list_R = bootstrap_across_degrees(Ridge, round, degrees, lmbdas=optimal_lmbdas)
 
 ###
 #LASSO
@@ -235,8 +243,12 @@ if __name__ == "__main__":
     optimal_lmbda = lmbdas_grid[np.unravel_index(np.argmin(MSEs), MSEs.shape)]
     optimal_degree = (np.unravel_index(np.argmin(MSEs), MSEs.shape))[1]
 
-    ## run_bootstrap_rounds(Lasso, rounds, degree=optimal_degree, lmbda=optimal_lmbda) #Shows that round=400 gives the stabilized state
-    # run_bootstrap_degrees(Lasso, round, degrees, lmbdas=optimal_lmbdas)
+    bootstrap_across_rounds(Lasso, rounds, degree=optimal_degree, lmbda=optimal_lmbda) #Shows that round=400 gives the stabilized state
+    # BS_list_L = bootstrap_across_degrees(Lasso, round, degrees, lmbdas=optimal_lmbdas)
+
+###
+#Comparison
+###
 
 
     
