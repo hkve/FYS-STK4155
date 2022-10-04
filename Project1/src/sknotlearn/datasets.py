@@ -10,6 +10,7 @@ from matplotlib import cm
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from mpl_toolkits.mplot3d import Axes3D
 import seaborn as sns
+import pathlib as pl
 
 def make_FrankeFunction(n=1000, uniform=True, noise_std=0, random_state=42):
 	x, y = None, None
@@ -34,30 +35,44 @@ def make_FrankeFunction(n=1000, uniform=True, noise_std=0, random_state=42):
 
 	return Data(z, np.c_[x,y])
 
-def plot_FrankeFunction(D, angle=(18, 45), filename=None, Franke=True):
+def plot_surf(D):
 	sns.set_style("white")
 	fig = plt.figure()
 	ax = fig.add_subplot(projection="3d")
 	surf = ax.plot_trisurf(*D.X.T, D.y, cmap=cm.viridis, linewidth=0, antialiased=False)
 
-	#TODO: Add limits
-	if Franke:
-		ax.set_zlim(-0.10, 1.40)
-		ax.zaxis.set_major_locator(LinearLocator(10))
-		ax.zaxis.set_major_formatter(FormatStrFormatter("%.02f"))
-
 	ax.set_xlabel("x", fontsize=14)
 	ax.set_ylabel("y", fontsize=14)
-	ax.set_zlabel(r"$F (x,y)$", fontsize=14, rotation=90)
 	fig.colorbar(surf, shrink=0.5, aspect=5)
-	
+
+	return fig, ax, surf
+
+
+def plot_FrankeFunction(D, angle=(18, 45), filename=None):
+	fig, ax, surf = plot_surf(D)
+
+	ax.set_zlim(-0.10, 1.40)
+	ax.zaxis.set_major_locator(LinearLocator(10))
+	ax.zaxis.set_major_formatter(FormatStrFormatter("%.02f"))
+	ax.set_zlabel(r"$F (x,y)$", fontsize=14, rotation=90)
 	ax.view_init(*angle)
-	
-	plt.tight_layout()
 
 	if filename:
 		plt.savefig(filename, dpi=300)
 	
+	fig.tight_layout()
+	plt.show()
+
+def plot_terrain(D, angle=(18,45), filename=None):
+	fig, ax, surf = plot_surf(D)
+
+	ax.set_zlabel(r"Terrain", fontsize=14, rotation=90)
+	ax.view_init(*angle)
+
+	if filename:
+		plt.savefig(filename, dpi=300)
+	
+	fig.tight_layout()
 	plt.show()
 
 def FrankeFunction(x,y):
@@ -69,24 +84,16 @@ def FrankeFunction(x,y):
 
 
 def load_terrain(filename="SRTM_data_mot.tif"):
+	path = pl.Path(__file__).parent / filename
 	l = np.arange(30)
 	X, Y = np.meshgrid(l,l)	
 	x = X.flatten()
 	y = Y.flatten()
 
-	z = imread(filename)[1740:1800:2, 1600:1660:2] 
+	z = imread(path)[1740:1800:2, 1600:1660:2] 
 	z = z.flatten()
 	
 	return Data(z, np.c_[x,y])
-
-def plot_terrain(D):
-
-	fig = plt.figure()
-	ax = fig.gca(projection="3d")
-
-	im = ax.plot_surface(X, Y, D, cmap="viridis")
-	fig.colorbar(im)
-	plt.show()
 
 
 if __name__ == "__main__":
