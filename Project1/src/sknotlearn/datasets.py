@@ -93,5 +93,5 @@ if __name__ == "__main__":
 	D = make_FrankeFunction(n=625, uniform=False, noise_std=0.1)
 	# plot_FrankeFunction(D)
 
-	D = load_terrain()
+	D = load_terrain("SRTM_data_mot.tif")
 	plot_FrankeFunction(D, angle=(22,-55), Franke=False)

@@ -1,14 +1,8 @@
-from code import interact
-from statistics import variance
 import numpy as np
-from time import time
 from scipy.stats import norm
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.preprocessing import PolynomialFeatures, StandardScaler
-from sklearn.model_selection import train_test_split
-from sklearn.utils import resample
-from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import PolynomialFeatures
 
 # Custom stuff
 import context
@@ -16,17 +10,26 @@ from sknotlearn.linear_model import LinearRegression, Ridge, Lasso
 from sknotlearn.datasets import make_FrankeFunction
 from sknotlearn.resampling import Bootstrap
 from sknotlearn.data import Data
-from utils import make_figs_path, colors
+from utils import make_figs_path, colors, model_names
 from ridgelasso import load 
+
+#TODO: Change titles 
+#TODO: Change filenames 
+#TODO: Change limits 
+#TODO: Check for various ns (60, 600, 1500)
+#TODO: Make a common plot for train/test mse for the various models
+#TODO: Make plots for various lambda (make one for optimal_lambda and one for a big one). Both for Ridge and LASSO. 
+#TODO: Bias-Var with dependence on lambda for a given degree (8) (Ridge and LASSO)
 
 """ 
 With the bias and var calculated across the bootstrap
 (With data-class implemented)
 """
+fontsize_leg = 12
 fontsize_lab = 14
 fontsize_tit = 16
 
-def plot_hist_of_bootstrap(Bootstrap_, degree):
+def plot_hist_of_bootstrap(Bootstrap_, degree, model=LinearRegression):
     """Generate the histogram of the mse-values of a certain model with a given number 
     of bootstrap rounds
 
@@ -40,17 +43,36 @@ def plot_hist_of_bootstrap(Bootstrap_, degree):
     find_bins = lambda arr, times=800: np.abs(int((np.max(arr)-np.min(arr))*times))
 
     sns.set_style('darkgrid')
-    plt.hist(mse_train, bins=find_bins(mse_train), label='mse for training data', color=colors[1], density=True)
-    plt.hist(mse_test, bins=find_bins(mse_test), alpha=0.6,  label='mse for test data', color=colors[0], density=True)
+    plt.hist(mse_train, bins=find_bins(mse_train), label='MSE for training data', color=colors[1], density=True)
+    plt.hist(mse_test, bins=find_bins(mse_test), alpha=0.6,  label='MSE for test data', color=colors[0], density=True)
     plt.xlabel('MSE', fontsize=fontsize_lab)
     plt.ylabel('Probability density', fontsize=fontsize_lab)
-    plt.title(f'Results of MSE when bootstrapping {Bootstrap_.rounds} times', fontsize=fontsize_tit)
-    plt.legend()
-    # plt.savefig(make_figs_path(f'hist_bootstrap_{Bootstrap_.rounds}_scaled_of_degree_{degree}.pdf'), dpi=300)
+    plt.title(f'MSE when bootstrapping {Bootstrap_.rounds} times: {model_names[model]}', fontsize=fontsize_tit)
+    plt.legend(fontsize = fontsize_leg)
+    plt.savefig(make_figs_path(f'BS:hist_bootstraped_{Bootstrap_.rounds}_rounds_of_degree_{degree}.pdf'), dpi=300)
     plt.show()
 
 
-def plot_bias_var(Bootstrap_list, degrees):
+def plot_mse_across_rounds(Bootstrap_list_rounds, rounds, model=LinearRegression):
+    """Plotting the mean of the MSE as a function of rounds
+
+    Args:
+        Bootstrap_list_rounds (list): A list of Bootstrap instances 
+        rounds (int): Number of bootstrap-rounds 
+    """
+    mse = [BS.mse_test for BS in Bootstrap_list_rounds]
+    mse_std = [np.std(BS.mse_test_values) for BS in Bootstrap_list_rounds]/np.sqrt(rounds)
+    sns.set_style('darkgrid')
+    plt.plot(rounds, mse, c=colors[0], lw=2.5)
+    plt.fill_between(rounds, mse+mse_std, mse-mse_std, color=colors[1], alpha=.3)
+    plt.xlabel('Bootstrap rounds', fontsize=fontsize_lab)
+    plt.ylabel('MSE value', fontsize=fontsize_lab)
+    plt.title(f'MSE across rounds: {model_names[model]}', fontsize=fontsize_tit)
+    plt.savefig(make_figs_path(f'BS:mse_across_rounds_{model_names[model]}.pdf'), dpi=300)
+    plt.show()
+
+
+def plot_bias_var(Bootstrap_list, degrees, model):
     """Plotting the bias-variance decomposition of the mse value across various polynomial degrees. 
 
     Args:
@@ -68,16 +90,16 @@ def plot_bias_var(Bootstrap_list, degrees):
     plt.plot(degrees, mse, label='MSE', c=colors[2], lw=2.5)
     plt.plot(degrees, bias, label=r'Bias$^2$', c=colors[1], lw=2.5)
     plt.plot(degrees, var, label='Variance', c=colors[0], lw=2.5)
-    plt.plot(degrees, proj_mse, '--', label='Projected mse', c=colors[3], lw=3)
+    plt.plot(degrees, proj_mse, '--', label=r'Bias$^2$ + Variance', c=colors[3], lw=3)
     plt.xlabel('Polynomial degree', fontsize=fontsize_lab)
     plt.ylabel('Score', fontsize=fontsize_lab)
-    plt.title('Bias-Variance Decomposition of the MSE', fontsize=fontsize_tit)
-    plt.legend()
-    # plt.savefig(make_figs_path(f'Bias_var_decomp.pdf'), dpi=300)
+    plt.title(f'Bias-Variance Decomposition of the MSE: {model_names[model]}', fontsize=fontsize_tit)
+    plt.legend(fontsize = fontsize_leg)
+    plt.savefig(make_figs_path(f'BS:Bias_var_decomp_{model_names[model]}.pdf'), dpi=300)
     plt.show()
 
 
-def plot_mse(Bootstrap_list, degrees):
+def plot_train_test_mse(Bootstrap_list, degrees, model):
     """Plotting the training and test mse for the various polynomial degrees. 
 
     Args:
@@ -104,28 +126,9 @@ def plot_mse(Bootstrap_list, degrees):
     plt.ylim([0,0.6])
     plt.xlabel('Polynomial degree', fontsize=fontsize_lab)
     plt.ylabel('MSE value', fontsize=fontsize_lab)
-    plt.legend()
-    plt.title('Training and Test MSE', fontsize=fontsize_tit)
-    # plt.savefig(make_figs_path(f'train_test_mse.pdf'), dpi=300)
-    plt.show()
-
-
-def plot_mse_across_rounds(Bootstrap_list_rounds, rounds):
-    """Plotting the mean of the MSE as a function of rounds
-
-    Args:
-        Bootstrap_list_rounds (list): A list of Bootstrap instances 
-        rounds (int): Number of bootstrap-rounds 
-    """
-    mse = [BS.mse_test for BS in Bootstrap_list_rounds]
-    mse_std = [np.std(BS.mse_test_values) for BS in Bootstrap_list_rounds]/np.sqrt(rounds)
-    sns.set_style('darkgrid')
-    plt.plot(rounds, mse, c=colors[0], lw=2.5)
-    plt.fill_between(rounds, mse+mse_std, mse-mse_std, color=colors[1], alpha=.3)
-    plt.xlabel('Bootstrap rounds', fontsize=fontsize_lab)
-    plt.ylabel('MSE value', fontsize=fontsize_lab)
-    plt.title('MSE across rounds')
-    # plt.savefig(make_figs_path(f'mse_across_rounds1.pdf'), dpi=300)
+    plt.legend(fontsize = fontsize_leg)
+    plt.title(f'Train and Test MSE: {model_names[model]}', fontsize=fontsize_tit)
+    plt.savefig(make_figs_path(f'BS:train_test_mse_{model_names[model]}.pdf'), dpi=300)
     plt.show()
 
 
@@ -141,14 +144,14 @@ def solve_c(y, X, degree, rounds, reg, scale_scheme='Standard', ratio=3/4, rando
     BS = Bootstrap(reg, data_train, data_test, random_state = random_state, rounds=rounds)
     return BS
 
-def run_bootstrap_rounds(model, rounds, degree, lmbda=None):
-    """Bootstraps for various number of bootstrap rounds. Plots histogram (if OLS) and mse across rounds
+def bootstrap_across_rounds(model, rounds, degree, lmbda=None):
+    """Function for doing the analysis of bootstrap across rounds given a certain model. Plots histogram (if OLS) and mse across rounds. 
 
     Args:
-        model (_type_): _description_
-        rounds (_type_): _description_
-        degree (_type_): _description_
-        lmbda (_type_, optional): _description_. Defaults to None.
+        model (_type_): Model for linear regression
+        rounds (ndarray): Number of bootstrap rounds 
+        degree (int): Polynomial degree of model
+        lmbda (int, optional): Lambda implemented in the Ridge and Lasso model. Defaults to None. 
     """
     Bootstrap_list_rounds = []
     for round in rounds:
@@ -160,14 +163,21 @@ def run_bootstrap_rounds(model, rounds, degree, lmbda=None):
         BS = solve_c(y, X, degree=degree, rounds=round, reg=reg)
         Bootstrap_list_rounds.append(BS)
 
-        if model == LinearRegression and round in rounds[::rounds.shape//4]:
+        if model == LinearRegression and round in [30,102,408,606]:
             pass
-            plot_hist_of_bootstrap(BS, 7)
+            # plot_hist_of_bootstrap(BS, degree, model)
+    plot_mse_across_rounds(Bootstrap_list_rounds, rounds, model)
 
-    plot_mse_across_rounds(Bootstrap_list_rounds, rounds)
 
+def bootstrap_across_degrees(model, round, degrees, lmbdas=None):
+    """Function for doing the analysis of bootstrap across degrees given a certain model and number of bootstrap rounds. This includes test/train mse and bias-variance-decomposition. The function calls plot functions.
 
-def run_bootstrap_degrees(model, round, degrees, lmbdas=None):
+    Args:
+        model (_type_): Model for linear regression
+        round (int): number of bootstrap rounds
+        degrees (ndarray): degress on which to preform the analysis
+        lmbdas (ndarray, optional): array with same size as degrees. Each element of lmbdas corresponds to a polynomial degree. For Ridge and Lasso.  Defaults to None.
+    """
     #For various degrees
     Bootstrap_list = []
     for i, deg in enumerate(degrees): 
@@ -179,9 +189,16 @@ def run_bootstrap_degrees(model, round, degrees, lmbdas=None):
         BS = solve_c(y, X, degree=deg, rounds=round, reg=reg)
         Bootstrap_list.append(BS)
 
-    plot_mse(Bootstrap_list, degrees)
+    plot_train_test_mse(Bootstrap_list, degrees)
     plot_bias_var(Bootstrap_list, degrees)
 
+    return Bootstrap_list
+
+
+def comparison(models=[LinearRegression, Ridge, Lasso]):
+    #Plotting the train/test for various models
+    for model in models:
+        pass 
 
 
 if __name__ == "__main__":
@@ -191,19 +208,16 @@ if __name__ == "__main__":
     D = make_FrankeFunction(n=600, uniform=True, random_state=321, noise_std=0.1)
     y, X = D.unpacked()
 
-    rounds = np.arange(30, 1000+1, (1001-30)//10)
+    rounds = np.arange(30, 1000+1, (1001-30)//100)
     degrees = np.arange(1, 15+1)
     round = 400
-
 
 ###
 #Linreg
 ###
 
-    # run_bootstrap_rounds(LinearRegression, rounds, degree=7)
-    # run_bootstrap_degrees(LinearRegression, round, degrees)
-
-
+    # bootstrap_across_rounds(LinearRegression, rounds, degree=7) #Chose deg=7 rather 'randomly' 
+    # BS_list_OLS = bootstrap_across_degrees(LinearRegression, round, degrees)
 
 ###
 #Ridge
@@ -215,8 +229,8 @@ if __name__ == "__main__":
     optimal_lmbda = lmbdas_grid[np.unravel_index(np.argmin(MSEs), MSEs.shape)]
     optimal_degree = (np.unravel_index(np.argmin(MSEs), MSEs.shape))[1]
 
-    # run_bootstrap_rounds(Ridge, rounds, degree=optimal_degree, lmbda=optimal_lmbda)
-    # run_bootstrap_degrees(Ridge, round, degrees, lmbdas=optimal_lmbdas)
+    # bootstrap_across_rounds(Ridge, rounds, degree=optimal_degree, lmbda=optimal_lmbda) #Shows that round=400 gives the stabilized state
+    # BS_list_R = bootstrap_across_degrees(Ridge, round, degrees, lmbdas=optimal_lmbdas)
 
 ###
 #LASSO
@@ -229,30 +243,14 @@ if __name__ == "__main__":
     optimal_lmbda = lmbdas_grid[np.unravel_index(np.argmin(MSEs), MSEs.shape)]
     optimal_degree = (np.unravel_index(np.argmin(MSEs), MSEs.shape))[1]
 
-    run_bootstrap_rounds(Lasso, rounds, degree=optimal_degree, lmbda=optimal_lmbda)
-    run_bootstrap_degrees(Lasso, round, degrees, lmbdas=optimal_lmbdas)
+    bootstrap_across_rounds(Lasso, rounds, degree=optimal_degree, lmbda=optimal_lmbda) #Shows that round=400 gives the stabilized state
+    # BS_list_L = bootstrap_across_degrees(Lasso, round, degrees, lmbdas=optimal_lmbdas)
 
-    exit()
-    #For various rounds:
-    rounds = np.array([30, 120, 210, 300])
-    rounds = np.arange(30, 1000+1, (1001-30)//10)
-    Bootstrap_list_rounds = []
-    for i, round in enumerate(rounds):
-        BS = solve_c(y, X, degree=optimal_degree, rounds=round, reg=Ridge(lmbda = optimal_lmbda))
-        Bootstrap_list_rounds.append(BS)
-        # plot_hist_of_bootstrap(BS, 7)
-    plot_mse_across_rounds(Bootstrap_list_rounds, rounds)
+###
+#Comparison
+###
 
-    #For various degrees
-    degrees = np.arange(1, 12+1)
-    lmbdas = []
-    Bootstrap_list = []
-    for i, deg in enumerate(degrees): 
-        BS = solve_c(y, X, degree=deg, rounds=70, reg=Ridge(lmbda = optimal_lmbdas[i]))
-        Bootstrap_list.append(BS)
 
-    plot_mse(Bootstrap_list, degrees)
-    plot_bias_var(Bootstrap_list, degrees)
     
 
     
