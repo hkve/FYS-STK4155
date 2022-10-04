@@ -43,13 +43,13 @@ def plot_surf(D):
 
 	ax.set_xlabel("x", fontsize=14)
 	ax.set_ylabel("y", fontsize=14)
-	fig.colorbar(surf, shrink=0.5, aspect=5)
+	cbar = fig.colorbar(surf, shrink=0.5, aspect=5)
 
-	return fig, ax, surf
+	return fig, ax, surf, cbar
 
 
 def plot_FrankeFunction(D, angle=(18, 45), filename=None):
-	fig, ax, surf = plot_surf(D)
+	fig, ax, surf, cbar = plot_surf(D)
 
 	ax.set_zlim(-0.10, 1.40)
 	ax.zaxis.set_major_locator(LinearLocator(10))
@@ -63,9 +63,10 @@ def plot_FrankeFunction(D, angle=(18, 45), filename=None):
 	fig.tight_layout()
 	plt.show()
 
-def plot_terrain(D, angle=(18,45), filename=None):
-	fig, ax, surf = plot_surf(D)
+def plot_Terrain(D, angle=(18,45), figsize=(10,7), filename=None):
+	fig, ax, surf, cbar = plot_surf(D)
 
+	fig.set_size_inches(*figsize)
 	ax.set_zlabel(r"Terrain", fontsize=14, rotation=90)
 	ax.view_init(*angle)
 
@@ -83,7 +84,7 @@ def FrankeFunction(x,y):
 	return term1 + term2 + term3 + term4
 
 
-def load_terrain(filename="SRTM_data_mot.tif"):
+def load_Terrain(filename="SRTM_data_Nica.tif"):
 	path = pl.Path(__file__).parent / filename
 	l = np.arange(30)
 	X, Y = np.meshgrid(l,l)	
@@ -100,5 +101,5 @@ if __name__ == "__main__":
 	D = make_FrankeFunction(n=625, uniform=False, noise_std=0.1)
 	# plot_FrankeFunction(D)
 
-	D = load_terrain("SRTM_data_mot.tif")
+	D = load_Terrain("SRTM_data_mot.tif")
 	plot_FrankeFunction(D, angle=(22,-55), Franke=False)
