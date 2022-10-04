@@ -1,4 +1,6 @@
 import pathlib as pl
+import context 
+from sknotlearn.linear_model import LinearRegression, Ridge, Lasso
 import seaborn as sns
 
 def make_figs_path(filename):
@@ -18,6 +20,8 @@ def make_figs_path(filename):
     figs_path /= filename
 
     return str(figs_path)
+
+model_names = {LinearRegression:'OLS', Ridge:'Ridge', Lasso:'Lasso'}
 
 colors = [
     sns.color_palette('husl')[-3],
