@@ -103,7 +103,7 @@
 
     \comment{Here I am lost as to the order and division of things. - Carl Martin, ca. 2000 AD. I think the devision and ordering makes sense. Mabye shuffle CLT around? - \Hakon}
     \subsubsection{Central Limit Theorem}
-        The central limit theorem tells us that when sampling a series of quantities $\cclosed{z_i|i=1,\ldots,n}$ with independent and identical distributions with a mean $\mu$ and variance $\sigma^2<\infty$, the distribution of the sample mean $\bar{z}_n = \frac{1}{n}\sum_{i=1}^n z_i$ will approach a normal distrbution. Explicitly, we have (\comment{I don't know whether to box this - \Carl, I think no box - \Hakon, agree - \Carl})
+        The central limit theorem tells us that when sampling a series of quantities $\cclosed{z_i|i=1,\ldots,n}$ with independent and identical distributions with a mean $\mu$ and variance $\sigma^2<\infty$, the distribution of the sample mean $\bar{z}_n = \frac{1}{n}\sum_{i=1}^n z_i$ will approach a normal distrbution. Explicitly, we have
         \begin{align}\label{eq:theo:CLM}
             \lim_{n\to\infty} \sqrt{n}(\bar{z}_n-\mu) \distas \normal{0}{\sigma^2}.
         \end{align}
@@ -111,13 +111,12 @@
         \begin{align}
             \bar{z}_n \distas \normal{\mu}{\frac{\sigma^2}{n}}
         \end{align}
-        becomes sound. Colloquially we say the sample mean approaches the true mean $\mu$. This is powerful, as it means not only that the sample mean becomes better as the sample size grows, but quantities derived from its distribution are also determined more precisely. Note also that this holds with only very weak restrictions on the distribution of the $z_i$'s -- their sample mean will approach normal distribution regardles. Together, this lays the foundation for statistically informed models such as regression methods. \comment{Wild-ish claim here, but I was not sure how to `motivate' this section on CLM so that it doesn't seem too random, without going too big. Any input is appreciated. -\Carl, I think this makes sens (not too wild). Mabye explicitly state that this happends  even if $z_i$ are not themselves normally distributed. - \Hakon, Good idea! -\Carl}
+        becomes sound. Colloquially we say the sample mean approaches the true mean $\mu$. This is powerful, as it means not only that the sample mean becomes better as the sample size grows, but quantities derived from its distribution are also determined more precisely. Note also that this holds with only very weak restrictions on the distribution of the $z_i$'s -- their sample mean will approach normal distribution regardles. Together, this lays the foundation for statistically informed models such as regression methods.
 
 
 
 
     \subsubsection{Measure for goodness of fit}
-        \comment{Title suggestions, "measures for goodness of fit". Then say we simply call these "metrics" to not clutter other sections with long words. - \Hakon, Sold! -\Carl}
         When we want to create a statistically informed model that is able to predict the outcome of future measurements, we need to develop metrics for how well our model fits the data we already have. That is, given a model parametrised by parametrs $\vec{\theta}$, we want to optimise them such that $\hat{f}(x) \approx f(x)$. We call this the goodness of fit. To estimate how well we acheive this with our given dataset $\mathcal{D}$, we will start with the mean squared error (MSE). Given a model which predicts values $\vec{\hat{y}}$, the mean squared error is given by
         \begin{align}
             \boxed{
@@ -132,7 +131,6 @@
             \Rsquared(\vec{\hat{y}}) = 1 - \frac{\sum_{i=1}^n (y_i-\hat{y}_i)^2}{\sum_{i=1}^n (y_i-\bar{y})^2} = 1 - \frac{(\vec{y}-\vec{\hat{y}})^2}{(\vec{y}-\bar{y})^2},
             \label{eq:theo:r2}
         \end{align}
-        \comment{Mabye something about $\Rsquared \in (-\infty, 1]$, where $\Rsquared = 1$ is a perfect fit, $\Rsquared = 0$ is equal to predicting the mean $\bar{y}$ all the time and $\Rsquared < 0$ is even worse. - \Hakon, agree - \Carl}
         where $\bar{y} = \frac{1}{n}\sum_{i=1}^n y_i$ is the sample mean of the observed data. This metric falls on the interval $(-\infty, 1]$, where 1 denotes the perfect fit, 0 correspond to a constant prediction of $\bar{y}$, and negative values corresponds to worse prediction than this.
 
 
@@ -162,7 +160,7 @@
 
 
     \subsection{Ordinary least squares}
-        We define the ordinary least squares method by assuming that the data $y(x)$ that we want to make a fit to has a linear noise term that is normally distributed with zero mean \comment{Dont be posh -\Hakon, Sorry, I am a noughty boy -\Carl}. That is, the data is generated as $y(x) = f(x) + \epsilon$, where $f(x)$ is some analytic, non-stochastic function of the data input $x$, and $\epsilon \distas \normal{0}{\sigma^2}$ for some $\sigma^2>0$. Further, if we make a model fitting $y(x)$ by a $\hat{y}(x)$, we should expect the error at every data point $(y_i, x_i)$ to be be normally distributed with the same variance, i.e., independently and identically distributed (i.i.d.). This can be summarised
+        We define the ordinary least squares method by assuming that the data $y(x)$ that we want to make a fit to has a linear noise term that is normally distributed with zero mean. That is, the data is generated as $y(x) = f(x) + \epsilon$, where $f(x)$ is some analytic, non-stochastic function of the data input $x$, and $\epsilon \distas \normal{0}{\sigma^2}$ for some $\sigma^2>0$. Further, if we make a model fitting $y(x)$ by a $\hat{y}(x)$, we should expect the error at every data point $(y_i, x_i)$ to be be normally distributed with the same variance, i.e., independently and identically distributed (i.i.d.). This can be summarised
         \begin{align}
             P(\vec{y}|X, \vec{\theta}) = \prod_{i=1}^{n} \frac{1}{\sqrt{2\pi\sigma^2}} \exp{-\frac{{(y_i-\hat{y}_i)}^2}{2\sigma^2}}.
         \end{align}
@@ -219,7 +217,7 @@
     \comment{Should we at some point mention the hessian matrix and the C of Ridge being convex (Hessian is positive definite) -\Anna}
 
 \section{Method}
-Something general about initially fitting Franke data using OLS, ridge and lasso. Then moving on to real terrain data something something.
+    Something general about initially fitting Franke data using OLS, ridge and Lasso. Then moving on to real terrain data something something.
     
     \subsection{Datasets}
         \subsubsection{Franke function}
@@ -239,14 +237,13 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
                 f_4(x,y) &= -\frac{1}{5}\exptext{ -(9x-4)^2 - (9y-7)^2} \nonumber
             \end{align}
 
-            And $\epsilon$ is some stochastic noise $\epsilon \distas \normal{0}{\sigma^2}$. By visual inspection, we can fine tune $\sigma$ to create data that looks like noisy digital terrain data. For all fits to the Franke function we used $n = 600$ uniformly distributed points $x,y \distas \mathcal{U}(0,1)$ with a noise level of $\sigma = 0.1$, which is discussed in \ref{app:sec:frankefunction N and sigma}.   
+            And $\epsilon$ is some stochastic noise $\epsilon \distas \normal{0}{\sigma^2}$. By visual inspection, we can fine tune $\sigma$ to create data that looks like noisy digital terrain data. For all fits to the Franke function we used $n = 600$ uniformly distributed points $x,y \distas \mathcal{U}(0,1)$ with a noise level of $\sigma = 0.1$, which is discussed in App. \ref{app:sec:frankefunction N and sigma}.   
 
         \subsubsection{Terrain data}
             \comment{Here we put the terrain we extracted with coordinates etc.}
 
-        \subsection{Linear regression}
-            \comment{not sure about how we should divide these subsections, but I wanted to write a bit about data scaling - \Carl. Since we compose this design matrix and preform scaling for all models, mabye give this section a  more general name and write about train test splitting -\Hakon}
-            When fitting our models to the data, we base our models on simple polynomial expansions of the arguments of the function generating the data. We are fitting scalar function with to arguments $x$ and $y$, so our design matrix is constructed as
+        \subsection{Data preparation}
+            When fitting our models to the data, we base our models on simple polynomial expansions of the arguments of the function generating the data. We are fitting scalar function with two arguments $x$ and $y$, so our design matrix is constructed as
             \begin{align}
                 X = \begin{pmatrix}
                     1 & x_1 & y_1 & x^2_1 & x_1y_1 & y_1^2 & \cdots & x_1^p & \cdots & y_1^p \\
@@ -263,12 +260,15 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
                 \end{align}
             \end{subequations}
             where $\bar{z} = \frac{1}{n} \sum_{i=1}^n z_n$ denotes the sample mean of $\vec{z}$ and $\sigma_{\vec{z}}^2 = \frac{1}{n} \sum_{i=1}^n {(z_i-\bar{z})}^2$ denotes the sample std of $\vec{z}$. When we calculate MSE scores to compare between models and resampling techniques, we will use the scaled $\vec{y}$.
-            \newline\newline
-            \comment{Just wrote down some thoughts, think this should be present in the method section before the resampling part. \Hakon}
-            To get a proper assessment of our model, we will split the dataset into a \textit{training set} and \textit{testing set}. The training set is used to fit the model, giving our coefficient estimates $\vec{\hat{\theta}}$. Using the fitted model and the training data, we can calculate metrics to quantify how good our model replicates this data. In the case that our model perfectly predicts the training data $\vec{y}$ based on $X$, the calculated metrics MSE and $\Rsquared$ (Eq. \eqref{eq:theo:mse}, \ref{eq:theo:r2}) should be 0 and 1 respectively. However, using these scores to assess the goodness of our fit has an underlying problem. Since the model has seen the training data to estimate $\vec{\hat{\theta}}$, we can run into problems where the model begins to fit the $\epsilon$ values and not the (assumed) underlying function $f(x)$. This phenomenon is called \textit{overfitting}. To mediate this, we calculate our metrics based on a testing data which was not used for fitting. This serves as a way to estimate the errors on data which the model has not seen before. For the artificial data made using the Franke function, we went for a split where $\sfrac{2}{3}$ of the data is used for the training set, while other $\sfrac{1}{3}$ is reserved for the testing set.
 
+            To get a proper assessment of our model, we will split the dataset into a \textit{training set} and \textit{testing set}. The training set is used to fit the model, giving our coefficient estimates $\vec{\hat{\theta}}$. Using the fitted model and the training data, we can calculate metrics to quantify how good our model replicates this data. In the case that our model perfectly predicts the training data $\vec{y}$ based on $X$, the calculated metrics MSE and $\Rsquared$ (Eqs. \eqref{eq:theo:mse}, \eqref{eq:theo:r2}) should be 0 and 1 respectively. However, using these scores to assess the goodness of our fit has an underlying problem. Since the model has seen the training data to estimate $\vec{\hat{\theta}}$, we can run into problems where the model begins to fit the $\epsilon$ values and not the (assumed) underlying function $f(x)$. This phenomenon is called \textit{overfitting}. To mediate this, we calculate our metrics based on a testing data which was not used for fitting. This serves as a way to estimate the errors on data which the model has not seen before. For the artificial data made using the Franke function, we went for a split where $\sfrac{2}{3}$ of the data is used for the training set, while other $\sfrac{1}{3}$ is reserved for the testing set.
+
+
+    \subsection{Initial application of OLS}
+        \comment{Thought we could put the initial testing without resampling into a section of its own, \Carl}\\
 
     \subsection{Resampling techniques}
+        \comment{I think we should introduce the initial testing of the resamplers where we find optimal rounds or $k$ in this section. Then we add the `real' application and comparison in ridge/lasso section. -\Carl}
         With the intent to compute more accurate measures for goodness of fit (such as MSE and $\Rsquared$) to evaluate our model, we 
         artificially increase the data sample by repeatedly fitting the model on subsamples of our data. This approach is called resampling and consists of a variety of methods. In this project we have applied \textit{Bootstrapping} and \textit{$k$-fold Cross-validation}. 
 
@@ -282,16 +282,21 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
             final goodness of fit. 
 
     \subsection{Expanding to regularised methods}
-        \comment{Not married to this section name or existence. -\Carl}\\
+        \comment{Not married to this section name or separate existence. -\Carl}\\
         With the regularised regression methods, ridge and Lasso, we introduce a hyperparameter $\lambda$ that affects our fit. To explore this, we will study the MSE of the fits using cross validation resampling as the polynomial degree and $\lambda$-value is changed. We will use the same polynomial degrees as when exploring OLS, and look at a wide range of $\lambda \in [10^{-9}, 10^1]$.
 
-        When we have gotten a feeling for the $\lambda$-values in relation to the polynomial degree, we will return to studying the bias-variance tradeoff, this time only using Bootstrap resampling. We will look at the difference between good $\lambda$-values from our previous examination, and a choice of poorer $\lambda$ to see exactly how it affects the goodness of fit.
+        When we have gotten a feeling for the $\lambda$-values in relation to the polynomial degree, we will return to studying the bias-variance tradeoff, this time only using Bootstrap resampling. We will look at the difference between good $\lambda$-values from our previous examination, and a choice of poorer $\lambda$ to see more precisely how it affects the goodness of fit.
+
+        Finally, we will study the bias-variance tradeoff as a function of the $\lambda$, with the polynomial degree fixed at a good number (\comment{What is a good number?}). This might give insight into the effective degrees of freedom of the regularised methods (\comment{perhaps?}).
+
+    \subsection{Application on real data}
+            \comment{Here we talk about the repeat of the analysis on real data, and model selection.}
 
 
 \section{Results}
     \comment{Proposed structure: OLS, Ridge Lasso, Terrain data \Hakon}
     \subsection{Ordinary least squares}
-        We begin by calulating the MSE and $\Rsquared$ score (Eqs. \eqref{eq:theo:mse}, \eqref{eq:theo:r2}) fitted to the Franke function for different polynomial degrees. This can be seen in Figure \ref{fig:res:OLS_mse_noresample} and \ref{fig:res:OLS_R2_noresample} respectively. Based on the MSE calculated for the test data, the optimal degree was found to be $\msub{p}{opt} = 5$ with $\mse \approx 0.134$. We observe that the train MSE decreases steadily with higher $p$, while the test MSE decreases until we reach $\msub{p}{opt}$, after which it increases. The opposite relationship is seen for the $\Rsquared$ score.   
+        We begin by calulating the MSE and $\Rsquared$ score (Eqs. \eqref{eq:theo:mse}, \eqref{eq:theo:r2}) fitted to the Franke function for different polynomial degrees. This can be seen in Figures \ref{fig:res:OLS_mse_noresample} and \ref{fig:res:OLS_R2_noresample} respectively. Based on the MSE calculated for the test data, the optimal degree was found to be $\msub{p}{opt} = 5$ with $\mse \approx 0.134$. We observe that the train MSE decreases steadily with higher $p$, while the test MSE decreases until we reach $\msub{p}{opt}$, after which it increases. The opposite relationship is seen for the $\Rsquared$ score.   
         \begin{figure}[H]
             \centering
             \includegraphics[width=\linewidth]{OLS_mse_noresample.pdf}
@@ -384,8 +389,10 @@ Something general about initially fitting Franke data using OLS, ridge and lasso
         \end{align}
         From this we can infer that the order of magnitude of a parameter $\theta_a$ is governed by the dimension its corresponding feature $\dimof{x_a}$. This matters in the regularised models where a cost is associated with the norm of the parameters $\norm[p]{\vec{\theta}}$, which will be dominated by parameters whose dimension is large. In practice, this means that the fitting will focus more on reducing the magnitude of the parameters whose associated dimension is large, letting the others fluctuate more freely. By making the $x_a$'s dimensionless, the parameters are put on a `level playing field', so to speak. The dimension of $y$ serves to raise or lower the order of magnitude of the all the parameters equally, and can be adjusted as to avoid numerical truncation errors by avoiding larger floats.
 
+        From this, we can conclude that scaling of the inputs is not strictly necessary when using OLS, as there is no regularisation penalty associated with the dimension of the parameters. However, the MSE is still a dimensionful quantity, and it is useful then to scale the data for OLS too for consistency and ease of comparison of the results between the models.
+
     \subsection{OLS}
-    Looking back at Figure \ref{fig:res:OLS_mse_noresample} and \ref{fig:res:OLS_R2_noresample} showing the MSE and $\Rsquared$ scores calculated using the train and test set, we recognise a common sign of overfitting when moving past $\msub{p}{opt} = 5$. In this region, we introduce many new degrees of freedom to the fit, which allows our model to accurately recreate the exact points present in the training set, but at the cost of fitting the added noise $\epsilon$ and/or assuming a too complex structure to the underlying function. This can be seen by the large MSE values calculated on the test data, telling us that our model preforms poorly on data which it has not yet been exposed to.     
+    Looking back at Figures \ref{fig:res:OLS_mse_noresample} and \ref{fig:res:OLS_R2_noresample} showing the MSE and $\Rsquared$ scores calculated using the train and test set, we recognise a common sign of overfitting when moving past $\msub{p}{opt} = 5$. In this region, we introduce many new degrees of freedom to the fit, which allows our model to accurately recreate the exact points present in the training set, but at the cost of fitting the added noise $\epsilon$ and/or assuming a too complex structure to the underlying function. This can be seen by the large MSE values calculated on the test data, telling us that our model preforms poorly on data which it has not yet been exposed to.     
 
     \subsection{Resampling}
         \comment{Here I am just writing a bit on our discussion about the limit of resampling. Structure of the discussion section is very much not set in any stone.}
