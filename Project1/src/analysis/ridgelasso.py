@@ -33,7 +33,7 @@ def min_params(degrees_grid, lmbdas_grid, MSEs):
     return degrees_grid[best_idx], lmbdas_grid[best_idx], lmbdas_grid[best_idxs]
 
 
-def plot_heatmap(degrees_grid, lmbdas_grid, MSEs, model=None):
+def plot_heatmap(degrees_grid, lmbdas_grid, MSEs, model=None, filename=None):
     n_levels = 50
     
     levels = np.linspace(np.min(MSEs), np.max(MSEs), n_levels)
@@ -49,11 +49,16 @@ def plot_heatmap(degrees_grid, lmbdas_grid, MSEs, model=None):
     cbar = fig.colorbar(cont, pad=0.01, aspect=6)
     cbar.set_label("MSE", fontsize=14)
 
-    ax.set_title(f"Optimisation of {model} using CV.", fontsize=16)
+    if model:
+        ax.set_title(f"Optimisation of {model} using CV.", fontsize=16)
     ax.set_yscale("log")
     ax.set_xlabel("Polynomial degree", fontsize=14)
     ax.set_ylabel(r"Log$_{10}(\lambda)$", fontsize=14)
     fig.tight_layout()
+
+    if filename:
+        plt.savefig(make_figs_path(filename), dpi=300, bbox_inches="tight")
+
     plt.show()
 
 
@@ -69,7 +74,6 @@ def make_mse_grid(Method, degrees, lmbdas):
 
     for i, degree in enumerate(degrees):
         Dp = D.polynomial(degree=degree).scaled(scheme="Standard")
-        Dp_train, Dp_test = Dp.train_test_split(ratio=train_size, random_state=random_state)
 
         for j, lmbda in enumerate(lmbdas):
             resampler = KFold_cross_validate(
@@ -81,7 +85,7 @@ def make_mse_grid(Method, degrees, lmbdas):
                 run=True,
                 random_state=321,
             )
-            MSEs[i,j] = np.mean(resampler.scores_["test_mse"])
+            MSEs[i,j] = np.mean(resampler["test_mse"])
 
     degrees_grid, lmbdas_grid = np.meshgrid(degrees, lmbdas, indexing="ij")
     return degrees_grid, lmbdas_grid, MSEs
@@ -97,10 +101,10 @@ if __name__ == "__main__":
     # params = make_mse_grid(Ridge, degrees, lmbdas)
     # dump("ridge_grid", *params)
     params = load("ridge_grid")
-    plot_heatmap(*params, model="Ridge")
+    plot_heatmap(*params, model="Ridge", filename="heatmap_ridge")
 
     # Lasso
     # params = make_mse_grid(Lasso, degrees, lmbdas)
     # dump("lasso_grid", *params)
     params = load("lasso_grid")
-    plot_heatmap(*params, model="Lasso")
+    plot_heatmap(*params, model="Lasso", filename="heatmap_lasso")
