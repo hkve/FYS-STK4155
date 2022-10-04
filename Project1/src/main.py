@@ -1,28 +1,45 @@
-from sknotlearn.linear_model import LinearRegression as LR_custom
-from sklearn.linear_model import LinearRegression as LR
+# Does the actual parsing
+import argparse
+from ast import parse
 
-import numpy as np
+import sknotlearn.datasets as datasets
+import analysis.noresampling as noresampling
 
-# Set 50 datapoints and 4 features (including intercept)
-n, m = 50, 4
-x = np.random.uniform(low=-5, high=5, size=n)
 
-# The 4 true parameters and model y = sum( beta_i * x^i ) 
-beta = np.array([1, 0.25, -1.5, 3])
-y = np.sum(np.array([b*x**i for i, b in enumerate(beta)]), axis=0)
+parser = argparse.ArgumentParser()
+plots_parser = parser.add_subparsers(help="Plot", dest="plot")
 
-# Construct design matrix
-one = np.ones_like(x)
-X = np.c_[one, x, x**2, x**3]
+naive_parser = plots_parser.add_parser("naive")
+naive_parser.add_argument("-d0", "--degrees0", type=int, default=10)
+naive_parser.add_argument("-d1", "--degrees1", type=int, default=10)
 
-# Compeare between sklearn and custom code
-lin1 = LR(fit_intercept=False).fit(X, y)
+plot_parser_chained = [
+    naive_parser,
+]
 
-# Method can be INV or SVD 
-lin2 = LR_custom(method="INV").fit(X, y)
-lin3 = LR_custom(method="SVD").fit(X, y)
+for plot_parser in plot_parser_chained:
+    data_parser = plot_parser.add_subparsers(help="Data", dest="data")
+    Franke_parser = data_parser.add_parser("Franke")
+    Franke_parser.add_argument("-n", "--npoints", type=int, default=600)
+    
+    Terrain_parser = data_parser.add_parser("Franke")
+    Terrain_parser.add_argument("-n", "--npoints", type=int, default=900)
+    
 
-print(lin1.coef_)
-print(lin2.coef_)
-print(lin3.coef_)
 
+# parser = argparse.ArgumentParser()
+# group = parser.add_mutually_exclusive_group()
+# group.add_argument("-F", "--Franke", action="store_const", dest="data", const="Franke")
+# group.add_argument("-T", "--Terrain", action="store_const", dest="data", const="Terrain")
+
+# print(group)
+# subparser = parser.add_subparsers(help="commands", dest="command")
+# noresample_parser = subparser.add_parser("naive", help="Preforms analysis based on a simple train/test split")
+
+
+# parser.set_defaults(data="Franke")
+
+args = vars(parser.parse_args())
+# command = args["command"]
+
+print(args)

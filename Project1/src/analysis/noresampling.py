@@ -4,11 +4,16 @@ import seaborn as sns
 from matplotlib.colors import LogNorm
 
 # Custom stuff
-import context
+# Run from main.py or in analysis folder?
+if __name__ == "__main__":
+	import context
+	from utils import make_figs_path, colors
+else:
+	from analysis.utils import make_figs_path, colors
+
 from sknotlearn.linear_model import LinearRegression, Ridge, Lasso
 from sknotlearn.datasets import make_FrankeFunction, load_Terrain
 from sknotlearn.data import Data
-from utils import make_figs_path, colors
 
 
 def make_power_labels(p, powers):
