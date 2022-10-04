@@ -408,31 +408,36 @@
 
 \section{Concluding remarks}
 
-
-
+% for numbering appendix equations more appropriately
+\numberwithin{equation}{section}
+\renewcommand{\theequation}{\thesection.\arabic{equation}}
 \begin{appendices}
     \section{Theoretical proof of concept of the OLS model}
+        Supposing that we have have data generated from from $y_i = f(x_i)+\epsilon$ as before, we look statistical quantities derived from the distribution of our parameters $\vec{\theta}$ inhereted from $\epsilon\distas \normal{0}{\sigma^2}$. Under the assumption that $f(x) \in \operatorname{span}\cclosed{x}_a$ of our design matrix $X$, we can write the data $\vec{y} = X\vec{\theta} + \vec{\epsilon}$ for some $\vec{\theta}$ which would be a `true' optimum for our parameters.
+
+        The expectatio value of a datapoint $y_i$ is\footnote{In this appendix, we understand repeated indices to be summed over.}
         \begin{align}
-            \expval(y_i) = \expval\bclosed{X_{ia} \vec{\theta}_a + \epsilon_i} = X_{ia}\vec{\theta}_a + \expval(\epsilon_i) = X_{ia}\vec{\theta}_a
+            \expval(y_i) = \expval\bclosed{X_{ia} \theta_a + \epsilon_i} = X_{ia}\theta_a + \expval(\epsilon_i) = X_{ia}\theta_a,
         \end{align}
-
+        with its variance is
         \begin{align} \nonumber
-            \var(y_i) &= \expval\bclosed{\pclosed{y_i-\expval\pclosed{y_i}}^2} = \expval\bclosed{\pclosed{X_{ia}\vec{\theta}_a + \epsilon_i - X_{ia}\vec{\theta}_a}^2} \\
-            &= \expval\pclosed{\epsilon_i^2} = \var\pclosed{\epsilon_i} = \sigma^2
+            \var(y_i) &= \expval\bclosed{\pclosed{y_i-\expval\pclosed{y_i}}^2} = \expval\bclosed{\pclosed{X_{ia}\theta_a + \epsilon_i - X_{ia}\theta_a}^2} \\
+            &= \expval\pclosed{\epsilon_i^2} = \var\pclosed{\epsilon_i} = \sigma^2.
         \end{align}
 
+        The expectation value of our parameters can be calculated specific to OLS as
         \begin{align} \nonumber
-            \expval(\vec{\thetahat}) &= \expval\pclosed{(X^TX)^{-1}X^T \vec{y}} = \expval\pclosed{(X^TX)^{-1}X^T \bclosed{X\vec{\theta} + \vec{\epsilon}} } \\
-            &= \expval\pclosed{\vec{\theta}} + {(X^TX)}^{-1}X^T \expval\pclosed{\vec{\epsilon}} = \vec{\theta}
+            \expval(\vec{\thetahat}) &= \expval\bclosed{(X^TX)^{-1}X^T \vec{y}} = \expval\bclosed{(X^TX)^{-1}X^T \bclosed{X\vec{\theta} + \vec{\epsilon}} } \\
+            &= \expval\pclosed{\vec{\theta}} + {(X^TX)}^{-1}X^T \expval\pclosed{\vec{\epsilon}} = \vec{\theta},
         \end{align}
-
+        and their variance is
         \begin{align} \nonumber
             \var(\vec{\thetahat}) &= \expval({\vec{\thetahat} \vec{\thetahat}^T}) - \expval({\vec{\thetahat}}) \expval({\vec{\thetahat}^T}) \\ \nonumber
-            &= \expval((X^TX)^{-1}X^T \vec{y} \vec{y}^T X (X^TX)^{-1}) - \vec{\theta}\vec{\theta^T} \\ \nonumber
+            &= \expval\bclosed{(X^TX)^{-1}X^T \vec{y} \vec{y}^T X (X^TX)^{-1}} - \vec{\theta}\vec{\theta}^T \\ \nonumber
             &= (X^TX)^{-1}X^T \bclosed{X\vec{\theta}\vec{\theta}^TX^T + \sigma^2 \eye}X (X^TX)^{-1} - \vec{\theta}\vec{\theta}^T \\
             &= \sigma^2 (X^TX)^{-1},
         \end{align}
-        where we have used that \(\expval(\vec{y}\vec{y}^T) = \expval\pclosed{(X\vec{\theta}+\vec{\epsilon})(X\vec{\theta}+\vec{\epsilon})^T} = X\vec{\theta}\vec{\theta}^TX^T + \sigma^2 \eye\).
+        where we have used that \(\expval(\vec{y}\vec{y}^T) = \expval\bclosed{(X\vec{\theta}+\vec{\epsilon})(X\vec{\theta}+\vec{\epsilon})^T} = X\vec{\theta}\vec{\theta}^TX^T + \sigma^2 \eye\).
 
     \section{Bias-variance decomposition of the MSE of a linear model} \label{app:sec:bvdecomp}
         The true MSE of a model $\hat{f}(x)$ to data constructed from $f(x) + \epsilon$ can be decomposed into terms resulting from the bias of the model, the variance of the model and the \textit{irreducible error} resulting from the error in the observations. The bias encapsulates tendency of the model $\hat{f}(x)$ to under- or overpredict the value at a point $x$ as the data used to fit the model is varied. The variance encapsulates how much the prediction at a point $x$ changes as the data used to fit the model is varied. The decomposition follows from the definition of the MSE. We supress the arguments $x$, understanding that the expectation values are taken at the same point $x$.
