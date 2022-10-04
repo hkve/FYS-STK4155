@@ -66,7 +66,7 @@ def plot_theta_progression(thetas, thetas_se, powers, degrees=[1,3,5], filename=
 
 	axes[0].set_ylabel(r"$\theta$", fontsize=14)
 	fig.suptitle("OLS coefficients", fontsize=16)
-	fig.supxlabel(r"$\theta$ corresponding to $x^i y^j$", fontsize=14)
+	fig.supxlabel(r"$\theta$ corresponding to $x^a y^b$", fontsize=14)
 
 	x = [0,0,60]
 	for ax, p, x_ in zip(axes, degrees, x):
@@ -113,7 +113,7 @@ def plot_theta_heatmap(thetas, theta_se, powers, degrees=[1,2,3,4,5], filename=N
 	ax.set_yticks(np.arange(len(degrees)), labels=degrees)
 	cbar = fig.colorbar(im, pad=0.01, shrink=0.55, aspect=6)
 	cbar.set_label(r"$|\theta|$", fontsize=14)
-	ax.set_xlabel(r"$\theta$ corresponding to $x^i y^j$", fontsize=14)
+	ax.set_xlabel(r"$\theta$ corresponding to $x^a y^b$", fontsize=14)
 	ax.set_ylabel(r"Polynomial degree", fontsize=14)
 	ax.set_title("OLS coefficients", fontsize=16)
 
