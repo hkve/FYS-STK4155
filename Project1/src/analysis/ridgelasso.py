@@ -1,4 +1,3 @@
-from random import random
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -30,28 +29,36 @@ def load(filename):
 
 def min_params(degrees_grid, lmbdas_grid, MSEs):
     best_idx = np.unravel_index(MSEs.argmin(), MSEs.shape)
-    return degrees_grid[best_idx], lmbdas_grid[best_idx]
+    best_idxs = np.unravel_index(MSEs.argmin(axis=1), MSEs.shape)
+    return degrees_grid[best_idx], lmbdas_grid[best_idx], lmbdas_grid[best_idxs]
 
 
-def plot_heatmap(degrees_grid, lmbdas_grid, MSEs):
+def plot_heatmap(degrees_grid, lmbdas_grid, MSEs, model=None, filename=None):
     n_levels = 50
     
     levels = np.linspace(np.min(MSEs), np.max(MSEs), n_levels)
 
-    best_degree, best_lmbda = min_params(degrees_grid, lmbdas_grid, MSEs)
+    best_degree, best_lmbda, best_lmbdas = min_params(degrees_grid, lmbdas_grid, MSEs)
 
     fig, ax = plt.subplots()
 
     cont = ax.contourf(degrees_grid, lmbdas_grid, MSEs, levels=levels, cmap="viridis")
-    ax.scatter(best_degree, best_lmbda, marker="x", color="r", alpha=0.6)
+    ax.scatter(degrees_grid[:,0], best_lmbdas, marker="x", s=40, color="r", alpha=0.4)
+    ax.scatter(best_degree, best_lmbda, marker="X", s=160, color="r", alpha=0.6)
     ax.text(best_degree-1.7, best_lmbda*1.7, f"$({best_degree:n}, {best_lmbda:.0E})$", color="w")
     cbar = fig.colorbar(cont, pad=0.01, aspect=6)
     cbar.set_label("MSE", fontsize=14)
 
+    if model:
+        ax.set_title(f"Optimisation of {model} using CV.", fontsize=16)
     ax.set_yscale("log")
     ax.set_xlabel("Polynomial degree", fontsize=14)
     ax.set_ylabel(r"Log$_{10}(\lambda)$", fontsize=14)
     fig.tight_layout()
+
+    if filename:
+        plt.savefig(make_figs_path(filename), dpi=300, bbox_inches="tight")
+
     plt.show()
 
 
@@ -67,20 +74,18 @@ def make_mse_grid(Method, degrees, lmbdas):
 
     for i, degree in enumerate(degrees):
         Dp = D.polynomial(degree=degree).scaled(scheme="Standard")
-        Dp_train, Dp_test = Dp.train_test_split(ratio=train_size, random_state=random_state)
 
         for j, lmbda in enumerate(lmbdas):
-            # Add resampling option here
             resampler = KFold_cross_validate(
                 reg = Method(lmbda=lmbda),
                 data = Dp,
-                k = 5,
+                k = 7,
                 scoring = ("mse"),
                 shuffle = False,
                 run=True,
                 random_state=321,
             )
-            MSEs[i,j] = np.mean(resampler.scores_["test_mse"])
+            MSEs[i,j] = np.mean(resampler["test_mse"])
 
     degrees_grid, lmbdas_grid = np.meshgrid(degrees, lmbdas, indexing="ij")
     return degrees_grid, lmbdas_grid, MSEs
@@ -93,13 +98,13 @@ if __name__ == "__main__":
     degrees = np.arange(1, n_degrees+1)
 
     # Ridge
-    params = make_mse_grid(Ridge, degrees, lmbdas)
-    dump("ridge_grid", *params)
-    # params = load("ridge_grid")
-    # plot_heatmap(*params)
+    # params = make_mse_grid(Ridge, degrees, lmbdas)
+    # dump("ridge_grid", *params)
+    params = load("ridge_grid")
+    plot_heatmap(*params, model="Ridge", filename="heatmap_ridge")
 
     # Lasso
     # params = make_mse_grid(Lasso, degrees, lmbdas)
     # dump("lasso_grid", *params)
     params = load("lasso_grid")
-    plot_heatmap(*params)
+    plot_heatmap(*params, model="Lasso", filename="heatmap_lasso")
