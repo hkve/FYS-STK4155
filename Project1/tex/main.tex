@@ -57,7 +57,7 @@
 \DeclareMathOperator{\eye}{\mathbb{I}}
 \DeclareMathOperator{\sgn}{sgn}
 
-\newcommand{\betahat}{\hat{\beta}}
+\newcommand{\thetahat}{\hat{\theta}}
 \newcommand{\msub}[2]{\ensuremath{{#1}_\text{#2}}}
 
 \newcommand{\Hakon}{$\mathcal{H}$}
@@ -311,19 +311,19 @@
                     \label{fig:res:OLS_R2_noresample}
                 \end{figure}
 
-                To investigate the stability of our fits with varying polynomial degrees, we also plot coefficient values with varying polynomial degree. In Figure \ref{fig:res:OLS_beta_values_plot} we see these plotted for $p = 1,2,3$ with 95\% confidence intervals. These are calculated using the diagonal $\sigma^2_{\theta_a} = \var{(\hat{\beta})_{aa}}$. Additionally, in Figure \ref{fig:res:OLS_beta_values_table} we see the absolute values of these coefficients tabulated for $p \in [1,5]$.
+                To investigate the stability of our fits with varying polynomial degrees, we also plot coefficient values with varying polynomial degree. In Figure \ref{fig:res:OLS_beta_values_plot} we see these plotted for $p = 1,2,3$ with 95\% confidence intervals. These are calculated using the diagonal $\sigma^2_{\theta_a} = \var{(\hat{\theta})_{aa}}$. Additionally, in Figure \ref{fig:res:OLS_beta_values_table} we see the absolute values of these coefficients tabulated for $p \in [1,5]$.
 
             \begin{figure*}
                 \begin{subfigure}{\textwidth}
                     \centering
                     \includegraphics[width=\linewidth]{OLS_coefs_plots.pdf}
-                    \caption{Showing values of polynomial coefficients for degree 1, 3 and 5 from left to right. The shaded regions are given by $\pm 2\sigma_\beta$. Note the different y-axes.} 
+                    \caption{Showing values of polynomial coefficients for degree 1, 3 and 5 from left to right. The shaded regions are given by $\pm 2\sigma_\theta$. Note the different y-axes.} 
                     \label{fig:res:OLS_beta_values_plot}
                 \end{subfigure}
                 \begin{subfigure}{\textwidth}
                     \centering
                     \includegraphics[width=\linewidth]{OLS_coefs_table.pdf}
-                    \caption{Showing $\beta_{ij}$ corresponding to the term $x^i y^j$ present in the fit.}
+                    \caption{Showing $\theta_{ij}$ corresponding to the term $x^i y^j$ present in the fit.}
                     \label{fig:res:OLS_beta_values_table}    
                 \end{subfigure}
             \end{figure*}
@@ -364,7 +364,7 @@
     
 
     \subsection{Ridge and Lasso}
-        \comment{No naivité, exploration of resampling is just 1 sentence.}\\
+        \comment{No naïveté, exploration of resampling is just 1 sentence.}\\
         We now repeat the same analysis for ridge and Lasso regression.
         \begin{figure}
             \begin{subfigure}{\linewidth}
@@ -413,26 +413,26 @@
 \begin{appendices}
     \section{Theoretical proof of concept of the OLS model}
         \begin{align}
-            \expval(y_i) = \expval\bclosed{X_{ia} \vec{\beta}_a + \epsilon_i} = X_{ia}\vec{\beta}_a + \expval(\epsilon_i) = X_{ia}\vec{\beta}_a
+            \expval(y_i) = \expval\bclosed{X_{ia} \vec{\theta}_a + \epsilon_i} = X_{ia}\vec{\theta}_a + \expval(\epsilon_i) = X_{ia}\vec{\theta}_a
         \end{align}
 
         \begin{align} \nonumber
-            \var(y_i) &= \expval\bclosed{\pclosed{y_i-\expval\pclosed{y_i}}^2} = \expval\bclosed{\pclosed{X_{ia}\vec{\beta}_a + \epsilon_i - X_{ia}\vec{\beta}_a}^2} \\
+            \var(y_i) &= \expval\bclosed{\pclosed{y_i-\expval\pclosed{y_i}}^2} = \expval\bclosed{\pclosed{X_{ia}\vec{\theta}_a + \epsilon_i - X_{ia}\vec{\theta}_a}^2} \\
             &= \expval\pclosed{\epsilon_i^2} = \var\pclosed{\epsilon_i} = \sigma^2
         \end{align}
 
         \begin{align} \nonumber
-            \expval(\vec{\betahat}) &= \expval\pclosed{(X^TX)^{-1}X^T \vec{y}} = \expval\pclosed{(X^TX)^{-1}X^T \bclosed{X\vec{\beta} + \vec{\epsilon}} } \\
-            &= \expval\pclosed{\vec{\beta}} + {(X^TX)}^{-1}X^T \expval\pclosed{\vec{\epsilon}} = \vec{\beta}
+            \expval(\vec{\thetahat}) &= \expval\pclosed{(X^TX)^{-1}X^T \vec{y}} = \expval\pclosed{(X^TX)^{-1}X^T \bclosed{X\vec{\theta} + \vec{\epsilon}} } \\
+            &= \expval\pclosed{\vec{\theta}} + {(X^TX)}^{-1}X^T \expval\pclosed{\vec{\epsilon}} = \vec{\theta}
         \end{align}
 
         \begin{align} \nonumber
-            \var(\vec{\betahat}) &= \expval({\vec{\betahat} \vec{\betahat}^T}) - \expval({\vec{\betahat}}) \expval({\vec{\betahat}^T}) \\ \nonumber
-            &= \expval((X^TX)^{-1}X^T \vec{y} \vec{y}^T X (X^TX)^{-1}) - \vec{\beta}\vec{\beta^T} \\ \nonumber
-            &= (X^TX)^{-1}X^T \bclosed{X\vec{\beta}\vec{\beta}^TX^T + \sigma^2 \eye}X (X^TX)^{-1} - \vec{\beta}\vec{\beta}^T \\
+            \var(\vec{\thetahat}) &= \expval({\vec{\thetahat} \vec{\thetahat}^T}) - \expval({\vec{\thetahat}}) \expval({\vec{\thetahat}^T}) \\ \nonumber
+            &= \expval((X^TX)^{-1}X^T \vec{y} \vec{y}^T X (X^TX)^{-1}) - \vec{\theta}\vec{\theta^T} \\ \nonumber
+            &= (X^TX)^{-1}X^T \bclosed{X\vec{\theta}\vec{\theta}^TX^T + \sigma^2 \eye}X (X^TX)^{-1} - \vec{\theta}\vec{\theta}^T \\
             &= \sigma^2 (X^TX)^{-1},
         \end{align}
-        where we have used that \(\expval(\vec{y}\vec{y}^T) = \expval\pclosed{(X\vec{\beta}+\vec{\epsilon})(X\vec{\beta}+\vec{\epsilon})^T} = X\vec{\beta}\vec{\beta}^TX^T + \sigma^2 \eye\).
+        where we have used that \(\expval(\vec{y}\vec{y}^T) = \expval\pclosed{(X\vec{\theta}+\vec{\epsilon})(X\vec{\theta}+\vec{\epsilon})^T} = X\vec{\theta}\vec{\theta}^TX^T + \sigma^2 \eye\).
 
     \section{Bias-variance decomposition of the MSE of a linear model} \label{app:sec:bvdecomp}
         The true MSE of a model $\hat{f}(x)$ to data constructed from $f(x) + \epsilon$ can be decomposed into terms resulting from the bias of the model, the variance of the model and the \textit{irreducible error} resulting from the error in the observations. The bias encapsulates tendency of the model $\hat{f}(x)$ to under- or overpredict the value at a point $x$ as the data used to fit the model is varied. The variance encapsulates how much the prediction at a point $x$ changes as the data used to fit the model is varied. The decomposition follows from the definition of the MSE. We supress the arguments $x$, understanding that the expectation values are taken at the same point $x$.
