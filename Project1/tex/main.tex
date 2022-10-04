@@ -99,7 +99,7 @@
 
     We will assume that the measurements $y_i$ are generated from an exact function $f(x)$ with stochastic noise $\epsilon$ added, such that $y_i = f(x_i) + \epsilon$. Throughout this project, we will assume that the noise is normally distributed with zero mean and some standard deviation (std) $\sigma$; $\epsilon \distas \normal{0}{\sigma^2}$. Furthermore, we will assume that the noise between different measurements is independent and identically distributed (i.i.d.). Our job then is to model an $\hat{f}(x)$ that we want to be close to $f(x)$.
 
-    \subsection{Error assesement and model optimisation}
+    \subsection{Error assessment and model optimisation}
 
     \comment{Here I am lost as to the order and division of things. - Carl Martin, ca. 2000 AD. I think the devision and ordering makes sense. Mabye shuffle CLT around? - \Hakon}
     \subsubsection{Central Limit Theorem}
@@ -289,78 +289,83 @@
 
         Finally, we will study the bias-variance tradeoff as a function of the $\lambda$, with the polynomial degree fixed at a good number (\comment{What is a good number?}). This might give insight into the effective degrees of freedom of the regularised methods (\comment{perhaps?}).
 
-    \subsection{Application on real data}
+    \subsection{Application on Real Data}
             \comment{Here we talk about the repeat of the analysis on real data, and model selection.}
 
 
 \section{Results}
-    \comment{Proposed structure: OLS, Ridge Lasso, Terrain data \Hakon}
-    \subsection{Ordinary least squares}
-        We begin by calulating the MSE and $\Rsquared$ score (Eqs. \eqref{eq:theo:mse}, \eqref{eq:theo:r2}) fitted to the Franke function for different polynomial degrees. This can be seen in Figures \ref{fig:res:OLS_mse_noresample} and \ref{fig:res:OLS_R2_noresample} respectively. Based on the MSE calculated for the test data, the optimal degree was found to be $\msub{p}{opt} = 5$ with $\mse \approx 0.134$. We observe that the train MSE decreases steadily with higher $p$, while the test MSE decreases until we reach $\msub{p}{opt}$, after which it increases. The opposite relationship is seen for the $\Rsquared$ score.   
-        \begin{figure}[H]
-            \centering
-            \includegraphics[width=\linewidth]{OLS_mse_noresample.pdf}
-            \caption{Showing the MSE score for OLS, calculated on the train and test sample for different polynomial degrees.}
-            \label{fig:res:OLS_mse_noresample}
-        \end{figure}
+    \subsection{Ordinary Least Squares}
+            \subsubsection{Without Resampling}
+                We begin by calulating the MSE and $\Rsquared$ score (Eqs. \eqref{eq:theo:mse}, \eqref{eq:theo:r2}) fitted to the Franke function for different polynomial degrees. This can be seen in Figures \ref{fig:res:OLS_mse_noresample} and \ref{fig:res:OLS_R2_noresample} respectively. Based on the MSE calculated for the test data, the optimal degree was found to be $\msub{p}{opt} = 5$ with $\mse \approx 0.134$. We observe that the train MSE decreases steadily with higher $p$, while the test MSE decreases until we reach $\msub{p}{opt}$, after which it increases. The opposite relationship is seen for the $\Rsquared$ score.   
+                \begin{figure}[H]
+                    \centering
+                    \includegraphics[width=\linewidth]{OLS_mse_noresample.pdf}
+                    \caption{Showing the MSE score for OLS, calculated on the train and test sample for different polynomial degrees.}
+                    \label{fig:res:OLS_mse_noresample}
+                \end{figure}
 
-        \begin{figure}[H]
-            \centering
-            \includegraphics[width=\linewidth]{OLS_r2_noresample.pdf}
-            \caption{Showing the $\Rsquared$ score for OLS, calculated on the train and test sample for different polynomial degrees.}
-            \label{fig:res:OLS_R2_noresample}
-        \end{figure}
+                \begin{figure}[H]
+                    \centering
+                    \includegraphics[width=\linewidth]{OLS_r2_noresample.pdf}
+                    \caption{Showing the $\Rsquared$ score for OLS, calculated on the train and test sample for different polynomial degrees.}
+                    \label{fig:res:OLS_R2_noresample}
+                \end{figure}
 
-        To investigate the stability of our fits with varying polynomial degrees, we also plot coefficient values with varying polynomial degree. In Figure \ref{fig:res:OLS_beta_values_plot} we see these plotted for $p = 1,2,3$ with 95\% confidence intervals. These are calculated using the diagonal $\sigma^2_{\theta_a} = \var{(\hat{\beta})_{aa}}$. Additionally, in Figure \ref{fig:res:OLS_beta_values_table} we see the absolute values of these coefficients tabulated for $p \in [1,5]$.
+                To investigate the stability of our fits with varying polynomial degrees, we also plot coefficient values with varying polynomial degree. In Figure \ref{fig:res:OLS_beta_values_plot} we see these plotted for $p = 1,2,3$ with 95\% confidence intervals. These are calculated using the diagonal $\sigma^2_{\theta_a} = \var{(\hat{\beta})_{aa}}$. Additionally, in Figure \ref{fig:res:OLS_beta_values_table} we see the absolute values of these coefficients tabulated for $p \in [1,5]$.
 
-    \begin{figure*}
-        \begin{subfigure}{\textwidth}
-            \centering
-            \includegraphics[width=\linewidth]{OLS_coefs_plots.pdf}
-            \caption{Showing values of polynomial coefficients for degree 1, 3 and 5 from left to right. The shaded regions are given by $\pm 2\sigma_\beta$. Note the different y-axes.} 
-            \label{fig:res:OLS_beta_values_plot}
-        \end{subfigure}
-        \begin{subfigure}{\textwidth}
-            \centering
-            \includegraphics[width=\linewidth]{OLS_coefs_table.pdf}
-            \caption{Showing $\beta_{ij}$ corresponding to the term $x^i y^j$ present in the fit.}
-            \label{fig:res:OLS_beta_values_table}    
-        \end{subfigure}
-    \end{figure*}
+            \begin{figure*}
+                \begin{subfigure}{\textwidth}
+                    \centering
+                    \includegraphics[width=\linewidth]{OLS_coefs_plots.pdf}
+                    \caption{Showing values of polynomial coefficients for degree 1, 3 and 5 from left to right. The shaded regions are given by $\pm 2\sigma_\beta$. Note the different y-axes.} 
+                    \label{fig:res:OLS_beta_values_plot}
+                \end{subfigure}
+                \begin{subfigure}{\textwidth}
+                    \centering
+                    \includegraphics[width=\linewidth]{OLS_coefs_table.pdf}
+                    \caption{Showing $\beta_{ij}$ corresponding to the term $x^i y^j$ present in the fit.}
+                    \label{fig:res:OLS_beta_values_table}    
+                \end{subfigure}
+            \end{figure*}
 
-    The metrics thus far has only been calculated without the use of any resampling techniques. To see how this influences MSE, we apply $k$-fold Cross-validation and plot the averaged train- and test MSE across the different folds. This is presented in Figure \ref{fig:res:OLS_mse_kfold}. The optimal polynomial degrees and MSE values based on the training data is presented in table 
+            The metrics thus far has only been calculated without the use of any resampling techniques. To see how this influences MSE, we apply $k$-fold Cross-validation and plot the averaged train- and test MSE across the different folds. This is presented in Figure \ref{fig:res:OLS_mse_kfold}. The optimal polynomial degrees and MSE values based on the training data is presented in table 
+
+        \subsubsection{Exploring Resampling}
+            \begin{table}[H]
+                \centering
+                \begin{tabular}{l|ll}
+                $k$ & $\msub{p}{opt}$ & MSE \\
+                \hline
+                5   & 6         & 0.136 \\
+                7   & 7         & 0.134 \\
+                10  & 7         & 0.136
+                \end{tabular}
+                \caption{Showing the optimal degrees $\msub{p}{opt}$ and MSE values calculate on the test data using Cross validation with $k = 5, 7$ and $10$.}
+                \label{res:tab:OLS_kfold_optimal}
+            \end{table}
+            
+            Just as in the case without resampling, the train MSE decreases with $p$. For the test MSE, the increase after the various $\msub{p}{opt}$ values is smaller, but the general trend is the same.  
+            
+            \begin{figure}[H]
+                \centering
+                \includegraphics[width=\linewidth]{OLS_mse_kfold.pdf}
+                \caption{MSE values as a function of polynomial degrees, calculated using $k$-fold Cross validation for $k = 5, 7$ and $10$. }
+                \label{fig:res:OLS_mse_kfold}
+            \end{figure}
+
+            \begin{figure}[H]
+                \centering
+                \includegraphics[width=\linewidth]{Bias_var_decomp.pdf}
+                \caption{FILL ME}
+                \label{fig:res:OLS_bias_variance_tradeoff}
+            \end{figure}
+
+        \subsubsection{Applying Resampling}
     
-    \begin{table}[H]
-        \centering
-        \begin{tabular}{l|ll}
-        $k$ & $\msub{p}{opt}$ & MSE \\
-        \hline
-        5   & 6         & 0.136 \\
-        7   & 7         & 0.134 \\
-        10  & 7         & 0.136
-        \end{tabular}
-        \caption{Showing the optimal degrees $\msub{p}{opt}$ and MSE values calculate on the test data using Cross validation with $k = 5, 7$ and $10$.}
-        \label{res:tab:OLS_kfold_optimal}
-    \end{table}
-    
-    Just as in the case without resampling, the train MSE decreases with $p$. For the test MSE, the increase after the various $\msub{p}{opt}$ values is smaller, but the general trend is the same.  
-    
-    \begin{figure}[H]
-        \centering
-        \includegraphics[width=\linewidth]{OLS_mse_kfold.pdf}
-        \caption{MSE values as a function of polynomial degrees, calculated using $k$-fold Cross validation for $k = 5, 7$ and $10$. }
-        \label{fig:res:OLS_mse_kfold}
-    \end{figure}
-
-    \begin{figure}[H]
-        \centering
-        \includegraphics[width=\linewidth]{Bias_var_decomp.pdf}
-        \caption{FILL ME}
-        \label{fig:res:OLS_bias_variance_tradeoff}
-    \end{figure}
 
     \subsection{Ridge and Lasso}
-        We now repeat the same analysis for ridge regression.
+        \comment{No naivité, exploration of resampling is just 1 sentence.}\\
+        We now repeat the same analysis for ridge and Lasso regression.
         \begin{figure}
             \begin{subfigure}{\linewidth}
                 \centering
