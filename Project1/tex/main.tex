@@ -177,6 +177,7 @@
                 \msub{\vec{\hat{\theta}}}{OLS} = \pclosed{X^TX}^{-1} X^T \vec{y}.
             }
         \end{align}
+        An exploration of the statistical expectation and variance of the OLS results is done in Appendix \ref{app:sec:OLS_proof}.
 
     \subsection{Ridge regression}
         So far, we have assumed that the parameters $\vec{\theta}$ are uniformly distributed, and as such have no \textit{bias} towards any particular value. In practice, this means that the OLS model will contort to fit itself to all values in the data. As such, a motivation for adding a bias could be for the sake of stability in the fit. These methods are called \textit{regularised} methods. An example is ridge regression, where one assumes that the parameters are normally distributed, such that parameter values far from the mean are thought less likely to occur. This in practice means that the model is less willing to contort to outliers in the dataset, trading it for a bias towards certain parameter values. Assuming the probability distrbution for $\vec{\theta}$ \comment{What is $\tau$ here? Just a $\sigma \xrightarrow{} \tau$? -\Hakon, Yes exactly, using $\tau$ as in the literature to avoid confusion with noise $\sigma$. $\tau$ is also used in Lasso where it does not correspond to the std. -\Carl}
@@ -206,7 +207,7 @@
         \begin{align}
             P(\vec{\theta}) = \prod_{a=1}^{p} \frac{1}{2\tau} \exp{-\frac{|\theta_a|}{\tau}},
         \end{align}
-        which as we can see is not differentiable at $\theta_i = 0$. This means that the optimisation of the probability $P(\vec{\theta}|X, \vec{y})$ is not necessarily possible analytically without putting bounds on the data $X, \vec{y}$, and even numerical algorithms like gradient descent will encounter trouble. Moreover, it is not optimisable point by point, unless bounds like $X^TX$ being diagonal are enforced. This makes Lasso generally more cumbersome. Nevertheless, we can coax a cost function out of the probability, which is minimalisable. Letting the cost function be written $\msub{C}{lasso}(\vec{\theta}) = -A\log\pclosed{P(\vec{\theta|X,\vec{y}})} + B$  we can choose the constants $A, B$ such that
+        which as we can see is not differentiable at $\theta_a = 0$. This means that the optimisation of the probability $P(\vec{\theta}|X, \vec{y})$ is not necessarily possible analytically without putting bounds on the data $X, \vec{y}$, and even numerical algorithms like gradient descent will encounter trouble. Moreover, it is not optimisable point by point, unless bounds like $X^TX$ being diagonal are enforced. This makes Lasso generally more cumbersome. Nevertheless, we can coax a cost function out of the probability, which is minimalisable. Letting the cost function be written $\msub{C}{lasso}(\vec{\theta}) = -A\log\pclosed{P(\vec{\theta|X,\vec{y}})} + B$  we can choose the constants $A, B$ such that
         \begin{align}
             \boxed{
                 \msub{C}{lasso}(\vec{\vec{\theta}}) = \norm[2]{ \vec{y} - X\vec{\theta} }^2 + \lambda \norm[1]{\vec{\theta}},
@@ -265,12 +266,13 @@
 
 
     \subsection{Initial application of OLS}
-        \comment{Thought we could put the initial testing without resampling into a section of its own, \Carl}\\
+        \comment{Thought we could put the initial testing without resampling into a section of its own, -\Carl}\\
 
     \subsection{Resampling techniques}
         \comment{I think we should introduce the initial testing of the resamplers where we find optimal rounds or $k$ in this section. Then we add the `real' application and comparison in ridge/lasso section. -\Carl}
         With the intent to compute more accurate measures for goodness of fit (such as MSE and $\Rsquared$) to evaluate our model, we 
         artificially increase the data sample by repeatedly fitting the model on subsamples of our data. This approach is called resampling and consists of a variety of methods. In this project we have applied \textit{Bootstrapping} and \textit{$k$-fold Cross-validation}. 
+        \comment{Reminder: Address how we calculate and compare bias/variance - that we find them for every test data point, and compare the average values over all data points.}
 
         \subsubsection*{Bootstrap}
             Bootstrapping consists of generating new training data by sampling data points from the original training data with replacement; meaning the same data points can be selected more than once. The new set of training data is called a bootstrapped dataset and is used to train the model. Then the relevant measures of goodness of fit is calculated. This process of resampling and calculating measures is repeated a certain number of times (rounds), giving a distribution of these measures. The mean of the measures is then calculated across the bootstrapped models. Through the central limit theorem this mean is assumed to be the more accurate measure for goodness of fit and therefore a better evaluation of the model in question.  
@@ -323,7 +325,7 @@
                 \begin{subfigure}{\textwidth}
                     \centering
                     \includegraphics[width=\linewidth]{OLS_coefs_table.pdf}
-                    \caption{Showing $\theta_{ij}$ corresponding to the term $x^i y^j$ present in the fit.}
+                    \caption{Showing $\theta_{ab}$ corresponding to the term $x^a y^b$ present in the fit.}
                     \label{fig:res:OLS_beta_values_table}    
                 \end{subfigure}
             \end{figure*}
@@ -355,7 +357,7 @@
 
             \begin{figure}[H]
                 \centering
-                \includegraphics[width=\linewidth]{Bias_var_decomp.pdf}
+                \includegraphics[width=\linewidth]{BS_Bias_var_decomp_OLS.pdf}
                 \caption{FILL ME}
                 \label{fig:res:OLS_bias_variance_tradeoff}
             \end{figure}
@@ -366,7 +368,7 @@
     \subsection{Ridge and Lasso}
         \comment{No naïveté, exploration of resampling is just 1 sentence.}\\
         We now repeat the same analysis for ridge and Lasso regression.
-        \begin{figure}
+        \begin{figure}[ht]
             \begin{subfigure}{\linewidth}
                 \centering
                 \includegraphics[width=\linewidth]{heatmap_ridge.pdf}
@@ -397,7 +399,7 @@
         From this, we can conclude that scaling of the inputs is not strictly necessary when using OLS, as there is no regularisation penalty associated with the dimension of the parameters. However, the MSE is still a dimensionful quantity, and it is useful then to scale the data for OLS too for consistency and ease of comparison of the results between the models.
 
     \subsection{OLS}
-    Looking back at Figure \ref{fig:res:OLS_mse_noresample} and \ref{fig:res:OLS_R2_noresample} showing the MSE and $\Rsquared$ scores calculated using the train and test set, we recognize a common sign of overfitting when moving past $\msub{p}{opt} = 5$. Since the polynomial degree increases, we can make many more $x^iy^j$ combination, which in turn gives more coefficients $\beta_{ij}$ to determine. This introduces many new degrees of freedom to the fit, which allows our model to accurately recreate the exact points present in the training set, but at the cost of fitting the added noise $\epsilon$ and/or assuming a too complex structure to the underlying function $f(x)$. This can be seen by the large MSE values calculated on the test data, telling us that our model preforms poorly on data which it has not yet been exposed to.
+    Looking back at Figures \ref{fig:res:OLS_mse_noresample} and \ref{fig:res:OLS_R2_noresample} showing the MSE and $\Rsquared$ scores calculated using the train and test set, we recognize a common sign of overfitting when moving past $\msub{p}{opt} = 5$. Since the polynomial degree increases, we can make many more $x^ay^b$ combination, which in turn gives more coefficients $\theta_{ab}$ to determine. This introduces many new degrees of freedom to the fit, which allows our model to accurately recreate the exact points present in the training set, but at the cost of fitting the added noise $\epsilon$ and/or assuming a too complex structure to the underlying function $f(x)$. This can be seen by the large MSE values calculated on the test data, telling us that our model preforms poorly on data which it has not yet been exposed to.
 
     \subsection{Resampling}
         \comment{Here I am just writing a bit on our discussion about the limit of resampling. Structure of the discussion section is very much not set in any stone.}
@@ -412,7 +414,20 @@
 \numberwithin{equation}{section}
 \renewcommand{\theequation}{\thesection.\arabic{equation}}
 \begin{appendices}
-    \section{Theoretical proof of concept of the OLS model}
+    \section{Bias-variance decomposition of the MSE of a linear model} \label{app:sec:bvdecomp}
+        The true MSE of a model $\hat{f}(x)$ to data constructed from $f(x) + \epsilon$ can be decomposed into terms resulting from the bias of the model, the variance of the model and the \textit{irreducible error} resulting from the error in the observations. The bias encapsulates tendency of the model $\hat{f}(x)$ to under- or overpredict the value at a point $x$ as the data used to fit the model is varied. The variance encapsulates how much the prediction at a point $x$ changes as the data used to fit the model is varied. The decomposition follows from the definition of the MSE. We supress the arguments $x$, understanding that the expectation values are taken at the same point $x$.
+
+        \begin{align} \nonumber
+            &\operatorname{MSE}(\hat{f}) = \expval\bclosed{(f+\epsilon-\hat{f})^2} \\ \nonumber
+            =& \expval\bclosed{\pclosed{(f+\epsilon-\expval(\hat{f}))- (\hat{f}-\expval(\hat{f}))}^2} \\ \nonumber
+            =& \expval\bclosed{\pclosed{f+\epsilon-\expval(\hat{f})}^2} + \expval\bclosed{\pclosed{\hat{f}-\expval(\hat{f})}^2} \\ \nonumber
+            &-2 \expval\bclosed{ (f+\epsilon-\expval(\hat{f})) (\hat{f}-\expval(\hat{f})) } \\ \nonumber
+            =& \pclosed{\expval\bclosed{f+\epsilon-\expval(\hat{f})}}^2 + \expval(\epsilon^2) + \var(\hat{f}) - 2\expval(\epsilon \hat{f}) \\
+            =& \pclosed{\bias(\hat{f})}^2 + \var(\hat{f}) + \sigma^2,
+        \end{align}
+        where in the last line, we used that $\expval(\epsilon\hat{f}) = \expval(\epsilon)\expval(\hat{f})=0$.\footnote{At first glance, this might seem odd, as there is noise involved in the fitting of $\hat{f}$ too. However, under the assumption that the noise is i.i.d. between experiments, the noise in the data used to fit $\hat{f}$ is independent of the noise in a test sample. It is worth noting that this would not be true if we were comparing with the same data used to fit the model, which explains the optimism of the training MSE. \comment{This last part here might be put into the discussion perhaps?}}
+
+    \section{Theoretical proof of concept of the OLS model} \label{app:sec:OLS_proof}
         Supposing that we have have data generated from from $y_i = f(x_i)+\epsilon$ as before, we look statistical quantities derived from the distribution of our parameters $\vec{\theta}$ inhereted from $\epsilon\distas \normal{0}{\sigma^2}$. Under the assumption that $f(x) \in \operatorname{span}\cclosed{x}_a$ of our design matrix $X$, we can write the data $\vec{y} = X\vec{\theta} + \vec{\epsilon}$ for some $\vec{\theta}$ which would be a `true' optimum for our parameters.
 
         The expectatio value of a datapoint $y_i$ is\footnote{In this appendix, we understand repeated indices to be summed over.}
@@ -430,7 +445,7 @@
             \expval(\vec{\thetahat}) &= \expval\bclosed{(X^TX)^{-1}X^T \vec{y}} = \expval\bclosed{(X^TX)^{-1}X^T \bclosed{X\vec{\theta} + \vec{\epsilon}} } \\
             &= \expval\pclosed{\vec{\theta}} + {(X^TX)}^{-1}X^T \expval\pclosed{\vec{\epsilon}} = \vec{\theta},
         \end{align}
-        and their variance is
+        and their covariance matrix is
         \begin{align} \nonumber
             \var(\vec{\thetahat}) &= \expval({\vec{\thetahat} \vec{\thetahat}^T}) - \expval({\vec{\thetahat}}) \expval({\vec{\thetahat}^T}) \\ \nonumber
             &= \expval\bclosed{(X^TX)^{-1}X^T \vec{y} \vec{y}^T X (X^TX)^{-1}} - \vec{\theta}\vec{\theta}^T \\ \nonumber
@@ -439,48 +454,36 @@
         \end{align}
         where we have used that \(\expval(\vec{y}\vec{y}^T) = \expval\bclosed{(X\vec{\theta}+\vec{\epsilon})(X\vec{\theta}+\vec{\epsilon})^T} = X\vec{\theta}\vec{\theta}^TX^T + \sigma^2 \eye\).
 
-    \section{Bias-variance decomposition of the MSE of a linear model} \label{app:sec:bvdecomp}
-        The true MSE of a model $\hat{f}(x)$ to data constructed from $f(x) + \epsilon$ can be decomposed into terms resulting from the bias of the model, the variance of the model and the \textit{irreducible error} resulting from the error in the observations. The bias encapsulates tendency of the model $\hat{f}(x)$ to under- or overpredict the value at a point $x$ as the data used to fit the model is varied. The variance encapsulates how much the prediction at a point $x$ changes as the data used to fit the model is varied. The decomposition follows from the definition of the MSE. We supress the arguments $x$, understanding that the expectation values are taken at the same point $x$.
-
-        \begin{align} \nonumber
-            &\operatorname{MSE}(\hat{f}) = \expval\bclosed{(f+\epsilon-\hat{f})^2} \\ \nonumber
-            =& \expval\bclosed{\pclosed{(f+\epsilon-\expval(\hat{f}))- (\hat{f}-\expval(\hat{f}))}^2} \\ \nonumber
-            =& \expval\bclosed{\pclosed{f+\epsilon-\expval(\hat{f})}^2} + \expval\bclosed{\pclosed{\hat{f}-\expval(\hat{f})}^2} \\ \nonumber
-            &-2 \expval\bclosed{ (f+\epsilon-\expval(\hat{f})) (\hat{f}-\expval(\hat{f})) } \\ \nonumber
-            =& \pclosed{\expval\bclosed{f+\epsilon-\expval(\hat{f})}}^2 + \expval(\epsilon^2) + \var(\hat{f}) - 2\expval(\epsilon \hat{f}) \\
-            =& \pclosed{\bias(\hat{f})}^2 + \var(\hat{f}) + \sigma^2,
-        \end{align}
-        where in the last line, we used that $\expval(\epsilon\hat{f}) = \expval(\epsilon)\expval(\hat{f})=0$.\footnote{At first glance, this might seem odd, as there is noise involved in the fitting of $\hat{f}$ too. However, under the assumption that the noise is i.i.d. between experiments, the noise in the data used to fit $\hat{f}$ is independent of the noise in a test sample. It is worth noting that this would not be true if we were comparing with the same data used to fit the model, which explains the optimism of the training MSE. \comment{This last part here might be put into the discussion perhaps?}}
 
     \section{Parameters for artifical data} \label{app:sec:frankefunction N and sigma}
-    To fairly compare between methods, a constant number of sampled points $N$ from the Franke function (equation \ref{eq:met:Franke_Function}) and the noise magnitude $\sigma$ needs to be set. We decided that $N = 600$ points should be sufficient to get enough data points in both the train and test set, while still being small enough to not bring in too much computational complexity. The points $(x,y)$ are drawn from a uniform distribution $x,y \distas \mathcal{U}(0,1)$ limited to their domain. Trough visual inspection, we decided on $\sigma = 0.1$ for the noise $\epsilon \distas \normal{0}{\sigma^2}$. We found that this scale gave our function plenty of noise, while still being recognizable (Figure \ref{fig:app:frankefunction varying noise}).   
-    \begin{figure*}
-        \begin{subfigure}{.5\textwidth}
-            \centering
-            \includegraphics[width=\linewidth]{franke_functions_0.pdf}
-            \caption{$\sigma = 0$}
+        To fairly compare between methods, a constant number of sampled points $N$ from the Franke function (equation \ref{eq:met:Franke_Function}) and the noise magnitude $\sigma$ needs to be set. We decided that $N = 600$ points should be sufficient to get enough data points in both the train and test set, while still being small enough to not bring in too much computational complexity. The points $(x,y)$ are drawn from a uniform distribution $x,y \distas \mathcal{U}(0,1)$ limited to their domain. Trough visual inspection, we decided on $\sigma = 0.1$ for the noise $\epsilon \distas \normal{0}{\sigma^2}$. We found that this scale gave our function plenty of noise, while still being recognizable (Figure \ref{fig:app:frankefunction varying noise}).   
+        \begin{figure*}
+            \begin{subfigure}{.5\textwidth}
+                \centering
+                \includegraphics[width=\linewidth]{franke_functions_0.pdf}
+                \caption{$\sigma = 0$}
+                \end{subfigure}
+            \hfill
+            \begin{subfigure}{.5\textwidth}
+                \centering
+                \includegraphics[width=\linewidth]{franke_functions_0_01.pdf}
+                \caption{$\sigma = 0.01$}
             \end{subfigure}
-        \hfill
-        \begin{subfigure}{.5\textwidth}
-            \centering
-            \includegraphics[width=\linewidth]{franke_functions_0_01.pdf}
-            \caption{$\sigma = 0.01$}
-        \end{subfigure}
-        \hfill
-        \begin{subfigure}{.5\textwidth}
-            \centering
-            \includegraphics[width=\linewidth]{franke_functions_0_1.pdf}
-            \caption{$\sigma = 0.1$}
-        \end{subfigure}
-        \begin{subfigure}{.5\textwidth}
-            \centering
-            \includegraphics[width=\linewidth]{franke_functions_0_2.pdf}
-            \caption{$\sigma = 0.2$}
+            \hfill
+            \begin{subfigure}{.5\textwidth}
+                \centering
+                \includegraphics[width=\linewidth]{franke_functions_0_1.pdf}
+                \caption{$\sigma = 0.1$}
+            \end{subfigure}
+            \begin{subfigure}{.5\textwidth}
+                \centering
+                \includegraphics[width=\linewidth]{franke_functions_0_2.pdf}
+                \caption{$\sigma = 0.2$}
 
-        \end{subfigure}
-    
-        \caption{Showing Franke function with increasing noise, from \textit{a} to \textit{d}, $\sigma \in \{ 0, 0.01, 0.1, 0.2\}$. All figures plotted with $n = 625$ equidistant $(x,y)$ points.}\label{fig:app:frankefunction varying noise}
-    \end{figure*}
+            \end{subfigure}
+        
+            \caption{Showing Franke function with increasing noise, from \textit{a} to \textit{d}, $\sigma \in \{ 0, 0.01, 0.1, 0.2\}$. All figures plotted with $n = 625$ equidistant $(x,y)$ points.}\label{fig:app:frankefunction varying noise}
+        \end{figure*}
 
 
 \end{appendices}
