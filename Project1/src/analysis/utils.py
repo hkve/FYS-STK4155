@@ -1,5 +1,4 @@
-import pathlib as pl
-import context 
+import pathlib as pl 
 from sknotlearn.linear_model import LinearRegression, Ridge, Lasso
 import seaborn as sns
 
