@@ -185,4 +185,4 @@ if plot == "heatmap":
         f1 = None
         if args["filename"]:
             f1 = f"{args['filename']}_heatmap_{name}"
-        hm.plot_heatmap(degrees_grid, lmbdas_grid, MSEs, model=name, filename=f"heatmap_{name}")
+        hm.plot_heatmap(degrees_grid, lmbdas_grid, MSEs, model=name, filename=f1)

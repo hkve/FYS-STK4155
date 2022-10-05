@@ -90,13 +90,14 @@ def FrankeFunction(x,y):
 	return term1 + term2 + term3 + term4
 
 
-def load_Terrain(filename="SRTM_data_Nica.tif", n=900):
+def load_Terrain(filename="SRTM_data_Nica.tif", n=900, random_state=321):
 	path = pl.Path(__file__).parent / filename
 	start, stop = 1600, 1900
 
 	# z = imread(path)[1740:1800:2, 1600:1660:2] 
 	z = imread(path)[start:stop, start:stop]
 	
+	np.random.seed(random_state)
 	X = np.random.uniform(low=0, high=(stop-start), size=(n, 2)).astype(int)
 	y = np.zeros(shape=n, dtype=float)
 
