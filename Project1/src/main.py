@@ -91,7 +91,8 @@ if args["data"] == "Franke":
     )
 elif args["data"] == "Terrain":
     D = datasets.load_Terrain(
-
+        n = args["npoints"],
+        random_state=args["rndmstate"]
     )
 
 if "OLS" not in args.keys(): args["OLS"] = False
@@ -110,8 +111,8 @@ names = ["OLS", "Ridge", "Lasso"]
 
 
 # Debug
-for k, v in args.items():
-    print(k,v)
+# for k, v in args.items():
+#     print(k,v)
 
 
 # Preform noresampling functionality
