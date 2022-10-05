@@ -13,9 +13,9 @@ parser = argparse.ArgumentParser()
 plots_parser = parser.add_subparsers(help="Plot", dest="plot")
 
 naive_parser = plots_parser.add_parser("naive")
-naive_parser.add_argument("-OLS", "--OLS", type=bool, default=False, help="Use OLS")
-naive_parser.add_argument("-R", "--Ridge", type=bool, default=False, help="Use Ridge")
-naive_parser.add_argument("-L", "--Lasso", type=bool, default=False, help="Use Lasso")
+naive_parser.add_argument("-OLS", "--OLS", type=bool, default=False, action=argparse.BooleanOptionalAction, help="Use OLS")
+naive_parser.add_argument("-R", "--Ridge", type=bool, default=False, action=argparse.BooleanOptionalAction, help="Use Ridge")
+naive_parser.add_argument("-L", "--Lasso", type=bool, default=False, action=argparse.BooleanOptionalAction, help="Use Lasso")
 naive_parser.add_argument("-ds", "--startdeg", type=int, default=1, help="Start degree for plotting MSE and R2")
 naive_parser.add_argument("-de", "--enddeg", type=int, default=20, help="End degree for plotting MSE and R2")
 naive_parser.add_argument("-ts", "--trainsize", type=float, default=2/3, help="Percentage of data used for training")
@@ -26,9 +26,9 @@ naive_parser.add_argument("-f", "--filename", type=str, default=None, help="File
 
 cv_parser = plots_parser.add_parser("cv")
 cv_parser.add_argument("-k", "--kfolds", nargs="+", type=int, default=7, help="How many folds to run. To compare, type multiple sep by spaces")
-cv_parser.add_argument("-OLS", "--OLS", type=bool, default=False, help="Use OLS")
-cv_parser.add_argument("-R", "--Ridge", type=bool, default=False, help="Use Ridge")
-cv_parser.add_argument("-L", "--Lasso", type=bool, default=False, help="Use Lasso")
+cv_parser.add_argument("-OLS", "--OLS", type=bool, default=False, action=argparse.BooleanOptionalAction, help="Use OLS")
+cv_parser.add_argument("-R", "--Ridge", type=bool, default=False, action=argparse.BooleanOptionalAction, help="Use Ridge")
+cv_parser.add_argument("-L", "--Lasso", type=bool, default=False, action=argparse.BooleanOptionalAction, help="Use Lasso")
 cv_parser.add_argument("-ds", "--startdeg", type=int, default=1, help="Start degree for plotting MSE and R2")
 cv_parser.add_argument("-de", "--enddeg", type=int, default=20, help="End degree for plotting MSE and R2")
 cv_parser.add_argument("-ts", "--trainsize", type=float, default=2/3, help="Percentage of data used for training")
@@ -97,7 +97,7 @@ names = ["OLS", "Ridge", "Lasso"]
 for k, v in args.items():
     print(k,v)
 
-"""
+
 # Preform noresampling functionality
 if plot == "naive":
     degrees = np.arange(args["startdeg"], args["enddeg"]+1)
@@ -120,17 +120,20 @@ if plot == "naive":
         if Model == lm.LinearRegression:
             nores.plot_theta_progression(*params2, filename=f3)
             nores.plot_theta_heatmap(*params2, filename=f4)
-"""
 
 
 if plot == "cv":
-    ks = 
+    degrees = np.arange(args["startdeg"], args["enddeg"]+1)
+    ks = np.unique(np.array(args["kfolds"]))
+    ks.sort()
 
     mse_across_folds = {}
 
     for Model, lmbda, name in zip(Models, lmbdas, names):
         for k in ks:
-            train_mse, test_mse = cv.run_Kfold_cross_validate(Model, degrees, k=k, random_state=321, lmbda=lmbda)
+            train_mse, test_mse = cv.run_Kfold_cross_validate(Model, degrees, k=k, random_state=args["rndmstate"], lmbda=lmbda)
             mse_across_folds[k] = [train_mse, test_mse]
         
-        cv.plot_train_mse_kfold(degrees, mse_across_folds, name, filename=f"{name}_mse_kfold")
+        f1 = None
+        if args["filename"]: f1 = f"{args['filename']}_{name}_mse_kfold"
+        cv.plot_train_mse_kfold(degrees, mse_across_folds, name, filename=f1)
