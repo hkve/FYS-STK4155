@@ -33,7 +33,7 @@ def plot_train_mse_kfold(degrees, mse_across_folds, title="OLS", filename=None):
     if filename is not None: plt.savefig(make_figs_path(filename), dpi=300)
     plt.show()
 
-def run_Kfold_cross_validate(Model, degrees, n=600, k=5, random_state=321, lmbda=None):    
+def run_Kfold_cross_validate(Model, degrees, k=5, random_state=321, lmbda=None):    
     train_mse = np.zeros_like(degrees, dtype=float)
     test_mse = np.zeros_like(degrees, dtype=float)
 
