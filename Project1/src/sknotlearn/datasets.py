@@ -39,8 +39,13 @@ def plot_surf(D):
 	sns.set_style("white")
 	fig = plt.figure()
 	ax = fig.add_subplot(projection="3d")
-	surf = ax.plot_trisurf(*D.X.T, D.y, cmap=cm.viridis, linewidth=0, antialiased=False)
 
+	X = D.X
+	if D.X.shape[1] == 2:
+		surf = ax.plot_trisurf(*X.T, D.y, cmap=cm.viridis, linewidth=0, antialiased=False)
+	else:
+		surf = ax.plot_trisurf(X[:,1], X[:,2], D.y, cmap=cm.viridis, linewidth=0, antialiased=False)
+	
 	ax.set_xlabel("x", fontsize=14)
 	ax.set_ylabel("y", fontsize=14)
 	cbar = fig.colorbar(surf, shrink=0.5, aspect=5)
@@ -91,7 +96,8 @@ def load_Terrain(filename="SRTM_data_Nica.tif"):
 	x = X.flatten()
 	y = Y.flatten()
 
-	z = imread(path)[1740:1800:2, 1600:1660:2] 
+	# z = imread(path)[1740:1800:2, 1600:1660:2] 
+	z = imread(path)[1600:1900:10, 1600:1900:10]
 	z = z.flatten()
 	
 	return Data(z, np.c_[x,y])

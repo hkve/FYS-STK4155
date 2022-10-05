@@ -4,11 +4,16 @@ import seaborn as sns
 from matplotlib.colors import LogNorm
 
 # Custom stuff
-import context
+# Run from main.py or in analysis folder?
+if __name__ == "__main__":
+	import context
+	from utils import make_figs_path, colors
+else:
+	from analysis.utils import make_figs_path, colors
+
 from sknotlearn.linear_model import LinearRegression, Ridge, Lasso
-from sknotlearn.datasets import make_FrankeFunction
+from sknotlearn.datasets import make_FrankeFunction, load_Terrain
 from sknotlearn.data import Data
-from utils import make_figs_path, colors
 
 
 def make_power_labels(p, powers):
@@ -66,7 +71,7 @@ def plot_theta_progression(thetas, thetas_se, powers, degrees=[1,3,5], filename=
 
 	axes[0].set_ylabel(r"$\theta$", fontsize=14)
 	fig.suptitle("OLS coefficients", fontsize=16)
-	fig.supxlabel(r"$\theta$ corresponding to $x^i y^j$", fontsize=14)
+	fig.supxlabel(r"$\theta$ corresponding to $x^a y^b$", fontsize=14)
 
 	x = [0,0,60]
 	for ax, p, x_ in zip(axes, degrees, x):
@@ -113,7 +118,7 @@ def plot_theta_heatmap(thetas, theta_se, powers, degrees=[1,2,3,4,5], filename=N
 	ax.set_yticks(np.arange(len(degrees)), labels=degrees)
 	cbar = fig.colorbar(im, pad=0.01, shrink=0.55, aspect=6)
 	cbar.set_label(r"$|\theta|$", fontsize=14)
-	ax.set_xlabel(r"$\theta$ corresponding to $x^i y^j$", fontsize=14)
+	ax.set_xlabel(r"$\theta$ corresponding to $x^a y^b$", fontsize=14)
 	ax.set_ylabel(r"Polynomial degree", fontsize=14)
 	ax.set_title("OLS coefficients", fontsize=16)
 
@@ -129,7 +134,7 @@ def plot_theta_heatmap(thetas, theta_se, powers, degrees=[1,2,3,4,5], filename=N
 	plt.show()
 
 
-def run_no_resampling(Model, degrees, n=1000, train_size=0.8, noise_std=0.1, random_state=123, lmbda=None):
+def run_no_resampling(Model, degrees, D, train_size=0.8, random_state=123, lmbda=None):
 	"""
 	Function to preform what I assume task b is asking. R2 and MSE (test and train) for polynomials (1,5)
 
@@ -140,8 +145,6 @@ def run_no_resampling(Model, degrees, n=1000, train_size=0.8, noise_std=0.1, ran
 	5. Plot mse & r2
 	6. Plot chaos theta plot
 	"""
-	D = make_FrankeFunction(n=n, uniform=True, random_state=random_state, noise_std=noise_std)
-
 	mse_train = np.zeros_like(degrees, dtype=float)
 	mse_test = np.zeros_like(degrees, dtype=float)
 	r2_train = np.zeros_like(degrees, dtype=float)
@@ -182,18 +185,43 @@ if __name__ == "__main__":
 	degrees = np.arange(1, 12+1)
 	
 	# Slicing [:3] is just a very hacky way if you only want to plot some
-	Models = [LinearRegression, Ridge, Lasso][:3]
+	Models = [LinearRegression, Ridge, Lasso]
 	lmbdas = [None, 1e-3, 1e-3][:3]
 	names = ["OLS", "Ridge", "Lasso"][:3]
 
+	random_state = 321
+	n = 600
+	noise_std=0.1
+
+	# # This runs for other data (heeh)
+	# D = make_FrankeFunction(n=n, uniform=True, random_state=random_state, noise_std=noise_std)
+
+	# for Model, lmbda, name in zip(Models, lmbdas, names):
+	# 	params1, params2 = run_no_resampling(Model, degrees, D, random_state=random_state, train_size=2/3, lmbda=lmbda)
+	# 	mse_train, mse_test, r2_train, r2_test = params1
+
+	# 	title = f"{name} no resampling"
+	# 	plot_train_test(degrees, mse_train, mse_test, filename=f"{name}_mse_noresample", title=title)
+	# 	plot_train_test(degrees, r2_train, r2_test, filename=f"{name}_R2_noresample", ylabel=r"R$^2$-score", title=title)
+
+	# 	if Model == LinearRegression:
+	# 		plot_theta_progression(*params2, filename="OLS_coefs_plots")
+	# 		plot_theta_heatmap(*params2, filename="OLS_coefs_table")
+
+
+	D = load_Terrain()
+	degrees = np.arange(1, 20+1)
+	lmbdas = [None, 1e-3, 1e-3]
+	names = ["Nica_OLS", "Nica_Ridge", "Nica_Lasso"]
+
 	for Model, lmbda, name in zip(Models, lmbdas, names):
-		params1, params2 = run_no_resampling(Model, degrees,n=600, noise_std=0.1, random_state=321, train_size=2/3, lmbda=lmbda)
+		params1, params2 = run_no_resampling(Model, degrees, D, random_state=random_state, train_size=2/3, lmbda=lmbda)
 		mse_train, mse_test, r2_train, r2_test = params1
 
-		title = f"{name} no resampling"
+		title = f"{name.replace('_', ' ')} no resampling"
 		plot_train_test(degrees, mse_train, mse_test, filename=f"{name}_mse_noresample", title=title)
 		plot_train_test(degrees, r2_train, r2_test, filename=f"{name}_R2_noresample", ylabel=r"R$^2$-score", title=title)
 
 		if Model == LinearRegression:
-			plot_theta_progression(*params2, filename="OLS_coefs_plots")
-			plot_theta_heatmap(*params2, filename="OLS_coefs_table")
+			plot_theta_progression(*params2, filename="Nica_OLS_coefs_plots")
+			plot_theta_heatmap(*params2, filename="Nica_OLS_coefs_table")
