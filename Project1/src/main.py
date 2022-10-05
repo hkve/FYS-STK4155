@@ -50,6 +50,8 @@ heatmap_parser.add_argument("-nl", "--nlmbda", type=int, default=21, help="Numbe
 heatmap_parser.add_argument("-ts", "--trainsize", type=float, default=2/3, help="Percentage of data used for training")
 heatmap_parser.add_argument("-rs", "--rndmstate", type=int, default=321, help="Seed used while fitting models")
 heatmap_parser.add_argument("-f", "--filename", type=str, default=None, help="Filename in case the plot(s) should be saved. Will chain filename_(type_of_plot)")
+heatmap_parser.add_argument("-d", "--dump", type=str, default=None, help="If the lambda, degree and MSE meshgridsd should be saved to file")
+heatmap_parser.add_argument("-l", "--load", type=str, default=None, help="If the lambda, degree and MSE meshgridsd should be loaded from file")
 
 plot_parsers_chained = [
     naive_parser,
@@ -164,17 +166,23 @@ if plot == "heatmap":
 
     for Model, lmbda, name, run in zip(Models, lmbdas, names, run_models):
         if not run: continue
+        
+        if args["load"]:
+            degrees_grid, lmbdas_grid, MSEs = hm.load(args["load"])
+        else:
+            degrees_grid, lmbdas_grid, MSEs = hm.make_mse_grid(
+                Model,
+                D, 
+                degrees,
+                lmbdas,
+                args["trainsize"],
+                args["rndmstate"]
+            )
 
-        params = hm.make_mse_grid(
-            Model,
-            D, 
-            degrees,
-            lmbdas,
-            args["trainsize"],
-            args["rndmstate"]
-        )
+        if args["dump"]:
+            hm.dump(args["dump"], degrees_grid, lmbdas_grid, MSEs)
 
         f1 = None
         if args["filename"]:
             f1 = f"{args['filename']}_heatmap_{name}"
-        hm.plot_heatmap(*params, model=name, filename=f"heatmap_{name}")
+        hm.plot_heatmap(degrees_grid, lmbdas_grid, MSEs, model=name, filename=f"heatmap_{name}")
