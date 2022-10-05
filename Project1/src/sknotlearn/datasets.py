@@ -12,14 +12,11 @@ from mpl_toolkits.mplot3d import Axes3D
 import seaborn as sns
 import pathlib as pl
 
-def make_FrankeFunction(n=1000, uniform=True, noise_std=0, random_state=42):
+def make_FrankeFunction(n=1000, linspace=False, noise_std=0, random_state=42):
 	x, y = None, None
 
 	np.random.seed(random_state)
-	if uniform:
-		x = np.random.uniform(low=0, high=1, size=n)
-		y = np.random.uniform(low=0, high=1, size=n)
-	else:
+	if linspace:
 		perfect_square = ( int(n) == int(np.sqrt(n))**2)
 		assert perfect_square, f"{n = } is not a perfect square. Thus linspaced points cannot be made"
 
@@ -29,6 +26,9 @@ def make_FrankeFunction(n=1000, uniform=True, noise_std=0, random_state=42):
 		X, Y = np.meshgrid(x, y)
 		x = X.flatten()
 		y = Y.flatten()
+	else:
+		x = np.random.uniform(low=0, high=1, size=n)
+		y = np.random.uniform(low=0, high=1, size=n)
 		
 
 	z = FrankeFunction(x, y) + np.random.normal(loc=0, scale=noise_std, size=n)
