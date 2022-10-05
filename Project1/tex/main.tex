@@ -64,7 +64,7 @@
 \newcommand{\Carl}{$\mathbb{CM}$}
 \newcommand{\Anna}{$\mathfrak{Anna}$}
 
-\title{Bias-Variance Tradeoff in Simple Linear Models} % very much working title
+\title{Bias-Variance Tradeoff in Simple Linear Models}
 \author{Anna Aasen, Carl Martin Fevang, Håkon Kvernmoen}
 \date{\today}
 
@@ -119,9 +119,7 @@
     \subsubsection{Measure for goodness of fit}
         When we want to create a statistically informed model that is able to predict the outcome of future measurements, we need to develop metrics for how well our model fits the data we already have. That is, given a model parametrised by parametrs $\vec{\theta}$, we want to optimise them such that $\hat{f}(x) \approx f(x)$. We call this the goodness of fit. To estimate how well we acheive this with our given dataset $\mathcal{D}$, we will start with the mean squared error (MSE). Given a model which predicts values $\vec{\hat{y}}$, the mean squared error is given by
         \begin{align}
-            \boxed{
-                \mse(\vec{\hat{y}}) = \frac{1}{n} \sum_{i=1}^n (y_i-\hat{y}_i)^2 = \frac{1}{n} (\vec{y} - \vec{\hat{y}})^2,
-            }
+            \mse(\vec{\hat{y}}) = \frac{1}{n} \sum_{i=1}^n (y_i-\hat{y}_i)^2 = \frac{1}{n} (\vec{y} - \vec{\hat{y}})^2,
             \label{theo:eq:mse}
         \end{align}
         and is a strictly positive metric that we want to minimise.
@@ -180,7 +178,7 @@
         An exploration of the statistical expectation and variance of the OLS results is done in Appendix~\ref{app:sec:OLS_proof}.
 
     \subsection{Ridge regression}
-        So far, we have assumed that the parameters $\vec{\theta}$ are uniformly distributed, and as such have no \textit{bias} towards any particular value. In practice, this means that the OLS model will contort to fit itself to all values in the data. As such, a motivation for adding a bias could be for the sake of stability in the fit. These methods are called \textit{regularised} methods. An example is ridge regression, where one assumes that the parameters are normally distributed, such that parameter values far from the mean are thought less likely to occur. This in practice means that the model is less willing to contort to outliers in the dataset, trading it for a bias towards certain parameter values. Assuming the probability distrbution for $\vec{\theta}$ \comment{What is $\tau$ here? Just a $\sigma \xrightarrow{} \tau$? -\Hakon, Yes exactly, using $\tau$ as in the literature to avoid confusion with noise $\sigma$. $\tau$ is also used in Lasso where it does not correspond to the std. -\Carl}
+        So far, we have assumed that the parameters $\vec{\theta}$ are uniformly distributed, and as such have no \textit{bias} towards any particular value. In practice, this means that the OLS model will contort to fit itself to all values in the data. As such, a motivation for adding a bias could be for the sake of stability in the fit. These methods are called \textit{regularised} methods. An example is ridge regression, where one assumes that the parameters are normally distributed, such that parameter values far from the mean are thought less likely to occur. This in practice means that the model is less willing to contort to outliers in the dataset, trading it for a bias towards certain parameter values. Assuming the probability distrbution for $\theta_a \distas \normal{0}{\tau^2}$,
         \begin{align}
             P(\vec{\theta}) = \prod_{a=1}^{p} \frac{1}{\sqrt{2\pi\tau^2}} \exp{-\frac{\theta_a^2}{2\tau^2}},
         \end{align}
@@ -410,7 +408,7 @@
         From this, we can conclude that scaling of the inputs is not strictly necessary when using OLS, as there is no regularisation penalty associated with the dimension of the parameters. However, the MSE is still a dimensionful quantity, and it is useful then to scale the data for OLS too for consistency and ease of comparison of the results between the models.
 
     \subsection{OLS}
-    Looking back at Figures~\ref{fig:res:OLS_mse_noresample} and~\ref{fig:res:OLS_R2_noresample} showing the MSE and $\Rsquared$ scores calculated using the train and test set, we recognize a common sign of overfitting when moving past $\msub{p}{opt} = 5$. Since the polynomial degree increases, we can make many more $x^ay^b$ combination, which in turn gives more coefficients $\theta_{ab}$ to determine. This introduces many new degrees of freedom to the fit, which allows our model to accurately recreate the exact points present in the training set, but at the cost of fitting the added noise $\epsilon$ and/or assuming a too complex structure to the underlying function $f(x)$. This can be seen by the large MSE values calculated on the test data, telling us that our model preforms poorly on data which it has not yet been exposed to.
+        Looking back at Figures~\ref{fig:res:OLS_mse_noresample} and~\ref{fig:res:OLS_R2_noresample} showing the MSE and $\Rsquared$ scores calculated using the train and test set, we recognise a common sign of overfitting when moving past $\msub{p}{opt} = 5$. Since the polynomial degree increases, we can make many more $x^ay^b$ combination, which in turn gives more coefficients $\theta_{ab}$ to determine. This introduces many new degrees of freedom to the fit, which allows our model to accurately recreate the exact points present in the training set, but at the cost of fitting the added noise $\epsilon$ and/or assuming a too complex structure to the underlying function $f(x)$. This can be seen by the large MSE values calculated on the test data, telling us that our model preforms poorly on data which it has not yet been exposed to.
 
     \subsection{Resampling}
         \comment{Here I am just writing a bit on our discussion about the limit of resampling. Structure of the discussion section is very much not set in any stone.}
@@ -441,7 +439,7 @@
     \section{Theoretical proof of concept of the OLS model} \label{app:sec:OLS_proof}
         Supposing that we have have data generated from from $y_i = f(x_i)+\epsilon$ as before, we look statistical quantities derived from the distribution of our parameters $\vec{\theta}$ inhereted from $\epsilon\distas \normal{0}{\sigma^2}$. Under the assumption that $f(x) \in \operatorname{span}\cclosed{x}_a$ of our design matrix $X$, we can write the data $\vec{y} = X\vec{\theta} + \vec{\epsilon}$ for some $\vec{\theta}$ which would be a `true' optimum for our parameters.
 
-        The expectatio value of a datapoint $y_i$ is\footnote{In this appendix, we understand repeated indices to be summed over.}
+        The expectation value of a datapoint $y_i$ is\footnote{In this appendix, we understand repeated indices to be summed over.}
         \begin{align}
             \expval(y_i) = \expval\bclosed{X_{ia} \theta_a + \epsilon_i} = X_{ia}\theta_a + \expval(\epsilon_i) = X_{ia}\theta_a,
         \end{align}
