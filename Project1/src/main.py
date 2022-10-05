@@ -8,6 +8,7 @@ import sknotlearn.linear_model as lm
 
 import analysis.noresampling as nores
 import analysis.cross_validation as cv
+import analysis.ridgelasso as hm
 
 parser = argparse.ArgumentParser()
 plots_parser = parser.add_subparsers(help="Plot", dest="plot")
@@ -17,7 +18,7 @@ naive_parser.add_argument("-OLS", "--OLS", type=bool, default=False, action=argp
 naive_parser.add_argument("-R", "--Ridge", type=bool, default=False, action=argparse.BooleanOptionalAction, help="Use Ridge")
 naive_parser.add_argument("-L", "--Lasso", type=bool, default=False, action=argparse.BooleanOptionalAction, help="Use Lasso")
 naive_parser.add_argument("-ds", "--startdeg", type=int, default=1, help="Start degree for plotting MSE and R2")
-naive_parser.add_argument("-de", "--enddeg", type=int, default=20, help="End degree for plotting MSE and R2")
+naive_parser.add_argument("-de", "--enddeg", type=int, default=12, help="End degree for plotting MSE and R2")
 naive_parser.add_argument("-ts", "--trainsize", type=float, default=2/3, help="Percentage of data used for training")
 naive_parser.add_argument("-rs", "--rndmstate", type=int, default=321, help="Seed used while fitting models")
 naive_parser.add_argument("-lR", "--lmbdaRidge", type=float, default=0.1, help="Set lambda value used for Ridge")
@@ -29,18 +30,31 @@ cv_parser.add_argument("-k", "--kfolds", nargs="+", type=int, default=7, help="H
 cv_parser.add_argument("-OLS", "--OLS", type=bool, default=False, action=argparse.BooleanOptionalAction, help="Use OLS")
 cv_parser.add_argument("-R", "--Ridge", type=bool, default=False, action=argparse.BooleanOptionalAction, help="Use Ridge")
 cv_parser.add_argument("-L", "--Lasso", type=bool, default=False, action=argparse.BooleanOptionalAction, help="Use Lasso")
-cv_parser.add_argument("-ds", "--startdeg", type=int, default=1, help="Start degree for plotting MSE and R2")
-cv_parser.add_argument("-de", "--enddeg", type=int, default=20, help="End degree for plotting MSE and R2")
+cv_parser.add_argument("-ds", "--startdeg", type=int, default=1, help="Start degree for plotting MSE")
+cv_parser.add_argument("-de", "--enddeg", type=int, default=20, help="End degree for plotting MSE")
 cv_parser.add_argument("-ts", "--trainsize", type=float, default=2/3, help="Percentage of data used for training")
 cv_parser.add_argument("-rs", "--rndmstate", type=int, default=321, help="Seed used while fitting models")
 cv_parser.add_argument("-lR", "--lmbdaRidge", type=float, default=0.1, help="Set lambda value used for Ridge")
 cv_parser.add_argument("-lL", "--lmbdaLasso", type=float, default=0.1, help="Set lambda value used for Lasso")
-
 cv_parser.add_argument("-f", "--filename", type=str, default=None, help="Filename in case the plot(s) should be saved. Will chain filename_(type_of_plot)")
+
+heatmap_parser = plots_parser.add_parser("heatmap")
+heatmap_parser.add_argument("-k", "--kfolds", nargs="+", type=int, default=7, help="How many folds to run. To compare, type multiple sep by spaces")
+heatmap_parser.add_argument("-R", "--Ridge", type=bool, default=False, action=argparse.BooleanOptionalAction, help="Use Ridge")
+heatmap_parser.add_argument("-L", "--Lasso", type=bool, default=False, action=argparse.BooleanOptionalAction, help="Use Lasso")
+heatmap_parser.add_argument("-ds", "--startdeg", type=int, default=1, help="Start degree for plotting MSE")
+heatmap_parser.add_argument("-de", "--enddeg", type=int, default=15, help="End degree for plotting MSE")
+heatmap_parser.add_argument("-ls", "--startlmbda", type=int, default=-9, help="Start log10(lambda) for plotting MSE")
+heatmap_parser.add_argument("-le", "--endlmbda", type=int, default=1, help="End log10(lambda) for plotting MSE")
+heatmap_parser.add_argument("-nl", "--nlmbda", type=int, default=21, help="Number of lambda values")
+heatmap_parser.add_argument("-ts", "--trainsize", type=float, default=2/3, help="Percentage of data used for training")
+heatmap_parser.add_argument("-rs", "--rndmstate", type=int, default=321, help="Seed used while fitting models")
+heatmap_parser.add_argument("-f", "--filename", type=str, default=None, help="Filename in case the plot(s) should be saved. Will chain filename_(type_of_plot)")
 
 plot_parsers_chained = [
     naive_parser,
-    cv_parser
+    cv_parser,
+    heatmap_parser
 ]
 
 for plot_parser in plot_parsers_chained:
@@ -78,6 +92,7 @@ elif args["data"] == "Terrain":
 
     )
 
+if "OLS" not in args.keys(): args["OLS"] = False
 run_models = [
     args["OLS"],
     args["Ridge"],
@@ -89,7 +104,6 @@ if all(model is False for model in run_models):
     run_models = [True, True, True]
 
 Models = [lm.LinearRegression, lm.Ridge, lm.Lasso]
-lmbdas = [None, args["lmbdaRidge"], args["lmbdaLasso"]]
 names = ["OLS", "Ridge", "Lasso"]
 
 
@@ -100,9 +114,11 @@ for k, v in args.items():
 
 # Preform noresampling functionality
 if plot == "naive":
+    lmbdas = [None, args["lmbdaRidge"], args["lmbdaLasso"]]
     degrees = np.arange(args["startdeg"], args["enddeg"]+1)
     
-    for Model, lmbda, name in zip(Models, lmbdas, names):
+    for Model, lmbda, name, run in zip(Models, lmbdas, names, run_models):
+        if not run: continue
         params1, params2 = nores.run_no_resampling(Model, degrees, D, random_state=args["rndmstate"], train_size=args["trainsize"], lmbda=lmbda, noise_std=args["stderror"])
         mse_train, mse_test, r2_train, r2_test = params1
 
@@ -123,13 +139,15 @@ if plot == "naive":
 
 
 if plot == "cv":
+    lmbdas = [None, args["lmbdaRidge"], args["lmbdaLasso"]]
     degrees = np.arange(args["startdeg"], args["enddeg"]+1)
     ks = np.unique(np.array(args["kfolds"]))
     ks.sort()
 
     mse_across_folds = {}
 
-    for Model, lmbda, name in zip(Models, lmbdas, names):
+    for Model, lmbda, name, run in zip(Models, lmbdas, names, run_models):
+        if not run: continue
         for k in ks:
             train_mse, test_mse = cv.run_Kfold_cross_validate(Model, degrees, k=k, random_state=args["rndmstate"], lmbda=lmbda)
             mse_across_folds[k] = [train_mse, test_mse]
@@ -137,3 +155,26 @@ if plot == "cv":
         f1 = None
         if args["filename"]: f1 = f"{args['filename']}_{name}_mse_kfold"
         cv.plot_train_mse_kfold(degrees, mse_across_folds, name, filename=f1)
+
+
+if plot == "heatmap":
+    args["OLS"] = False
+    lmbdas = np.logspace(args["startlmbda"], args["endlmbda"], args["nlmbda"])
+    degrees = np.arange(args["startdeg"], args["enddeg"])
+
+    for Model, lmbda, name, run in zip(Models, lmbdas, names, run_models):
+        if not run: continue
+
+        params = hm.make_mse_grid(
+            Model,
+            D, 
+            degrees,
+            lmbdas,
+            args["trainsize"],
+            args["rndmstate"]
+        )
+
+        f1 = None
+        if args["filename"]:
+            f1 = f"{args['filename']}_heatmap_{name}"
+        hm.plot_heatmap(*params, model=name, filename=f"heatmap_{name}")
