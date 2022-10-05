@@ -1,0 +1,1 @@
+rm *.blg *.aux *.bbl *.fdb_latexmk *.log *.fls *.log *.out *.run.xml *.gz main-blx.bib
