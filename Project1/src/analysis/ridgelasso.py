@@ -4,12 +4,16 @@ import seaborn as sns
 from matplotlib.colors import LogNorm
 
 # Custom stuff
-import context
+if __name__ == "__main__":
+    import context
+    from utils import make_figs_path, colors
+else:
+    from analysis.utils import make_figs_path, colors
+    
 from sknotlearn.linear_model import Ridge, Lasso
 from sknotlearn.datasets import make_FrankeFunction
 from sknotlearn.resampling import KFold_cross_validate
 from sknotlearn.data import Data
-from utils import make_figs_path, colors
 
 def dump(filename, degrees_grid, lmbdas_grid, MSEs):
     with open(f"{filename}.npz", "wb") as fp: 
@@ -62,13 +66,7 @@ def plot_heatmap(degrees_grid, lmbdas_grid, MSEs, model=None, filename=None):
     plt.show()
 
 
-def make_mse_grid(Method, degrees, lmbdas):
-    train_size = 2/3
-    random_state = 321
-    noise_std = 0.1
-    n = 600
-    D = make_FrankeFunction(n=n, uniform=True, random_state=random_state, noise_std=noise_std)
-
+def make_mse_grid(Method, D, degrees, lmbdas, train_size=2/3, random_state=321):
     h, w = len(degrees), len(lmbdas)
     MSEs = np.zeros((h,w))
 
@@ -97,14 +95,21 @@ if __name__ == "__main__":
     lmbdas = np.logspace(-9, 1, n_lmbdas)
     degrees = np.arange(1, n_degrees+1)
 
+    train_size = 2/3
+    random_state = 321
+    noise_std = 0.1
+    n = 600
+
+    D = make_FrankeFunction(n=n, linspace=False, random_state=random_state, noise_std=noise_std)
+
     # Ridge
-    # params = make_mse_grid(Ridge, degrees, lmbdas)
+    params = make_mse_grid(Ridge, D, degrees, lmbdas, train_size, random_state)
     # dump("ridge_grid", *params)
-    params = load("ridge_grid")
+    # params = load("ridge_grid")
     plot_heatmap(*params, model="Ridge", filename="heatmap_ridge")
 
     # Lasso
-    # params = make_mse_grid(Lasso, degrees, lmbdas)
+    # params = make_mse_grid(Lasso, D, degrees, lmbdas, train_size, random_state)
     # dump("lasso_grid", *params)
-    params = load("lasso_grid")
-    plot_heatmap(*params, model="Lasso", filename="heatmap_lasso")
+    # params = load("lasso_grid")
+    # plot_heatmap(*params, model="Lasso", filename="heatmap_lasso")

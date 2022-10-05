@@ -285,8 +285,8 @@ class Ridge(Model):
 
 class Lasso(Model):
 	"""
-	Implementation of Ridge Regression. Can preform coefficient estimation using both direct matrix inversion of X.T @ X 
-	and trough SVD decomposition.  
+	Implementation of Lasso Regression. Can preform coefficient estimation using cost function minimization  
+	This class uses cvxopt for minimization.
 	"""
 	def __init__(self, lmbda, method="cMIN"):
 		"""
