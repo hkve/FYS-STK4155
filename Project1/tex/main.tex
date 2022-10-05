@@ -102,7 +102,7 @@
     \subsection{Error assessment and model optimisation}
 
     \comment{Here I am lost as to the order and division of things. - Carl Martin, ca. 2000 AD. I think the devision and ordering makes sense. Mabye shuffle CLT around? - \Hakon}
-    \subsubsection{Central Limit Theorem}
+    \subsubsection*{Central Limit Theorem}
         The central limit theorem tells us that when sampling a series of quantities $\cclosed{z_i|i=1,\ldots,n}$ with independent and identical distributions with a mean $\mu$ and variance $\sigma^2<\infty$, the distribution of the sample mean $\bar{z}_n = \frac{1}{n}\sum_{i=1}^n z_i$ will approach a normal distrbution. Explicitly, we have
         \begin{align}\label{theo:eq:CLM}
             \lim_{n\to\infty} \sqrt{n}(\bar{z}_n-\mu) \distas \normal{0}{\sigma^2}.
@@ -116,7 +116,7 @@
 
 
 
-    \subsubsection{Measure for goodness of fit}
+    \subsubsection*{Measure for goodness of fit}
         When we want to create a statistically informed model that is able to predict the outcome of future measurements, we need to develop metrics for how well our model fits the data we already have. That is, given a model parametrised by parametrs $\vec{\theta}$, we want to optimise them such that $\hat{f}(x) \approx f(x)$. We call this the goodness of fit. To estimate how well we acheive this with our given dataset $\mathcal{D}$, we will start with the mean squared error (MSE). Given a model which predicts values $\vec{\hat{y}}$, the mean squared error is given by
         \begin{align}
             \mse(\vec{\hat{y}}) = \frac{1}{n} \sum_{i=1}^n (y_i-\hat{y}_i)^2 = \frac{1}{n} (\vec{y} - \vec{\hat{y}})^2,
@@ -222,7 +222,7 @@
     Something general about initially fitting Franke data using OLS, ridge and Lasso. Then moving on to real terrain data something something.
     
     \subsection{Datasets}
-        \subsubsection{Franke function}
+        \subsubsection*{Franke function}
 
             For the initial testing of our implemented fitting routines, we will use the so called \textit{Franke function}. Being able to control the number of sample points and noise levels will serve as a good examination of our models advantages and disadvantaged. Defined for $x, y \in [0,1]$
 
@@ -241,7 +241,7 @@
 
             And $\epsilon$ is some stochastic noise $\epsilon \distas \normal{0}{\sigma^2}$. By visual inspection, we can fine tune $\sigma$ to create data that looks like noisy digital terrain data. Unless specified otherwise all fits to the Franke function will use $n = 600$ uniformly distributed points $x,y \distas \mathcal{U}(0,1)$ with a noise level of $\sigma = 0.1$. We discuss this in in Appendix~\ref{app:sec:frankefunction N and sigma}.   
 
-        \subsubsection{Terrain data}
+        \subsubsection*{Terrain data}
             \comment{Here we put the terrain we extracted with coordinates etc.}\\
             Coordinates SW corner: $13^\circ\,26'\,40''\,\text{N}, 87^\circ\,31'\,40''\,\text{W}$, SE corner: $13^\circ\,26'\,40''\,\text{N}, 87^\circ\,26'\,40''\,\text{W}$ NW corner: $13^\circ\,31'\,40''\,\text{N}, 87^\circ\,31'\,40''\,\text{W}$, NE corner: $13^\circ\,31'\,40''\,\text{N}, 87^\circ\,26'\,40''\,\text{W}$
 
@@ -286,15 +286,15 @@
             \newline\newline
             In this report, we will use the famous \textit{$k$-fold Cross-validation} technique. Considering the dataset $\mathcal{D} = (\vec{y}, X)$, consisting of $n$ data points: Initially we partition $\mathcal{D}$ into $k$ folds $\mathcal{D}_i$, $i = 1, \ldots , k$, of equal size. For each fold $\mathcal{D}_i$, a model is fitted using every fold \textit{except} $\mathcal{D}_i$, which we denote $\mathcal{D}_{-i}$. With this model, we calculate the different statitistical measures of the model on $\mathcal{D}_i$, which was not used to fit the model. When this is done for all $k$ folds, we take the mean of the measures to get the final goodness of fit. 
             \newline\newline
-            To reduce the computational cost introduced when increasing the number of folds $k$, we aim to first study the calculated test MSE for $k \in [5,10]$. By studying the stability of the test MSE across different $k$ values, we can qualitatively identify where the trend stabalizes and used this $k$ for futher studies.   
+            To reduce the computational cost introduced when increasing the number of folds $k$, we aim to first study the calculated test MSE for $k \in [5,10]$. By studying the stability of the test MSE across different $k$ values, we can qualitatively identify where the trend stabalizes and used this $k$ for further application.   
 
     \subsection{Expanding to regularised methods}
         \comment{Not married to this section name or separate existence. -\Carl}\\
-        With the regularised regression methods, ridge and Lasso, we introduce a hyperparameter $\lambda$ that affects our fit. To explore this, we will study the MSE of the fits using cross validation resampling as the polynomial degree and $\lambda$-value is changed. We will use the same polynomial degrees as when exploring OLS, and look at a wide range of $\lambda \in [10^{-9}, 10^1]$ with logarithmically spaced values. This effectively results in a gridsearch over ($p$,$\lambda$), where the lowest MSE value will give us the optimal set of paramters $(p_{opt}, \lambda_{opt})$. To 
+        With the regularised regression methods, ridge and Lasso, we introduce a hyperparameter $\lambda$ that affects our fit. To explore this, we will study the MSE of the fits using cross validation resampling as the polynomial degree and $\lambda$-value is changed. We will use the same polynomial degrees as when exploring OLS, and look at a wide range of $\lambda \in [10^{-9}, 10^1]$ with logarithmically spaced values. This effectively results in a gridsearch over ($p$,$\lambda$), where the lowest MSE value will give us the optimal set of paramters $(\msub{p}{opt}, \msub{\lambda}{opt})$. To 
 
         When we have gotten a feeling for the $\lambda$-values in relation to the polynomial degree, we will study the bias-variance tradeoff of all our models using Bootstrap resampling as we increase the complexity of our parametrisation of $X$. This includes a decomposition and comparison with our previous OLS method. We will further look at the difference between `good' $\lambda$-values from our previous examination, and a `poorer' choice of $\lambda$ to see more precisely how it affects the goodness of fit.
 
-        Finally, we will study the bias-variance tradeoff as a function of the $\lambda$, with the polynomial degree fixed at a good number (\comment{What is a good number?}). This might give insight into the effective degrees of freedom of the regularised methods (\comment{perhaps?}).
+        Finally, we will study the bias-variance tradeoff as a function of $\lambda$, with the polynomial degree fixed at a good number (\comment{What is a good number?}). This might give insight into the effective degrees of freedom of the regularised methods (\comment{perhaps?}).
 
     \subsection{Application on Real Data}
         \comment{Here we talk about the repeat of the analysis on real data, and model selection.}\\
@@ -307,7 +307,7 @@
 
 \section{Results}
     \subsection{Ordinary Least Squares}
-            \subsubsection{Without Resampling}
+            \subsubsection*{Without Resampling}
                 We begin by calulating the MSE and $\Rsquared$ score (Eqs.~\ref{theo:eq:mse},~\ref{theo:eq:r2}) fitted to the Franke function for different polynomial degrees. This can be seen in Figures~\ref{fig:res:OLS_mse_noresample} and~\ref{fig:res:OLS_R2_noresample} respectively. Based on the MSE calculated for the test data, the optimal degree was found to be $\msub{p}{opt} = 5$ with $\mse \approx 0.134$. We observe that the train MSE decreases steadily with higher $p$, while the test MSE decreases until we reach $\msub{p}{opt}$, after which it increases. The opposite relationship is seen for the $\Rsquared$ score.   
                 \begin{figure}[H]
                     \centering
@@ -340,7 +340,7 @@
                 \end{subfigure}
             \end{figure*} 
 
-        \subsubsection{Exploring Resampling}
+        \subsubsection*{Exploring Resampling}
             \comment{Reminder: Insert bootstrap results.}
             The metrics thus far have been calculated without the use of any resampling techniques. To see how this influences MSE, we apply $k$-fold Cross-validation and plot the averaged train- and test MSE across the different folds. This is presented in Figure~\ref{fig:res:OLS_mse_kfold}. The optimal polynomial degrees and MSE values based on the training data is presented in Table~\ref{res:tab:OLS_kfold_optimal}
 
@@ -371,7 +371,7 @@
             \comment{Reminder: Compare bootstrap and CV.}
 
 
-        \subsubsection{Applying Resampling}
+        \subsubsection*{Applying Resampling}
             \begin{figure}[H]
                 \centering
                 \includegraphics[width=\linewidth]{BS_Bias_var_decomp_OLS.pdf}
@@ -423,7 +423,7 @@
         The value of resampling rather comes from creating a way to emphasise different parts of the original dataset when fitting our model, and consequently comparing what this does to the predictions of the model. For instance, an overfitted model might contort to accomodate a statistical outlier in the original dataset, and thereby make a poor prediction on new data. However, when resampling, many of the new datasets sampled to make new fits from our model will not include this statistical outlier, and should make predictions not influenced too heavily by this. There should then be a medium where the particular `oddities' in the original dataset can be smoothed over, and the bias of the original dataset is not brought out to the front.
 
         \subsubsection*{Cross validation and bootstrap}
-        The choice of $k=7$ used for our parameter gridsearch is influenced by the computational aspect of the approach. Since a model has to be fitted $k$ times for each set of parameter $(p,\lambda)$, it is clear that this increases the time taken to search the paramter space. However, for both OLS and Ridge, the closed form expressions (eq. \eqref{theo:eq:OLS_coefs} and \eqref{theo:eq:Ridge_coefs} respectively) only require matrix multiplication and inversion. Adding more folds chould potentially be feasible here. However, since Lasso requires a cost function minimization, it is significantly slower than OLS and Ridge, espcially for high $p$. Therefor we get a trade off between the number of $(p,\lambda)$ to try and the number of folds $k$, where $k=7$ was found to allow for high parameter reselution while still being completed in a feasible amount of time.      
+            The choice of $k=7$ used for our parameter gridsearch is influenced by the computational aspect of the approach. Since a model has to be fitted $k$ times for each set of parameter $(p,\lambda)$, it is clear that this increases the time taken to search the parameter space. However, for both OLS and Ridge, the closed form expressions (Eqs.~\eqref{theo:eq:OLS_coefs} and~\eqref{theo:eq:Ridge_coefs} respectively) only require matrix multiplication and inversion. Adding more folds chould (\comment{nice one}) potentially be feasible here. However, since Lasso requires a cost function minimization, it is significantly slower than OLS and Ridge, espcially for high $p$. Therefore we get a trade-off between the number of $(p,\lambda)$ to try and the number of folds $k$, where $k=7$ was found to allow for high parameter resolution while still being completed in a feasible amount of time.      
 
 \section{Concluding remarks}
 
