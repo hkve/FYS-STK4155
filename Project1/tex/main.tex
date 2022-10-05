@@ -175,6 +175,7 @@
         \begin{align}
             \boxed{
                 \msub{\vec{\hat{\theta}}}{OLS} = \pclosed{X^TX}^{-1} X^T \vec{y}.
+                \label{theo:eq:OLS_coefs}
             }
         \end{align}
         An exploration of the statistical expectation and variance of the OLS results is done in Appendix~\ref{app:sec:OLS_proof}.
@@ -197,6 +198,7 @@
         \begin{align}
             \boxed{
             \msub{\vec{\hat{\theta}}}{ridge} = \pclosed{X^TX + \lambda \eye}^{-1} X^T \vec{y}.
+            \label{theo:eq:Ridge_coefs}
             }
         \end{align}
         This has the added bonus of ensuring that $X^TX + \lambda \eye$ is always invertible, as $\det(\lambda \eye) \neq 0$ for $\lambda>0$.
@@ -212,6 +214,7 @@
             \boxed{
                 \msub{C}{lasso}(\vec{\vec{\theta}}) = \norm[2]{ \vec{y} - X\vec{\theta} }^2 + \lambda \norm[1]{\vec{\theta}},
             }
+            \label{theo:eq:Lasso_costfunction}
         \end{align}
         where $\lambda = \frac{2\sigma^2}{\tau}$ and $\norm[p]{\vec{v}} = \pclosed{\sum_k |v_k|^p}^{\sfrac{1}{p}}$ denotes the $L_p$ norm of the vector $\vec{v} \in \mathbb{R}^k$.
 
@@ -285,11 +288,11 @@
             \newline\newline
             In this report, we will use the famous \textit{$k$-fold Cross-validation} technique. Considering the dataset $\mathcal{D} = (\vec{y}, X)$, consisting of $n$ data points: Initially we partition $\mathcal{D}$ into $k$ folds $\mathcal{D}_i$, $i = 1, \ldots , k$, of equal size. For each fold $\mathcal{D}_i$, a model is fitted using every fold \textit{except} $\mathcal{D}_i$, which we denote $\mathcal{D}_{-i}$. With this model, we calculate the different statitistical measures of the model on $\mathcal{D}_i$, which was not used to fit the model. When this is done for all $k$ folds, we take the mean of the measures to get the final goodness of fit. 
             \newline\newline
-            To reduce the computational cost introduced when increasing the number of folds $k$, we aim to first study the calculated test MSE for $k \in [5,10]$. By studying the stability of the test MSE across different $k$ values, we can identify where the trend stabalizes and used this $k$ for futher studies.   
+            To reduce the computational cost introduced when increasing the number of folds $k$, we aim to first study the calculated test MSE for $k \in [5,10]$. By studying the stability of the test MSE across different $k$ values, we can qualitatively identify where the trend stabalizes and used this $k$ for futher studies.   
 
     \subsection{Expanding to regularised methods}
         \comment{Not married to this section name or separate existence. -\Carl}\\
-        With the regularised regression methods, ridge and Lasso, we introduce a hyperparameter $\lambda$ that affects our fit. To explore this, we will study the MSE of the fits using cross validation resampling as the polynomial degree and $\lambda$-value is changed. We will use the same polynomial degrees as when exploring OLS, and look at a wide logarithmically spaced range of $\lambda \in [10^{-9}, 10^1]$. This effectively results in a gridsearch over ($p$,$\lambda$), where the lowest MSE value will give us the optimal set of paramters $(p_{opt}, \lambda_{opt})$.
+        With the regularised regression methods, ridge and Lasso, we introduce a hyperparameter $\lambda$ that affects our fit. To explore this, we will study the MSE of the fits using cross validation resampling as the polynomial degree and $\lambda$-value is changed. We will use the same polynomial degrees as when exploring OLS, and look at a wide range of $\lambda \in [10^{-9}, 10^1]$ with logarithmically spaced values. This effectively results in a gridsearch over ($p$,$\lambda$), where the lowest MSE value will give us the optimal set of paramters $(p_{opt}, \lambda_{opt})$. To 
 
         When we have gotten a feeling for the $\lambda$-values in relation to the polynomial degree, we will study the bias-variance tradeoff of all our models using Bootstrap resampling as we increase the complexity of our parametrisation of $X$. This includes a decomposition and comparison with our previous OLS method. We will further look at the difference between `good' $\lambda$-values from our previous examination, and a `poorer' choice of $\lambda$ to see more precisely how it affects the goodness of fit.
 
@@ -421,6 +424,8 @@
 
         The value of resampling rather comes from creating a way to emphasise different parts of the original dataset when fitting our model, and consequently comparing what what this does to the predictions of the model. For instance, an overfitted model might contort to accomodate a statistical outlier in the original dataset, and thereby make a poor prediction on new data. However, when resampling, many of the new datasets sampled to make new fits from our model will not include this statistical outlier, and should make predictions not influenced too heavily by this. There should then be a medium where the particular `oddities' in the original dataset can be smoothed over, and the bias of the original dataset is not brought out to the front.
 
+        \subsubsection*{Cross validation and bootstrap}
+        The choice of $k=7$ used for our parameter gridsearch is influenced by the computational aspect of the approach. Since a model has to be fitted $k$ times for each set of parameter $(p,\lambda)$, it is clear that this increases the time taken to search the paramter space. However, for both OLS and Ridge, the closed form expressions (eq. \eqref{theo:eq:OLS_coefs} and \eqref{theo:eq:Ridge_coefs} respectively) only require matrix multiplication and inversion. Adding more folds chould potentially be feasible here. However, since Lasso requires a cost function minimization, it is significantly slower than OLS and Ridge, espcially for high $p$. Therefor we get a trade off between the number of $(p,\lambda)$ to try and the number of folds $k$, where $k=7$ was found to allow for high parameter reselution while still being completed in a feasible amount of time.      
 
 \section{Concluding remarks}
 
