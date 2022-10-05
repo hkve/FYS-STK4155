@@ -22,7 +22,7 @@ from ridgelasso import load
 """ 
 The idea behind this document is to create functions for two things: exploring the effect of bootstrapping (various number of rounds), and implementing bootstrapping when analysing MSE (and bias and variance) as a funtion of model complexity. 
 """
-fontsize_leg = 12
+fontsize_leg = 14
 fontsize_lab = 14
 fontsize_tit = 16
 

@@ -134,7 +134,7 @@ def plot_theta_heatmap(thetas, theta_se, powers, degrees=[1,2,3,4,5], filename=N
 	plt.show()
 
 
-def run_no_resampling(Model, degrees, D, train_size=0.8, random_state=123, lmbda=None):
+def run_no_resampling(Model, degrees, D, train_size=0.8, random_state=123, lmbda=None, noise_std=0.1):
 	"""
 	Function to preform what I assume task b is asking. R2 and MSE (test and train) for polynomials (1,5)
 
@@ -174,7 +174,7 @@ def run_no_resampling(Model, degrees, D, train_size=0.8, random_state=123, lmbda
 
 		thetas[degree] = reg.coef_
 		var_theta =	 np.diag(reg.coef_var(Dp_train.X, noise_std))
-		thetas_se[degree] = 2*np.sqrt(var_theta)
+		thetas_se[degree] = 2*np.sqrt(abs(var_theta))
 
 	# Show mse and r2 score 
 	print(f"Found best degree p = {degrees[np.argmin(mse_test)]} with MSE = {np.min(mse_test)} for {Model.__name__}")
@@ -197,7 +197,7 @@ if __name__ == "__main__":
 	# D = make_FrankeFunction(n=n, uniform=True, random_state=random_state, noise_std=noise_std)
 
 	# for Model, lmbda, name in zip(Models, lmbdas, names):
-	# 	params1, params2 = run_no_resampling(Model, degrees, D, random_state=random_state, train_size=2/3, lmbda=lmbda)
+	# 	params1, params2 = run_no_resampling(Model, degrees, D, random_state=random_state, train_size=2/3, lmbda=lmbda, noise_std=noise_std)
 	# 	mse_train, mse_test, r2_train, r2_test = params1
 
 	# 	title = f"{name} no resampling"
@@ -215,7 +215,7 @@ if __name__ == "__main__":
 	names = ["Nica_OLS", "Nica_Ridge", "Nica_Lasso"]
 
 	for Model, lmbda, name in zip(Models, lmbdas, names):
-		params1, params2 = run_no_resampling(Model, degrees, D, random_state=random_state, train_size=2/3, lmbda=lmbda)
+		params1, params2 = run_no_resampling(Model, degrees, D, random_state=random_state, train_size=2/3, lmbda=lmbda, noise_std=noise_std)
 		mse_train, mse_test, r2_train, r2_test = params1
 
 		title = f"{name.replace('_', ' ')} no resampling"

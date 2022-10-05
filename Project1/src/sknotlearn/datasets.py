@@ -1,3 +1,4 @@
+import enum
 import os
 import sys
 from imageio import imread
@@ -12,14 +13,11 @@ from mpl_toolkits.mplot3d import Axes3D
 import seaborn as sns
 import pathlib as pl
 
-def make_FrankeFunction(n=1000, uniform=True, noise_std=0, random_state=42):
+def make_FrankeFunction(n=1000, linspace=False, noise_std=0, random_state=42):
 	x, y = None, None
 
 	np.random.seed(random_state)
-	if uniform:
-		x = np.random.uniform(low=0, high=1, size=n)
-		y = np.random.uniform(low=0, high=1, size=n)
-	else:
+	if linspace:
 		perfect_square = ( int(n) == int(np.sqrt(n))**2)
 		assert perfect_square, f"{n = } is not a perfect square. Thus linspaced points cannot be made"
 
@@ -29,6 +27,9 @@ def make_FrankeFunction(n=1000, uniform=True, noise_std=0, random_state=42):
 		X, Y = np.meshgrid(x, y)
 		x = X.flatten()
 		y = Y.flatten()
+	else:
+		x = np.random.uniform(low=0, high=1, size=n)
+		y = np.random.uniform(low=0, high=1, size=n)
 		
 
 	z = FrankeFunction(x, y) + np.random.normal(loc=0, scale=noise_std, size=n)
@@ -89,23 +90,30 @@ def FrankeFunction(x,y):
 	return term1 + term2 + term3 + term4
 
 
-def load_Terrain(filename="SRTM_data_Nica.tif"):
+def load_Terrain(filename="SRTM_data_Nica.tif", n=900, random_state=321):
 	path = pl.Path(__file__).parent / filename
-	l = np.arange(30)
-	X, Y = np.meshgrid(l,l)	
-	x = X.flatten()
-	y = Y.flatten()
+	start, stop = 1600, 1900
 
 	# z = imread(path)[1740:1800:2, 1600:1660:2] 
-	z = imread(path)[1600:1900:10, 1600:1900:10]
-	z = z.flatten()
+	z = imread(path)[start:stop, start:stop]
 	
-	return Data(z, np.c_[x,y])
+	np.random.seed(random_state)
+	X = np.random.uniform(low=0, high=(stop-start), size=(n, 2)).astype(int)
+	y = np.zeros(shape=n, dtype=float)
+
+	# If you find this, EASTER EGG: Why does this not work instead of the following loop?	
+	# for i, (x,y) in enumerate(X):
+	# 	y[i] = z[x,y]
+
+	for i in range(n):
+		y[i] = z[X[i,0], X[i,1]]
+
+	return Data(y, X.astype(float))
 
 
 if __name__ == "__main__":
-	D = make_FrankeFunction(n=625, uniform=False, noise_std=0.1)
+	# D = make_FrankeFunction(n=625, uniform=False, noise_std=0.1)
 	# plot_FrankeFunction(D)
 
-	D = load_Terrain("SRTM_data_mot.tif")
-	plot_FrankeFunction(D, angle=(22,-55), Franke=False)
+	D = load_Terrain(n = 1500)
+	plot_Terrain(D, angle=(22,-55))

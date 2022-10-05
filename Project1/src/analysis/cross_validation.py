@@ -2,12 +2,16 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-import context
+if __name__ == "__main__":
+    import context
+    from utils import make_figs_path, colors
+else:
+    from analysis.utils import make_figs_path, colors
+
 from sknotlearn.linear_model import LinearRegression, Ridge, Lasso
 from sknotlearn.resampling import KFold_cross_validate
 from sknotlearn.datasets import make_FrankeFunction
 from sknotlearn.data import Data
-from utils import make_figs_path, colors
 
 def plot_train_mse_kfold(degrees, mse_across_folds, title="OLS", filename=None):
     sns.set_style("darkgrid")
@@ -29,7 +33,7 @@ def plot_train_mse_kfold(degrees, mse_across_folds, title="OLS", filename=None):
     if filename is not None: plt.savefig(make_figs_path(filename), dpi=300)
     plt.show()
 
-def run_Kfold_cross_validate(Model, degrees, n=600, k=5, random_state=321, lmbda=None):    
+def run_Kfold_cross_validate(Model, degrees, k=5, random_state=321, lmbda=None):    
     train_mse = np.zeros_like(degrees, dtype=float)
     test_mse = np.zeros_like(degrees, dtype=float)
 
