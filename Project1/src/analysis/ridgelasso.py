@@ -103,13 +103,13 @@ if __name__ == "__main__":
     D = make_FrankeFunction(n=n, linspace=False, random_state=random_state, noise_std=noise_std)
 
     # Ridge
-    params = make_mse_grid(Ridge, D, degrees, lmbdas, train_size, random_state)
+    # params = make_mse_grid(Ridge, D, degrees, lmbdas, train_size, random_state)
     # dump("ridge_grid", *params)
-    # params = load("ridge_grid")
+    params = load("ridge_grid")
     plot_heatmap(*params, model="Ridge", filename="heatmap_ridge")
 
     # Lasso
     # params = make_mse_grid(Lasso, D, degrees, lmbdas, train_size, random_state)
     # dump("lasso_grid", *params)
-    # params = load("lasso_grid")
-    # plot_heatmap(*params, model="Lasso", filename="heatmap_lasso")
+    params = load("lasso_grid")
+    plot_heatmap(*params, model="Lasso", filename="heatmap_lasso")

@@ -310,7 +310,6 @@ class Lasso(Model):
 		y, X = data.unpacked()
 		A = matrix(X/np.sqrt(self.lmbda))
 		b = matrix(y/np.sqrt(self.lmbda))
-		print(np.shape(A), np.shape(b))
 		self.coef_ = np.array(l1regls(A, b))[:,0]
 		return self
 
