@@ -93,7 +93,7 @@ def load_Terrain(filename="SRTM_data_Nica.tif", n=900, random_state=321):
 	path = pl.Path(__file__).parent / filename
 	start, stop = 1600, 1900
 
-	assert n <= (stop-start)**2, f"Cannot load {n} points of data, maximum available is {(stop-start)**2}."
+	assert n <= (stop-start)**2, f"Cannot load {n} points of terrain data, maximum available is {(stop-start)**2}."
 
 	z = imread(path)[start:stop, start:stop]
 	
