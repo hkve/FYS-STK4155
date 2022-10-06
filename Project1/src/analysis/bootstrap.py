@@ -1,4 +1,3 @@
-from turtle import title
 import numpy as np
 from scipy.stats import norm
 import matplotlib.pyplot as plt
@@ -6,13 +5,18 @@ import seaborn as sns
 from sklearn.preprocessing import PolynomialFeatures
 
 # Custom stuff
-import context
+if __name__ == "__main__":
+    import context
+    from utils import make_figs_path, colors, model_names
+    from ridgelasso import load 
+else:
+    from analysis.utils import make_figs_path, colors, model_names
+    from analysis.ridgelasso import load
+
 from sknotlearn.linear_model import LinearRegression, Ridge, Lasso
 from sknotlearn.datasets import make_FrankeFunction, load_Terrain
 from sknotlearn.resampling import Bootstrap
 from sknotlearn.data import Data
-from utils import make_figs_path, colors, model_names
-from ridgelasso import load 
 
 
 
@@ -325,6 +329,7 @@ if __name__ == "__main__":
     # D = load_Terrain()
 
     rounds = np.arange(30, 1000+1, (1001-30)//100)
+
     degrees = np.arange(1, 15+1)
     round = 400
 
@@ -333,7 +338,6 @@ if __name__ == "__main__":
 #All Models
 ###
     BS_lists_rounds = []
-    BS_lists_deg = []
     models = [LinearRegression, Ridge, Lasso]
     for model in models:
         if model in [Ridge, Lasso]:
@@ -349,8 +353,19 @@ if __name__ == "__main__":
         #across rounds:
         BS_list_rounds = bootstrap_across_rounds(D, model, rounds, degree=optimal_degree, lmbda=optimal_lmbda) #Shows that round=400 gives the stabilized state
         BS_lists_rounds.append(BS_list_rounds)
-        plot_mse_across_rounds(BS_list_rounds, rounds, model) #FLAG HERE
+        plot_mse_across_rounds(BS_list_rounds, rounds, model)
 
+    BS_lists_deg = []
+    for model in models:
+        if model in [Ridge, Lasso]:
+            degrees_grid, lmbdas_grid, MSEs = load(model_names[model].lower()+'_grid')
+            optimal_lmbdas = lmbdas_grid[0, np.argmin(MSEs, axis=1)]
+            optimal_lmbda = lmbdas_grid[np.unravel_index(np.argmin(MSEs), MSEs.shape)]
+            optimal_degree = degrees_grid[(np.unravel_index(np.argmin(MSEs), MSEs.shape))[0]][0]
+        else:
+            optimal_degree = 7
+            optimal_lmbda = None
+            optimal_lmbdas = None
         #across degrees:
         BS_list_deg = bootstrap_across_degrees(D, model, round, degrees, lmbdas=optimal_lmbdas)
         BS_lists_deg.append(BS_list_deg)
@@ -365,14 +380,13 @@ if __name__ == "__main__":
 #For various n's
 ###
 #Wish to plot the train/test and bias-var decomposition for various n's. Should  be in the same plot?
-    models = [LinearRegression]
-    for model in models: 
-        ns = [60, 600, 1500]
-        for n in ns:
-            D = make_FrankeFunction(n=n, random_state=321, noise_std=0.1)
 
-            BS_list = bootstrap_across_degrees(D, model, round, degrees)
-            plot_bias_var(BS_list, degrees, model, title=f"Bias-Variance Decomposition: {model_names[model]}, {n} data points", filename=f"BS_Bias_var_decomp_{model_names[model]}_{n}_data_points.pdf")
+    ns = [60, 600, 1500]
+    for n in ns:
+        D = make_FrankeFunction(n=n, random_state=321, noise_std=0.1)
+
+        BS_list = bootstrap_across_degrees(D, LinearRegression, round, degrees)
+        plot_bias_var(BS_list, degrees, LinearRegression, title=f"Bias-Variance Decomposition: {model_names[LinearRegression]}, {n} data points", filename=f"BS_Bias_var_decomp_{model_names[model]}_{n}_data_points.pdf")
 
 
 ###
