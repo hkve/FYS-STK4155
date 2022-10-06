@@ -33,11 +33,9 @@ def plot_train_mse_kfold(degrees, mse_across_folds, title="OLS", filename=None):
     if filename is not None: plt.savefig(make_figs_path(filename), dpi=300)
     plt.show()
 
-def run_Kfold_cross_validate(Model, degrees, k=5, random_state=321, lmbda=None):    
+def run_Kfold_cross_validate(Model, D, degrees, k=5, random_state=321, lmbda=None):    
     train_mse = np.zeros_like(degrees, dtype=float)
     test_mse = np.zeros_like(degrees, dtype=float)
-
-    D = make_FrankeFunction(n, noise_std=0.1, random_state=random_state)
 
     for i, degree in enumerate(degrees):
         Dp = D.polynomial(degree=degree)
@@ -61,6 +59,8 @@ def run_Kfold_cross_validate(Model, degrees, k=5, random_state=321, lmbda=None):
 if __name__ == "__main__":
     ks = [5,7,10]
     degrees = np.arange(1, 12+1)
+    D = make_FrankeFunction(600, noise_std=0.1, random_state=321)
+
     
     # Slicing [:3] is just a very hacky way if you only want to plot some
     Models = [LinearRegression, Ridge, Lasso][:3]
@@ -71,7 +71,7 @@ if __name__ == "__main__":
 
     for Model, lmbda, name in zip(Models, lmbdas, names):
         for k in ks:
-            train_mse, test_mse = run_Kfold_cross_validate(Model, degrees, k=k, random_state=321, lmbda=lmbda)
+            train_mse, test_mse = run_Kfold_cross_validate(Model, D, degrees, k=k, random_state=321, lmbda=lmbda)
             mse_across_folds[k] = [train_mse, test_mse]
         
         plot_train_mse_kfold(degrees, mse_across_folds, name, filename=f"{name}_mse_kfold")

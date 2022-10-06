@@ -34,7 +34,7 @@ cv_parser.add_argument("-OLS", "--OLS", type=bool, default=False, action=argpars
 cv_parser.add_argument("-R", "--Ridge", type=bool, default=False, action=argparse.BooleanOptionalAction, help="Use Ridge")
 cv_parser.add_argument("-L", "--Lasso", type=bool, default=False, action=argparse.BooleanOptionalAction, help="Use Lasso")
 cv_parser.add_argument("-ds", "--startdeg", type=int, default=1, help="Start degree for plotting MSE")
-cv_parser.add_argument("-de", "--enddeg", type=int, default=20, help="End degree for plotting MSE")
+cv_parser.add_argument("-de", "--enddeg", type=int, default=12, help="End degree for plotting MSE")
 cv_parser.add_argument("-ts", "--trainsize", type=float, default=2/3, help="Percentage of data used for training")
 cv_parser.add_argument("-rs", "--rndmstate", type=int, default=321, help="Seed used while fitting models")
 cv_parser.add_argument("-lR", "--lmbdaRidge", type=float, default=0.1, help="Set lambda value used for Ridge")
@@ -203,7 +203,7 @@ if plot == "cv":
     for Model, lmbda, name, run in zip(Models, lmbdas, names, run_models):
         if not run: continue
         for k in ks:
-            train_mse, test_mse = cv.run_Kfold_cross_validate(Model, degrees, k=k, random_state=args["rndmstate"], lmbda=lmbda)
+            train_mse, test_mse = cv.run_Kfold_cross_validate(Model, D, degrees, k=k, random_state=args["rndmstate"], lmbda=lmbda)
             mse_across_folds[k] = [train_mse, test_mse]
         
         f1 = None
