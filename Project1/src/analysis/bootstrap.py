@@ -15,8 +15,6 @@ from utils import make_figs_path, colors, model_names
 from ridgelasso import load 
 
 
-#TODO: Bias-Var with dependence on lambda for a given degree (8) (LASSO)
-#TODO: Make a common plot for train/test mse for the various models
 
 """ 
 The idea behind this document is to create functions for two things: exploring the effect of bootstrapping (various number of rounds), and implementing bootstrapping when analysing MSE (and bias and variance) as a funtion of model complexity. 
@@ -46,30 +44,35 @@ def plot_hist_of_bootstrap(Bootstrap_, degree, model=LinearRegression):
     plt.ylabel('Probability density', fontsize=fontsize_lab)
     plt.title(f'MSE when bootstrapping {Bootstrap_.rounds} times: {model_names[model]}', fontsize=fontsize_tit)
     plt.legend(fontsize = fontsize_leg)
-    # plt.savefig(make_figs_path(f'BS_hist_bootstraped_{Bootstrap_.rounds}_rounds_of_degree_{degree}.pdf'), dpi=300)
+    plt.savefig(make_figs_path(f'BS_hist_bootstraped_{Bootstrap_.rounds}_rounds_of_degree_{degree}.pdf'), dpi=300)
     plt.show()
 
 
-def plot_mse_across_rounds(Bootstrap_list_rounds, rounds, model=LinearRegression):
+def plot_mse_across_rounds(Bootstrap_list_rounds, rounds, model=LinearRegression, filename=None):
     """Plotting the mean of the MSE as a function of rounds
 
     Args:
         Bootstrap_list_rounds (list): A list of Bootstrap instances 
         rounds (int): Number of bootstrap-rounds 
     """
-    mse = [BS.mse_test for BS in Bootstrap_list_rounds]
-    mse_std = [np.std(BS.mse_test_values) for BS in Bootstrap_list_rounds]/np.sqrt(rounds)
-    sns.set_style('darkgrid')
-    plt.plot(rounds, mse, c=colors[0], lw=2.5)
-    plt.fill_between(rounds, mse+mse_std, mse-mse_std, color=colors[1], alpha=.3)
-    plt.xlabel('Bootstrap rounds', fontsize=fontsize_lab)
-    plt.ylabel('MSE value', fontsize=fontsize_lab)
-    plt.title(f'MSE across rounds: {model_names[model]}', fontsize=fontsize_tit)
-    # plt.savefig(make_figs_path(f'BS_mse_across_rounds_{model_names[model]}.pdf'), dpi=300)
-    plt.show()
+    if model == Lasso: 
+        pass 
+    else:
+        mse = [BS.mse_test for BS in Bootstrap_list_rounds]
+        mse_std = [np.std(BS.mse_test_values) for BS in Bootstrap_list_rounds]/np.sqrt(rounds)
+        sns.set_style('darkgrid')
+        plt.plot(rounds, mse, c=colors[0], lw=2.5)
+        plt.fill_between(rounds, mse+mse_std, mse-mse_std, color=colors[1], alpha=.3)
+        plt.xlabel('Bootstrap rounds', fontsize=fontsize_lab)
+        plt.ylabel('MSE value', fontsize=fontsize_lab)
+        plt.title(f'MSE across rounds: {model_names[model]}', fontsize=fontsize_tit)
+        if filename:
+            plt.savefig(make_figs_path(filename), dpi=300)
+        # plt.savefig(make_figs_path(f'BS_mse_across_rounds_{model_names[model]}.pdf'), dpi=300)
+        plt.show()
 
 
-def plot_train_test_mse(Bootstrap_list, degrees, model):
+def plot_train_test_mse(Bootstrap_list, degrees, model, filename=None):
     """Plotting the training and test mse for the various polynomial degrees. 
 
     Args:
@@ -97,11 +100,13 @@ def plot_train_test_mse(Bootstrap_list, degrees, model):
     plt.ylabel('MSE value', fontsize=fontsize_lab)
     plt.legend(fontsize = fontsize_leg)
     plt.title(f'Train and Test MSE: {model_names[model]}', fontsize=fontsize_tit)
+    if filename:
+        plt.savefig(make_figs_path(filename), dpi=300)
     # plt.savefig(make_figs_path(f'BS_train_test_mse_{model_names[model]}.pdf'), dpi=300)
     plt.show()
 
 
-def plot_bias_var(Bootstrap_list, degrees, model, **kwargs):
+def plot_bias_var(Bootstrap_list, degrees, model, filename=None, **kwargs):
     """Plotting the bias-variance decomposition of the mse value across various polynomial degrees. 
 
     Args:
@@ -109,8 +114,7 @@ def plot_bias_var(Bootstrap_list, degrees, model, **kwargs):
         degrees (array): Array of the polynomial degrees 
     """
     opt = {
-        "title": f"Bias-Variance Decomposition of the MSE: {model_names[model]}",
-        "filename": f"BS_Bias_var_decomp_{model_names[model]}.pdf"
+        "title": f"Bias-Variance Decomposition of the MSE: {model_names[model]}"
     }
     opt.update(kwargs)
 
@@ -130,11 +134,13 @@ def plot_bias_var(Bootstrap_list, degrees, model, **kwargs):
     plt.ylabel('Score', fontsize=fontsize_lab)
     plt.title(opt["title"], fontsize=fontsize_tit)
     plt.legend(fontsize = fontsize_leg)
+    if filename:
+        plt.savefig(make_figs_path(filename), dpi=300)
     # plt.savefig(make_figs_path(f"BS_Bias_var_lambdas_{model_names[model]}.pdf"), dpi=300)
     plt.show()
 
 
-def plot_bias_var_lmbdas(Bootstrap_list, lmbdas, model):
+def plot_bias_var_lmbdas(Bootstrap_list, lmbdas, model, filename=None):
     #extracting the mean values for each degree: 
     mse = [BS.mse_test for BS in Bootstrap_list]
     bias = [BS.bias_test for BS in Bootstrap_list]
@@ -152,14 +158,15 @@ def plot_bias_var_lmbdas(Bootstrap_list, lmbdas, model):
     plt.ylabel('Score', fontsize=fontsize_lab)
     plt.title(f"Bias-Variance Decomposition of the MSE across $\lambda$: {model_names[model]}", fontsize=fontsize_tit)
     plt.legend(fontsize = fontsize_leg)
-    plt.savefig(make_figs_path(f'BS_bias_var_lmbdas_{model_names[model]}.pdf'), dpi=300)
+    if filename:
+        plt.savefig(make_figs_path(filename), dpi=300)
+    # plt.savefig(make_figs_path(f'BS_bias_var_lmbdas_{model_names[model]}.pdf'), dpi=300)
     plt.show()
 
 
-def plot_bias_var_2lmbda(BS_list1, BS_list2, lmbda1, lmbda2, degrees, model):
+def plot_bias_var_2lmbda(BS_list1, BS_list2, lmbda1, lmbda2, degrees, model, filename=None):
     lmbdas = [lmbda1[0], lmbda2[0]]
     #Plotting:
-    plt.figure(figsize=(8,8))
     sns.set_style('darkgrid')    
     for i, BS_list in enumerate([BS_list1, BS_list2]):
         #extracting the mean values for each degree: 
@@ -180,6 +187,8 @@ def plot_bias_var_2lmbda(BS_list1, BS_list2, lmbda1, lmbda2, degrees, model):
     plt.ylabel('Score', fontsize=fontsize_lab)
     plt.title(f'Bias-Variance Decomposition for two $\lambda$: {model_names[model]}', fontsize=fontsize_tit)
     plt.legend(fontsize = 10)
+    if filename:
+        plt.savefig(make_figs_path(filename), dpi=300)
     # plt.savefig(make_figs_path(f'BS_bias_var_two_lmbdas_{model_names[model]}.pdf'), dpi=300)
     plt.show()
 
@@ -225,22 +234,25 @@ def bootstrap_across_rounds(D, model, rounds, degree, lmbda=None, hist=False):
     Returns: 
         Bootstrap_list_rounds (list): list of Bootstrap instances.
     """
-    y, X = D.unpacked()
+    if model == Lasso: 
+        pass 
+    else:
+        y, X = D.unpacked()
 
-    Bootstrap_list_rounds = []
-    for round in rounds:
-        if model in [Ridge, Lasso]:
-            reg = model(lmbda = lmbda)
-        else: 
-            reg = model()
+        Bootstrap_list_rounds = []
+        for round in rounds:
+            if model in [Ridge, Lasso]:
+                reg = model(lmbda = lmbda)
+            else: 
+                reg = model()
 
-        BS = call_Bootstrap(y, X, degree=degree, rounds=round, reg=reg)
-        Bootstrap_list_rounds.append(BS)
+            BS = call_Bootstrap(y, X, degree=degree, rounds=round, reg=reg)
+            Bootstrap_list_rounds.append(BS)
 
-        if model == LinearRegression and round in [30,102,408,606] and hist:
-            plot_hist_of_bootstrap(BS, degree, model)
+            if model == LinearRegression and round in [30,102,408,606] and hist:
+                plot_hist_of_bootstrap(BS, degree, model)
 
-    return Bootstrap_list_rounds
+        return Bootstrap_list_rounds
 
 
 def bootstrap_across_degrees(D, model, round, degrees, lmbdas=None):
@@ -280,6 +292,7 @@ def bootstrap_across_lmbdas(D, lmbdas, model, round, degree):
 
     Bootstrap_list = []
     for lmbda in lmbdas: 
+        print(lmbda)
         reg = model(lmbda = lmbda)
         BS = call_Bootstrap(y, X, degree=degree, rounds=round, reg=reg)
         Bootstrap_list.append(BS)
@@ -315,6 +328,7 @@ if __name__ == "__main__":
     degrees = np.arange(1, 15+1)
     round = 400
 
+
 ###
 #All Models
 ###
@@ -326,42 +340,38 @@ if __name__ == "__main__":
             degrees_grid, lmbdas_grid, MSEs = load(model_names[model].lower()+'_grid')
             optimal_lmbdas = lmbdas_grid[0, np.argmin(MSEs, axis=1)]
             optimal_lmbda = lmbdas_grid[np.unravel_index(np.argmin(MSEs), MSEs.shape)]
-            optimal_degree = (np.unravel_index(np.argmin(MSEs), MSEs.shape))[1]
+            optimal_degree = degrees_grid[(np.unravel_index(np.argmin(MSEs), MSEs.shape))[0]][0]
         else:
             optimal_degree = 7
             optimal_lmbda = None
             optimal_lmbdas = None
 
         #across rounds:
-        # BS_list_rounds = bootstrap_across_rounds(D, model, rounds, degree=optimal_degree, lmbda=optimal_lmbda) #Shows that round=400 gives the stabilized state
-        # BS_lists_rounds.append(BS_list_rounds)
-        # plot_mse_across_rounds(BS_list_rounds, rounds, model) #FLAG HERE
+        BS_list_rounds = bootstrap_across_rounds(D, model, rounds, degree=optimal_degree, lmbda=optimal_lmbda) #Shows that round=400 gives the stabilized state
+        BS_lists_rounds.append(BS_list_rounds)
+        plot_mse_across_rounds(BS_list_rounds, rounds, model) #FLAG HERE
 
         #across degrees:
         BS_list_deg = bootstrap_across_degrees(D, model, round, degrees, lmbdas=optimal_lmbdas)
         BS_lists_deg.append(BS_list_deg)
-        # plot_train_test_mse(BS_list_deg, degrees, model)
-        # plot_bias_var(BS_list_deg, degrees, model)
+        plot_train_test_mse(BS_list_deg, degrees, model)
+        plot_bias_var(BS_list_deg, degrees, model)
 
     plot_comparison(BS_lists_deg)
-    exit()
+
 
 
 ###
 #For various n's
 ###
 #Wish to plot the train/test and bias-var decomposition for various n's. Should  be in the same plot?
-    models = [LinearRegression, Ridge, Lasso]
+    models = [LinearRegression]
     for model in models: 
-        if model == Lasso:
-            ns = [60, 600]
-        else:
-            ns = [60, 600, 1500]
+        ns = [60, 600, 1500]
         for n in ns:
             D = make_FrankeFunction(n=n, random_state=321, noise_std=0.1)
-            y, X = D.unpacked()
 
-            BS_list = bootstrap_across_degrees(model, round, degrees)
+            BS_list = bootstrap_across_degrees(D, model, round, degrees)
             plot_bias_var(BS_list, degrees, model, title=f"Bias-Variance Decomposition: {model_names[model]}, {n} data points", filename=f"BS_Bias_var_decomp_{model_names[model]}_{n}_data_points.pdf")
 
 
@@ -382,13 +392,15 @@ if __name__ == "__main__":
 ###
 #Across lambdas
 ###
-    models = [Ridge]
-    lmbdas = np.logspace(-9,0,15)
+    models = [Ridge, Lasso]
+    lmbdas = np.logspace(-8,0,15)
     for model in models:
         degrees_grid, lmbdas_grid, MSEs = load(model_names[model].lower()+'_grid')
-        optimal_degree = (np.unravel_index(np.argmin(MSEs), MSEs.shape))[1]
+        optimal_degree = degrees_grid[(np.unravel_index(np.argmin(MSEs), MSEs.shape))[0]][0]
         BS_list_lam = bootstrap_across_lmbdas(D, lmbdas, model, round=400, degree=optimal_degree)
         plot_bias_var_lmbdas(BS_list_lam, lmbdas, model)
+
+
 
 
 
