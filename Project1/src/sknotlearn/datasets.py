@@ -1,7 +1,6 @@
-import enum
 import os
 import sys
-from imageio import imread
+from imageio.v2 import imread
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from data import Data 
 
@@ -94,19 +93,22 @@ def load_Terrain(filename="SRTM_data_Nica.tif", n=900, random_state=321):
 	path = pl.Path(__file__).parent / filename
 	start, stop = 1600, 1900
 
-	# z = imread(path)[1740:1800:2, 1600:1660:2] 
+	assert n <= (stop-start)**2, f"Cannot load {n} points of data, maximum available is {(stop-start)**2}."
+
 	z = imread(path)[start:stop, start:stop]
 	
+	# drawing random samples from grid
 	np.random.seed(random_state)
-	X = np.random.uniform(low=0, high=(stop-start), size=(n, 2)).astype(int)
+	x1 = np.arange(stop=stop-start) # NS-coordinates
+	x2 = x1.copy() # EW-coordinates
+	# Making array of every combination of (x1, x2)
+	X = np.reshape(np.meshgrid(x1, x2), (2, (stop-start)**2)).T
+	np.random.shuffle(X) # shuffling for randomness
+	X = X[:n] # drawing n points
+
 	y = np.zeros(shape=n, dtype=float)
-
-	# If you find this, EASTER EGG: Why does this not work instead of the following loop?	
-	# for i, (x,y) in enumerate(X):
-	# 	y[i] = z[x,y]
-
-	for i in range(n):
-		y[i] = z[X[i,0], X[i,1]]
+	for i, (x1,x2) in enumerate(X):
+		y[i] = z[x1,x2]
 
 	return Data(y, X.astype(float))
 
@@ -115,5 +117,5 @@ if __name__ == "__main__":
 	# D = make_FrankeFunction(n=625, uniform=False, noise_std=0.1)
 	# plot_FrankeFunction(D)
 
-	D = load_Terrain(n = 1500)
+	D = load_Terrain(n = 9000)
 	plot_Terrain(D, angle=(22,-55))
