@@ -183,8 +183,8 @@ names = ["OLS", "Ridge", "Lasso"]
 
 
 # Debug
-# for k, v in args.items():
-#     print(k,v)
+    # for k, v in args.items():
+    #     print(k,v)
 
 
 # Make plots where no resampling is used
@@ -192,9 +192,14 @@ if plot == "naive":
     lmbdas = [None, args["lmbdaRidge"], args["lmbdaLasso"]]
     degrees = np.arange(args["startdeg"], args["enddeg"]+1)
     
+    if not "stderror" in args.keys():
+        noise_std = None
+    else:
+        noise_std = args["stderror"]
+
     for Model, lmbda, name, run in zip(Models, lmbdas, names, run_models):
         if not run: continue
-        params1, params2 = nores.run_no_resampling(Model, degrees, D, random_state=args["rndmstate"], train_size=args["trainsize"], lmbda=lmbda, noise_std=args["stderror"])
+        params1, params2 = nores.run_no_resampling(Model, degrees, D, random_state=args["rndmstate"], train_size=args["trainsize"], lmbda=lmbda, noise_std=noise_std)
         mse_train, mse_test, r2_train, r2_test = params1
 
         f1, f2, f3, f4 = None, None, None, None
@@ -203,12 +208,13 @@ if plot == "naive":
             f1, f2 = f+"_mse_noresample", f+"_R2_noresample"
             f3, f4 = f+"OLS_coefs_plots", f+"OLS_coefs_table"
 
+        print(name)
         title = f"{name} no resampling"
-        nores.plot_train_test(degrees, mse_train, mse_test, filename=f1)
+        nores.plot_train_test(degrees, mse_train, mse_test, filename=f1, title=title)
         nores.plot_train_test(degrees, r2_train, r2_test, filename=f2, ylabel=r"R$^2$-score", title=title)
 
 
-        if Model == lm.LinearRegression:
+        if Model == lm.LinearRegression and all([p in degrees for p in [1,2,3,4,5]]):
             nores.plot_theta_progression(*params2, filename=f3)
             nores.plot_theta_heatmap(*params2, filename=f4)
 

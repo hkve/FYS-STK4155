@@ -173,8 +173,11 @@ def run_no_resampling(Model, degrees, D, train_size=0.8, random_state=123, lmbda
 		r2_test[i] = reg.r2_score(Dp_test)
 
 		thetas[degree] = reg.coef_
-		var_theta =	 np.diag(reg.coef_var(Dp_train.X, noise_std))
-		thetas_se[degree] = 2*np.sqrt(abs(var_theta))
+		if noise_std:
+			var_theta =	 np.diag(reg.coef_var(Dp_train.X, noise_std))
+			thetas_se[degree] = 2*np.sqrt(abs(var_theta))
+		else:
+			thetas_se[degree] = 0
 
 	# Show mse and r2 score 
 	print(f"Found best degree p = {degrees[np.argmin(mse_test)]} with MSE = {np.min(mse_test)} for {Model.__name__}")
