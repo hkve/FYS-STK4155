@@ -79,6 +79,8 @@
     \end{@twocolumnfalse}
 ]
 
+\tableofcontents
+
 \section{Introduction}
     In this project, we will introduce some of the most important general properties of machine learning models in the context of linear regression. Specifically the mean squared error (MSE), the bias, and the variance of data predictions are essential in evaluating the quality of a statistical model. We look at the phenomena of underfitting and overfitting, and explore them in the context of bias-variance trade-off. The three models we will use explicitly are Ordinary Least Squares (OLS), Ridge regression and Least-Absolute-Shrinkage-and-Selection-Operation (Lasso) regression. These will first be tested on the 2D Franke function, and later on real geographical terrain data.
 
@@ -129,7 +131,7 @@
             \end{align}
             \label{theo:eq:bias and var}
         \end{subequations}
-        are the sample bias and sample variance of the model at the predicted point. This decomposition is done in more detail in Appendix~\ref{app:sec:bvdecomp}. 
+        are the sample bias and sample variance of the model at the predicted point. This decomposition is done in more detail in Appendix~\ref{app:sec:bvdecomp}. The bias tells our model's tendency to err on a certain side of the `true' value. The variance describes the model's spread in prediction as the model is fitted to different data.
 
 
     \subsubsection*{Central Limit Theorem}
