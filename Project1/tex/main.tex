@@ -289,10 +289,7 @@
 
             Together with the MSE, the bias and variance of the model are in our case relevant measures for goodness of fit. We are interested in calculating these measures, not for each bootstrapped model, but across the models. Given $L$ number of bootstrap rounds (and corresponding bootstrapped models), we want the bias and variance between all the bootstrapped models at each point compared to the testing data (see equations \ref*{theo:eq:bias and var}). This will create a bias value and variance value for each of the input data points. When evaluating a model of a certain polynomial degree, we find an appropriate measure of the bias and variance for the entire model, would be the mean across data points. 
             
-            \comment{Exploration/number of rounds - \Anna}
-            When utilising bootstrap it is important to find an appropriate number of rounds to preform the resampling. There is a trade-off between getting an accurate distribution of the values and keeping the process computationally feasible. To find the optimal number of rounds we preform bootstrap on the Franke data for various number of rounds, calculate the MSE values and plot the results. 
-
-            \comment{Look at the importance of the various points}
+            When employing bootstrap it is important to find an appropriate number of rounds to preform the resampling. There is a trade-off between getting an accurate distribution of the values and keeping the process computationally feasible. To find the optimal number of rounds we preform bootstrap on the Franke data for a variety of rounds while  calculating the MSE values. There will be a distribution of MSE values for each number of rounds. By taking the mean of each distribution we can plot it as a function of rounds and find where it stabilises. One can argue that any number of rounds above this point will be excessive. 
 
 
 
@@ -357,7 +354,7 @@
                 \end{subfigure}
             \end{figure*} 
 
-
+        \subsubsection*{Exploring Resampling}
             The metrics thus far have been calculated without the use of any resampling techniques. To see how this influences MSE, we apply $k$-fold Cross-validation and plot the averaged train- and test MSE across the different folds. This is presented in Figure~\ref{fig:res:OLS_mse_kfold}. The optimal polynomial degrees and MSE values based on the training data is presented in Table~\ref{res:tab:OLS_kfold_optimal}
 
 
@@ -387,15 +384,17 @@
             \comment{Reminder: Compare bootstrap and CV.}
 
         
-        \subsubsection*{Exploring Resampling}
-            There are some parameters that need to be set before resampling.
-            \comment{Reminder: Insert bootstrap results.}
+
+            When deciding the optimal number of bootstrap rounds we look at the mean of the MSE values for each number of bootstrap rounds (see Figure~\ref{res:fig:mse across rounds}). 
             \begin{figure}[ht]
                 \centering
                 \includegraphics[width=\linewidth]{BS_mse_across_rounds_OLS.pdf}
-                \caption{Plot of the MSE value as a function of number of bootstrap rounds.}
+                \caption{Plot of the MSE value as a function of number of bootstrap rounds. Each MSE value in the plot is the mean of the MSE values for that number of rounds. The blue field around the graph is the standard deviation of the MSE distribution divided by the number of bootstrap rounds.}
                 \label{res:fig:mse across rounds}
             \end{figure}
+            We can see from the plot that the mean MSE value varies a lot in the beginning, but stabilises around 400 rounds and remains rather constant thereafter. The same goes for the standard deviation divided by number of rounds (the blue field around the graph). For further exploration of the number of bootstrap rounds and the distributions of the MSE values see Appendix \ref{app:sec:BS rounds}. 
+            \comment{Should maybe comment on the choice of the blue field.}
+
 
             \begin{figure}[ht]
                 \centering
