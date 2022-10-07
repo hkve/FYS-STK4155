@@ -235,7 +235,8 @@ if plot == "cv":
         
         f1 = None
         if args["filename"]: f1 = f"{args['filename']}_{name}_mse_kfold"
-        cv.plot_train_mse_kfold(degrees, mse_across_folds, name, filename=f1)
+        cv.plot_train_mse_kfold(degrees, mse_across_folds, name, lmbda=lmbda, filename=f1)
+
 
 # Make heatmap plots
 if plot == "heatmap":

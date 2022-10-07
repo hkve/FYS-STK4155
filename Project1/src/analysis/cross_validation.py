@@ -13,7 +13,7 @@ from sknotlearn.resampling import KFold_cross_validate
 from sknotlearn.datasets import make_FrankeFunction
 from sknotlearn.data import Data
 
-def plot_train_mse_kfold(degrees, mse_across_folds, title="OLS", filename=None):
+def plot_train_mse_kfold(degrees, mse_across_folds, title="OLS", lmbda=None, filename=None):
     sns.set_style("darkgrid")
     fig, ax = plt.subplots(figsize=(7,5.5))
 
@@ -27,7 +27,11 @@ def plot_train_mse_kfold(degrees, mse_across_folds, title="OLS", filename=None):
     ax.set_xlabel("Polynomial degrees", fontsize=14)
     ax.set_ylabel(r"$MSE$", fontsize=14)
     ax.legend(fontsize=14)
-    ax.set_title(rf"{title} Cross validation, $k \in [{ks[0]},{ks[-1]}]$", fontsize=16)
+    title = rf"{title} Cross validation, $k \in [{ks[0]},{ks[-1]}]$"
+    if title:
+        exp = np.log10(lmbda)
+        title += f" $\lambda = 10^" + "{" + str(int(exp)) + "}$"
+    ax.set_title(title, fontsize=16)
 
     fig.tight_layout()
     if filename is not None: plt.savefig(make_figs_path(filename), dpi=300)
@@ -74,4 +78,4 @@ if __name__ == "__main__":
             train_mse, test_mse = run_Kfold_cross_validate(Model, D, degrees, k=k, random_state=321, lmbda=lmbda)
             mse_across_folds[k] = [train_mse, test_mse]
         
-        plot_train_mse_kfold(degrees, mse_across_folds, name, filename=f"{name}_mse_kfold")
+        plot_train_mse_kfold(degrees, mse_across_folds, name, filename=f"{name}_mse_kfold", lmbda=lmbda)
