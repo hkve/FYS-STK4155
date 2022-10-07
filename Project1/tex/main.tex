@@ -270,7 +270,7 @@
             \end{subequations}
             where $\bar{z} = \frac{1}{n} \sum_{i=1}^n z_n$ denotes the sample mean of $\vec{z}$ and $\sigma_{\vec{z}}^2 = \frac{1}{n} \sum_{i=1}^n {(z_i-\bar{z})}^2$ denotes the sample std of $\vec{z}$. When we calculate MSE scores to compare between models and resampling techniques, we will use the scaled $\vec{y}$.
 
-            To get a proper assessment of our model, we will split the dataset into a \textit{training set} and \textit{testing set}. The training set is used to fit the model, giving our coefficient estimates $\vec{\hat{\theta}}$. Using the fitted model and the training data, we can calculate metrics to quantify how good our model replicates this data. In the case that our model perfectly predicts the training data $\vec{y}$ based on $X$, the calculated metrics MSE and $\Rsquared$ (Eqs.~\ref{theo:eq:mse},~\ref{theo:eq:r2}) should be 0 and 1 respectively. However, using these scores to assess the goodness of our fit has an underlying problem. Since the model has seen the training data to estimate $\vec{\hat{\theta}}$, we can run into problems where the model begins to fit the $\epsilon$ values and not the (assumed) underlying function $f(x)$. This phenomenon is called \textit{overfitting}. To mediate this, we calculate our metrics based on a testing data which was not used for fitting. This serves as a way to estimate the errors on data which the model has not seen before. For the artificial data made using the Franke function, we went for a split where $\sfrac{2}{3}$ of the data is used for the training set, while other $\sfrac{1}{3}$ is reserved for the testing set.
+            To get a proper assessment of our model, we will split the dataset into a \textit{training set} and \textit{testing set}. The training set is used to fit the model, giving our coefficient estimates $\vec{\hat{\theta}}$. Using the fitted model and the training data, we can calculate metrics to quantify how good our model replicates this data. In the case that our model perfectly predicts the training data $\vec{y}$ based on $X$, the calculated metrics MSE and $\Rsquared$ (Eqs.~\ref{theo:eq:mse},~\ref{theo:eq:r2}) should be 0 and 1 respectively. However, using these scores to assess the goodness of our fit has an underlying problem. Since the model has seen the training data to estimate $\vec{\hat{\theta}}$, we can run into problems where the model fits the $\epsilon$ values and not the (assumed) underlying function $f(x)$. This phenomenon is called \textit{overfitting}. To mediate this, we calculate our metrics based on a testing data which was not used for fitting. This serves as a way to estimate the errors on data which the model has not seen before. For the artificial data made using the Franke function, we went for a split where $\sfrac{2}{3}$ of the data is used for the training set, while other $\sfrac{1}{3}$ is reserved for the testing set.
 
 
     \subsection{Initial application of OLS}
@@ -284,10 +284,18 @@
         \comment{Reminder: Address how we calculate and compare bias-variance - that we find them for every test data point, and compare the average values over all data points.}
 
         \subsubsection*{Bootstrap}
-            Bootstrapping consists of generating new training data by sampling data points from the original training data with replacement; meaning the same data points can be selected more than once. The new set of training data is called a bootstrapped dataset and is used to train the model. Then the relevant measures of goodness of fit is calculated. This process of resampling and calculating measures is repeated a certain number of times (rounds), giving a distribution of these measures. The mean of the measures is then calculated across the bootstrapped models. Through the central limit theorem this mean is assumed to be the more accurate measure for goodness of fit and therefore a better evaluation of the model in question.  
+            Bootstrapping consists of generating new training data by sampling data points from the original training data with replacement; meaning the same data points can be selected more than once. The new set of training data is called a bootstrapped dataset and is used to train the model. Then the relevant measures of goodness of fit is calculated using the testing data. This process of resampling and calculating measures is repeated a certain number of times (rounds), giving a distribution of these measures. The mean of the measures is then calculated across the bootstrapped models. Through the central limit theorem this mean is assumed to be the more accurate measure for goodness of fit and therefore a better evaluation of the model in question.
+
+            \comment{Bias-variance - \Anna}
+
+            \comment{Exploration/number of rounds - \Anna}
+
+
+
+
 
         \subsubsection*{Cross-validation}
-            Cross-validation consist of partitioning the dataset into different subsets (which we will call \textit{folds}). By using some folds for fitting the model and others for computing metrics, we can get multiple values for the same measure by changing which folds are used for fitting and which are used for calculating measures. This differs from Bootstrapping since no points used for fitting are used for calculating measures for goodness of fit.
+            Cross-validation consist of partitioning the dataset into different subsets (which we will call \textit{folds}). By using some folds for fitting the model and others for computing metrics, we can get multiple values for the same measure by changing which folds are used for fitting and which are used for calculating measures. 
             \newline\newline
             In this report, we will use the famous \textit{$k$-fold Cross-validation} technique. Considering the dataset $\mathcal{D} = (\vec{y}, X)$, consisting of $n$ data points: Initially we partition $\mathcal{D}$ into $k$ folds $\mathcal{D}_i$, $i = 1, \ldots , k$, of equal size. For each fold $\mathcal{D}_i$, a model is fitted using every fold \textit{except} $\mathcal{D}_i$, which we denote $\mathcal{D}_{-i}$. With this model, we calculate the different statitistical measures of the model on $\mathcal{D}_i$, which was not used to fit the model. When this is done for all $k$ folds, we take the mean of the measures to get the final goodness of fit. 
             \newline\newline
@@ -345,8 +353,7 @@
                 \end{subfigure}
             \end{figure*} 
 
-        \subsubsection*{Exploring Resampling}
-            \comment{Reminder: Insert bootstrap results.}
+
             The metrics thus far have been calculated without the use of any resampling techniques. To see how this influences MSE, we apply $k$-fold Cross-validation and plot the averaged train- and test MSE across the different folds. This is presented in Figure~\ref{fig:res:OLS_mse_kfold}. The optimal polynomial degrees and MSE values based on the training data is presented in Table~\ref{res:tab:OLS_kfold_optimal}
 
 
@@ -364,7 +371,7 @@
                 \label{res:tab:OLS_kfold_optimal}
             \end{table}
             
-            Just as in the case without resampling, the train MSE decreases with $p$. For the test MSE, the increase after the various $\msub{p}{opt}$ values is smaller, but the general trend is the same.  
+            Just as in the case without resampling, the train MSE decreases with $p$. For the test MSE, the increase after the various $\msub{p}{opt}$ values is smaller, but the general trend is the same. For further usage of Cross-validation as a resampling technique applied to the Franke data, we use $k = 7$.   
             
             \begin{figure}[H]
                 \centering
@@ -374,6 +381,23 @@
             \end{figure}
 
             \comment{Reminder: Compare bootstrap and CV.}
+
+        
+            \subsubsection*{Exploring Resampling}
+            \comment{Reminder: Insert bootstrap results.}
+            \begin{figure}[ht]
+                \centering
+                \includegraphics[width=\linewidth]{BS_mse_across_rounds_OLS.pdf}
+                \caption{Plot of the MSE value as a function of number of bootstrap rounds.}
+                \label{res:fig:mse across rounds}
+            \end{figure}
+
+            \begin{figure}[ht]
+                \centering
+                \includegraphics[width=\linewidth]{BS_mse_across_rounds_OLS.pdf}
+                \caption{}
+                \label{}
+            \end{figure}
 
 
         \subsubsection*{Applying Resampling}
@@ -387,7 +411,41 @@
 
     \subsection{Ridge and Lasso}
         \comment{No naïveté, exploration of resampling is just 1 sentence.}\\
-        We now repeat the same analysis for ridge and Lasso regression.
+        We now repeat the same analysis for ridge and Lasso regression. \comment{Add plots for task C repeated for Ridge and Lasso (parts of task e and f)}
+        
+        We preform the save Cross-validation analysis as we did for OLS. This has been done for two different $\lambda$ values, $0.1$ and $10^{-7}$. This can be seen in figure \ref{res:fig:ridge_cv_badlambda} and \ref{res:fig:ridge_cv_goodlambda} respectively.
+        \begin{figure}[ht]
+            \begin{subfigure}{\linewidth}
+                \centering
+                \includegraphics[width=\linewidth]{bad_lmbda_Ridge_mse_kfold.pdf}
+            \end{subfigure}
+            \caption{Test and train MSE calculated across different polynomial degrees using Ridge regression for $\lambda = 10^{-1}$}
+            \label{res:fig:ridge_cv_badlambda}
+            \begin{subfigure}{\linewidth}
+                \centering
+                \includegraphics[width=\linewidth]{good_lmbda_Ridge_mse_kfold.pdf}
+            \end{subfigure}
+            \caption{Test and train MSE calculated across different polynomial degrees using Ridge regression for $\lambda = 10^{-7}$}
+            \label{res:fig:ridge_cv_goodlambda}
+        \end{figure}
+
+        Moving on to Lasso regression, we try the same $\lambda$ values of $0.1$ and $10^{-7}$. 
+
+        \begin{figure}[ht]
+            \begin{subfigure}{\linewidth}
+                \centering
+                \includegraphics[width=\linewidth]{bad_lmbda_Lasso_mse_kfold.pdf}
+            \end{subfigure}
+            \caption{Test and train MSE calculated across different polynomial degrees using Lasso regression for $\lambda = 10^{-1}$}
+            \label{res:fig:lasso_cv_badlambda}
+            \begin{subfigure}{\linewidth}
+                \centering
+                \includegraphics[width=\linewidth]{good_lmbda_Lasso_mse_kfold.pdf}
+            \end{subfigure}
+            \caption{Test and train MSE calculated across different polynomial degrees using Lasso regression for $\lambda = 10^{-7}$}
+            \label{res:fig:lasso_cv_goodlambda}
+        \end{figure}
+
         \begin{figure}[ht]
             \begin{subfigure}{\linewidth}
                 \centering
@@ -427,8 +485,12 @@
 
         The value of resampling rather comes from creating a way to emphasise different parts of the original dataset when fitting our model, and consequently comparing what this does to the predictions of the model. For instance, an overfitted model might contort to accomodate a statistical outlier in the original dataset, and thereby make a poor prediction on new data. However, when resampling, many of the new datasets sampled to make new fits from our model will not include this statistical outlier, and should make predictions not influenced too heavily by this. There should then be a medium where the particular `oddities' in the original dataset can be smoothed over, and the bias of the original dataset is not brought out to the front.
 
-        \subsubsection*{Cross validation and bootstrap}
-            The choice of $k=7$ used for our parameter gridsearch is influenced by the computational aspect of the approach. Since a model has to be fitted $k$ times for each set of parameter $(p,\lambda)$, it is clear that this increases the time taken to search the parameter space. However, for both OLS and Ridge, the closed form expressions (Eqs.~\eqref{theo:eq:OLS_coefs} and~\eqref{theo:eq:Ridge_coefs} respectively) only require matrix multiplication and inversion. Adding more folds chould (\comment{nice one}) potentially be feasible here. However, since Lasso requires a cost function minimization, it is significantly slower than OLS and Ridge, espcially for high $p$. Therefore we get a trade-off between the number of $(p,\lambda)$ to try and the number of folds $k$, where $k=7$ was found to allow for high parameter resolution while still being completed in a feasible amount of time.      
+        \subsubsection*{Cross validation and bootstrap} 
+            The choice of $k=7$ used for our parameter grid search is influenced by the computational aspect of the approach. Since a model has to be fitted $k$ times for each set of parameter $(p,\lambda)$, it is clear that this increases the time taken to search the parameter space. However, for both OLS and Ridge, the closed form expressions (Eqs.~\eqref{theo:eq:OLS_coefs} and~\eqref{theo:eq:Ridge_coefs} respectively) only require matrix multiplication and inversion. Adding more folds chould (\comment{nice one}) potentially be feasible here. However, since Lasso requires a cost function minimization, it is significantly slower than OLS and Ridge, espcially for high $p$. Therefor we get a trade-off between the number of $(p,\lambda)$ to try and the number of folds $k$, where $k=7$ was found to allow for high parameter resolution while still being completed in a feasible amount of time.
+            \newline
+            \comment{Some general disc about Bootstrapping here, and after that some comparison?}
+            \newline
+            The Bootstrap holds the test set constant during calculation of metrics. This is in contrast to Cross-validation where the test set is different (with no overlapping points) for each fitted model. Holding the test set constant might be beneficial since every model calculates metrics based on the same data, thus averaging over MSE scores gives a more accurate picture of the MSE present in that specific test set. However, this introduces bias since we assume that the selected test set accurately represents the population, which it may not. Cross-validation on the other hand does not average MSE values over the same test data and larger variations may occur. The advantage of this is that metrics are calculated on the entire data set, not just a specific partition.          
 
 \section{Concluding remarks}
 
@@ -507,6 +569,41 @@
             \caption{Showing Franke function with increasing noise, from \textit{a} to \textit{d}, $\sigma \in \{ 0, 0.01, 0.1, 0.2\}$. All figures plotted with $n = 625$ equidistant $(x,y)$ points.}\label{fig:app:frankefunction varying noise}
         \end{figure*}
 
+    
+    \section{Exploring number of Bootstrap rounds} \label{app:sec:BS rounds}
+        \comment{Add reference -\Anna}
+         Figure \ref*{app:fig:histograms for rounds} shows that the distribution of MSE values derived from models trained on bootstrapped data set approaches a normal distribution as the number of bootstrap rounds increases, as the Central Limit Theorem states. In accordance with other results, one can see from the plots that when exceeding 400 rounds the distribution stabilises (see also figure \ref*{res:fig:mse across rounds} for this result). As in figure \ref*{} the histograms show that the training data gives a smaller and more consistent MSE value than the testing data. This holds across number of bootstrap rounds.
+        \begin{figure*}
+            \begin{subfigure}{.5\textwidth}
+                \centering
+                \includegraphics[width=\linewidth]{BS_hist_bootstraped_30_rounds_of_degree_7.pdf}
+                \caption{}
+                \label{app:fig:histograms for rounds:30}
+                \end{subfigure}
+            \hfill
+            \begin{subfigure}{.5\textwidth}
+                \centering
+                \includegraphics[width=\linewidth]{BS_hist_bootstraped_102_rounds_of_degree_7.pdf}
+                \caption{}
+                \label{app:fig:histograms for rounds:102}
+            \end{subfigure}
+            \hfill
+            \begin{subfigure}{.5\textwidth}
+                \centering
+                \includegraphics[width=\linewidth]{BS_hist_bootstraped_408_rounds_of_degree_7.pdf}
+                \caption{}
+                \label{app:fig:histograms for rounds:408}
+            \end{subfigure}
+            \begin{subfigure}{.5\textwidth}
+                \centering
+                \includegraphics[width=\linewidth]{BS_hist_bootstraped_606_rounds_of_degree_7.pdf}
+                \caption{}
+                \label{app:fig:histograms for rounds:606}
+            \end{subfigure}
+
+            \caption{The histograms of MSE values for various number of bootstrap rounds. }
+            \label{app:fig:histograms for rounds}
+        \end{figure*}
 
 \end{appendices}
 

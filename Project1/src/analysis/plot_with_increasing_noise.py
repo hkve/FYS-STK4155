@@ -3,7 +3,7 @@ import numpy as np
 import context
 from sknotlearn.data import Data
 from sknotlearn.datasets import make_FrankeFunction, plot_FrankeFunction, load_Terrain, plot_Terrain
-from sknotlearn.linear_model import LinearRegression
+from sknotlearn.linear_model import LinearRegression, Ridge, Lasso
 from utils import make_figs_path
 
 
@@ -15,11 +15,11 @@ def plot_with_increasing_noise(sigma = [0, 0.01, 0.1, 0.2]):
         plot_FrankeFunction(D, filename=filename)
 
 def plot_Terrain_fit_and_raw():
-    D = load_Terrain("SRTM_data_Nica.tif")
+    D = load_Terrain("SRTM_data_Nica.tif", n=600)
 
     plot_Terrain(D)
 
-    Dp = D.polynomial(degree=10)
+    Dp = D.polynomial(degree=40)
     Dp_train, Dp_test = Dp.train_test_split(ratio=2/3, random_state=321)
 
     Dp_train = Dp_train.scaled(scheme="Standard")

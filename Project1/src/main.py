@@ -16,7 +16,11 @@ import analysis.ridgelasso as hm
 parser = argparse.ArgumentParser()
 plots_parser = parser.add_subparsers(help="Plot", dest="plot")
 
-naive_parser = plots_parser.add_parser("naive")
+naive_parser = plots_parser.add_parser("naive", help="""
+    Preform fitting using a train-test split, and plotting the MSE and R2 scores
+    as a function of polynomial degrees. If OLS is used, a
+    plot and table showing coefficient sizes will also be shown.
+""")
 naive_parser.add_argument("-OLS", "--OLS", type=bool, default=False, action=argparse.BooleanOptionalAction, help="Use OLS")
 naive_parser.add_argument("-R", "--Ridge", type=bool, default=False, action=argparse.BooleanOptionalAction, help="Use Ridge")
 naive_parser.add_argument("-L", "--Lasso", type=bool, default=False, action=argparse.BooleanOptionalAction, help="Use Lasso")
@@ -28,7 +32,10 @@ naive_parser.add_argument("-lR", "--lmbdaRidge", type=float, default=0.1, help="
 naive_parser.add_argument("-lL", "--lmbdaLasso", type=float, default=0.1, help="Set lambda value used for Lasso")
 naive_parser.add_argument("-f", "--filename", type=str, default=None, help="Filename in case the plot(s) should be saved. Will chain filename_(type_of_plot)")
 
-cv_parser = plots_parser.add_parser("cv")
+cv_parser = plots_parser.add_parser("cv", help=""" 
+    Preform fitting using k-fold Cross-validation, plotting the MSE score as a function of number of degrees.
+    Plots train/test mse curves in the same plot with different k values. 
+""")
 cv_parser.add_argument("-k", "--kfolds", nargs="+", type=int, default=7, help="How many folds to run. To compare, type multiple sep by spaces")
 cv_parser.add_argument("-OLS", "--OLS", type=bool, default=False, action=argparse.BooleanOptionalAction, help="Use OLS")
 cv_parser.add_argument("-R", "--Ridge", type=bool, default=False, action=argparse.BooleanOptionalAction, help="Use Ridge")
@@ -41,7 +48,10 @@ cv_parser.add_argument("-lR", "--lmbdaRidge", type=float, default=0.1, help="Set
 cv_parser.add_argument("-lL", "--lmbdaLasso", type=float, default=0.1, help="Set lambda value used for Lasso")
 cv_parser.add_argument("-f", "--filename", type=str, default=None, help="Filename in case the plot(s) should be saved. Will chain filename_(type_of_plot)")
 
-heatmap_parser = plots_parser.add_parser("heatmap")
+heatmap_parser = plots_parser.add_parser("heatmap", help="""
+    Preform a gridsearch of polynomial degrees and lambda values for Ridge and Lasso regression. Cross validation is used to calculated the 
+    MSE values, with k = 7.
+""")
 heatmap_parser.add_argument("-k", "--kfolds", nargs="+", type=int, default=7, help="How many folds to run. To compare, type multiple sep by spaces")
 heatmap_parser.add_argument("-R", "--Ridge", type=bool, default=False, action=argparse.BooleanOptionalAction, help="Use Ridge")
 heatmap_parser.add_argument("-L", "--Lasso", type=bool, default=False, action=argparse.BooleanOptionalAction, help="Use Lasso")
@@ -57,7 +67,10 @@ heatmap_parser.add_argument("-d", "--dump", type=str, default=None, help="If the
 heatmap_parser.add_argument("-l", "--load", type=str, default=None, help="If the lambda, degree and MSE meshgridsd should be loaded from file")
 
 
-bsrounds_parser = plots_parser.add_parser("bsrounds")
+bsrounds_parser = plots_parser.add_parser("bsrounds", help=""" 
+    Makes a plot of averaged MSE against number of rounds used for boostrapping. Used to see how to the MSE stabalizes when
+    more bootstrap rounds are preformed.
+""")
 bsrounds_parser.add_argument("-OLS", "--OLS", type=bool, default=False, action=argparse.BooleanOptionalAction, help="Use OLS")
 bsrounds_parser.add_argument("-R", "--Ridge", type=bool, default=False, action=argparse.BooleanOptionalAction, help="Use Ridge")
 bsrounds_parser.add_argument("-L", "--Lasso", type=bool, default=False, action=argparse.BooleanOptionalAction, help="Use Lasso")
@@ -68,7 +81,10 @@ bsrounds_parser.add_argument("-rs", "--rndmstate", type=int, default=321, help="
 
 
 # bsdegs -> Model, filename (plot_comparison only if all true) and heatmap data, round
-bsdegs_parser = plots_parser.add_parser("bsdegs")
+bsdegs_parser = plots_parser.add_parser("bsdegs", help="""
+    Plotting things related to bootstrapping (test/train, bias variance and so on), while varying the
+    number of degrees.
+""")
 bsdegs_parser.add_argument("-OLS", "--OLS", type=bool, default=False, action=argparse.BooleanOptionalAction, help="Use OLS")
 bsdegs_parser.add_argument("-R", "--Ridge", type=bool, default=False, action=argparse.BooleanOptionalAction, help="Use Ridge")
 bsdegs_parser.add_argument("-L", "--Lasso", type=bool, default=False, action=argparse.BooleanOptionalAction, help="Use Lasso")
@@ -78,7 +94,10 @@ bsdegs_parser.add_argument("-df", "--datafilename", type=str, default=None, help
 bsdegs_parser.add_argument("-rs", "--rndmstate", type=int, default=321, help="Seed used while fitting models")
 
 
-bslmbdas_parser = plots_parser.add_parser("bslmbdas")
+bslmbdas_parser = plots_parser.add_parser("bslmbdas", help="""
+    Plotting things related to bootstrapping (test/train, bias variance and so on), while varying the
+    the hyperparameter lambda. Only usable for Ridge and Lasso.
+""")
 bslmbdas_parser.add_argument("-R", "--Ridge", type=bool, default=False, action=argparse.BooleanOptionalAction, help="Use Ridge")
 bslmbdas_parser.add_argument("-L", "--Lasso", type=bool, default=False, action=argparse.BooleanOptionalAction, help="Use Lasso")
 bslmbdas_parser.add_argument("-f", "--filename", type=str, default=None, help="Filename in case the plot(s) should be saved. Will chain filename_(type_of_plot)")
@@ -89,7 +108,9 @@ bslmbdas_parser.add_argument("-ls", "--startlmbda", type=int, default=-8, help="
 bslmbdas_parser.add_argument("-le", "--endlmbda", type=int, default=0, help="End log10(lambda) for plotting MSE")
 bslmbdas_parser.add_argument("-nl", "--nlmbda", type=int, default=15, help="Number of lambda values")
 
-bs2lmbdas_parser = plots_parser.add_parser("bs2lmbdas")
+bs2lmbdas_parser = plots_parser.add_parser("bs2lmbdas", help="""
+    Makes bias-variance plots for 2 different lambdas (hardcoded).
+""")
 bs2lmbdas_parser.add_argument("-ds", "--startdeg", type=int, default=1, help="Start degree for plotting MSE")
 bs2lmbdas_parser.add_argument("-de", "--enddeg", type=int, default=15, help="End degree for plotting MSE")
 bs2lmbdas_parser.add_argument("-R", "--Ridge", type=bool, default=False, action=argparse.BooleanOptionalAction, help="Use Ridge")
@@ -118,7 +139,7 @@ for plot_parser in plot_parsers_chained:
     Franke_parser.add_argument("-std", "--stderror", type=float, default=0.1, help="Set the error std for the data set")
 
     Terrain_parser = data_parser.add_parser("Terrain")
-    Terrain_parser.add_argument("-np", "--npoints", type=int, default=900)
+    Terrain_parser.add_argument("-np", "--npoints", type=int, default=600)
     
 args = vars(parser.parse_args())
 plot = args["plot"]
@@ -162,8 +183,8 @@ names = ["OLS", "Ridge", "Lasso"]
 
 
 # Debug
-for k, v in args.items():
-    print(k,v)
+    # for k, v in args.items():
+    #     print(k,v)
 
 
 # Make plots where no resampling is used
@@ -171,9 +192,14 @@ if plot == "naive":
     lmbdas = [None, args["lmbdaRidge"], args["lmbdaLasso"]]
     degrees = np.arange(args["startdeg"], args["enddeg"]+1)
     
+    if not "stderror" in args.keys():
+        noise_std = None
+    else:
+        noise_std = args["stderror"]
+
     for Model, lmbda, name, run in zip(Models, lmbdas, names, run_models):
         if not run: continue
-        params1, params2 = nores.run_no_resampling(Model, degrees, D, random_state=args["rndmstate"], train_size=args["trainsize"], lmbda=lmbda, noise_std=args["stderror"])
+        params1, params2 = nores.run_no_resampling(Model, degrees, D, random_state=args["rndmstate"], train_size=args["trainsize"], lmbda=lmbda, noise_std=noise_std)
         mse_train, mse_test, r2_train, r2_test = params1
 
         f1, f2, f3, f4 = None, None, None, None
@@ -182,12 +208,13 @@ if plot == "naive":
             f1, f2 = f+"_mse_noresample", f+"_R2_noresample"
             f3, f4 = f+"OLS_coefs_plots", f+"OLS_coefs_table"
 
+        print(name)
         title = f"{name} no resampling"
-        nores.plot_train_test(degrees, mse_train, mse_test, filename=f1)
+        nores.plot_train_test(degrees, mse_train, mse_test, filename=f1, title=title)
         nores.plot_train_test(degrees, r2_train, r2_test, filename=f2, ylabel=r"R$^2$-score", title=title)
 
 
-        if Model == lm.LinearRegression:
+        if Model == lm.LinearRegression and all([p in degrees for p in [1,2,3,4,5]]):
             nores.plot_theta_progression(*params2, filename=f3)
             nores.plot_theta_heatmap(*params2, filename=f4)
 
@@ -208,7 +235,8 @@ if plot == "cv":
         
         f1 = None
         if args["filename"]: f1 = f"{args['filename']}_{name}_mse_kfold"
-        cv.plot_train_mse_kfold(degrees, mse_across_folds, name, filename=f1)
+        cv.plot_train_mse_kfold(degrees, mse_across_folds, name, lmbda=lmbda, filename=f1)
+
 
 # Make heatmap plots
 if plot == "heatmap":
