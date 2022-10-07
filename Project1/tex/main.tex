@@ -90,11 +90,11 @@
 
 
 
-\begin{figure}[H]\label{fig:intro:plat}
-    \centering
-    \includegraphics[width=0.5\linewidth]{Young-Platypus.jpg}
-    \caption{Some figure caption}
-\end{figure}
+% \begin{figure}[H]\label{fig:intro:plat}
+%     \centering
+%     \includegraphics[width=0.5\linewidth]{Young-Platypus.jpg}
+%     \caption{Some figure caption}
+% \end{figure}
 
 \section{Theory}
     Before we delve into to details of the theory section, it is useful to take a moment to define the quantities we will be dealing with. Let $\vec{y}$ denote a vector of a series of measured values $y_i$, $i\in 1, 2,\ldots, n$ at points $X$, where $X$ is a matrix where the rows $x_i$ correspond to the input values that produced the measurement $y_i$. For completeness we refer to the columns of $X$ as $\vec{x}_a$, $a=1, 2,\ldots, p$.\footnote{Throughout this project, $a, b$ will always index the $p$ features for a model, and $i, j$ the $n$ data points.} Together, these form the dataset $\mathcal{D} = \cclosed{(y_i, x_i)}$. Another important set of values is $\vec{\theta}$ which contains the parameters that will define the model we will use to predict the data.
@@ -471,16 +471,22 @@
 
 
     \subsection{Nicaraguan terrain data}
-        Initially, we fit the OLS method to the terrain data with $p\in[5, 25]$. 
+    Initially, we fit the OLS method to the terrain data with $p\in[5, 25]$. 
+        \begin{figure} [ht]
+            \centering
+            \includegraphics[width=\linewidth]{BV_OLS_OLS_mse_kfold.pdf}
+            \caption{MSE of OLS on Nicaraguan terrain data using $k=7$ cross validation. Miminum at $p=12$ with $\mse = 0.1808$.}
+            \label{res:fig:Nica_OLS}
+        \end{figure}
+    
+        \begin{figure} [ht]
+            \centering
+            \includegraphics[width=\linewidth]{HM_Nica_Ridge_heatmap.pdf}
+            \includegraphics[width=\linewidth]{HM_Nica_Lasso_heatmap.pdf}
+            \caption{Grid search of the MSE of the ridge and Lasso methods fitted to Nicaraguan terrain data with $k=7$ CV resampling. The red crosses denote the best $\lambda$-value for each degree, the large cross denoting the global minimum of the MSE.}
+            \label{res:fig:Nica_heatmap}
+        \end{figure}
 
-        
-        % \begin{figure} [ht]
-        %     \centering
-        %     % \includegraphics[width=\linewidth]{HM_Nica_Ridge_heatmap.pdf}
-        %     % \includegraphics[width=\linewidth]{HM_Nica_Lasso_heatmap.pdf}
-        %     \caption{Grid search of the MSE of the ridge and Lasso methods fitted to Nicaraguan terrain data with $k=7$ CV resampling. The red crosses denote the best $\lambda$-value for each degree, the large cross denoting the global minimum of the MSE.}
-        %     \label{res:fig:Nica_heatmap}
-        % \end{figure}
     
 \section{Discussion}
     \subsection{Data scaling}
