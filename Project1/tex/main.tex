@@ -305,9 +305,7 @@
             To reduce the computational cost introduced when increasing the number of folds $k$, we aim to first study the calculated test MSE for $k \in [5,10]$. By studying the stability of the test MSE across different $k$ values, we can qualitatively identify where the trend stabalises and used this $k$ for further application.   
 
     \subsection{OLS Revisited}
-        As concluded in the section above, resampling the data yields a more precise evaluation of our model. We will therefore revisit the implementation of OLS now employing resampling techniques. 
-
-
+        As concluded in the section above, resampling the data yields a more precise evaluation of our model. We will therefore revisit the implementation of OLS, now employing resampling techniques. We start by plotting the MSE for the training and testing data as a function of model complexity (polynomial degree from $p=1\text{--}12$). Thereafter we plot the bias-variance decomposition of the MSE value.  
 
 
     
@@ -401,20 +399,28 @@
 
 
         \subsubsection*{Applying Resampling}
+        The 
+            \begin{figure}[ht]
+                \centering
+                \includegraphics[width=\linewidth]{BS_train_test_mse_OLS.pdf}
+                \caption{Plot of the MSE values calculated using the training and testing data for various bootstraps. The solid line is the mean of all the bootstrapped models.}
+                \label{res:fig:train_test_ols}
+            \end{figure}
+
             \begin{figure}[H]
                 \centering
                 \includegraphics[width=\linewidth]{BS_Bias_var_decomp_OLS.pdf}
-                \caption{FILL ME}
-                \label{fig:res:OLS_bias_variance_tradeoff}
+                \caption{Plot of the bias-variance decomposition. }
+                \label{res:fig:OLS_bias_variance_tradeoff_ols}
             \end{figure}
 
-
-            \begin{figure}[ht]
+            \begin{figure}
                 \centering
-                \includegraphics[width=\linewidth]{BS_mse_across_rounds_OLS.pdf}
+                \includegraphics[width=\linewidth]{}
                 \caption{}
-                \label{}
+                \label{res:fig:}
             \end{figure}
+
     
 
     \subsection{Ridge and Lasso}
