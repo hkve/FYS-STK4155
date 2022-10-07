@@ -15,7 +15,7 @@ def plot_with_increasing_noise(sigma = [0, 0.01, 0.1, 0.2]):
         plot_FrankeFunction(D, filename=filename)
 
 def plot_Terrain_fit_and_raw():
-    D = load_Terrain("SRTM_data_Nica.tif", n=9000)
+    D = load_Terrain("SRTM_data_Nica.tif", n=600)
 
     plot_Terrain(D)
 

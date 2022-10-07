@@ -371,7 +371,7 @@
                 \label{res:tab:OLS_kfold_optimal}
             \end{table}
             
-            Just as in the case without resampling, the train MSE decreases with $p$. For the test MSE, the increase after the various $\msub{p}{opt}$ values is smaller, but the general trend is the same.  
+            Just as in the case without resampling, the train MSE decreases with $p$. For the test MSE, the increase after the various $\msub{p}{opt}$ values is smaller, but the general trend is the same. For further usage of Cross-validation as a resampling technique applied to the Franke data, we use $k = 7$.   
             
             \begin{figure}[H]
                 \centering
@@ -411,7 +411,41 @@
 
     \subsection{Ridge and Lasso}
         \comment{No naïveté, exploration of resampling is just 1 sentence.}\\
-        We now repeat the same analysis for ridge and Lasso regression.
+        We now repeat the same analysis for ridge and Lasso regression. \comment{Add plots for task C repeated for Ridge and Lasso (parts of task e and f)}
+        
+        We preform the save Cross-validation analysis as we did for OLS. This has been done for two different $\lambda$ values, $0.1$ and $10^{-7}$. This can be seen in figure \ref{res:fig:ridge_cv_badlambda} and \ref{res:fig:ridge_cv_goodlambda} respectively.
+        \begin{figure}[ht]
+            \begin{subfigure}{\linewidth}
+                \centering
+                \includegraphics[width=\linewidth]{bad_lmbda_Ridge_mse_kfold.pdf}
+            \end{subfigure}
+            \caption{Test and train MSE calculated across different polynomial degrees using Ridge regression for $\lambda = 10^{-1}$}
+            \label{res:fig:ridge_cv_badlambda}
+            \begin{subfigure}{\linewidth}
+                \centering
+                \includegraphics[width=\linewidth]{good_lmbda_Ridge_mse_kfold.pdf}
+            \end{subfigure}
+            \caption{Test and train MSE calculated across different polynomial degrees using Ridge regression for $\lambda = 10^{-7}$}
+            \label{res:fig:ridge_cv_goodlambda}
+        \end{figure}
+
+        Moving on to Lasso regression, we try the same $\lambda$ values of $0.1$ and $10^{-7}$. 
+
+        \begin{figure}[ht]
+            \begin{subfigure}{\linewidth}
+                \centering
+                \includegraphics[width=\linewidth]{bad_lmbda_Lasso_mse_kfold.pdf}
+            \end{subfigure}
+            \caption{Test and train MSE calculated across different polynomial degrees using Lasso regression for $\lambda = 10^{-1}$}
+            \label{res:fig:lasso_cv_badlambda}
+            \begin{subfigure}{\linewidth}
+                \centering
+                \includegraphics[width=\linewidth]{good_lmbda_Lasso_mse_kfold.pdf}
+            \end{subfigure}
+            \caption{Test and train MSE calculated across different polynomial degrees using Lasso regression for $\lambda = 10^{-7}$}
+            \label{res:fig:lasso_cv_goodlambda}
+        \end{figure}
+
         \begin{figure}[ht]
             \begin{subfigure}{\linewidth}
                 \centering
