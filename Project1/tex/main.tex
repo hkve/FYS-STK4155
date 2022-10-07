@@ -88,6 +88,14 @@
 
     All the models will be applied by fitting a two-dimensional polynomial expansion to the observed data.
 
+
+
+\begin{figure}[H]\label{fig:intro:plat}
+    \centering
+    \includegraphics[width=0.5\linewidth]{Young-Platypus.jpg}
+    \caption{Some figure caption}
+\end{figure}
+
 \section{Theory}
     Before we delve into to details of the theory section, it is useful to take a moment to define the quantities we will be dealing with. Let $\vec{y}$ denote a vector of a series of measured values $y_i$, $i\in 1, 2,\ldots, n$ at points $X$, where $X$ is a matrix where the rows $x_i$ correspond to the input values that produced the measurement $y_i$. For completeness we refer to the columns of $X$ as $\vec{x}_a$, $a=1, 2,\ldots, p$.\footnote{Throughout this project, $a, b$ will always index the $p$ features for a model, and $i, j$ the $n$ data points.} Together, these form the dataset $\mathcal{D} = \cclosed{(y_i, x_i)}$. Another important set of values is $\vec{\theta}$ which contains the parameters that will define the model we will use to predict the data.
 
@@ -270,17 +278,20 @@
 
 
     \subsection{Initial application of OLS}
+        \comment{Thought we could put the initial testing without resampling into a section of its own, -\Carl}\\
         At first, we try out the OLS algorithm on our Franke data with $n=600$ data points. We plot the MSE and $\Rsquared$ of the testing and training data as we crank up the maximum degree of our polynomials in Eq.~\eqref{met:eq:design_X} from $p=1 \text{--} 12$. The way the coefficient values change as complexity increases can give us insight to the stability of our model. To get a better feel for this we plot the coefficient values $\theta_{ab}$ corresponding to $x^ay^b$ for $p=1,3,5$. Likewise, we tabulate the values of the coefficients for $p=1 \text{--} 5$. 
 
     \subsection{Resampling techniques}
+        \comment{I think we should introduce the initial testing of the resamplers where we find optimal rounds or $k$ in this section. Then we add the `real' application and comparison in ridge/lasso section. -\Carl}
         With the intent to compute more accurate measures for goodness of fit (such as MSE and $\Rsquared$) to evaluate our model, we 
         artificially increase the data sample by repeatedly fitting the model on subsamples of our data. This approach is called resampling and consists of a variety of methods. In this project we have applied \textit{Bootstrapping} and \textit{$k$-fold Cross-validation}. 
         \comment{Reminder: Address how we calculate and compare bias-variance - that we find them for every test data point, and compare the average values over all data points.}
 
         \subsubsection*{Bootstrap}
-            Bootstrapping consists of generating new training data by sampling data points from the original training data with replacement; meaning the same data points can be selected more than once. The new set of training data is called a bootstrapped dataset and is used to train the model. Then the relevant measures for goodness of fit is calculated. This process of resampling and calculating measures is repeated a certain number of times (bootstrap rounds), giving a distribution of these measures. The mean of the measures is then calculated across the bootstrapped models. Through the central limit theorem this mean is assumed to be the more accurate measure for goodness of fit and therefore a better evaluation of the model in question. Bootstrapping is also a method of weighing some data points more than others. This might shed new light on the data.  
+            Bootstrapping consists of generating new training data by sampling data points from the original training data with replacement; meaning the same data points can be selected more than once. The new set of training data is called a bootstrapped dataset and is used to train the model. Then the relevant measures for goodness of fit is calculated. This process of resampling and calculating measures is repeated a certain number of times (bootstrap rounds), giving a distribution of these measures. The mean of the measures is then calculated across the bootstrapped models. Through the central limit theorem this mean is assumed to be the more accurate measure for goodness of fit and therefore a better evaluation of the model in question. Bootstrapping is also a method of weighing some data points more than others. This might shed new light on the data. 
 
-            Together with the MSE, the bias and variance of the model are in our case relevant measures for goodness of fit. We are interested in calculating these measures, not for each bootstrapped model, but across the models. Given $L$ number of bootstrap rounds (and corresponding bootstrapped models), we want the bias and variance between all the bootstrapped models at each point compared to the testing data (see Eqs.~\eqref{theo:eq:bias and var}). This will create a bias value and variance value for each of the input data points. When evaluating a model of a certain polynomial degree, we find an appropriate measure of the bias and variance for the entire model, would be the mean across data points. 
+            Together with the MSE, the bias and variance of the model are in our case relevant measures for goodness of fit. By implementing bootstrapping we wish to study the bias-variance trade off. We are interested in calculating these measures, not for each bootstrapped model, but across the models. Given $L$ number of bootstrap rounds (and corresponding bootstrapped models), we want the bias and variance between all the bootstrapped models at each point compared to the testing data (see equations \ref
+            {theo:eq:bias and var}). This will create a bias value and variance value for each of the input data points. When evaluating a model of a certain polynomial degree, we find an appropriate measure of the bias and variance for the entire model, would be the mean across data points. 
             
             When employing bootstrap it is important to find an appropriate number of rounds to preform the resampling. There is a trade-off between getting an accurate distribution of the values and keeping the process computationally feasible. To find the optimal number of rounds we preform bootstrap on the Franke data for a variety of rounds while  calculating the MSE values. There will be a distribution of MSE values for each number of rounds. By taking the mean of each distribution we can plot it as a function of rounds and find where it stabilises. One can argue that any number of rounds above this point will be excessive. 
 
@@ -295,6 +306,13 @@
             \newline\newline
             To reduce the computational cost introduced when increasing the number of folds $k$, we aim to first study the calculated test MSE for $k \in [5,10]$. By studying the stability of the test MSE across different $k$ values, we can qualitatively identify where the trend stabalises and used this $k$ for further application.   
 
+    \subsection{OLS Revisited}
+        As concluded in the section above, resampling the data yields a more precise evaluation of our model. We will therefore revisit the implementation of OLS now employing resampling techniques. 
+
+
+
+
+    
     \subsection{Expanding to Regularised Regression}
         With the regularised regression methods, ridge and Lasso, we introduce a hyperparameter $\lambda$ that affects our fit. To explore this, we will study the MSE of the fits using cross validation resampling as the polynomial degree and $\lambda$-value is changed. We will use the same polynomial degrees as when exploring OLS, and look at a wide range of $\lambda \in [10^{-9}, 10^1]$ with logarithmically spaced values. This effectively results in a gridsearch over ($p$,$\lambda$), where the lowest MSE value will give us the optimal set of paramters $(\msub{p}{opt}, \msub{\lambda}{opt})$. To 
 
@@ -384,20 +402,20 @@
             \comment{Should maybe comment on the choice of the blue field.}
 
 
-            \begin{figure}[ht]
-                \centering
-                \includegraphics[width=\linewidth]{BS_mse_across_rounds_OLS.pdf}
-                \caption{}
-                \label{}
-            \end{figure}
-
-
         \subsubsection*{Applying Resampling}
             \begin{figure}[H]
                 \centering
                 \includegraphics[width=\linewidth]{BS_Bias_var_decomp_OLS.pdf}
                 \caption{FILL ME}
                 \label{fig:res:OLS_bias_variance_tradeoff}
+            \end{figure}
+
+
+            \begin{figure}[ht]
+                \centering
+                \includegraphics[width=\linewidth]{BS_mse_across_rounds_OLS.pdf}
+                \caption{}
+                \label{}
             \end{figure}
     
 
@@ -456,13 +474,13 @@
         Initially, we fit the OLS method to the terrain data with $p\in[5, 25]$. 
 
         
-        \begin{figure} [ht]
-            \centering
-            \includegraphics[width=\linewidth]{HM_Nica_Ridge_heatmap.pdf}
-            \includegraphics[width=\linewidth]{HM_Nica_Lasso_heatmap.pdf}
-            \caption{Grid search of the MSE of the ridge and Lasso methods fitted to Nicaraguan terrain data with $k=7$ CV resampling. The red crosses denote the best $\lambda$-value for each degree, the large cross denoting the global minimum of the MSE.}
-            \label{res:fig:Nica_heatmap}
-        \end{figure}
+        % \begin{figure} [ht]
+        %     \centering
+        %     % \includegraphics[width=\linewidth]{HM_Nica_Ridge_heatmap.pdf}
+        %     % \includegraphics[width=\linewidth]{HM_Nica_Lasso_heatmap.pdf}
+        %     \caption{Grid search of the MSE of the ridge and Lasso methods fitted to Nicaraguan terrain data with $k=7$ CV resampling. The red crosses denote the best $\lambda$-value for each degree, the large cross denoting the global minimum of the MSE.}
+        %     \label{res:fig:Nica_heatmap}
+        % \end{figure}
     
 \section{Discussion}
     \subsection{Data scaling}
