@@ -1,6 +1,6 @@
 \documentclass[twocolumn,english,notitlepage]{article}
 \usepackage[margin=0.5in]{geometry}
-\setlength{\parindent}{0pt} % no indents
+% \setlength{\parindent}{0pt} % no indents
 
 % Math
 \usepackage{amsmath}
@@ -85,14 +85,6 @@
     The aforementioned models will be explored using resampling techniques, which will be employed to extract the relevant statistical quantities in an accurate way. We will use the standard methods of Bootstrapping and $k$-fold Cross Validation and compare the results we get between them across the three linear models.
 
     All the models will be applied by fitting a two-dimensional polynomial expansion to the observed data.
-
-
-
-\begin{figure}[H]\label{fig:intro:plat}
-    \centering
-    \includegraphics[width=0.5\linewidth]{Young-Platypus.jpg}
-    \caption{Some figure caption}
-\end{figure}
 
 \section{Theory}
     Before we delve into to details of the theory section, it is useful to take a moment to define the quantities we will be dealing with. Let $\vec{y}$ denote a vector of a series of measured values $y_i$, $i\in 1, 2,\ldots, n$ at points $X$, where $X$ is a matrix where the rows $x_i$ correspond to the input values that produced the measurement $y_i$. For completeness we refer to the columns of $X$ as $\vec{x}_a$, $a=1, 2,\ldots, p$.\footnote{Throughout this project, $a, b$ will always index the $p$ features for a model, and $i, j$ the $n$ data points.} Together, these form the dataset $\mathcal{D} = \cclosed{(y_i, x_i)}$. Another important set of values is $\vec{\theta}$ which contains the parameters that will define the model we will use to predict the data.
@@ -244,7 +236,8 @@
             We chose to sample terrain data from a mountainous region in northwestern Nicaragua, close to the border to Honduras, see Figure~\ref{met:fig:gmaps}.
             The terrain data consists of a 300 by 300 point grid with one arcsecond ('') resolution. When doing our fits, we restrict our data to $n=600$, as in the earlier case of the Franke function. The points are sampled uniformly from the grid, without replacement. 
             \begin{figure} [ht]
-                \includegraphics[width=\linewidth]{Nica_gmaps.PNG}
+                \centering
+                \includegraphics[width=.9\linewidth]{Nica_gmaps.PNG}
                 \caption{Map of the terrain taken from \url{google.com/maps}. \\
                 Coordinates of south-west corner: $13^\circ\,26'\,40''\,\text{N}, 86^\circ\,33'\,20''\,\text{W}$ \\
                 Coordinates of north-east corner: $13^\circ\,31'\,40''\,\text{N}, 86^\circ\,28'\,20''\,\text{W}$}
@@ -275,11 +268,9 @@
 
 
     \subsection{Initial application of OLS}
-        \comment{Thought we could put the initial testing without resampling into a section of its own, -\Carl}\\
         At first, we try out the OLS algorithm on our Franke data with $n=600$ data points. We plot the MSE and $\Rsquared$ of the testing and training data as we crank up the maximum degree of our polynomials in Eq.~\eqref{met:eq:design_X} from $p=1 \text{--} 12$. The way the coefficient values change as complexity increases can give us insight to the stability of our model. To get a better feel for this we plot the coefficient values $\theta_{ab}$ corresponding to $x^ay^b$ for $p=1,3,5$. Likewise, we tabulate the values of the coefficients for $p=1 \text{--} 5$. 
 
     \subsection{Resampling techniques}
-        \comment{I think we should introduce the initial testing of the resamplers where we find optimal rounds or $k$ in this section. Then we add the `real' application and comparison in ridge/lasso section. -\Carl}
         With the intent to compute more accurate measures for goodness of fit (such as MSE and $\Rsquared$) to evaluate our model, we 
         artificially increase the data sample by repeatedly fitting the model on subsamples of our data. This approach is called resampling and consists of a variety of methods. In this project we have applied \textit{Bootstrapping} and \textit{$k$-fold Cross-validation}. 
         \comment{Reminder: Address how we calculate and compare bias-variance - that we find them for every test data point, and compare the average values over all data points.}
@@ -287,7 +278,7 @@
         \subsubsection*{Bootstrap}
             Bootstrapping consists of generating new training data by sampling data points from the original training data with replacement; meaning the same data points can be selected more than once. The new set of training data is called a bootstrapped dataset and is used to train the model. Then the relevant measures for goodness of fit is calculated. This process of resampling and calculating measures is repeated a certain number of times (bootstrap rounds), giving a distribution of these measures. The mean of the measures is then calculated across the bootstrapped models. Through the central limit theorem this mean is assumed to be the more accurate measure for goodness of fit and therefore a better evaluation of the model in question.
 
-            Together with the MSE, the bias and variance of the model are in our case relevant measures for goodness of fit. We are interested in calculating these measures, not for each bootstrapped model, but across the models. Given $L$ number of bootstrap rounds (and corresponding bootstrapped models), we want the bias and variance between all the bootstrapped models at each point compared to the testing data (see equations \ref*{theo:eq:bias and var}). This will create a bias value and variance value for each of the input data points. When evaluating a model of a certain polynomial degree, we find an appropriate measure of the bias and variance for the entire model, would be the mean across data points. 
+            Together with the MSE, the bias and variance of the model are in our case relevant measures for goodness of fit. We are interested in calculating these measures, not for each bootstrapped model, but across the models. Given $L$ number of bootstrap rounds (and corresponding bootstrapped models), we want the bias and variance between all the bootstrapped models at each point compared to the testing data (see Eqs.~\eqref{theo:eq:bias and var}). This will create a bias value and variance value for each of the input data points. When evaluating a model of a certain polynomial degree, we find an appropriate measure of the bias and variance for the entire model, would be the mean across data points. 
             
 
 
@@ -306,21 +297,16 @@
             \newline\newline
             To reduce the computational cost introduced when increasing the number of folds $k$, we aim to first study the calculated test MSE for $k \in [5,10]$. By studying the stability of the test MSE across different $k$ values, we can qualitatively identify where the trend stabalises and used this $k$ for further application.   
 
-    \subsection{Expanding to regularised methods}
-        \comment{Not married to this section name or separate existence. -\Carl}\\
+    \subsection{Expanding to Regularised Regression}
         With the regularised regression methods, ridge and Lasso, we introduce a hyperparameter $\lambda$ that affects our fit. To explore this, we will study the MSE of the fits using cross validation resampling as the polynomial degree and $\lambda$-value is changed. We will use the same polynomial degrees as when exploring OLS, and look at a wide range of $\lambda \in [10^{-9}, 10^1]$ with logarithmically spaced values. This effectively results in a gridsearch over ($p$,$\lambda$), where the lowest MSE value will give us the optimal set of paramters $(\msub{p}{opt}, \msub{\lambda}{opt})$. To 
 
         When we have gotten a feeling for the $\lambda$-values in relation to the polynomial degree, we will study the bias-variance tradeoff of all our models using Bootstrap resampling as we increase the complexity of our parametrisation of $X$. This includes a decomposition and comparison with our previous OLS method. We will further look at the difference between `good' $\lambda$-values from our previous examination, and a `poorer' choice of $\lambda$ to see more precisely how it affects the goodness of fit.
 
-        Finally, we will study the bias-variance tradeoff as a function of $\lambda$, with the polynomial degree fixed at a good number (\comment{What is a good number?}). This might give insight into the effective degrees of freedom of the regularised methods (\comment{perhaps?}).
+        Finally, we will study the bias-variance tradeoff as a function of $\lambda$, with the polynomial degree fixed at a good number (\comment{What is a good number?}). The hope is that this will give insight into the effective degrees of freedom of the regularised methods (\comment{perhaps?}).
 
     \subsection{Application on Real Data}
-        \comment{Here we talk about the repeat of the analysis on real data, and model selection.}\\
-        Finally, we will apply the three regression methods on our Nicaraguan terrain data. We repeat the same analyses as done earlier, starting by varying the number of degrees for a simple OLS fit. When moving to our regularied methods, Ridge and Lasso, the same method using gridsearch for hyperparameter optimazation will be used. Using the optimal paramters for each model, a comparison between them will be preformed to find which model most accurately recreates the test-portion of the data. We do bias-variance decomposition of the models as they fit the test-portion of the data, varying the complexity of the design matrix from expansion up to power $p=1\text{--}15$ (\comment{insert correct power here}). This will be used as a basis for a comparison of the vailidity of the three models in their application in recreating mountainous terrain. Finally, for completeness, we plot our best fit to the terrain and compare with the actual terrain.
-
-        % We do bias-variance decomposition of the models as they fit the test-portion of the data, varying the complexity of the design matrix from expansion up to power $p=1\text{--}15$ (\comment{insert correct power here}).
-
-        %This will be used as a basis for a comparison of the vailidity of the three models in their application in recreating mountainous terrain. Finally, for cokmpleteness, we plot our best fit to the terrain against the terrain.
+        Finally, we will apply the three regression methods on our Nicaraguan terrain data. We many the same analyses as done earlier, starting by varying the number of degrees for a simple OLS fit, finding the optimal degree by minimising the MSE found using cross validation.
+        When moving to our regularied methods, the same method gridsearching for hyperparameter optimazation will be used. Using the optimal parameters for each model, a comparison between them will be preformed to find which model most accurately recreates the test data. We do bias-variance decomposition of the models as they fit the test data, varying the complexity of the design matrix from expansion up to power $p=5\text{--}25$. This will be used as a basis for a comparison of the vailidity of the three models in their application in recreating mountainous terrain. Finally, for completeness, we plot our best fit to the terrain and compare with the actual terrain.
 
 
 \section{Results}
@@ -341,7 +327,7 @@
                     \label{fig:res:OLS_R2_noresample}
                 \end{figure}
 
-                To investigate the stability of our fits with varying polynomial degrees, we also plot coefficient values with varying polynomial degree. In Figure~\ref{fig:res:OLS_beta_values_plot} we see these plotted for $p = 1,2,3$ with 95\% confidence intervals. These are calculated using the diagonal $\sigma^2_{\theta_a} = \var{(\hat{\theta})_{aa}}$. Additionally, in Figure~\ref{fig:res:OLS_beta_values_table} we see the values of these coefficients tabulated for $p \in [1,5]$.
+                To investigate the stability of our fits with varying polynomial degrees, we also plot coefficient values with varying polynomial degree. In Figure~\ref{fig:res:OLS_beta_values_plot} we see these plotted for $p = 1,2,3$ with 95\% confidence intervals. These are calculated using the diagonal $\sigma^2_{\theta_a} = \var{(\vec{\hat{\theta}})_{aa}}$. Additionally, in Figure~\ref{fig:res:OLS_beta_values_table} we see the values of these coefficients tabulated for $p \in [1,5]$.
 
             \begin{figure*}
                 \begin{subfigure}{\textwidth}
@@ -419,7 +405,7 @@
         \comment{No naïveté, exploration of resampling is just 1 sentence.}\\
         We now repeat the same analysis for ridge and Lasso regression. \comment{Add plots for task C repeated for Ridge and Lasso (parts of task e and f)}
         
-        We preform the save Cross-validation analysis as we did for OLS. This has been done for two different $\lambda$ values, $0.1$ and $10^{-7}$. This can be seen in figure \ref{res:fig:ridge_cv_badlambda} and \ref{res:fig:ridge_cv_goodlambda} respectively.
+        We preform the save Cross-validation analysis as we did for OLS. This has been done for two different $\lambda$ values, $0.1$ and $10^{-7}$. This can be seen in Figures~\ref{res:fig:ridge_cv_badlambda} and~\ref{res:fig:ridge_cv_goodlambda} respectively.
         \begin{figure}[ht]
             \begin{subfigure}{\linewidth}
                 \centering
@@ -461,12 +447,20 @@
                 \centering
                 \includegraphics[width=\linewidth]{heatmap_lasso.pdf}
             \end{subfigure}
-            \caption{Grid search of the MSE of the ridge and Lasso methods with CV. The red crosses denote the best $\lambda$-value for each degree, the large cross denoting the global minimum of the MSE.}
-            \label{fig:res:heatmaps}
+            \caption{Grid search of the MSE of the ridge and Lasso methods fitted to the Franke function with $k=7$ CV resampling. The red crosses denote the best $\lambda$-value for each degree, the large cross denoting the global minimum of the MSE.}
+            \label{fig:res:Franke_heatmaps}
         \end{figure}
 
 
     \subsection{Nicaraguan terrain data}
+        
+        \begin{figure} [ht]
+            \centering
+            \includegraphics[width=\linewidth]{HM_Nica_Ridge_heatmap.pdf}
+            \includegraphics[width=\linewidth]{HM_Nica_Lasso_heatmap.pdf}
+            \caption{Grid search of the MSE of the ridge and Lasso methods fitted to Nicaraguan terrain data with $k=7$ CV resampling. The red crosses denote the best $\lambda$-value for each degree, the large cross denoting the global minimum of the MSE.}
+            \label{res:fig:Nica_heatmap}
+        \end{figure}
     
 \section{Discussion}
     \subsection{Data scaling}
@@ -578,7 +572,7 @@
     
     \section{Exploring number of Bootstrap rounds} \label{app:sec:BS rounds}
         \comment{Add reference -\Anna}
-         Figure \ref*{app:fig:histograms for rounds} shows that the distribution of MSE values derived from models trained on bootstrapped data set approaches a normal distribution as the number of bootstrap rounds increases, as the Central Limit Theorem states. In accordance with other results, one can see from the plots that when exceeding 400 rounds the distribution stabilises (see also figure \ref*{res:fig:mse across rounds} for this result). As in figure \ref*{} the histograms show that the training data gives a smaller and more consistent MSE value than the testing data. This holds across number of bootstrap rounds.
+         Figure~\ref{app:fig:histograms for rounds} shows that the distribution of MSE values derived from models trained on bootstrapped data set approaches a normal distribution as the number of bootstrap rounds increases, as the Central Limit Theorem states. In accordance with other results, one can see from the plots that when exceeding 400 rounds the distribution stabilises (see also Figure~\ref{res:fig:mse across rounds} for this result). As in Figure~\ref{} the histograms show that the training data gives a smaller and more consistent MSE value than the testing data. This holds across number of bootstrap rounds.
         \begin{figure*}
             \begin{subfigure}{.5\textwidth}
                 \centering
