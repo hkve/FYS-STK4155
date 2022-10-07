@@ -205,7 +205,7 @@
             \begin{align}
                 P(\vec{\theta}) = \prod_{a=1}^{p} \frac{1}{2\tau} \exp{-\frac{|\theta_a|}{\tau}},
             \end{align}
-            which as we can see is not differentiable at $\theta_a = 0$. This means that the optimisation of the probability $P(\vec{\theta}|X, \vec{y})$ is not necessarily possible analytically without putting bounds on the data $X, \vec{y}$, and even numerical algorithms like gradient descent will encounter trouble. Moreover, it is not optimisable point by point, unless bounds like $X^TX$ being diagonal are enforced. This makes Lasso generally more cumbersome. Nevertheless, we can coax a cost function out of the probability, which is minimalisable. Letting the cost function be written $\msub{C}{lasso}(\vec{\theta}) = -A\log\pclosed{P(\vec{\theta|X,\vec{y}})} + B$  we can choose the constants $A, B$ such that
+            which as we can see is not differentiable at $\theta_a = 0$. This means that the optimisation of the probability $P(\vec{\theta}|X, \vec{y})$ is not necessarily possible analytically without putting bounds on the data $X, \vec{y}$, and even numerical algorithms like gradient descent will encounter trouble. Moreover, it is not optimisable point by point, unless bounds like $X^TX$ being diagonal are enforced. This makes Lasso generally more cumbersome. Nevertheless, we can coax a cost function out of the probability, which is minimalisable. Letting the cost function be written $\msub{C}{lasso}(\vec{\theta}) = -A\log\pclosed{P(\vec{\theta}|X,\vec{y}}) + B$  we can choose the constants $A, B$ such that
             \begin{align}
                 \boxed{
                     \msub{C}{lasso}(\vec{\vec{\theta}}) = \norm[2]{ \vec{y} - X\vec{\theta} }^2 + \lambda \norm[1]{\vec{\theta}},
@@ -240,8 +240,8 @@
 
         \subsubsection*{Terrain data}
             \comment{Here we put the terrain we extracted with coordinates etc.}\\
-            We chose to sample terrain data from a mountainous region in northwestern Nicaragua, close to the border to Honduras.
-
+            We chose to sample terrain data from a mountainous region in northwestern Nicaragua, close to the border to Honduras, see Figure~\ref{met:fig:gmaps}.
+            The terrain data consists of a 300 by 300 point grid with one arcsecond ('') resolution. When doing our fits, we restrict our data to $n=600$, as in the earlier case of the Franke function. The points are sampled uniformly from the grid, without replacement. 
             \begin{figure} [ht]
                 \includegraphics[width=\linewidth]{Nica_gmaps.PNG}
                 \caption{Map of the terrain taken from \url{google.com/maps}. \\
@@ -291,7 +291,7 @@
             \newline\newline
             In this report, we will use the famous \textit{$k$-fold Cross-validation} technique. Considering the dataset $\mathcal{D} = (\vec{y}, X)$, consisting of $n$ data points: Initially we partition $\mathcal{D}$ into $k$ folds $\mathcal{D}_i$, $i = 1, \ldots , k$, of equal size. For each fold $\mathcal{D}_i$, a model is fitted using every fold \textit{except} $\mathcal{D}_i$, which we denote $\mathcal{D}_{-i}$. With this model, we calculate the different statitistical measures of the model on $\mathcal{D}_i$, which was not used to fit the model. When this is done for all $k$ folds, we take the mean of the measures to get the final goodness of fit. 
             \newline\newline
-            To reduce the computational cost introduced when increasing the number of folds $k$, we aim to first study the calculated test MSE for $k \in [5,10]$. By studying the stability of the test MSE across different $k$ values, we can qualitatively identify where the trend stabalizes and used this $k$ for further application.   
+            To reduce the computational cost introduced when increasing the number of folds $k$, we aim to first study the calculated test MSE for $k \in [5,10]$. By studying the stability of the test MSE across different $k$ values, we can qualitatively identify where the trend stabalises and used this $k$ for further application.   
 
     \subsection{Expanding to regularised methods}
         \comment{Not married to this section name or separate existence. -\Carl}\\
@@ -450,7 +450,7 @@
         where in the last line, we used that $\expval(\epsilon\hat{f}) = \expval(\epsilon)\expval(\hat{f})=0$.\footnote{At first glance, this might seem odd, as there is noise involved in the fitting of $\hat{f}$ too. However, under the assumption that the noise is i.i.d. between experiments, the noise in the data used to fit $\hat{f}$ is independent of the noise in a test sample. It is worth noting that this would not be true if we were comparing with the same data used to fit the model, which explains the optimism of the training MSE. \comment{This last part here might be put into the discussion perhaps?}}
 
     \section{Theoretical proof of concept of the OLS model} \label{app:sec:OLS_proof}
-        Supposing that we have have data generated from from $y_i = f(x_i)+\epsilon$ as before, we look statistical quantities derived from the distribution of our parameters $\vec{\theta}$ inhereted from $\epsilon\distas \normal{0}{\sigma^2}$. Under the assumption that $f(x) \in \operatorname{span}\cclosed{x}_a$ of our design matrix $X$, we can write the data $\vec{y} = X\vec{\theta} + \vec{\epsilon}$ for some $\vec{\theta}$ which would be a `true' optimum for our parameters.
+        Supposing that we have have data generated from from $y_i = f(x_i)+\epsilon$ as before, we look statistical quantities derived from the distribution of our parameters $\vec{\theta}$ inhereted from $\epsilon\distas \normal{0}{\sigma^2}$. Under the assumption that $f(x) \in \operatorname{span}\cclosed{x}_a, a\in 1,\ldots,p$ of our design matrix $X$, we can write the data $\vec{y} = X\vec{\theta} + \vec{\epsilon}$ for some $\vec{\theta}$ which would be a `true' optimum for our parameters.
 
         The expectation value of a datapoint $y_i$ is\footnote{In this appendix, we understand repeated indices to be summed over.}
         \begin{align}
@@ -478,7 +478,7 @@
 
 
     \section{Parameters for artifical data} \label{app:sec:frankefunction N and sigma}
-        To fairly compare between methods, a constant number of sampled points $N$ from the Franke function (equation~\ref{met:eq:Franke_Function}) and the noise magnitude $\sigma$ needs to be set. We decided that $N = 600$ points should be sufficient to get enough data points in both the train and test set, while still being small enough to not bring in too much computational complexity. The points $(x,y)$ are drawn from a uniform distribution $x,y \distas \mathcal{U}(0,1)$ limited to their domain. Trough visual inspection, we decided on $\sigma = 0.1$ for the noise $\epsilon \distas \normal{0}{\sigma^2}$. We found that this scale gave our function plenty of noise, while still being recognizable (Figure~\ref{fig:app:frankefunction varying noise}).   
+        To fairly compare between methods, a constant number of sampled points $N$ from the Franke function (Eq.~\ref{met:eq:Franke_Function}) and the noise magnitude $\sigma$ needs to be set. We decided that $N = 600$ points should be sufficient to get enough data points in both the train and test set, while still being small enough to not bring in too much computational complexity. The points $(x,y)$ are drawn from a uniform distribution $x,y \distas \mathcal{U}(0,1)$ limited to their domain. Trough visual inspection, we decided on $\sigma = 0.1$ for the noise $\epsilon \distas \normal{0}{\sigma^2}$. We found that this scale gave our function plenty of noise, while still being recognizable (Figure~\ref{fig:app:frankefunction varying noise}).   
         \begin{figure*}
             \begin{subfigure}{.5\textwidth}
                 \centering
