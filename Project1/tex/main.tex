@@ -398,7 +398,7 @@
             \begin{figure}[ht]
                 \centering
                 \includegraphics[width=\linewidth]{BS_mse_across_rounds_OLS.pdf}
-                \caption{Plot of the MSE value as a function of number of bootstrap rounds. Each MSE value in the plot is the mean of the MSE values for that number of rounds. The blue field around the graph is the standard deviation of the MSE distribution divided by the number of bootstrap rounds.}
+                \caption{Plot of the MSE value as a function of number of bootstrap rounds. Each MSE value in the plot is the mean of the MSE values for that number of rounds. The blue field around the graph is the standard deviation of the MSE distribution divided by the square root of the number of bootstrap rounds.}
                 \label{res:fig:bs_mse_across_rounds}
             \end{figure}
             We can see from the plot that the mean MSE value varies a lot in the beginning, but stabilises around 400 rounds and remains rather constant thereafter. The same goes for the standard deviation divided by number of rounds (the blue field around the graph). For further exploration of the number of bootstrap rounds and the distributions of the MSE values see Appendix~\ref{app:sec:BS rounds}. 
@@ -461,37 +461,30 @@
         \comment{No naïveté, exploration of resampling is just 1 sentence.}\\
         We now repeat the same analysis for ridge and Lasso regression. \comment{Add plots for task C repeated for Ridge and Lasso (parts of task e and f)}
         
-        We perform the save Cross-validation analysis as we did for OLS. This has been done for two different $\lambda$ values, $0.1$ and $10^{-7}$. This can be seen in Figures~\ref{res:fig:ridge_cv_badlambda} and~\ref{res:fig:ridge_cv_goodlambda} respectively.
+        We perform the save Cross-validation analysis as we did for OLS. This has been done for two different $\lambda$ values, $0.1$ and $10^{-7}$, both with ridge and Lasso regression. This can be seen in Figures~\ref{res:fig:ridgelasso_cv_badlambda} and~\ref{res:fig:ridgelasso_cv_goodlambda} respectively.
         \begin{figure}[ht]
-            \begin{subfigure}{\linewidth}
+            \begin{subfigure}{.5\linewidth}
                 \centering
                 \includegraphics[width=\linewidth]{bad_lmbda_Ridge_mse_kfold.pdf}
             \end{subfigure}
-            \caption{Test and train MSE calculated across different polynomial degrees using Ridge regression for $\lambda = 10^{-1}$}
-            \label{res:fig:ridge_cv_badlambda}
-            \begin{subfigure}{\linewidth}
-                \centering
-                \includegraphics[width=\linewidth]{good_lmbda_Ridge_mse_kfold.pdf}
-            \end{subfigure}
-            \caption{Test and train MSE calculated across different polynomial degrees using Ridge regression for $\lambda = 10^{-7}$}
-            \label{res:fig:ridge_cv_goodlambda}
-        \end{figure}
-
-        Moving on to Lasso regression, we try the same $\lambda$ values of $0.1$ and $10^{-7}$. 
-
-        \begin{figure}[ht]
-            \begin{subfigure}{\linewidth}
+            \hfill
+            \begin{subfigure}{.5\linewidth}
                 \centering
                 \includegraphics[width=\linewidth]{bad_lmbda_Lasso_mse_kfold.pdf}
             \end{subfigure}
-            \caption{Test and train MSE calculated across different polynomial degrees using Lasso regression for $\lambda = 10^{-1}$}
-            \label{res:fig:lasso_cv_badlambda}
-            \begin{subfigure}{\linewidth}
+            \caption{Test and train MSE calculated across different polynomial degrees using Ridge and Lasso regression with $\lambda = 10^{-1}$}
+            \label{res:fig:ridgelasso_cv_badlambda}
+            \begin{subfigure}{.5\linewidth}
+                \centering
+                \includegraphics[width=\linewidth]{good_lmbda_Ridge_mse_kfold.pdf}
+            \end{subfigure}
+            \hfill
+            \begin{subfigure}{.5\linewidth}
                 \centering
                 \includegraphics[width=\linewidth]{good_lmbda_Lasso_mse_kfold.pdf}
             \end{subfigure}
-            \caption{Test and train MSE calculated across different polynomial degrees using Lasso regression for $\lambda = 10^{-7}$}
-            \label{res:fig:lasso_cv_goodlambda}
+            \caption{Test and train MSE calculated across different polynomial degrees using Ridge and Lasso regression with $\lambda = 10^{-7}$}
+            \label{res:fig:ridgelasso_cv_goodlambda}
         \end{figure}
 
         \begin{figure}[ht]

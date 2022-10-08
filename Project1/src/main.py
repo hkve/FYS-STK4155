@@ -1,7 +1,5 @@
 # Does the actual parsing
 import argparse
-from fileinput import filename
-from pyexpat import model
 import numpy as np
 
 import sknotlearn.datasets as datasets
@@ -17,7 +15,7 @@ parser = argparse.ArgumentParser()
 plots_parser = parser.add_subparsers(help="Plot", dest="plot")
 
 naive_parser = plots_parser.add_parser("naive", help="""
-    Preform fitting using a train-test split, and plotting the MSE and R2 scores
+    perform fitting using a train-test split, and plotting the MSE and R2 scores
     as a function of polynomial degrees. If OLS is used, a
     plot and table showing coefficient sizes will also be shown.
 """)
@@ -33,7 +31,7 @@ naive_parser.add_argument("-lL", "--lmbdaLasso", type=float, default=0.1, help="
 naive_parser.add_argument("-f", "--filename", type=str, default=None, help="Filename in case the plot(s) should be saved. Will chain filename_(type_of_plot)")
 
 cv_parser = plots_parser.add_parser("cv", help=""" 
-    Preform fitting using k-fold Cross-validation, plotting the MSE score as a function of number of degrees.
+    perform fitting using k-fold Cross-validation, plotting the MSE score as a function of number of degrees.
     Plots train/test mse curves in the same plot with different k values. 
 """)
 cv_parser.add_argument("-k", "--kfolds", nargs="+", type=int, default=7, help="How many folds to run. To compare, type multiple sep by spaces")
@@ -49,7 +47,7 @@ cv_parser.add_argument("-lL", "--lmbdaLasso", type=float, default=0.1, help="Set
 cv_parser.add_argument("-f", "--filename", type=str, default=None, help="Filename in case the plot(s) should be saved. Will chain filename_(type_of_plot)")
 
 heatmap_parser = plots_parser.add_parser("heatmap", help="""
-    Preform a gridsearch of polynomial degrees and lambda values for Ridge and Lasso regression. Cross validation is used to calculated the 
+    perform a gridsearch of polynomial degrees and lambda values for Ridge and Lasso regression. Cross validation is used to calculated the 
     MSE values, with k = 7.
 """)
 heatmap_parser.add_argument("-k", "--kfolds", nargs="+", type=int, default=7, help="How many folds to run. To compare, type multiple sep by spaces")
@@ -69,7 +67,7 @@ heatmap_parser.add_argument("-l", "--load", type=str, default=None, help="If the
 
 bsrounds_parser = plots_parser.add_parser("bsrounds", help=""" 
     Makes a plot of averaged MSE against number of rounds used for boostrapping. Used to see how to the MSE stabalizes when
-    more bootstrap rounds are preformed.
+    more bootstrap rounds are performed.
 """)
 bsrounds_parser.add_argument("-OLS", "--OLS", type=bool, default=False, action=argparse.BooleanOptionalAction, help="Use OLS")
 bsrounds_parser.add_argument("-R", "--Ridge", type=bool, default=False, action=argparse.BooleanOptionalAction, help="Use Ridge")
