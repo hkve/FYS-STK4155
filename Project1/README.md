@@ -6,7 +6,7 @@ The current directory contains everything related to Project 1. This has been a 
 
 The ``src`` directory contains 3 subdirectories (``sknotlearn``, ``analysis`` and ``tests``) and 1 file (``main.py``). 
 
-``sknotlearn`` implements 3 fitting schemes, Ordinary least squares (OLS), Ridge regression and least absolute shrinkage and selection operator (Lasso). Additionally, two resampling schemes are implemented, namely Bootstrapping and k-fold Cross-Validation. This code uses a custom data class where scaling, train test splitting and so on can be preformed.      
+``sknotlearn`` implements 3 fitting schemes, Ordinary least squares (OLS), Ridge regression and Least-Absolute-Shrinkage-and-Selection-Operator (Lasso). Additionally, two resampling schemes are implemented, namely Bootstrapping and k-fold Cross-Validation. This code uses a custom data class where scaling, train test splitting and so on can be performed.      
 
 ``analysis`` is the subdirectory where we actually use this code on two specific datasets, an artificially created hilltop landscape made using the Franke function and digital terrain data from Central America.
 
