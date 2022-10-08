@@ -425,10 +425,10 @@
             \end{figure}
 
             The change in variance coincides with the results in Figure~\ref{res:fig:bs_train_test_ols}.
-            When using the MSE as a measure of the goodness of fit, the model yielding the lowest value will be considered the best. At this point in Figure~\ref{res:fig:bs_OLS_bias_variance_tradeoff_ols} (around 6 polynomial degrees) the bias is at its lowest and the variance has not yet increased much. This is an example of the bias-variance trade-off.  
+            When using the MSE as a measure of the goodness of fit, the model yielding the lowest value will be considered the best. At this point in Figure~\ref{res:fig:bs_OLS_bias_variance_tradeoff_ols} (around $p=6$) the bias is at its lowest and the variance has not yet increased much. This is an example of the bias-variance trade-off.  
 
             \comment{Remove the titles -\Anna}
-            In Figure~\ref{res:fig:bs_bias_var_data_points} we see the change in the bias-variance decomposition when varying the number of data points. For $n=60$ the bias remains at 0 for all model complexities while the MSE and variance are identical and increase with the polynomial degree. However, for $n=1500$ the MSE and bias reaches a minimum and seemingly stabilises, while the variance barely increases. 
+            In Figure~\ref{res:fig:bs_bias_var_data_points} we see the change in the bias-variance decomposition when varying the number of data points. For $n=60$ the bias remains at negligible for all model complexities while the MSE and variance are identical and increase with the polynomial degree. Conversely, for $n=1500$ the MSE and bias reaches a minimum and seemingly stabilises, while the variance barely increases. 
             \begin{figure}[ht]
                 \begin{subfigure}{.25\textwidth}
                     \centering
@@ -451,9 +451,9 @@
                 \caption{Bias-variance decomposition of OLS models when varying the number of data points.}
                 \label{res:fig:bs_bias_var_data_points}
             \end{figure}
-            That the bias remains low for a small number of data points corresponds with the notion that there requires a little complex model to approximate few data points. It also makes sense that the variance and MSE quickly increase with the model complexity; the model is easily overfitted. 
+            The fact that the bias remains low for small numbers of data points corresponds with the notion that little complexity is required to approximate few data points. It also makes sense that the variance and MSE quickly increase with the model complexity; the model is easily overfitted. 
 
-            For $n=1500$ the number of datapoints impedes the model from overfitting as such low polynomial degrees. Had we further increased the model complexity, we would again see the signs of overfitting. 
+            For $n=1500$ the number of data points impedes the model from overfitting at such low polynomial degrees. Had we further increased the model complexity, we should again see the signs of overfitting. 
 
     
 
@@ -539,7 +539,7 @@
                 \caption{Best fit to the Nicaraguan terrain test data found using OLS with $p=12$.}
                 \label{res:subfig:Nica_predict}
             \end{subfigure}
-            \caption{Comparison of the actual Nicaraguan terrain test data and the unscaled prediction of our best scoring model.}
+            \caption{Comparison of the actual Nicaraguan terrain test data and the unscaled prediction of our best scoring model. $x$ denotes arcseconds north, $y$ denotes arcseconds west. $z$ units can be disregarded, but scale serves to allow comparison of magnitude between the plots.}
             \label{res:fig:Nica_terrain}
         \end{figure}
 
