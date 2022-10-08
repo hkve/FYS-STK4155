@@ -507,6 +507,7 @@
                 \label{res:subfig:Nica_predict}
             \end{subfigure}
             \caption{Comparison of the actual Nicaraguan terrain test data and the unscaled prediction of our best scoring model.}
+            \label{res:fig:Nica_terrain}
         \end{figure}
 
 
@@ -536,6 +537,9 @@
             \comment{Some general disc about Bootstrapping here, and after that some comparison?}
             \newline
             The Bootstrap holds the test set constant during calculation of metrics. This is in contrast to Cross-validation where the test set is different (with no overlapping points) for each fitted model. Holding the test set constant might be beneficial since every model calculates metrics based on the same data, thus averaging over MSE scores gives a more accurate picture of the MSE present in that specific test set. However, this introduces bias since we assume that the selected test set accurately represents the population, which it may not. Cross-validation on the other hand does not average MSE values over the same test data and larger variations may occur. The advantage of this is that metrics are calculated on the entire data set, not just a specific partition.          
+
+        \subsection{Fit to terrain data}
+            Firstly, we should take a minute to discuss the choice of terrain data to fit to, and how this could change things. We naturally chose a mountainous terrain, for there to be more interesting features for the models to recapture. However, we chose a large region, with a full resolution ($300\times 300$ points) which we could not hope to do our full analysis, using of all the models and resampling adequately. We could either choose a smaller sub-area or sample more sparsely from the region. We chose the latter, as this would more closely resemble noisy data or a situation where we might not have all the data we would want for our regression. This highlights the power of regression methods to sift through data and find the most salient features. This is seen in Figure~\ref{res:fig:Nica_terrain}, where our fitted model recreates a smoothed version of the jagged mountains where the difference from the low valley to the high peak is obvious, but without the sharpness and details of the original data.
 
 \section{Concluding remarks}
 
