@@ -82,7 +82,7 @@
 % \tableofcontents
 
 \section{Introduction}
-    In this project, we will introduce some of the most important general properties of machine learning models in the context of linear regression. Specifically the mean squared error (MSE), the bias, and the variance of data predictions are essential in evaluating the quality of a statistical model. We look at the phenomena of underfitting and overfitting, and explore them in the context of bias-variance trade-off. The three models we will use explicitly are Ordinary Least Squares (OLS), Ridge regression and Least-Absolute-Shrinkage-and-Selection-Operation (Lasso) regression. These will first be tested on the 2D Franke function, and later on real geographical terrain data.
+    In this project, we will introduce some of the most important general properties of machine learning models in the context of linear regression. Specifically the mean squared error (MSE), the bias, and the variance of data predictions are essential in evaluating the quality of a statistical model. We look at the phenomena of under fitting and overfitting, and explore them in the context of bias-variance trade-off. The three models we will use explicitly are Ordinary Least Squares (OLS), Ridge regression and Least-Absolute-Shrinkage-and-Selection-Operation (Lasso) regression. These will first be tested on the 2D Franke function, and later on real geographical terrain data.
 
     The aforementioned models will be explored using resampling techniques, which will be employed to extract the relevant statistical quantities in an accurate way. We will use the standard methods of Bootstrapping and $k$-fold Cross Validation and compare the results we get between them across the three linear models.
 
@@ -135,7 +135,7 @@
 
 
     \subsubsection*{Central Limit Theorem}
-        The central limit theorem tells us that when sampling a series of quantities $\cclosed{z_i|i=1,\ldots,n}$ with independent and identical distributions with a mean $\mu$ and variance $\sigma^2<\infty$, the distribution of the sample mean $\bar{z}_n = \frac{1}{n}\sum_{i=1}^n z_i$ will approach a normal distrbution. Explicitly, we have
+        The central limit theorem tells us that when sampling a series of quantities $\cclosed{z_i|i=1,\ldots,n}$ with independent and identical distributions with a mean $\mu$ and variance $\sigma^2<\infty$, the distribution of the sample mean $\bar{z}_n = \frac{1}{n}\sum_{i=1}^n z_i$ will approach a normal distribution. Explicitly, we have
         \begin{align}\label{theo:eq:CLM}
             \lim_{n\to\infty} \sqrt{n}(\bar{z}_n-\mu) \distas \normal{0}{\sigma^2}.
         \end{align}
@@ -242,7 +242,6 @@
             And $\epsilon$ is some stochastic noise $\epsilon \distas \normal{0}{\sigma^2}$. By visual inspection, we can fine tune $\sigma$ to create data that looks like noisy digital terrain data. Unless specified otherwise all fits to the Franke function will use $n = 600$ uniformly distributed points $x,y \distas \mathcal{U}(0,1)$ with a noise level of $\sigma = 0.1$. We discuss this in Appendix~\ref{app:sec:frankefunction N and sigma}.   
 
         \subsubsection*{Terrain data}
-            \comment{Here we put the terrain we extracted with coordinates etc.}\\
             We chose to sample terrain data from a mountainous region in northwestern Nicaragua, close to the border to Honduras, see Figure~\ref{met:fig:gmaps}.
             The terrain data consists of a 300 by 300 point grid with one arcsecond ('') resolution. When doing our fits, we restrict our data to $n=600$, as in the earlier case of the Franke function. The points are sampled uniformly from the grid, without replacement. 
             \begin{figure} [ht]
@@ -481,7 +480,7 @@
         \begin{figure} [ht]
             \centering
             \includegraphics[width=\linewidth]{OPT_OLS_mse_kfold.pdf}
-            \caption{Optimisation of the MSE of OLS on the terrain data using $k=7$ cross validation. The thinner lines denote the MSE by fold, and the thicker line the mean. Mininum at $p=12$ with $\mse = 0.1808$.}
+            \caption{Optimisation of the MSE of OLS on the terrain data using $k=7$ cross validation. The thinner lines denote the MSE by fold, and the thicker line the mean. Minimum at $p=12$ with $\mse = 0.1808$.}
             \label{res:fig:Nica_OLS}
         \end{figure}
     
@@ -493,11 +492,26 @@
             \label{res:fig:Nica_heatmap}
         \end{figure}
 
+        \begin{figure} [H]
+            \begin{subfigure}{\linewidth}
+                \centering
+                \includegraphics[width=\linewidth]{Nica_test_plot.pdf}
+                \caption{Nicaraguan terrain test data for evaluating our linear regression methods against.}
+                \label{res:subfig:Nica_test}
+            \end{subfigure}
+            \\
+            \begin{subfigure}{\linewidth}
+                \centering
+                \includegraphics[width=\linewidth]{Nica_predict_plot.pdf}
+                \caption{Best fit to the Nicaraguan terrain test data found using OLS with $p=12$.}
+                \label{res:subfig:Nica_predict}
+            \end{subfigure}
+            \caption{Comparison of the actual Nicaraguan terrain test data and the unscaled prediction of our best scoring model.}
+        \end{figure}
+
 
 \section{Discussion}
     \subsection{Data scaling}
-        \comment{This should probably be a subsubsection within something else. Just summing up the thoughts we have thrown around regarding the necessity and function of scaling.}
-        \comment{Please read and see if it makes sense at all!}
         The scaling of the inputs and measurements can roughly be divided into two operations, each with their own set consequences. Let us first consider shifting of the measurements $\vec{y}$ and the inputs $\vec{x}_a$ by their respective means. Effectively, this eliminates a degree of freedom from our model $\hat{f}(x)$ as we set its mean value to zero, and leave out any parameter that would govern the intercept $\hat{f}(0)$. However, if we shift $\vec{y}$ to have zero mean as well, this degree of freedom becomes redundant, and we end up effectively reducing the dimensionality of the model by one. Moreover, in regularised models where some norm of the parameters $\norm[p]{\vec{\theta}}$ is penalised, we remove any penalisation of the choice of the intercept. This is natural to do, as the goal of these methods is to reduce the variance of the model, something which is not affected by changing the intercept.
 
         Considering now the rescaling of $\vec{y}$ and $\vec{x}_a$, these affect the fitting of the model more subtly. Looking at it through the lens of dimensionality know that
@@ -512,7 +526,6 @@
         Looking back at Figures~\ref{fig:res:OLS_mse_noresample} and~\ref{fig:res:OLS_R2_noresample} showing the MSE and $\Rsquared$ scores calculated using the train and test set, we recognise a common sign of overfitting when moving past $\msub{p}{opt} = 5$. Since the polynomial degree increases, we can make many more $x^ay^b$ combination, which in turn gives more coefficients $\theta_{ab}$ to determine. This introduces many new degrees of freedom to the fit, which allows our model to accurately recreate the exact points present in the training set, but at the cost of fitting the added noise $\epsilon$ and/or assuming a too complex structure to the underlying function $f(x)$. This can be seen by the large MSE values calculated on the test data, telling us that our model performs poorly on data which it has not yet been exposed to.
 
     \subsection{Resampling}
-        \comment{Here I am just writing a bit on our discussion about the limit of resampling. Structure of the discussion section is very much not set in any stone.}
         Resampling a given data set seems on the face of it to be truly the work of magic. Somehow we invoke the law of large samples from the central limit theorem~\eqref{theo:eq:CLM} that our statistical quantities, like the mean value, approaches the true value as the sample size grows. However, that is not exactly what we are doing when we are resampling. To illustrate this, we can think of a coin-flipping experiment where are results are categorically heads or tails. If we perform the experiment an \textit{odd} number of times, we must necessarily end up with either more heads or more tails. If we then continuously resample from this dataset, a mean value should, by the central limit theorem, rather approach the \textit{biased} mean value of the original dataset.
 
         The value of resampling rather comes from creating a way to emphasise different parts of the original dataset when fitting our model, and consequently comparing what this does to the predictions of the model. For instance, an overfitted model might contort to accommodate a statistical outlier in the original dataset, and thereby make a poor prediction on new data. However, when resampling, many of the new datasets sampled to make new fits from our model will not include this statistical outlier, and should make predictions not influenced too heavily by this. There should then be a medium where the particular `oddities' in the original dataset can be smoothed over, and the bias of the original dataset is not brought out to the front.
