@@ -4,7 +4,14 @@
 
 The current directory contains everything related to Project 1. This has been a collaboration between [Anna Aasen](https://github.com/Annaaasen), [Carl Martin Fevang](https://github.com/carlmfe) and [Håkon Kvernmoen](https://github.com/hkve). The directory ``src`` contains all the code written throughout this project, while the directory ``tex`` contains everything related to the written report. A pdf report can be found INSERT WHERE HERE.
 
-The ``src`` directory contains 3 subdirectories (``sknotlearn``, ``analysis`` and ``tests``) and 1 file (``main.py``). 
+The ``src`` directory contains 3 subdirectories (``sknotlearn``, ``analysis`` and ``tests``) and 1 file (``main.py``), which has the following dependencies (+ a version of python which allows these):
+
+* ``numpy``, >= 1.17
+* ``sklearn``, Any
+* ``matplotlib``, >= 3.1
+* ``seaborn``, >= 0.12.0
+* ``imageio``, >=2.22.1
+* ``cvxopt``, >= 1.3.0
 
 ``sknotlearn`` implements 3 fitting schemes, Ordinary least squares (OLS), Ridge regression and Least-Absolute-Shrinkage-and-Selection-Operator (Lasso). Additionally, two resampling schemes are implemented, namely Bootstrapping and k-fold Cross-Validation. This code uses a custom data class where scaling, train test splitting and so on can be performed.      
 
