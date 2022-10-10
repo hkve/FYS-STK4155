@@ -103,7 +103,7 @@
 
     \subsection{Error Assessment and Model Optimisation}
 
-    \subsubsection*{Measure for Goodness of Fit}
+    \subsubsection{Measure for Goodness of Fit}
         When we want to create a statistically informed model that is able to predict the outcome of future measurements, we need to develop metrics for how well our model fits the data we already have. That is, given a model parametrised by parameters $\vec{\theta}$, we want to optimise them such that $\hat{f}(x) \approx f(x)$. We call this the goodness of fit. To estimate how well we achieve this with our given dataset $\mathcal{D}$, we will start with the mean squared error (MSE). Given a model which predicts values $\vec{\hat{y}}$, the mean squared error is given by
         \begin{align}
             \mse(\vec{\hat{y}}) = \frac{1}{n} \sum_{i=1}^n (y_i-\hat{y}_i)^2 = \frac{1}{n} (\vec{y} - \vec{\hat{y}})^2,
@@ -134,7 +134,7 @@
         are the sample bias and sample variance of the model at the predicted point. This decomposition is done in more detail in Appendix~\ref{app:sec:bvdecomp}. The bias tells our model's tendency to err on a certain side of the `true' value. The variance describes the model's spread in prediction as the model is fitted to different data.
 
 
-    \subsubsection*{Central Limit Theorem}
+    \subsubsection{Central Limit Theorem}
         The central limit theorem tells us that when sampling a series of quantities $\cclosed{z_i|i=1,\ldots,n}$ with independent and identical distributions with a mean $\mu$ and variance $\sigma^2<\infty$, the distribution of the sample mean $\bar{z}_n = \frac{1}{n}\sum_{i=1}^n z_i$ will approach a normal distribution. Explicitly, we have
         \begin{align}\label{theo:eq:CLM}
             \lim_{n\to\infty} \sqrt{n}(\bar{z}_n-\mu) \distas \normal{0}{\sigma^2}.
@@ -204,7 +204,7 @@
 
 
         \subsubsection{Lasso Regression}
-            Lasso regression builds on the same ideas as ridge regression, but rather assumes parameters $\vec{\theta}$ are distributed according to the Laplace distribution $L(0, \tau)$. This looks like
+            Lasso regression builds on the same ideas as Ridge regression, but rather assumes parameters $\vec{\theta}$ are distributed according to the Laplace distribution $L(0, \tau)$. This looks like
             \begin{align}
                 P(\vec{\theta}) = \prod_{a=1}^{p} \frac{1}{2\tau} \exp{-\frac{|\theta_a|}{\tau}},
             \end{align}
@@ -219,10 +219,10 @@
 
 
 \section{Method}
-    Something general about initially fitting Franke data using OLS, ridge and Lasso. Then moving on to real terrain data \comment{something something}.
+    Something general about initially fitting Franke data using OLS, Ridge and Lasso. Then moving on to real terrain data \comment{something something}.
     
     \subsection{Datasets}
-        \subsubsection*{Franke Function}
+        \subsubsection{Franke Function}
 
             For the initial testing of our implemented fitting routines, we will use the so called \textit{Franke function}. Being able to control the number of sample points and noise levels will serve as a good examination of our models advantages and disadvantaged. Defined for $x, y \in [0,1]$
 
@@ -241,7 +241,7 @@
 
             And $\epsilon$ is some stochastic noise $\epsilon \distas \normal{0}{\sigma^2}$. By visual inspection, we can fine tune $\sigma$ to create data that looks like noisy digital terrain data. Unless specified otherwise all fits to the Franke function will use $n = 600$ uniformly distributed points $x,y \distas \mathcal{U}(0,1)$ with a noise level of $\sigma = 0.1$. We discuss this in Appendix~\ref{app:sec:frankefunction N and sigma}.   
 
-        \subsubsection*{Terrain Data}
+        \subsubsection{Terrain Data}
             We chose to sample terrain data from a mountainous region in northwestern Nicaragua, close to the border to Honduras, see Figure~\ref{met:fig:gmaps}.
             The terrain data consists of a 300 by 300 point grid with one arcsecond ('') resolution. When doing our fits, we restrict our data to $n=600$, as in the earlier case of the Franke function. The points are sampled uniformly from the grid, without replacement. 
             \begin{figure} [ht]
@@ -281,12 +281,12 @@
         At first, we try out the OLS algorithm on our Franke data with $n=600$ data points. We plot the MSE and $\Rsquared$ of the testing and training data as we crank up the maximum degree of our polynomials in Eq.~\eqref{met:eq:design_X} from $p=1 \text{--} 12$. The way the coefficient values change as complexity increases can give us insight to the stability of our model. To get a better feel for this we plot the coefficient values $\theta_{ab}$ corresponding to $x^ay^b$ for $p=1,3,5$. Likewise, we tabulate the values of the coefficients for $p=1 \text{--} 5$. 
 
     \subsection{Resampling Techniques}
-        \comment{I think we should introduce the initial testing of the resamplers where we find optimal rounds or $k$ in this section. Then we add the `real' application and comparison in ridge/lasso section. -\Carl}
+        \comment{I think we should introduce the initial testing of the resamplers where we find optimal rounds or $k$ in this section. Then we add the `real' application and comparison in Ridge/Lasso section. -\Carl}
         With the intent to compute more accurate measures for goodness of fit (such as MSE and $\Rsquared$) to evaluate our model, we 
         artificially increase the data sample by repeatedly fitting the model on subsamples of our data. This approach is called resampling and consists of a variety of methods. In this project we have applied \textit{Bootstrapping} and \textit{$k$-fold Cross-validation}. 
         \comment{Reminder: Address how we calculate and compare bias-variance -- that we find them for every test data point, and compare the average values over all data points.}
 
-        \subsubsection*{Bootstrap}
+        \subsubsection{Bootstrap}
             Bootstrapping consists of generating new training data by sampling data points from the original training data with replacement; meaning the same data points can be selected more than once. The new set of training data is called a bootstrapped dataset and is used to train the model. Then the relevant measures for goodness of fit is calculated. This process of resampling and calculating measures is repeated a certain number of times (bootstrap rounds), giving a distribution of these measures. The mean of the measures is then calculated across the bootstrapped models. Through the central limit theorem this mean is assumed to be the more accurate measure for goodness of fit and therefore a better evaluation of the model in question. Bootstrapping is also a method of weighing some data points more than others. This might shed new light on the data. 
 
             Together with the MSE, the bias and variance of the model are in our case relevant measures for goodness of fit. By implementing bootstrapping we wish to study the bias-variance trade off. Given a model of a certain complexity, we are interested in calculating these measures, not for each bootstrapped model, but across them. Given $L$ number of bootstrap rounds (and corresponding bootstrapped models), we want the bias and variance between all the bootstrapped models at each point compared to the testing data (see Eqs.~\eqref
@@ -295,7 +295,7 @@
             When employing bootstrap it is important to find an appropriate number of rounds to preform the resampling. There is a trade-off between getting an accurate distribution of the values and keeping the process computationally feasible. To find the optimal number of rounds we preform bootstrap on the Franke data for a variety of rounds while  calculating the MSE values. There will be a distribution of MSE values for each number of rounds. By taking the mean of each distribution we can plot it as a function of rounds and find where it stabilises. One can argue that any number of rounds above this point will be excessive. 
 
 
-        \subsubsection*{Cross-Validation}
+        \subsubsection{Cross-Validation}
             Cross-validation consist of partitioning the dataset into different subsets (which we will call \textit{folds}). By using some folds for fitting the model and others for computing metrics, we can get multiple values for the same measure by changing which folds are used for fitting and which are used for calculating measures. 
             \newline\newline
             In this report, we will use the famous \textit{$k$-fold Cross-validation} technique. Considering the dataset $\mathcal{D} = (\vec{y}, X)$, consisting of $n$ data points: Initially we partition $\mathcal{D}$ into $k$ folds $\mathcal{D}_i$, $i = 1, \ldots , k$, of equal size. For each fold $\mathcal{D}_i$, a model is fitted using every fold \textit{except} $\mathcal{D}_i$, which we denote $\mathcal{D}_{-i}$. With this model, we calculate the different statistical measures of the model on $\mathcal{D}_i$, which was not used to fit the model. When this is done for all $k$ folds, we take the mean of the measures to get the final goodness of fit. 
@@ -315,7 +315,7 @@
 
     
     \subsection{Expanding to Regularised Regression}
-        With the regularised regression methods, ridge and Lasso, we introduce a hyperparameter $\lambda$ that affects our fit. To explore this, we will study the MSE of the fits using cross-validation resampling as the polynomial degree and $\lambda$-value is changed. We will use the same polynomial degrees as when exploring OLS, and look at a wide range of $\lambda \in [10^{-9}, 10^1]$ with logarithmically spaced values. This effectively results in a grid search over ($p$,$\lambda$), where the lowest MSE value will give us the optimal set of paramters $(\msub{p}{opt}, \msub{\lambda}{opt})$. To be more confident in our optimal parameters we will apply one of our resampling techniques, Bootstrapping or Cross-validation, when searching for the test MSE minimum. Computational costs and accuracy will decide both which method we use and the number of rounds/folds to apply for each $(p,\lambda)$ value.      
+        With the regularised regression methods, Ridge and Lasso, we introduce a hyperparameter $\lambda$ that affects our fit. To explore this, we will study the MSE of the fits using cross-validation resampling as the polynomial degree and $\lambda$-value is changed. We will use the same polynomial degrees as when exploring OLS, and look at a wide range of $\lambda \in [10^{-9}, 10^1]$ with logarithmically spaced values. This effectively results in a grid search over ($p$,$\lambda$), where the lowest MSE value will give us the optimal set of paramters $(\msub{p}{opt}, \msub{\lambda}{opt})$. To be more confident in our optimal parameters we will apply one of our resampling techniques, Bootstrapping or Cross-validation, when searching for the test MSE minimum. Computational costs and accuracy will decide both which method we use and the number of rounds/folds to apply for each $(p,\lambda)$ value.      
 
         When we have got a feeling for the $\lambda$-values in relation to the polynomial degree, we will study the bias-variance tradeoff of all our models using Bootstrap resampling as we increase the complexity of our parametrisation of $X$. This includes a decomposition and comparison with our previous OLS method. We will further look at the difference between `good' $\lambda$-values from our previous examination, and a `poorer' choice of $\lambda$ to see more precisely how it affects the goodness of fit.
 
@@ -328,7 +328,7 @@
 
 \section{Results}
     \subsection{Ordinary Least Squares}
-            \subsubsection*{Without Resampling}
+            \subsubsection{Without Resampling}
                 We begin by calculating the MSE and $\Rsquared$ score (Eqs.~\ref{theo:eq:mse},~\ref{theo:eq:r2}) fitted to the Franke function for different polynomial degrees. This can be seen in Figures~\ref{res:fig:OLS_mse_noresample} and~\ref{res:fig:OLS_R2_noresample} respectively. Based on the MSE calculated for the test data, the optimal degree was found to be $\msub{p}{opt} = 5$ with $\mse \approx 0.134$. We observe that the train MSE decreases steadily with higher $p$, while the test MSE decreases until we reach $\msub{p}{opt}$, after which it increases. The opposite relationship is seen for the $\Rsquared$ score.   
                 \begin{figure}[H]
                     \centering
@@ -363,7 +363,7 @@
                 \label{res:fig:OLS_beta_values}
             \end{figure*} 
 
-        \subsubsection*{Exploring Resampling}
+        \subsubsection{Exploring Resampling}
             The metrics thus far have been calculated without the use of any resampling techniques. To see how this influences MSE, we apply $k$-fold Cross-validation and plot the averaged train- and test MSE across the different folds. This is presented in Figure~\ref{res:fig:OLS_mse_kfold}. The optimal polynomial degrees and MSE values based on the training data is presented in Table~\ref{res:tab:OLS_kfold_optimal}
 
 
@@ -405,7 +405,7 @@
             \comment{Should maybe comment on the choice of the blue field.}
 
 
-        \subsubsection*{Applying Resampling}
+        \subsubsection{Applying Resampling}
         \comment{I  have written what is supposed to be objective above the figures and subjective below (in case we want to move it to 'discussion') -\Anna}
             As we can see from the plot in Figure~\ref{res:fig:bs_train_test_ols} the bootstrapped models tested on the training data yield more or less identical MSE values and decrease as the model complexity increases. However, this is not the case when implementing the testing data. After a certain polynomial degree ($\sim 6$) the MSE value not only increases (as is seen also in Figure~\ref{res:fig:OLS_mse_noresample}), but there is a large variance in results of the bootstrapped models. $\epsilon$.  
             \begin{figure}[ht]
@@ -459,9 +459,9 @@
 
     \subsection{Ridge and Lasso}
         \comment{No naïveté, exploration of resampling is just 1 sentence.}\\
-        We now repeat the same analysis for ridge and Lasso regression. \comment{Add plots for task C repeated for Ridge and Lasso (parts of task e and f)}
+        We now repeat the same analysis for Ridge and Lasso regression. \comment{Add plots for task C repeated for Ridge and Lasso (parts of task e and f)}
         
-        We perform the save Cross-validation analysis as we did for OLS. This has been done for two different $\lambda$ values, $0.1$ and $10^{-7}$, both with ridge and Lasso regression. This can be seen in Figures~\ref{res:fig:ridgelasso_cv_badlambda} and~\ref{res:fig:ridgelasso_cv_goodlambda} respectively.
+        We perform the save Cross-validation analysis as we did for OLS. This has been done for two different $\lambda$ values, $0.1$ and $10^{-7}$, both with Ridge and Lasso regression. This can be seen in Figures~\ref{res:fig:ridgelasso_cv_badlambda} and~\ref{res:fig:ridgelasso_cv_goodlambda} respectively.
         \begin{figure}[ht]
             \begin{subfigure}{.5\linewidth}
                 \centering
@@ -496,43 +496,47 @@
                 \centering
                 \includegraphics[width=\linewidth]{heatmap_lasso.pdf}
             \end{subfigure}
-            \caption{Grid search of the MSE of the ridge and Lasso methods fitted to the Franke function with $k=7$ CV resampling. The red crosses denote the best $\lambda$-value for each degree, the large cross denoting the global minimum of the MSE.}
+            \caption{Grid search of the MSE of the Ridge and Lasso methods fitted to the Franke function with $k=7$ CV resampling. The red crosses denote the best $\lambda$-value for each degree, the large cross denoting the global minimum of the MSE.}
             \label{res:fig:Franke_heatmaps}
         \end{figure}
 
 
     \subsection{Nicaraguan Terrain Data}
-    Initially, we fit the OLS method to the terrain data with $p\in[5, 25]$. 
+    Initially, we fit the OLS method to the terrain data with $p\in[5, 25]$; this can be seen in Figure~\ref{res:fig:Nica_OLS}. From this, we conclude that $p=12$ is the optimal degree for OLS with $n=600$ data points on this terrain data, where the MSE has a minimum at $0.1808$. We see the recognisable signs of overfitting starting at around $p=18$.
         \begin{figure} [ht]
             \centering
             \includegraphics[width=\linewidth]{OPT_OLS_mse_kfold.pdf}
             \caption{Optimisation of the MSE of OLS on the terrain data using $k=7$ cross-validation. The thinner lines denote the MSE by fold, and the thicker line the mean. Minimum at $p=12$ with $\mse = 0.1808$.}
             \label{res:fig:Nica_OLS}
         \end{figure}
+
+    This leads us to optimise the regularised methods, seen in Figure~\ref{res:fig:Nica_heatmap}. We find $(p=12, \lambda = 3\cdot 10^{-9})$ as the optimum for Ridge, and $(p=13, \lambda=6 \cdot 10^{-5})$ for Lasso, with respective minimum MSEs $0.1865$ and $0.1887$ -- slightly underperforming OLS.
     
         \begin{figure} [ht]
             \centering
             \includegraphics[width=\linewidth]{HM_Nica_Ridge_heatmap.pdf}
             \includegraphics[width=\linewidth]{HM_Nica_Lasso_heatmap.pdf}
-            \caption{Grid search of the MSE of the ridge and Lasso methods fitted to Nicaraguan terrain data with $k=7$ CV resampling. The red crosses denote the best $\lambda$-value for each degree, the large cross denoting the global minimum of the MSE.}
+            \caption{Grid search of the MSE of the Ridge and Lasso methods fitted to Nicaraguan terrain data with $k=7$ CV resampling. The red crosses denote the best $\lambda$-value for each degree, the large cross denoting the global minimum of the MSE.}
             \label{res:fig:Nica_heatmap}
         \end{figure}
 
-        \begin{figure} [H]
+    We plot the test prediction of our best fit, OLS with $p=12$, against the test terrain data in Figure~\ref{res:fig:Nica_terrain}.
+
+        \begin{figure} [ht]
             \begin{subfigure}{\linewidth}
                 \centering
                 \includegraphics[width=\linewidth]{Nica_test_plot.pdf}
-                \caption{Nicaraguan terrain test data for evaluating our linear regression methods against.}
+                \caption{$n=600$ randomly sampled points from our Nicaraguan terrain data.}
                 \label{res:subfig:Nica_test}
             \end{subfigure}
             \\
             \begin{subfigure}{\linewidth}
                 \centering
                 \includegraphics[width=\linewidth]{Nica_predict_plot.pdf}
-                \caption{Best fit to the Nicaraguan terrain test data found using OLS with $p=12$.}
+                \caption{Best fit to the Nicaraguan terrain data found using OLS with $p=12$.}
                 \label{res:subfig:Nica_predict}
             \end{subfigure}
-            \caption{Comparison of the actual Nicaraguan terrain test data and the unscaled prediction of our best scoring model. $x$ denotes arcseconds north, $y$ denotes arcseconds west. $z$ units can be disregarded, but scale serves to allow comparison of magnitude between the plots.}
+            \caption{Comparison of the actual Nicaraguan terrain data and the unscaled prediction of our best scoring model. $x$ denotes arcseconds north, $y$ denotes arcseconds west. $z$ units can be disregarded, but scale serves to allow comparison of magnitude between the plots.}
             \label{res:fig:Nica_terrain}
         \end{figure}
 
@@ -545,7 +549,7 @@
         \begin{align}
             \dimof{\theta_a} = \dimof{y} / \dimof{x_a}.
         \end{align}
-        From this we can infer that the order of magnitude of a parameter $\theta_a$ is governed by the dimension its corresponding feature $\dimof{x_a}$. This matters in the regularised models where a cost is associated with the norm of the parameters $\norm[p]{\vec{\theta}}$, which will be dominated by parameters whose dimension is large. In practice, this means that the fitting will focus more on reducing the magnitude of the parameters whose associated dimension is large, letting the others fluctuate more freely. By making the $x_a$'s dimensionless, the parameters are put on a `level playing field', so to speak. The dimension of $y$ serves to raise or lower the order of magnitude of the all the parameters equally, and can be adjusted as to avoid numerical truncation errors by avoiding larger floats.
+        From this we can infer that the order of magnitude of a parameter $\theta_a$ is governed by the dimension of its corresponding feature $\dimof{x_a}$. This matters in the regularised models where a cost is associated with the norm of the parameters $\norm[p]{\vec{\theta}}$, which will be dominated by parameters whose dimension is large. In practice, this means that the fitting will focus more on reducing the magnitude of the parameters whose associated dimension is large, letting the others fluctuate more freely. By making the $x_a$'s dimensionless, the parameters are put on a `level playing field', so to speak. The dimension of $y$ serves to raise or lower the order of magnitude of the all the parameters equally, and can be adjusted as to avoid numerical truncation errors by avoiding larger floats.
 
         From this, we can conclude that scaling of the inputs is not strictly necessary when using OLS, as there is no regularisation penalty associated with the dimension of the parameters. However, the MSE is still a dimensionful quantity, and it is useful then to scale the data for OLS too for consistency and ease of comparison of the results between the models.
 
@@ -557,7 +561,7 @@
 
         The value of resampling rather comes from creating a way to emphasise different parts of the original dataset when fitting our model, and consequently comparing what this does to the predictions of the model. For instance, an overfitted model might contort to accommodate a statistical outlier in the original dataset, and thereby make a poor prediction on new data. However, when resampling, many of the new datasets sampled to make new fits from our model will not include this statistical outlier, and should make predictions not influenced too heavily by this. There should then be a medium where the particular `oddities' in the original dataset can be smoothed over, and the bias of the original dataset is not brought out to the front.
 
-        \subsubsection*{Cross-Validation and Bootstrap} 
+        \subsubsection{Cross-Validation and Bootstrap} 
             The choice of $k=7$ used for our parameter grid search is influenced by the computational aspect of the approach. Since a model has to be fitted $k$ times for each set of parameter $(p,\lambda)$, it is clear that this increases the time taken to search the parameter space. However, for both OLS and Ridge, the closed form expressions (Eqs.~\eqref{theo:eq:OLS_coefs} and~\eqref{theo:eq:Ridge_coefs} respectively) only require matrix multiplication and inversion. Adding more folds could potentially be feasible here. However, since Lasso requires a cost function minimization, it is significantly slower than OLS and Ridge, especially for high $p$. Therefore, we get a trade-off between the number of $(p,\lambda)$ to try and the number of folds $k$, where $k=7$ was found to allow for high parameter resolution while still being completed in a feasible amount of time.
             \newline
             \comment{Some general disc about Bootstrapping here, and after that some comparison?}
