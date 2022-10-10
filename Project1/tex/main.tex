@@ -504,10 +504,8 @@
         \end{figure}
 
         \subsubsection{Bias-Variance Decomposition}
-<<<<<<< HEAD
             Using the optimal $\lambda$ found from cross-validation heatmap (see Figure~\ref{res:fig:Franke_heatmaps}) we now plot the bias-variance decomposition of Ridge and Lasso as funtions of model complexity. The results can be seen in Figure~\ref{res:fig:bs_bias_var_Ridge_Lasso}. As apposed to OLS, the MSE values of Ridge and Lasso do not increase with polynomial degree after a certain threshold, but rather always decreases (apart from some fluctuations). The plots resemble the OLS for $n=1500$. 
-=======
->>>>>>> 29ba1104c323a746a0d81545e441bdf8e1bae6bc
+
             \begin{figure}[ht]
                 \begin{subfigure}{\linewidth}
                     \centering
@@ -522,12 +520,9 @@
             \end{figure}
             This means that there is little to no occurence of overfitting when applying these methods.     
         
-<<<<<<< HEAD
 
             We would now like to do the bias-variance decomposition for one optimal and one suboptimal $\lambda$ for Ridge and Lasso. The plot of this can be found in Figure~\ref{res:fig:bs_bias_var_two_lmbdas_Ridge_Lasso}. To clarify, here the $\lambda$s are constant across all polynomials degree. It is evident that in both approaches the suboptimal $\lambda$ preforms better than the optimal $\lambda$ for larger degrees (a result of the choice of optimal $\lambda$), but never reaches an MSE as low as the optimal $\lambda$. 
-=======
-        \subsubsection{Bias-Variance Decomposition as a function of $\lambda$}
->>>>>>> 29ba1104c323a746a0d81545e441bdf8e1bae6bc
+
             \begin{figure}[ht]
                 \begin{subfigure}{\linewidth}
                     \centering
@@ -540,13 +535,11 @@
                 \caption{Bias-variance decomposition of Ridge and Lasso on Franke data with $n=600$, now with two different $\lambda$s; one optimal (found through cross-validation) and one larger.}
                 \label{res:fig:bs_bias_var_two_lmbdas_Ridge_Lasso}
             \end{figure}
-<<<<<<< HEAD
+
             We can see that the models of optimal $\lambda$s reach a minimum MSE value and thereafter increase with the model complexity. This is not the case for the models of the larger $\lambda$s, but it is plausible that it would be if we were to increase the polynomial degree further. Ridge and Lasso are not directly comparable as they differ in their definition of $\lambda$ (see Eqs.~\eqref{theo:eq:Ridge_coefs} and~\eqref{theo:eq:Lasso_costfunction}).   
             
             Lastly we will examine the bias variance decomposition as a funtion of $\lambda$ (see Figure~\ref{res:fig:bs_bias_var_lmbdas_Ridge_Lasso}).  
-=======
 
->>>>>>> 29ba1104c323a746a0d81545e441bdf8e1bae6bc
             \begin{figure}[ht]
                 \begin{subfigure}{\linewidth}
                     \centering
