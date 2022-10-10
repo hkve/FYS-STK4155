@@ -1,0 +1,52 @@
+\documentclass[twocolumn,english,notitlepage]{article}
+\usepackage[margin=0.5in]{geometry}
+% \setlength{\parindent}{0pt} % no indents
+
+\usepackage{overhead} % I put the overhead in a separate file
+
+\title{Project 2}
+\author{Anna Hjertvik Aasen, Carl Martin Fevang, Håkon Kvernmoen}
+\date{\today}
+
+\begin{document}
+
+\twocolumn[
+    \begin{@twocolumnfalse}
+        \maketitle
+        \begin{abstract}
+            This is the abstract.
+        \end{abstract}
+    \end{@twocolumnfalse}
+]
+
+% \tableofcontents
+
+\section{Introduction}
+\input{sections/introduction}
+
+\section{Theory}
+\input{sections/theory}
+
+\section{Method}
+\input{sections/method}
+
+\section{Results}
+\input{sections/results}
+
+\section{Discussion}
+\input{sections/discussion}
+
+\section{Concluding remarks}
+\input{sections/conclusion}
+
+% for numbering appendix equations more appropriately
+\numberwithin{equation}{section}
+\renewcommand{\theequation}{\thesection.\arabic{equation}}
+\begin{appendices}
+    \input{sections/appendix}
+\end{appendices}
+
+\printbibliography
+
+\end{document}
+
