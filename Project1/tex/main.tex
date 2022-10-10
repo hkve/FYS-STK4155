@@ -66,7 +66,7 @@
 \newcommand{\Anna}{$\mathfrak{Anna}$}
 
 \title{Bias-Variance Tradeoff in Simple Linear Models}
-\author{Anna Aasen, Carl Martin Fevang, Håkon Kvernmoen}
+\author{Anna Hjertvik Aasen, Carl Martin Fevang, Håkon Kvernmoen}
 \date{\today}
 
 \begin{document}
@@ -75,7 +75,7 @@
     \begin{@twocolumnfalse}
         \maketitle
         \begin{abstract}
-            This is the abstract.
+            In this project, we explored evaluation of goodness of fit of the OLS regression method against 2D terrain-like data; first the Franke function and then on real terrain data from the Nicaraguan mountains. We used different polynomial expansions of the 2D inputs as our features, exploring the balance of the bias of low-complexity models against the variance and overfitting of high-complexity ones. To do this, we employed two resampling techniques, bootstrapping and $k$-fold cross-validation. Further, we looked at two regression models with an added $L_p$ penalisation on the magnitude of the parameters to see how this affects the stability of the fit, and find that their variance is dampened as the penalisation is intensified. Finally, we compare their application on the real terrain data, and find that OLS is most easily fitted, and does best on the MSE score.
         \end{abstract}
     \end{@twocolumnfalse}
 ]
@@ -85,13 +85,13 @@
 \section{Introduction}
     In this project, we will introduce some of the most important general properties of machine learning models in the context of linear regression. Specifically the mean squared error (MSE), the bias, and the variance of data predictions are essential in evaluating the quality of a statistical model. We look at the phenomena of under fitting and overfitting, and explore them in the context of bias-variance trade-off. The three models we will use explicitly are Ordinary Least Squares (OLS), Ridge regression and Least-Absolute-Shrinkage-and-Selection-Operation (Lasso) regression. These will first be tested on the 2D Franke function, and later on real geographical terrain data.
 
-    The aforementioned models will be explored using resampling techniques, which will be employed to extract the relevant statistical quantities in an accurate way. We will use the standard methods of Bootstrapping and $k$-fold Cross-Validation and compare the results we get between them across the three linear models.
+    The aforementioned models will be explored using resampling techniques, which will be employed to extract the relevant statistical quantities in an accurate way. We will use the standard methods of Bootstrapping and $k$-fold cross-validation and compare the results we get between them across the three linear models.
 
     All the models will be applied by fitting a two-dimensional polynomial expansion to the observed data.
 
 
 
-% \begin{figure}[H]\label{fig:intro:plat}
+% \begin{figure}[ht]\label{fig:intro:plat}
 %     \centering
 %     \includegraphics[width=0.5\linewidth]{Young-Platypus.jpg}
 %     \caption{Some figure caption}
@@ -181,7 +181,7 @@
             An exploration of the statistical expectation and variance of the OLS results is done in Appendix~\ref{app:sec:OLS_proof}.
 
         \subsubsection{Ridge Regression}
-            So far, we have assumed that the parameters $\vec{\theta}$ are uniformly distributed, and as such have no \textit{bias} towards any particular value. In practice, this means that the OLS model will contort to fit itself to all values in the data. As such, a motivation for adding a bias could be for the sake of stability in the fit. These methods are called \textit{regularised} methods. An example is ridge regression, where one assumes that the parameters are normally distributed, such that parameter values far from the mean are thought less likely to occur. This in practice means that the model is less willing to contort to outliers in the dataset, trading it for a bias towards certain parameter values. Assuming the probability distribution for $\theta_a \distas \normal{0}{\tau^2}$,
+            So far, we have assumed that the parameters $\vec{\theta}$ are uniformly distributed, and as such have no \textit{bias} towards any particular value. In practice, this means that the OLS model will contort to fit itself to all values in the data. As such, a motivation for adding a bias could be for the sake of stability in the fit. These methods are called \textit{regularised} methods. An example is Ridge regression, where one assumes that the parameters are normally distributed, such that parameter values far from the mean are thought less likely to occur. This in practice means that the model is less willing to contort to outliers in the dataset, trading it for a bias towards certain parameter values. Assuming the probability distribution for $\theta_a \distas \normal{0}{\tau^2}$,
             \begin{align}
                 P(\vec{\theta}) = \prod_{a=1}^{p} \frac{1}{\sqrt{2\pi\tau^2}} \exp{-\frac{\theta_a^2}{2\tau^2}},
             \end{align}
@@ -284,7 +284,7 @@
     \subsection{Resampling Techniques}
         \comment{I think we should introduce the initial testing of the resamplers where we find optimal rounds or $k$ in this section. Then we add the `real' application and comparison in Ridge/Lasso section. -\Carl}
         With the intent to compute more accurate measures for goodness of fit (such as MSE and $\Rsquared$) to evaluate our model, we 
-        artificially increase the data set by repeatedly fitting the model on subsamples of our data. This approach is called resampling and consists of a variety of methods. In this project we have applied \textit{Bootstrapping} and \textit{$k$-fold Cross-validation}. 
+        artificially increase the data set by repeatedly fitting the model on subsamples of our data. This approach is called resampling and consists of a variety of methods. In this project we have applied \textit{Bootstrapping} and \textit{$k$-fold cross-validation}. 
         \comment{Reminder: Address how we calculate and compare bias-variance -- that we find them for every test data point, and compare the average values over all data points.}
 
         \subsubsection{Bootstrap}
@@ -299,9 +299,9 @@
         \subsubsection{Cross-Validation}
             Cross-validation consist of partitioning the dataset into different subsets (which we will call \textit{folds}). By using some folds for fitting the model and others for computing metrics, we can get multiple values for the same measure by changing which folds are used for fitting and which are used for calculating measures. 
             \newline\newline
-            In this report, we will use the famous \textit{$k$-fold Cross-validation} technique. Considering the dataset $\mathcal{D} = (\vec{y}, X)$, consisting of $n$ data points: Initially we partition $\mathcal{D}$ into $k$ folds $\mathcal{D}_i$, $i = 1, \ldots , k$, of equal size. For each fold $\mathcal{D}_i$, a model is fitted using every fold \textit{except} $\mathcal{D}_i$, which we denote $\mathcal{D}_{-i}$. With this model, we calculate the different statistical measures of the model on $\mathcal{D}_i$, which was not used to fit the model. When this is done for all $k$ folds, we take the mean of the measures to get the final goodness of fit. 
+            In this report, we will use the famous \textit{$k$-fold cross-validation} technique. Considering the dataset $\mathcal{D} = (\vec{y}, X)$, consisting of $n$ data points: Initially we partition $\mathcal{D}$ into $k$ folds $\mathcal{D}_i$, $i = 1, \ldots , k$, of equal size. For each fold $\mathcal{D}_i$, a model is fitted using every fold \textit{except} $\mathcal{D}_i$, which we denote $\mathcal{D}_{-i}$. With this model, we calculate the different statistical measures of the model on $\mathcal{D}_i$, which was not used to fit the model. When this is done for all $k$ folds, we take the mean of the measures to get the final goodness of fit. 
 
-            When preforming Cross-validation, the computational cost is dependent on the number of folds $k$. Increasing $k$ will presumably give us more confidence in our calculated metrics, but has the downside of being more computationally expensive. We wish to study the effect that $k$ has on the calculated metrics for different polynomial degrees. This will be done by calculating the train and test MSE for $k \in [5,10]$ and studying the differences between results obtained for different  $k$ values. The stability of the test MSE metric will be our main focus, trying to find the lowest value of $k$ where increasing it does not yield drastically different results. Looking qualitatively for when the test MSE stabilises across folds will then presumably give us the lowest $k$ value required while still giving accurate results.
+            When preforming cross-validation, the computational cost is dependent on the number of folds $k$. Increasing $k$ will presumably give us more confidence in our calculated metrics, but has the downside of being more computationally expensive. We wish to study the effect that $k$ has on the calculated metrics for different polynomial degrees. This will be done by calculating the train and test MSE for $k \in [5,10]$ and studying the differences between results obtained for different  $k$ values. The stability of the test MSE metric will be our main focus, trying to find the lowest value of $k$ where increasing it does not yield drastically different results. Looking qualitatively for when the test MSE stabilises across folds will then presumably give us the lowest $k$ value required while still giving accurate results.
 
     \subsection{OLS Revisited}
         As discussed in the section above, resampling the data should yield a more precise evaluation of our model. We will therefore revisit the implementation of OLS, now employing resampling techniques. 
@@ -333,16 +333,16 @@
     \subsection{Ordinary Least Squares}
             \subsubsection{Without Resampling}
                 We begin by calculating the MSE and $\Rsquared$ score (Eqs.~\ref{theo:eq:mse},~\ref{theo:eq:r2}) fitted to the Franke function for different polynomial degrees. This can be seen in Figures~\ref{res:fig:OLS_mse_noresample} and~\ref{res:fig:OLS_R2_noresample} respectively. Based on the MSE calculated for the test data, the optimal degree was found to be $\msub{p}{opt} = 5$ with $\mse \approx 0.134$. We observe that the train MSE decreases steadily with higher $p$, while the test MSE decreases until we reach $\msub{p}{opt}$, after which it increases. The opposite relationship is seen for the $\Rsquared$ score.   
-                \begin{figure}[H]
+                \begin{figure}[ht]
                     \centering
-                    \includegraphics[width=\linewidth]{OLS_mse_noresample.pdf}
+                    \includegraphics[width=.9\linewidth]{OLS_mse_noresample.pdf}
                     \caption{Showing the MSE score for OLS, calculated on the train and test sample for different polynomial degrees.}
                     \label{res:fig:OLS_mse_noresample}
                 \end{figure}
 
-                \begin{figure}[H]
+                \begin{figure}[ht]
                     \centering
-                    \includegraphics[width=\linewidth]{OLS_r2_noresample.pdf}
+                    \includegraphics[width=.9\linewidth]{OLS_r2_noresample.pdf}
                     \caption{Showing the $\Rsquared$ score for OLS, calculated on the train and test sample for different polynomial degrees.}
                     \label{res:fig:OLS_R2_noresample}
                 \end{figure}
@@ -367,11 +367,11 @@
             \end{figure*} 
 
         \subsubsection{Exploring Resampling}
-            The metrics thus far have been calculated without the use of any resampling techniques. To see how this influences MSE, we apply $k$-fold Cross-validation and plot the averaged train- and test MSE across the different folds. This is presented in Figure~\ref{res:fig:OLS_mse_kfold}. The optimal polynomial degrees and MSE values based on the training data is presented in Table~\ref{res:tab:OLS_kfold_optimal}
+            The metrics thus far have been calculated without the use of any resampling techniques. To see how this influences MSE, we apply $k$-fold cross-validation and plot the averaged train- and test MSE across the different folds. This is presented in Figure~\ref{res:fig:OLS_mse_kfold}. The optimal polynomial degrees and MSE values based on the training data is presented in Table~\ref{res:tab:OLS_kfold_optimal}
 
 
 
-            \begin{table}[H]
+            \begin{table}[ht]
                 \centering
                 \begin{tabular}{l|ll}
                 $k$ & $\msub{p}{opt}$ & MSE \\
@@ -384,9 +384,9 @@
                 \label{res:tab:OLS_kfold_optimal}
             \end{table}
             
-            Just as in the case without resampling, the train MSE decreases with $p$. For the test MSE, the increase after the various $\msub{p}{opt}$ values is smaller, but the general trend is the same. For further usage of Cross-validation as a resampling technique applied to the Franke data, we use $k = 7$.   
+            Just as in the case without resampling, the train MSE decreases with $p$. For the test MSE, the increase after the various $\msub{p}{opt}$ values is smaller, but the general trend is the same. For further usage of cross-validation as a resampling technique applied to the Franke data, we use $k = 7$.   
             
-            \begin{figure}[H]
+            \begin{figure}[ht]
                 \centering
                 \includegraphics[width=\linewidth]{OLS_mse_kfold.pdf}
                 \caption{MSE values as a function of polynomial degrees, calculated using $k$-fold cross-validation for $k = 5, 7$ and $10$. }
@@ -462,7 +462,7 @@
         \comment{No naïveté, exploration of resampling is just 1 sentence.}\\
         We now repeat the same analysis for Ridge and Lasso regression. \comment{Add plots for task C repeated for Ridge and Lasso (parts of task e and f)}
         
-        We perform the save Cross-validation analysis as we did for OLS. This has been done for two different $\lambda$ values, $0.1$ and $10^{-7}$, both with Ridge and Lasso regression. This can be seen in Figures~\ref{res:fig:ridgelasso_cv_badlambda} and~\ref{res:fig:ridgelasso_cv_goodlambda} respectively.
+        We perform the save cross-validation analysis as we did for OLS. This has been done for two different $\lambda$ values, $0.1$ and $10^{-7}$, both with Ridge and Lasso regression. This can be seen in Figures~\ref{res:fig:ridgelasso_cv_badlambda} and~\ref{res:fig:ridgelasso_cv_goodlambda} respectively.
         \begin{figure}[ht]
             \begin{subfigure}{.9\linewidth}
                 \centering
@@ -475,6 +475,8 @@
             \end{subfigure}
             \caption{Test and train MSE calculated across different polynomial degrees using Ridge and Lasso regression with $\lambda = 10^{-1}$}
             \label{res:fig:ridgelasso_cv_badlambda}
+        \end{figure}
+        \begin{figure}[ht]
             \begin{subfigure}{.9\linewidth}
                 \centering
                 \includegraphics[width=\linewidth]{good_lmbda_Ridge_mse_kfold.pdf}
@@ -502,7 +504,10 @@
         \end{figure}
 
         \subsubsection{Bias-Variance Decomposition}
+<<<<<<< HEAD
             Using the optimal $\lambda$ found from cross-validation heatmap (see Figure~\ref{res:fig:Franke_heatmaps}) we now plot the bias-variance decomposition of Ridge and Lasso as funtions of model complexity. The results can be seen in Figure~\ref{res:fig:bs_bias_var_Ridge_Lasso}. As apposed to OLS, the MSE values of Ridge and Lasso do not increase with polynomial degree after a certain threshold, but rather always decreases (apart from some fluctuations). The plots resemble the OLS for $n=1500$. 
+=======
+>>>>>>> 29ba1104c323a746a0d81545e441bdf8e1bae6bc
             \begin{figure}[ht]
                 \begin{subfigure}{\linewidth}
                     \centering
@@ -517,8 +522,12 @@
             \end{figure}
             This means that there is little to no occurence of overfitting when applying these methods.     
         
+<<<<<<< HEAD
 
             We would now like to do the bias-variance decomposition for one optimal and one suboptimal $\lambda$ for Ridge and Lasso. The plot of this can be found in Figure~\ref{res:fig:bs_bias_var_two_lmbdas_Ridge_Lasso}. To clarify, here the $\lambda$s are constant across all polynomials degree. It is evident that in both approaches the suboptimal $\lambda$ preforms better than the optimal $\lambda$ for larger degrees (a result of the choice of optimal $\lambda$), but never reaches an MSE as low as the optimal $\lambda$. 
+=======
+        \subsubsection{Bias-Variance Decomposition as a function of $\lambda$}
+>>>>>>> 29ba1104c323a746a0d81545e441bdf8e1bae6bc
             \begin{figure}[ht]
                 \begin{subfigure}{\linewidth}
                     \centering
@@ -531,9 +540,13 @@
                 \caption{Bias-variance decomposition of Ridge and Lasso on Franke data with $n=600$, now with two different $\lambda$s; one optimal (found through cross-validation) and one larger.}
                 \label{res:fig:bs_bias_var_two_lmbdas_Ridge_Lasso}
             \end{figure}
+<<<<<<< HEAD
             We can see that the models of optimal $\lambda$s reach a minimum MSE value and thereafter increase with the model complexity. This is not the case for the models of the larger $\lambda$s, but it is plausible that it would be if we were to increase the polynomial degree further. Ridge and Lasso are not directly comparable as they differ in their definition of $\lambda$ (see Eqs.~\eqref{theo:eq:Ridge_coefs} and~\eqref{theo:eq:Lasso_costfunction}).   
             
             Lastly we will examine the bias variance decomposition as a funtion of $\lambda$ (see Figure~\ref{res:fig:bs_bias_var_lmbdas_Ridge_Lasso}).  
+=======
+
+>>>>>>> 29ba1104c323a746a0d81545e441bdf8e1bae6bc
             \begin{figure}[ht]
                 \begin{subfigure}{\linewidth}
                     \centering
@@ -570,7 +583,7 @@
             \label{res:fig:Nica_heatmap}
         \end{figure}
 
-    We plot the test prediction of our best fit, OLS with $p=12$, against the test terrain data in Figure~\ref{res:fig:Nica_terrain}.
+    Finally, we fit our OLS model with $p=12$ on the entire terrain dataset, and plot the prediction against the original data in Figure~\ref{res:fig:Nica_terrain}.
 
         \begin{figure} [ht]
             \begin{subfigure}{\linewidth}
@@ -616,7 +629,7 @@
             \newline
             \comment{Some general disc about Bootstrapping here, and after that some comparison?}
             \newline
-            The Bootstrap holds the test set constant during calculation of metrics. This is in contrast to Cross-validation where the test set is different (with no overlapping points) for each fitted model. Holding the test set constant might be beneficial since every model calculates metrics based on the same data, thus averaging over MSE scores gives a more accurate picture of the MSE present in that specific test set. However, this introduces bias since we assume that the selected test set accurately represents the population, which it may not. Cross-validation on the other hand does not average MSE values over the same test data and larger variations may occur. The advantage of this is that metrics are calculated on the entire data set, not just a specific partition.          
+            The Bootstrap holds the test set constant during calculation of metrics. This is in contrast to cross-validation where the test set is different (with no overlapping points) for each fitted model. Holding the test set constant might be beneficial since every model calculates metrics based on the same data, thus averaging over MSE scores gives a more accurate picture of the MSE present in that specific test set. However, this introduces bias since we assume that the selected test set accurately represents the population, which it may not. Cross-validation on the other hand does not average MSE values over the same test data and larger variations may occur. The advantage of this is that metrics are calculated on the entire data set, not just a specific partition.          
 
         \subsection{Fit to Terrain Data}
             \comment{Add discussion of the comparison of OLS vs. regularised.}\\
