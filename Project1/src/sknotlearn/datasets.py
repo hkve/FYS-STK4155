@@ -1,6 +1,6 @@
 import os
 import sys
-from imageio.v2 import imread
+from imageio import imread
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from data import Data 
 

@@ -316,9 +316,11 @@
 
     
     \subsection{Expanding to Regularised Regression}
-        With the regularised regression methods, Ridge and Lasso, we introduce a hyperparameter $\lambda$ that affects our fit. To explore this, we will study the MSE of the fits using cross-validation resampling as the polynomial degree and $\lambda$-value is changed. We will use the same polynomial degrees as when exploring OLS, and look at a wide range of $\lambda \in [10^{-9}, 10^1]$ with logarithmically spaced values. This effectively results in a grid search over ($p$,$\lambda$), where the lowest MSE value will give us the optimal set of paramters $(\msub{p}{opt}, \msub{\lambda}{opt})$. To be more confident in our optimal parameters we will apply one of our resampling techniques, bootstrapping or cross-validation, when searching for the test MSE minimum. Computational costs and accuracy will decide both which method we use and the number of rounds/folds to apply for each $(p,\lambda)$ value. \comment{400 rounds vs 7 folds}.     
+        With the regularised regression methods, Ridge and Lasso, we introduce a hyperparameter $\lambda$ that affects our fit. To explore this, we will study the MSE of the fits using cross-validation resampling as the polynomial degree and $\lambda$-value is changed. We will use the same polynomial degrees as when exploring OLS, and look at a wide range of $\lambda \in [10^{-9}, 10^1]$ with logarithmically spaced values. This effectively results in a grid search over ($p$,$\lambda$), where the lowest MSE value will give us the optimal set of paramters $(\msub{p}{opt}, \msub{\lambda}{opt})$. To be more confident in our optimal parameters we will apply one of our resampling techniques, bootstrapping or cross-validation, when searching for the test MSE minimum. Computational costs and accuracy will decide both which method we use and the number of rounds/folds to apply for each $(p,\lambda)$ value. \comment{400 rounds vs 7 folds + choice of 400 rounds should be mentioned.x}.     
 
-        When we have got a feeling for the $\lambda$-values in relation to the polynomial degree, we will study the bias-variance tradeoff of all our models using Bootstrap resampling as we increase the complexity of our parametrisation of $X$. This includes a decomposition and comparison with our previous OLS method. We will further look at the difference between `good' $\lambda$-values from our previous examination, and a `poorer' choice of $\lambda$ to see more precisely how it affects the goodness of fit.
+        When we know $\lambda$-values relation to the polynomial degree, we will study the bias-variance tradeoff as a function of the complexity of our parametrisation of $X$ for Ridge and Lasso using bootstrap resampling. This includes a decomposition and comparison with our previous OLS method. In this case we will apply an optimale $\lambda$ for each polynomial degree (found through cross-validation).
+        
+        We will further look at the difference between an optimal $\lambda$-value (found through cross-validation), and a suboptimal and larger choice of $\lambda$ to see more precisely how it affects the goodness of fit. In this case the optimal $\lambda$ will be the same across degrees (as apposed to the previous analysis); the $\lambda$ which together with a certain degree yields the overall best result.
 
         Finally, we will study the bias-variance tradeoff as a function of $\lambda$, with the polynomial degree fixed at value which balances complexity and overfitting. The hope is that this will give insight into the effective degrees of freedom of the regularised methods.
 
@@ -502,6 +504,10 @@
         \end{figure}
 
         \subsubsection{Bias-Variance Decomposition}
+<<<<<<< HEAD
+            Using the optimal $\lambda$ found from cross-validation heatmap (see Figure~\ref{res:fig:Franke_heatmaps}) we now plot the bias-variance decomposition of Ridge and Lasso as funtions of model complexity. The results can be seen in Figure~\ref{res:fig:bs_bias_var_Ridge_Lasso}. As apposed to OLS, the MSE values of Ridge and Lasso do not increase with polynomial degree after a certain threshold, but rather always decreases (apart from some fluctuations). The plots resemble the OLS for $n=1500$. 
+=======
+>>>>>>> 29ba1104c323a746a0d81545e441bdf8e1bae6bc
             \begin{figure}[ht]
                 \begin{subfigure}{\linewidth}
                     \centering
@@ -514,9 +520,14 @@
                 \caption{Bias-variance decomposition of Ridge and Lasso on Franke data with $n=600$.}
                 \label{res:fig:bs_bias_var_Ridge_Lasso}
             \end{figure}
-
+            This means that there is little to no occurence of overfitting when applying these methods.     
         
+<<<<<<< HEAD
+
+            We would now like to do the bias-variance decomposition for one optimal and one suboptimal $\lambda$ for Ridge and Lasso. The plot of this can be found in Figure~\ref{res:fig:bs_bias_var_two_lmbdas_Ridge_Lasso}. To clarify, here the $\lambda$s are constant across all polynomials degree. It is evident that in both approaches the suboptimal $\lambda$ preforms better than the optimal $\lambda$ for larger degrees (a result of the choice of optimal $\lambda$), but never reaches an MSE as low as the optimal $\lambda$. 
+=======
         \subsubsection{Bias-Variance Decomposition as a function of $\lambda$}
+>>>>>>> 29ba1104c323a746a0d81545e441bdf8e1bae6bc
             \begin{figure}[ht]
                 \begin{subfigure}{\linewidth}
                     \centering
@@ -529,7 +540,13 @@
                 \caption{Bias-variance decomposition of Ridge and Lasso on Franke data with $n=600$, now with two different $\lambda$s; one optimal (found through cross-validation) and one larger.}
                 \label{res:fig:bs_bias_var_two_lmbdas_Ridge_Lasso}
             \end{figure}
+<<<<<<< HEAD
+            We can see that the models of optimal $\lambda$s reach a minimum MSE value and thereafter increase with the model complexity. This is not the case for the models of the larger $\lambda$s, but it is plausible that it would be if we were to increase the polynomial degree further. Ridge and Lasso are not directly comparable as they differ in their definition of $\lambda$ (see Eqs.~\eqref{theo:eq:Ridge_coefs} and~\eqref{theo:eq:Lasso_costfunction}).   
+            
+            Lastly we will examine the bias variance decomposition as a funtion of $\lambda$ (see Figure~\ref{res:fig:bs_bias_var_lmbdas_Ridge_Lasso}).  
+=======
 
+>>>>>>> 29ba1104c323a746a0d81545e441bdf8e1bae6bc
             \begin{figure}[ht]
                 \begin{subfigure}{\linewidth}
                     \centering
