@@ -320,7 +320,7 @@
 
         When we have got a feeling for the $\lambda$-values in relation to the polynomial degree, we will study the bias-variance tradeoff of all our models using Bootstrap resampling as we increase the complexity of our parametrisation of $X$. This includes a decomposition and comparison with our previous OLS method. We will further look at the difference between `good' $\lambda$-values from our previous examination, and a `poorer' choice of $\lambda$ to see more precisely how it affects the goodness of fit.
 
-        Finally, we will study the bias-variance tradeoff as a function of $\lambda$, with the polynomial degree fixed at a good number (\comment{What is a good number?}). The hope is that this will give insight into the effective degrees of freedom of the regularised methods (\comment{perhaps?}).
+        Finally, we will study the bias-variance tradeoff as a function of $\lambda$, with the polynomial degree fixed at value which balances complexity and overfitting. The hope is that this will give insight into the effective degrees of freedom of the regularised methods.
 
     \subsection{Application on Real Data}
         Finally, we will apply the three regression methods on our Nicaraguan terrain data. We many the same analyses as done earlier, starting by varying the number of degrees for a simple OLS fit, finding the optimal degree by minimising the MSE found using cross-validation.
@@ -618,6 +618,8 @@
             \comment{Add discussion of the comparison of OLS vs. regularised.}\\
             Firstly, we should take a minute to discuss the choice of terrain data to fit to, and how this could change things. We naturally chose a mountainous terrain, for there to be more interesting features for the models to recapture. However, we chose a large region, with a full resolution ($300\times 300$ points) which we could not hope to do our full analysis, using of all the models and resampling adequately. We could either choose a smaller sub-area or sample more sparsely from the region. We chose the latter, as this would more closely resemble noisy data or a situation where we might not have all the data we would want for our regression. This highlights the power of regression methods to sift through data and find the most salient features. This is seen in Figure~\ref{res:fig:Nica_terrain}, where our fitted model recreates a smoothed version of the jagged mountains where the difference from the low valley to the high peak is obvious, but without the sharpness and details of the original data.
 
+            
+
 \section{Concluding remarks}
 
 % for numbering appendix equations more appropriately
@@ -635,7 +637,7 @@
             =& \pclosed{\expval\bclosed{f+\epsilon-\expval(\hat{f})}}^2 + \expval(\epsilon^2) + \var(\hat{f}) - 2\expval(\epsilon \hat{f}) \\
             =& \pclosed{\bias(\hat{f})}^2 + \var(\hat{f}) + \sigma^2,
         \end{align}
-        where in the last line, we used that $\expval(\epsilon\hat{f}) = \expval(\epsilon)\expval(\hat{f})=0$.\footnote{At first glance, this might seem odd, as there is noise involved in the fitting of $\hat{f}$ too. However, under the assumption that the noise is i.i.d. between experiments, the noise in the data used to fit $\hat{f}$ is independent of the noise in a test sample. It is worth noting that this would not be true if we were comparing with the same data used to fit the model, which explains the optimism of the training MSE. \comment{This last part here might be put into the discussion perhaps?}}
+        where in the last line, we used that $\expval(\epsilon\hat{f}) = \expval(\epsilon)\expval(\hat{f})=0$.\footnote{At first glance, this might seem odd, as there is noise involved in the fitting of $\hat{f}$ too. However, under the assumption that the noise is i.i.d. between experiments, the noise in the data used to fit $\hat{f}$ is independent of the noise in a test sample. It is worth noting that this would not be true if we were comparing with the same data used to fit the model, which explains the optimism of the training MSE.}
 
     \section{Theoretical Proof of Concept of the OLS Model} \label{app:sec:OLS_proof}
         Supposing that we have data generated from $y_i = f(x_i)+\epsilon$ as before, we look statistical quantities derived from the distribution of our parameters $\vec{\theta}$ inherited from $\epsilon\distas \normal{0}{\sigma^2}$. Under the assumption that $f(x) \in \operatorname{span}\cclosed{x}_a, a\in 1,\ldots,p$ of our design matrix $X$, we can write the data $\vec{y} = X\vec{\theta} + \vec{\epsilon}$ for some $\vec{\theta}$ which would be a `true' optimum for our parameters.
