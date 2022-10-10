@@ -220,7 +220,7 @@
 
 
 \section{Method}
-    Something general about initially fitting Franke data using OLS, Ridge and Lasso. Then moving on to real terrain data \comment{something something}.
+    We will initially employ OLS on the Franke function, before moving on to using resampling techniques to explore the goodness of fit. We will then move on to the regularised regression methods, Ridge and Lasso, comparing their application on the Franke function with that of OLS. Finally, we use what we have learned to compare the three methods on real terrain data.
     
     \subsection{Datasets}
         \subsubsection{Franke Function}
@@ -278,11 +278,9 @@
 
 
     \subsection{Initial Application of OLS}
-        \comment{Thought we could put the initial testing without resampling into a section of its own, -\Carl}\\
         At first, we try out the OLS algorithm on our Franke data with $n=600$ data points. We plot the MSE and $\Rsquared$ of the testing and training data as we crank up the maximum degree of our polynomials in Eq.~\eqref{met:eq:design_X} from $p=1 \text{--} 12$. The way the coefficient values change as complexity increases can give us insight to the stability of our model. To get a better feel for this we plot the coefficient values $\theta_{ab}$ corresponding to $x^ay^b$ for $p=1,3,5$. Likewise, we tabulate the values of the coefficients for $p=1 \text{--} 5$. 
 
     \subsection{Resampling Techniques}
-        \comment{I think we should introduce the initial testing of the resamplers where we find optimal rounds or $k$ in this section. Then we add the `real' application and comparison in Ridge/Lasso section. -\Carl}
         With the intent to compute more accurate measures for goodness of fit (such as MSE and $\Rsquared$) to evaluate our model, we 
         artificially increase the data set by repeatedly fitting the model on subsamples of our data. This approach is called resampling and consists of a variety of methods. In this project we have applied \textit{Bootstrapping} and \textit{$k$-fold cross-validation}. 
         \comment{Reminder: Address how we calculate and compare bias-variance -- that we find them for every test data point, and compare the average values over all data points.}
@@ -625,7 +623,6 @@
             The Bootstrap holds the test set constant during calculation of metrics. This is in contrast to cross-validation where the test set is different (with no overlapping points) for each fitted model. Holding the test set constant might be beneficial since every model calculates metrics based on the same data, thus averaging over MSE scores gives a more accurate picture of the MSE present in that specific test set. However, this introduces bias since we assume that the selected test set accurately represents the population, which it may not. Cross-validation on the other hand does not average MSE values over the same test data and larger variations may occur. The advantage of this is that metrics are calculated on the entire data set, not just a specific partition.          
 
         \subsection{Fit to Terrain Data}
-            \comment{Add discussion of the comparison of OLS vs. regularised.}\\
             Firstly, we should take a minute to discuss the choice of terrain data to fit to, and how this could change things. We naturally chose a mountainous terrain, for there to be more interesting features for the models to recapture. However, we chose a large region, with a full resolution ($300\times 300$ points) which we could not hope to do our full analysis, using of all the models and resampling adequately. We could either choose a smaller sub-area or sample more sparsely from the region. We chose the latter, as this would more closely resemble noisy data or a situation where we might not have all the data we would want for our regression. This highlights the power of regression methods to sift through data and find the most salient features. This is seen in Figure~\ref{res:fig:Nica_terrain}, where our fitted model recreates a smoothed version of the jagged mountains where the difference from the low valley to the high peak is obvious, but without the sharpness and details of the original data.
 
             The different regression methods we used on the terrain data all performed similarly when optimised, with optimal MSEs of $0.1808$, $0.1865$ and $0.1887$ respectively for OLS, Ridge and Lasso. However, the window within which the OLS method works well is narrow, quickly moving from high bias to high variance, as evidenced in our earlier analyses. In Figure~\ref{res:fig:Nica_heatmap} we see that there are larger areas where Ridge and Lasso perform well, but at the cost of `fine-tuning' both the $\lambda$-parameters and the model complexity. The regularised methods are more consistent across model complexities, but come at the cost of an additional parameter to tune; in a sense they are `safer' to employ.
