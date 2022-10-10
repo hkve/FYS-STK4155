@@ -499,6 +499,51 @@
             \label{res:fig:Franke_heatmaps}
         \end{figure}
 
+        \subsubsection{Bias-Variance Decomposition}
+            \begin{figure}[H]
+                \begin{subfigure}{\linewidth}
+                    \centering
+                    \includegraphics[width=\linewidth]{BS_Bias_var_decomp_Ridge.pdf}
+                \end{subfigure}
+                \begin{subfigure}{\linewidth}
+                    \centering
+                    \includegraphics[width=\linewidth]{BS_Bias_var_decomp_Lasso.pdf}
+                \end{subfigure}
+                \caption{Bias-variance decomposition of Ridge and Lasso on Franke data with $n=600$.}
+                \label{res:fig:bs_bias_var_Ridge_Lasso}
+            \end{figure}
+
+        
+        \subsubsection{Bias-Variance Decomposition as a function of $\lambda$}
+            \begin{figure}[H]
+                \begin{subfigure}{\linewidth}
+                    \centering
+                    \includegraphics[width=\linewidth]{BS_bias_var_two_lmbdas_Ridge.pdf}
+                \end{subfigure}
+                \begin{subfigure}{\linewidth}
+                    \centering
+                    \includegraphics[width=\linewidth]{BS_bias_var_two_lmbdas_Lasso.pdf}
+                \end{subfigure}
+                \caption{Bias-variance decomposition of Ridge and Lasso on Franke data with $n=600$, now with two different $\lambda$s; one optimal (found through cross-validation) and one larger.}
+                \label{res:fig:bs_bias_var_two_lmbdas_Ridge_Lasso}
+            \end{figure}
+
+            \begin{figure}[H]
+                \begin{subfigure}{\linewidth}
+                    \centering
+                    \includegraphics[width=\linewidth]{BS_bias_var_lmbdas_Ridge.pdf}
+                \end{subfigure}
+                \begin{subfigure}{\linewidth}
+                    \centering
+                    \includegraphics[width=\linewidth]{BS_bias_var_lmbdas_Lasso.pdf}
+                \end{subfigure}
+                \caption{Bias-variance decomposition as a function of $\lambda$s of Ridge and Lasso on Franke data with $n=600$.}
+                \label{res:fig:bs_bias_var_lmbdas_Ridge_Lasso}
+            \end{figure}
+
+
+
+
 
     \subsection{Nicaraguan Terrain Data}
     Initially, we fit the OLS method to the terrain data with $p\in[5, 25]$; this can be seen in Figure~\ref{res:fig:Nica_OLS}. From this, we conclude that $p=12$ is the optimal degree for OLS with $n=600$ data points on this terrain data, where the MSE has a minimum at $0.1808$. We see the recognisable signs of overfitting starting at around $p=18$.
