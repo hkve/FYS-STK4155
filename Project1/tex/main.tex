@@ -23,6 +23,7 @@
 \usepackage{float}
 \usepackage{graphicx}
 \usepackage{subcaption}
+\usepackage[font=small, labelfont=bf]{caption}
 
 \graphicspath{ {./figs/} } 
 
@@ -315,7 +316,7 @@
 
     
     \subsection{Expanding to Regularised Regression}
-        With the regularised regression methods, ridge and Lasso, we introduce a hyperparameter $\lambda$ that affects our fit. To explore this, we will study the MSE of the fits using cross-validation resampling as the polynomial degree and $\lambda$-value is changed. We will use the same polynomial degrees as when exploring OLS, and look at a wide range of $\lambda \in [10^{-9}, 10^1]$ with logarithmically spaced values. This effectively results in a grid search over ($p$,$\lambda$), where the lowest MSE value will give us the optimal set of paramters $(\msub{p}{opt}, \msub{\lambda}{opt})$. To be more confident in our optimal parameters we will apply one of our resampling techniques, Bootstrapping or Cross-validation, when searching for the test MSE minimum. Computational costs and accuracy will decide both which method we use and the number of rounds/folds to apply for each $(p,\lambda)$ value.      
+        With the regularised regression methods, Ridge and Lasso, we introduce a hyperparameter $\lambda$ that affects our fit. To explore this, we will study the MSE of the fits using cross-validation resampling as the polynomial degree and $\lambda$-value is changed. We will use the same polynomial degrees as when exploring OLS, and look at a wide range of $\lambda \in [10^{-9}, 10^1]$ with logarithmically spaced values. This effectively results in a grid search over ($p$,$\lambda$), where the lowest MSE value will give us the optimal set of paramters $(\msub{p}{opt}, \msub{\lambda}{opt})$. To be more confident in our optimal parameters we will apply one of our resampling techniques, bootstrapping or cross-validation, when searching for the test MSE minimum. Computational costs and accuracy will decide both which method we use and the number of rounds/folds to apply for each $(p,\lambda)$ value. \comment{400 rounds vs 7 folds}.     
 
         When we have got a feeling for the $\lambda$-values in relation to the polynomial degree, we will study the bias-variance tradeoff of all our models using Bootstrap resampling as we increase the complexity of our parametrisation of $X$. This includes a decomposition and comparison with our previous OLS method. We will further look at the difference between `good' $\lambda$-values from our previous examination, and a `poorer' choice of $\lambda$ to see more precisely how it affects the goodness of fit.
 
@@ -420,7 +421,7 @@
             \begin{figure}[ht]
                 \centering
                 \includegraphics[width=\linewidth]{BS_Bias_var_decomp_OLS.pdf}
-                \caption{Plot of the bias-variance decomposition. }
+                \caption{Plot of the bias-variance decomposition. $n=600$ }
                 \label{res:fig:bs_OLS_bias_variance_tradeoff_ols}
             \end{figure}
 
@@ -430,19 +431,17 @@
             \comment{Remove the titles -\Anna}
             In Figure~\ref{res:fig:bs_bias_var_data_points} we see the change in the bias-variance decomposition when varying the number of data points. For $n=60$ the bias remains at negligible for all model complexities while the MSE and variance are identical and increase with the polynomial degree. Conversely, for $n=1500$ the MSE and bias reaches a minimum and seemingly stabilises, while the variance barely increases. 
             \begin{figure}[ht]
-                \begin{subfigure}{.25\textwidth}
+                \begin{subfigure}{.5\textwidth}
                     \centering
                     \includegraphics[width=\linewidth]{BS_Bias_var_decomp_OLS_60_data_points.pdf}
                     \caption{$n=60$}
                     \end{subfigure}
-                % \hfill
-                % \begin{subfigure}{.3\textwidth}
+                % \begin{subfigure}{.5\textwidth}
                 %     \centering
                 %     \includegraphics[width=\linewidth]{BS_Bias_var_decomp_OLS_600_data_points.pdf}
                 %     \caption{$n=600$}
                 % \end{subfigure}
-                \hfill
-                \begin{subfigure}{.25\textwidth}
+                \begin{subfigure}{.5\textwidth}
                     \centering
                     \includegraphics[width=\linewidth]{BS_Bias_var_decomp_OLS_1500_data_points.pdf}
                     \caption{$n=1500$}
@@ -463,23 +462,23 @@
         
         We perform the save Cross-validation analysis as we did for OLS. This has been done for two different $\lambda$ values, $0.1$ and $10^{-7}$, both with ridge and Lasso regression. This can be seen in Figures~\ref{res:fig:ridgelasso_cv_badlambda} and~\ref{res:fig:ridgelasso_cv_goodlambda} respectively.
         \begin{figure}[ht]
-            \begin{subfigure}{.5\linewidth}
+            \begin{subfigure}{.9\linewidth}
                 \centering
                 \includegraphics[width=\linewidth]{bad_lmbda_Ridge_mse_kfold.pdf}
             \end{subfigure}
             \hfill
-            \begin{subfigure}{.5\linewidth}
+            \begin{subfigure}{.9\linewidth}
                 \centering
                 \includegraphics[width=\linewidth]{bad_lmbda_Lasso_mse_kfold.pdf}
             \end{subfigure}
             \caption{Test and train MSE calculated across different polynomial degrees using Ridge and Lasso regression with $\lambda = 10^{-1}$}
             \label{res:fig:ridgelasso_cv_badlambda}
-            \begin{subfigure}{.5\linewidth}
+            \begin{subfigure}{.9\linewidth}
                 \centering
                 \includegraphics[width=\linewidth]{good_lmbda_Ridge_mse_kfold.pdf}
             \end{subfigure}
             \hfill
-            \begin{subfigure}{.5\linewidth}
+            \begin{subfigure}{.9\linewidth}
                 \centering
                 \includegraphics[width=\linewidth]{good_lmbda_Lasso_mse_kfold.pdf}
             \end{subfigure}
@@ -518,7 +517,7 @@
             \label{res:fig:Nica_heatmap}
         \end{figure}
 
-        \begin{figure} [H]
+        \begin{figure} [ht]
             \begin{subfigure}{\linewidth}
                 \centering
                 \includegraphics[width=\linewidth]{Nica_test_plot.pdf}
