@@ -75,7 +75,7 @@
     \begin{@twocolumnfalse}
         \maketitle
         \begin{abstract}
-            This is the abstract.
+            In this project, we explore 
         \end{abstract}
     \end{@twocolumnfalse}
 ]
@@ -181,7 +181,7 @@
             An exploration of the statistical expectation and variance of the OLS results is done in Appendix~\ref{app:sec:OLS_proof}.
 
         \subsubsection{Ridge Regression}
-            So far, we have assumed that the parameters $\vec{\theta}$ are uniformly distributed, and as such have no \textit{bias} towards any particular value. In practice, this means that the OLS model will contort to fit itself to all values in the data. As such, a motivation for adding a bias could be for the sake of stability in the fit. These methods are called \textit{regularised} methods. An example is ridge regression, where one assumes that the parameters are normally distributed, such that parameter values far from the mean are thought less likely to occur. This in practice means that the model is less willing to contort to outliers in the dataset, trading it for a bias towards certain parameter values. Assuming the probability distribution for $\theta_a \distas \normal{0}{\tau^2}$,
+            So far, we have assumed that the parameters $\vec{\theta}$ are uniformly distributed, and as such have no \textit{bias} towards any particular value. In practice, this means that the OLS model will contort to fit itself to all values in the data. As such, a motivation for adding a bias could be for the sake of stability in the fit. These methods are called \textit{regularised} methods. An example is Ridge regression, where one assumes that the parameters are normally distributed, such that parameter values far from the mean are thought less likely to occur. This in practice means that the model is less willing to contort to outliers in the dataset, trading it for a bias towards certain parameter values. Assuming the probability distribution for $\theta_a \distas \normal{0}{\tau^2}$,
             \begin{align}
                 P(\vec{\theta}) = \prod_{a=1}^{p} \frac{1}{\sqrt{2\pi\tau^2}} \exp{-\frac{\theta_a^2}{2\tau^2}},
             \end{align}
@@ -333,14 +333,14 @@
                 We begin by calculating the MSE and $\Rsquared$ score (Eqs.~\ref{theo:eq:mse},~\ref{theo:eq:r2}) fitted to the Franke function for different polynomial degrees. This can be seen in Figures~\ref{res:fig:OLS_mse_noresample} and~\ref{res:fig:OLS_R2_noresample} respectively. Based on the MSE calculated for the test data, the optimal degree was found to be $\msub{p}{opt} = 5$ with $\mse \approx 0.134$. We observe that the train MSE decreases steadily with higher $p$, while the test MSE decreases until we reach $\msub{p}{opt}$, after which it increases. The opposite relationship is seen for the $\Rsquared$ score.   
                 \begin{figure}[H]
                     \centering
-                    \includegraphics[width=\linewidth]{OLS_mse_noresample.pdf}
+                    \includegraphics[width=.9\linewidth]{OLS_mse_noresample.pdf}
                     \caption{Showing the MSE score for OLS, calculated on the train and test sample for different polynomial degrees.}
                     \label{res:fig:OLS_mse_noresample}
                 \end{figure}
 
                 \begin{figure}[H]
                     \centering
-                    \includegraphics[width=\linewidth]{OLS_r2_noresample.pdf}
+                    \includegraphics[width=.9\linewidth]{OLS_r2_noresample.pdf}
                     \caption{Showing the $\Rsquared$ score for OLS, calculated on the train and test sample for different polynomial degrees.}
                     \label{res:fig:OLS_R2_noresample}
                 \end{figure}
@@ -473,6 +473,8 @@
             \end{subfigure}
             \caption{Test and train MSE calculated across different polynomial degrees using Ridge and Lasso regression with $\lambda = 10^{-1}$}
             \label{res:fig:ridgelasso_cv_badlambda}
+        \end{figure}
+        \begin{figure}[ht]
             \begin{subfigure}{.9\linewidth}
                 \centering
                 \includegraphics[width=\linewidth]{good_lmbda_Ridge_mse_kfold.pdf}
@@ -519,7 +521,7 @@
             \label{res:fig:Nica_heatmap}
         \end{figure}
 
-    We plot the test prediction of our best fit, OLS with $p=12$, against the test terrain data in Figure~\ref{res:fig:Nica_terrain}.
+    Finally, we fit our OLS model with $p=12$ on the entire terrain dataset, and plot the prediction against the original data in Figure~\ref{res:fig:Nica_terrain}.
 
         \begin{figure} [ht]
             \begin{subfigure}{\linewidth}
