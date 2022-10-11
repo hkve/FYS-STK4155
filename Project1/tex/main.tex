@@ -323,7 +323,7 @@
 
     \subsection{Application on Real Data}
         Finally, we will apply the three regression methods on our Nicaraguan terrain data, always employing a resampling method. We carry out many of the same analyses as done earlier, starting by varying the number of degrees for a simple OLS fit, finding the optimal degree by minimising the MSE found using cross-validation.
-        When moving to our regularised methods, the same method grid searching for hyperparameter optimisation will be used, searching for $p \in [5,25]$ and $\lambda \in [10^{-11},10^{-6}]$ for Ridge, and $\lambda \in [10^{-8},10^{-3}]$. Using the optimal parameters for each model, a comparison between them will be performed to find which model most accurately recreates the test data. We do bias-variance decomposition of the models as they fit the test data, varying the complexity of the design matrix from expansion up to power $p=5\text{--}25$. This will be used as a basis for a comparison of the validity of the three models in their application in recreating mountainous terrain. Lastly, for completeness, we plot our best fit to the terrain and qualitatively compare with the actual terrain.
+        When moving to our regularised methods, the same method grid searching for hyperparameter optimisation will be used, searching for $p \in [5,25]$ and $\lambda \in [10^{-11},10^{-6}]$ for Ridge, and $\lambda \in [10^{-8},10^{-3}]$. Using the optimal parameters for each model, a comparison between them will be performed to find which model most accurately recreates the test data. Lastly, for completeness, we plot our best fit to the terrain and qualitatively compare with the actual terrain.
 
 
 \section{Results}
@@ -418,7 +418,6 @@
                 \label{res:fig:bs_OLS_bias_variance_tradeoff_ols}
             \end{figure}
 
-            \comment{Remove the titles op the plots -\Anna}
             In Figure~\ref{res:fig:bs_bias_var_data_points} we see the change in the bias-variance decomposition when varying the number of data points. For $n=60$ the bias remains at negligible for all model complexities while the MSE and variance are identical and increase with the polynomial degree. Conversely, for $n=1500$ the MSE and bias reach a minimum and seemingly stabilise, while the variance barely increases. 
             \begin{figure}[ht]
                 \begin{subfigure}{\linewidth}
@@ -619,7 +618,6 @@
             The value of the hyperparameter, $\lambda$, in Ridge and Lasso is not directly comparable as they differ in its definition (see Eqs.~\eqref{theo:eq:Ridge_coefs} and~\eqref{theo:eq:Lasso_costfunction}).   
 
 
-            \comment{Accros $\lambda$-disc here}\\
             When keeping the polynomial degree fixed and varying $\lambda$ in Figure~\ref{res:fig:bs_bias_var_lmbdas_Ridge_Lasso}, we saw similar results between Ridge and Lasso, mainly that the variance decreased as $\lambda$ is increased, while the bias initially decreases before shooting up again. This mirrors the plots where the polynomial degree is fixed, telling us that large $\lambda$-values limit the complexity of our models, resulting in low variance and large bias. As we decreased $\lambda$, we find an optimum tradeoff between the bias and variance before they approach the OLS results.
 
             The difference in the response to an increased $\lambda$ between Ridge and Lasso is that Ridge seemingly moves more smoothly from mimicking OLS before turning the effective degrees of freedom off, whereas Lasso suddenly does so (at around $\lambda=10^{-3}$ in our case). This difference can be leveraged depending on the situation, but as long as we optimise thoroughly, as we have done, this difference does not matter as much.
