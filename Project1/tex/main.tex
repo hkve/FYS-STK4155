@@ -83,7 +83,7 @@
 % \tableofcontents
 
 \section{Introduction}
-    In this project, we will introduce some of the most important general properties of machine learning models in the context of linear regression. Specifically the mean squared error (MSE), the bias, and the variance of data predictions are essential in evaluating the quality of a statistical model. We look at the phenomena of under fitting and overfitting, and explore them in the context of bias-variance tradeoff. The three models we will use explicitly are Ordinary Least Squares (OLS), Ridge regression and Least-Absolute-Shrinkage-and-Selection-Operation (Lasso) regression. These will first be tested on the 2D Franke function, and later on real geographical terrain data.
+    In this project, we will introduce some of the most important general properties of machine learning models in the context of linear regression. Specifically we look at some popular measures for the goodness of fit of a model, assessing how well a statistical model recreates real data. We look at the phenomena of underfitting and overfitting, and explore them in the context of bias-variance tradeoff. The three models we will use explicitly are Ordinary Least Squares (OLS), Ridge regression and Least-Absolute-Shrinkage-and-Selection-Operation (Lasso) regression. These will first be tested on the 2D Franke function, and later on real geographical terrain data.
 
     The aforementioned models will be explored using resampling techniques, which will be employed to extract the relevant statistical quantities in an accurate way. We will use the standard methods of Bootstrapping and $k$-fold cross-validation and compare the results we get between them across the three linear models.
 
@@ -117,7 +117,7 @@
             \Rsquared(\vec{\hat{y}}) = 1 - \frac{\sum_{i=1}^n (y_i-\hat{y}_i)^2}{\sum_{i=1}^n (y_i-\bar{y})^2} = 1 - \frac{(\vec{y}-\vec{\hat{y}})^2}{(\vec{y}-\bar{y})^2},
             \label{theo:eq:r2}
         \end{align}
-        where $\bar{y} = \frac{1}{n}\sum_{i=1}^n y_i$ is the sample mean of the observed data. This metric falls on the interval $(-\infty, 1]$, where 1 denotes the perfect fit, 0 correspond to a constant prediction of $\hat{y}_i = \bar{y}$, and negative values corresponds to worse prediction than this.
+        where $\bar{y} = \frac{1}{n}\sum_{i=1}^n y_i$ is the sample mean of the observed data. This metric falls on the interval $(-\infty, 1]$, where 1 denotes the perfect fit, 0 corresponds to a constant prediction of $\hat{y}_i = \bar{y}$, and negative values corresponds to worse predictions than this.
 
 
         To get further insight into the validity of our model, we can decompose the MSE into its \textit{bias} and \textit{variance}, which are quantities that can tell us more about exactly what our model is doing wrong. To set up this decomposition, we consider a situation where we have fitted a model to a series of $L$ different datasets, with parameters $\vec{\hat{\theta}}^\ell$, with $\ell=1,\ldots,L$, and predictions $\vec{\hat{y}}^\ell$ on the dataset we want to compare to. The sample mean squared error at each observed point can then be decomposed into
@@ -132,7 +132,7 @@
             \end{align}
             \label{theo:eq:bias and var}
         \end{subequations}
-        are the sample bias and sample variance of the model at the predicted point. This decomposition is done in more detail in Appendix~\ref{app:sec:bvdecomp}. The bias tells our model's tendency to err on a certain side of the `true' value. The variance describes the model's spread in prediction as the model is fitted to different data.
+        are the sample bias and sample variance of the model at the predicted point. This decomposition is done in more detail in Appendix~\ref{app:sec:bvdecomp}. The bias tells our model's tendency to err on a certain side of the `true' value. The variance describes the model's spread in prediction as the model is fitted to different datasets.
 
 
     \subsubsection{Central Limit Theorem}
@@ -144,7 +144,7 @@
         \begin{align}
             \bar{z}_n \distas \normal{\mu}{\frac{\sigma^2}{n}}
         \end{align}
-        becomes sound. Colloquially we say the sample mean approaches the true mean $\mu$. This is powerful, as it means not only that the sample mean becomes better as the sample size grows, but quantities derived from its distribution are also determined more precisely. Note also that this holds with only very weak restrictions on the distribution of the $z_i$'s --- their sample mean will approach normal distribution regardless. This lays the foundation for statistically informed models such as regression methods.
+        becomes sound. Colloquially we say the sample mean approaches the true mean $\mu$. This is powerful, as it means not only that the sample mean becomes better as the sample size grows, but quantities derived from its distribution are also determined more precisely. Note also that this holds with only very weak restrictions on the distribution of the $z_i$s --- their sample mean will approach normal distribution regardless. This lays the foundation for statistically informed models such as regression methods.
 
         
 
@@ -223,8 +223,8 @@
     We will initially employ OLS on the Franke function, before moving on to using resampling techniques to explore the goodness of fit. We will then move on to the regularised regression methods, Ridge and Lasso, comparing their application on the Franke function with that of OLS. Finally, we use what we have learned to compare the three methods on real terrain data.
     
     \subsection{Datasets}
+    First, we should introduce the datasets we will be working with.
         \subsubsection{Franke Function}
-
             For the initial testing of our implemented fitting routines, we will use the so called \textit{Franke function}. Being able to control the number of sample points and noise levels will serve as a good examination of our models advantages and disadvantaged. Defined for $x, y \in [0,1]$
 
             \begin{align}
@@ -243,7 +243,7 @@
             And $\epsilon$ is some stochastic noise $\epsilon \distas \normal{0}{\sigma^2}$. By visual inspection, we can fine tune $\sigma$ to create data that looks like noisy digital terrain data. Unless specified otherwise all fits to the Franke function will use $n = 600$ uniformly distributed points $x,y \distas \mathcal{U}(0,1)$ with a noise level of $\sigma = 0.1$. We discuss this in Appendix~\ref{app:sec:frankefunction N and sigma}.   
 
         \subsubsection{Terrain Data}
-            We chose to sample terrain data from a mountainous region in northwestern Nicaragua, close to the border to Honduras, see Figure~\ref{met:fig:gmaps}.
+            We chose to sample terrain data from a mountainous region in northwestern Nicaragua, close to the border to Honduras, shown in Figure~\ref{met:fig:gmaps}.
             The terrain data consists of a 300 by 300 point grid with one arcsecond ('') resolution. When doing our fits, we restrict our data to $n=600$, as in the earlier case of the Franke function. The points are sampled uniformly from the grid, without replacement. 
             \begin{figure} [ht]
                 \centering
