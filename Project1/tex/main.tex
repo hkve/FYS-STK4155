@@ -329,17 +329,17 @@
 \section{Results}
     \subsection{Ordinary Least Squares}
             \subsubsection{Without Resampling}
-                We begin by calculating the MSE and $\Rsquared$ score (Eqs.~\ref{theo:eq:mse},~\ref{theo:eq:r2}) fitted to the Franke function for different polynomial degrees. This can be seen in Figures~\ref{res:fig:OLS_mse_noresample} and~\ref{res:fig:OLS_R2_noresample} respectively. Based on the MSE calculated for the test data, the optimal degree was found to be $\msub{p}{opt} = 5$ with $\mse \approx 0.134$. We observe that the train MSE decreases steadily with higher $p$, while the test MSE decreases until we reach $\msub{p}{opt}$, after which it increases. The opposite relationship is seen for the $\Rsquared$ score.   
+                We begin by calculating the MSE and $\Rsquared$ score (Eqs.~\ref{theo:eq:mse},~\ref{theo:eq:r2}) fitted to the Franke function for different polynomial degrees. This can be seen in Figures~\ref{res:fig:OLS_mse_noresample} and~\ref{res:fig:OLS_R2_noresample} respectively. Based on the MSE calculated for the test data, the optimal degree was found to be $\msub{p}{opt} = 7$ with $\mse \approx 0.122$. We observe that the train MSE decreases steadily with higher $p$, while the test MSE decreases until we reach $\msub{p}{opt}$, after which it increases. The opposite relationship is seen for the $\Rsquared$ score.   
                 \begin{figure}[ht]
                     \centering
-                    \includegraphics[width=.9\linewidth]{OLS_mse_noresample.pdf}
+                    \includegraphics[width=.9\linewidth]{nores_OLS_mse_noresample.pdf}
                     \caption{Showing the MSE score for OLS, calculated on the train and test sample for different polynomial degrees.}
                     \label{res:fig:OLS_mse_noresample}
                 \end{figure}
 
                 \begin{figure}[ht]
                     \centering
-                    \includegraphics[width=.9\linewidth]{OLS_r2_noresample.pdf}
+                    \includegraphics[width=.9\linewidth]{nores_OLS_R2_noresample.pdf}
                     \caption{Showing the $\Rsquared$ score for OLS, calculated on the train and test sample for different polynomial degrees.}
                     \label{res:fig:OLS_R2_noresample}
                 \end{figure}
@@ -349,13 +349,13 @@
             \begin{figure*}
                 \begin{subfigure}{\textwidth}
                     \centering
-                    \includegraphics[width=\linewidth]{OLS_coefs_plots.pdf}
+                    \includegraphics[width=\linewidth]{nores_OLSOLS_coefs_plots.pdf}
                     \caption{Showing values of polynomial coefficients for degree 1, 3 and 5 from left to right. The shaded regions are given by $\pm 2\sigma_\theta$. Note the different y-axes.} 
                     \label{res:fig:OLS_coefs_values_plot}
                 \end{subfigure}
                 \begin{subfigure}{\textwidth}
                     \centering
-                    \includegraphics[width=\linewidth]{OLS_coefs_table.pdf}
+                    \includegraphics[width=\linewidth]{nores_OLSOLS_coefs_table.pdf}
                     \caption{Showing $\theta_{ab}$ corresponding to the term $x^a y^b$ present in the fit.}
                     \label{res:fig:OLS_coefs_values_table}    
                 \end{subfigure}
