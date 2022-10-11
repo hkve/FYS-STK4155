@@ -450,10 +450,8 @@
     
 
     \subsection{Ridge and Lasso}
-        \comment{No naïveté, exploration of resampling is just 1 sentence.}\\
-        We now repeat the same analysis for Ridge and Lasso regression implementing resampling techniques. \comment{Add plots for task C repeated for Ridge and Lasso (parts of task e and f)}
-        
-        We perform the same cross-validation analysis as we did for OLS. This has been done for two different $\lambda$ values, $0.1$ and $10^{-7}$, both with Ridge and Lasso regression. This can be seen in Figures~\ref{res:fig:ridgelasso_cv_badlambda} and~\ref{res:fig:ridgelasso_cv_goodlambda} respectively.
+        We now repeat the same analysis for Ridge and Lasso regression implementing resampling techniques. For cross-validation this has been done for two different $\lambda$ values, $0.1$ and $10^{-7}$, both with Ridge and Lasso regression. This can be seen in Figures~\ref{res:fig:ridgelasso_cv_badlambda} and~\ref{res:fig:ridgelasso_cv_goodlambda} respectively.
+
         \begin{figure}[ht]
             \begin{subfigure}{.9\linewidth}
                 \centering
@@ -709,38 +707,37 @@
 
     
     \section{Exploring Number of Bootstrap Rounds} \label{app:sec:BS rounds}
-        \comment{Add reference -\Anna}
-         Figure~\ref{app:fig:histograms for rounds} shows that the distribution of MSE values derived from models trained on bootstrapped data set approaches a normal distribution as the number of bootstrap rounds increases, as the Central Limit Theorem states. In accordance with other results, one can see from the plots that when exceeding 400 rounds the distribution stabilises (see also Figure~\ref{res:fig:bs_mse_across_rounds} for this result). As in Figure~\ref{} the histograms show that the training data gives a smaller and more consistent MSE value than the testing data. This holds across number of bootstrap rounds.
+         Figure~\ref{app:fig:histograms_for_rounds} shows that the distribution of MSE values derived from models trained on bootstrapped data set approaches a normal distribution as the number of bootstrap rounds increases, as the Central Limit Theorem states. In accordance with other results, one can see from the plots that when exceeding 400 rounds the distribution stabilises (see also Figure~\ref{res:fig:bs_mse_across_rounds} for this result). As in Figure~\ref{app:fig:histograms_for_rounds} the histograms show that the training data gives a smaller and more consistent MSE value than the testing data. This holds across number of bootstrap rounds.
         \begin{figure*}
             \begin{subfigure}{.5\textwidth}
                 \centering
                 \includegraphics[width=.9\linewidth]{BS_hist_bootstraped_30_rounds_of_degree_7.pdf}
                 \caption{}
-                \label{app:fig:histograms for rounds:30}
+                \label{app:fig:histograms_for_rounds:30}
                 \end{subfigure}
             \hfill
             \begin{subfigure}{.5\textwidth}
                 \centering
                 \includegraphics[width=.9\linewidth]{BS_hist_bootstraped_102_rounds_of_degree_7.pdf}
                 \caption{}
-                \label{app:fig:histograms for rounds:102}
+                \label{app:fig:histograms_for_rounds:102}
             \end{subfigure}
             \hfill
             \begin{subfigure}{.5\textwidth}
                 \centering
                 \includegraphics[width=.9\linewidth]{BS_hist_bootstraped_408_rounds_of_degree_7.pdf}
                 \caption{}
-                \label{app:fig:histograms for rounds:408}
+                \label{app:fig:histograms_for_rounds:408}
             \end{subfigure}
             \begin{subfigure}{.5\textwidth}
                 \centering
                 \includegraphics[width=.9\linewidth]{BS_hist_bootstraped_606_rounds_of_degree_7.pdf}
                 \caption{}
-                \label{app:fig:histograms for rounds:606}
+                \label{app:fig:histograms_for_rounds:606}
             \end{subfigure}
 
             \caption{The histograms of MSE values for various number of bootstrap rounds. }
-            \label{app:fig:histograms for rounds}
+            \label{app:fig:histograms_for_rounds}
         \end{figure*}
 
 \end{appendices}

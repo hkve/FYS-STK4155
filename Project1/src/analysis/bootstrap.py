@@ -356,7 +356,7 @@ if __name__ == "__main__":
 #         BS_lists_rounds.append(BS_list_rounds)
 #         plot_mse_across_rounds(BS_list_rounds, rounds, model)
 
-    models = [LinearRegression]
+    models = [LinearRegression, Ridge, Lasso]
     BS_lists_deg = []
     for model in models:
         if model in [Ridge, Lasso]:
@@ -373,7 +373,9 @@ if __name__ == "__main__":
         BS_lists_deg.append(BS_list_deg)
         plot_train_test_mse(BS_list_deg, degrees, model)
         # plot_bias_var(BS_list_deg, degrees, model)
-        print(np.argmin([BS.mse_test for BS in BS_list_deg]))
+        print(np.argmin([BS.mse_test for BS in BS_list_deg])+1)
+    
+    breakpoint()
 
     # plot_comparison(BS_lists_deg)
 
