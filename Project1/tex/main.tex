@@ -450,7 +450,7 @@
     
 
     \subsection{Ridge and Lasso}
-        We now repeat the same analysis for Ridge and Lasso regression implementing resampling techniques. For cross-validation this has been done for two different $\lambda$ values, $0.1$ and $10^{-7}$, both with Ridge and Lasso regression. This can be seen in Figures~\ref{res:fig:ridgelasso_cv_badlambda} and~\ref{res:fig:ridgelasso_cv_goodlambda} respectively.
+        We repeated the same analysis for Ridge and Lasso regression, implementing resampling techniques. For cross-validation this was done for two different $\lambda$ values, $0.1$ and $10^{-7}$, both with Ridge and Lasso regression. This can be seen in Figures~\ref{res:fig:ridgelasso_cv_badlambda} and \ref{res:fig:ridgelasso_cv_goodlambda} respectively.
 
         \begin{figure}[ht]
             \begin{subfigure}{.9\linewidth}
@@ -479,6 +479,8 @@
             \label{res:fig:ridgelasso_cv_goodlambda}
         \end{figure}
 
+        Further, we optimised the regularised methods, grid searching for the best combination of $p\in [1,15]$ and $\lambda \in [10^{-9}, 10^{1}]$ to find that $(p=8, \lambda=3\cdot 10^{-7})$ was the optimum for Ridge and $(p=8, \lambda=3\cdot 10^{-4})$ for Lasso. This is seen in Figure~\ref{res:fig:Franke_heatmaps}.
+
         \begin{figure}[ht]
             \begin{subfigure}{\linewidth}
                 \centering
@@ -488,7 +490,7 @@
                 \centering
                 \includegraphics[width=.9\linewidth]{heatmap_lasso.pdf}
             \end{subfigure}
-            \caption{Grid search of the MSE of the Ridge and Lasso methods fitted to the Franke function with $k=7$ CV resampling. The red crosses denote the best $\lambda$-value for each degree, the large cross denoting the global minimum of the MSE.}
+            \caption{Grid search of the MSE of the Ridge and Lasso methods fitted to the Franke function with $k=7$ CV resampling. We computed the MSE for every $p \in [1,15]$ and 21 logspaced $\lambda \in [10^{-9}, 10^1]$. The red crosses denote the best $\lambda$-value for each degree, the large cross denoting the global minimum of the MSE.}
             \label{res:fig:Franke_heatmaps}
         \end{figure}
 
@@ -617,13 +619,14 @@
             \comment{General bv disc here} \\
 
             \comment{Accros $\lambda$-disc here}\\
-            The different regression methods we used on the terrain data all performed similarly when optimised, with optimal MSEs of $0.1808$, $0.1865$ and $0.1887$ respectively for OLS, Ridge and Lasso. However, the window within which the OLS method works well is narrow, quickly moving from high bias to high variance, as evidenced in our earlier analyses. In Figure~\ref{res:fig:Nica_heatmap} we see that there are larger areas where Ridge and Lasso perform well, but at the cost of `fine-tuning' both the $\lambda$-parameters and the model complexity. The regularised methods are more consistent across model complexities, but come at the cost of an additional parameter to tune; in a sense they are `safer' to employ.
 
-            Ultimately, none of the methods do a brilliant job of reproducing the exact features of the jagged terrain we apply them on, as we do try to fit smooth functions to something inherently irregular. Had we focused on a smaller region with a larger resolution, our results would surely be better.
 
     \subsection{Fit to Terrain Data}
         First, we should take a minute to discuss the choice of terrain data to fit to, and how this could change things. We naturally chose a mountainous terrain, for there to be more interesting features for the models to recapture. However, we chose a large region, with a full resolution ($300\times 300$ points) on which we could not hope to do our full analysis, using of all the models and resampling adequately. We could either choose a smaller sub-area or sample more sparsely from the region. We chose the latter, as this would more closely resemble noisy data or a situation where we might not have all the data we would want for our regression. This highlights the power of regression methods to sift through data and find the most salient features. This is seen in Figure~\ref{res:fig:Nica_terrain}, where our fitted model recreates a smoothed version of the jagged mountains where the difference from the low valley to the high peak is obvious, but without the sharpness and details of the original data.
 
+        The different regression methods we used on the terrain data all performed similarly when optimised, with optimal MSEs of $0.1808$, $0.1865$ and $0.1887$ respectively for OLS, Ridge and Lasso. However, the window within which the OLS method works well is narrow, quickly moving from high bias to high variance, as evidenced in our earlier analyses. In Figure~\ref{res:fig:Nica_heatmap} we see that there are larger areas where Ridge and Lasso perform well, but at the cost of `fine-tuning' both the $\lambda$-parameters and the model complexity. The regularised methods are more consistent across model complexities, but come at the cost of an additional parameter to tune; in a sense they are `safer' to employ.
+
+        Ultimately, none of the methods do a brilliant job of reproducing the exact features of the jagged terrain we apply them on, as we do try to fit smooth functions to something inherently irregular. Had we focused on a smaller region with a larger resolution, our results would surely be better.
 
 
 
