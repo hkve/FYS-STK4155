@@ -383,7 +383,7 @@
             
             Just as in the case without resampling, the train MSE decreases with $p$. For the test MSE, the increase after the various $\msub{p}{opt}$ values is smaller, but the general trend is the same. For further usage of cross-validation as a resampling techniquex, we use $k = 7$.   
             
-            \begin{figure}[ht]
+            \begin{figure}[H]
                 \centering
                 \includegraphics[width=.9\linewidth]{OLS_mse_kfold.pdf}
                 \caption{MSE values as a function of polynomial degrees, calculated using $k$-fold cross-validation for $k = 5, 7$ and $10$. }
@@ -411,15 +411,15 @@
             \end{figure}
   
             When looking at the bias-variance decomposition of the bootstrapped MSE value (Figure~\ref{res:fig:bs_OLS_bias_variance_tradeoff_ols}), it is evident that when adding the decomposed parts together, it results in something very close to the original MSE, meaning the implementation is sound. The bias of the models starts high and decreases with increasing model complexity. The variance on the other hand is initially $0$ at $p=1$ and increases with the polynomial degree. The lowest MSE value occurs at $p_{opt}=6$, for which the bias is at its lowest and variance is still small. 
-            \begin{figure}[ht]
+
+            \begin{figure}[H]
                 \centering
                 \includegraphics[width=.9\linewidth]{BS_Bias_var_OLS.pdf}
                 \caption{Plot of the bias-variance decomposition. $n=600$ }
                 \label{res:fig:bs_OLS_bias_variance_tradeoff_ols}
             \end{figure}
 
-            In Figure~\ref{res:fig:bs_bias_var_data_points} we see the change in the bias-variance decomposition when varying the number of data points. For $n=60$ the bias remains at negligible for all model complexities while the MSE and variance are identical and increase with the polynomial degree. Conversely, for $n=1500$ the MSE and bias reach a minimum and seemingly stabilise, while the variance barely increases. 
-            \begin{figure}[ht]
+            \begin{figure}[H]
                 \begin{subfigure}{\linewidth}
                     \centering
                     \includegraphics[width=.9\linewidth]{BS_Bias_var_decomp_OLS_60_data_points.pdf}
@@ -438,6 +438,8 @@
                 \caption{Bias-variance decomposition of OLS models when varying the number of data points.}
                 \label{res:fig:bs_bias_var_data_points}
             \end{figure}
+
+            In Figure~\ref{res:fig:bs_bias_var_data_points} we see the change in the bias-variance decomposition when varying the number of data points. For $n=60$ the bias remains at negligible for all model complexities while the MSE and variance are identical and increase with the polynomial degree. Conversely, for $n=1500$ the MSE and bias reach a minimum and seemingly stabilise, while the variance barely increases. 
     
 
     \subsection{Ridge and Lasso}
@@ -472,18 +474,7 @@
 
         Further, we optimised the regularised methods, grid searching for the best combination of $p\in [1,15]$ and $\lambda \in [10^{-9}, 10^{1}]$ to find that $(p=8, \lambda=3\cdot 10^{-7})$ was the optimum for Ridge and $(p=8, \lambda=3\cdot 10^{-4})$ for Lasso. This is seen in Figure~\ref{res:fig:Franke_heatmaps}.
 
-        \begin{figure}[ht]
-            \begin{subfigure}{\linewidth}
-                \centering
-                \includegraphics[width=.9\linewidth]{heatmap_ridge.pdf}
-            \end{subfigure}
-            \begin{subfigure}{\linewidth}
-                \centering
-                \includegraphics[width=.9\linewidth]{heatmap_lasso.pdf}
-            \end{subfigure}
-            \caption{Grid search of the MSE of the Ridge and Lasso methods fitted to the Franke function with $k=7$ CV resampling. We computed the MSE for every $p \in [1,15]$ and 21 logspaced $\lambda \in [10^{-9}, 10^1]$. The red crosses denote the best $\lambda$-value for each degree, the large cross denoting the global minimum of the MSE.}
-            \label{res:fig:Franke_heatmaps}
-        \end{figure}
+
 
         \subsubsection{Bias-Variance Decomposition}
             Using the optimal $\lambda$ found from the cross-validation heatmap (see Figure~\ref{res:fig:Franke_heatmaps}) we now plot the bias-variance decomposition of Ridge and Lasso as functions of model complexity. The results can be seen in Figure~\ref{res:fig:bs_bias_var_Ridge_Lasso}. As opposed to OLS, where the MSE value quickly increase with polynomial degree after a certain threshold, the MSE values of Ridge and Lasso reaches a more or less stable value with only a slight increase with some fluctuation. The plots resemble the OLS for $n=1500$. The optimal polynomial degree for Ridge is $p_{opt} = 10$ and for Lasso $p_{opt} = 9$.
@@ -519,6 +510,22 @@
             
             Lastly we plot the bias-variance decomposition as a function of $\lambda$ (see Figure~\ref{res:fig:bs_bias_var_lmbdas_Ridge_Lasso}) using the optimal degrees $p=8$ for both Ridge and Lasso, taken from Figure~\ref{res:fig:Franke_heatmaps}.  
 
+
+
+            
+            \begin{figure}[ht]
+                \begin{subfigure}{\linewidth}
+                    \centering
+                    \includegraphics[width=.9\linewidth]{heatmap_ridge.pdf}
+                \end{subfigure}
+                \begin{subfigure}{\linewidth}
+                    \centering
+                    \includegraphics[width=.9\linewidth]{heatmap_lasso.pdf}
+                \end{subfigure}
+                \caption{Grid search of the MSE of the Ridge and Lasso methods fitted to the Franke function with $k=7$ CV resampling. We computed the MSE for every $p \in [1,15]$ and 21 logspaced $\lambda \in [10^{-9}, 10^1]$. The red crosses denote the best $\lambda$-value for each degree, the large cross denoting the global minimum of the MSE.}
+                \label{res:fig:Franke_heatmaps}
+            \end{figure}
+
             \begin{figure}[ht]
                 \begin{subfigure}{\linewidth}
                     \centering
@@ -531,13 +538,18 @@
                 \caption{Bias-variance decomposition as a function of $\lambda$s of Ridge and Lasso on Franke data with $n=600$.}
                 \label{res:fig:bs_bias_var_lmbdas_Ridge_Lasso}
             \end{figure}
-
+            \clearpage
 
 
 
 
     \subsection{Nicaraguan Terrain Data}
         Initially, we fit the OLS method to the terrain data with $p\in[5, 25]$; this can be seen in Figure~\ref{res:fig:Nica_OLS}. From this, we conclude that $p=12$ is the optimal degree for OLS with $n=600$ data points on this terrain data, where the MSE has a minimum at $0.1808$. We see the recognisable signs of overfitting starting at around $p=18$.
+
+        This leads us to optimise the regularised methods, seen in Figure~\ref{res:fig:Nica_heatmap}. We find $(p=12, \lambda = 3\cdot 10^{-9})$ as the optimum for Ridge, and $(p=13, \lambda=6 \cdot 10^{-5})$ for Lasso, with respective minima MSEs $0.1865$ and $0.1887$ --- slightly underperforming OLS.
+
+        Finally, we fit our OLS model with $p=12$ on the entire terrain dataset, and plot the prediction against the original data in Figure~\ref{res:fig:Nica_terrain}.
+
         \begin{figure} [ht]
             \centering
             \includegraphics[width=.9\linewidth]{OPT_OLS_mse_kfold.pdf}
@@ -545,7 +557,7 @@
             \label{res:fig:Nica_OLS}
         \end{figure}
 
-        This leads us to optimise the regularised methods, seen in Figure~\ref{res:fig:Nica_heatmap}. We find $(p=12, \lambda = 3\cdot 10^{-9})$ as the optimum for Ridge, and $(p=13, \lambda=6 \cdot 10^{-5})$ for Lasso, with respective minima MSEs $0.1865$ and $0.1887$ --- slightly underperforming OLS.
+
     
         \begin{figure} [ht]
             \centering
@@ -555,17 +567,14 @@
             \label{res:fig:Nica_heatmap}
         \end{figure}
 
-        Finally, we fit our OLS model with $p=12$ on the entire terrain dataset, and plot the prediction against the original data in Figure~\ref{res:fig:Nica_terrain}.
-
-        \begin{figure} [ht]
-            \begin{subfigure}{\linewidth}
+        \begin{figure*}
+            \begin{subfigure}{.5\linewidth}
                 \centering
                 \includegraphics[width=.9\linewidth]{Nica_test_plot.pdf}
                 \caption{$n=600$ randomly sampled points from our Nicaraguan terrain data.}
                 \label{res:subfig:Nica_test}
             \end{subfigure}
-            \\
-            \begin{subfigure}{\linewidth}
+            \begin{subfigure}{.5\linewidth}
                 \centering
                 \includegraphics[width=.9\linewidth]{Nica_predict_plot.pdf}
                 \caption{Best fit to the Nicaraguan terrain data found using OLS with $p=12$.}
@@ -573,7 +582,9 @@
             \end{subfigure}
             \caption{Comparison of the actual Nicaraguan terrain data and the unscaled prediction of our best scoring model. $x$ denotes arcseconds north, $y$ denotes arcseconds west. $z$ units can be disregarded, but scale serves to allow comparison of magnitude between the plots.}
             \label{res:fig:Nica_terrain}
-        \end{figure}
+        \end{figure*}
+
+
 
 
 \section{Discussion}
