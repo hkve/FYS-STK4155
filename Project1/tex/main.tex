@@ -381,7 +381,7 @@
                 \label{res:tab:OLS_kfold_optimal}
             \end{table}
             
-            Just as in the case without resampling, the train MSE decreases with $p$. For the test MSE, the increase after the various $\msub{p}{opt}$ values is smaller, but the general trend is the same. For further usage of cross-validation as a resampling technique applied to the Franke data, we use $k = 7$.   
+            Just as in the case without resampling, the train MSE decreases with $p$. For the test MSE, the increase after the various $\msub{p}{opt}$ values is smaller, but the general trend is the same. For further usage of cross-validation as a resampling techniquex, we use $k = 7$.   
             
             \begin{figure}[ht]
                 \centering
@@ -608,10 +608,8 @@
 
         \subsubsection{Cross-Validation and Bootstrap} 
             The choice of $k=7$ used for our parameter grid search is influenced by the computational aspect of the approach. Since a model has to be fitted $k$ times for each set of parameter $(p,\lambda)$, it is clear that this increases the time taken to search the parameter space. However, for both OLS and Ridge, the closed form expressions (Eqs.~\eqref{theo:eq:OLS_coefs} and~\eqref{theo:eq:Ridge_coefs} respectively) only require matrix multiplication and inversion. Adding more folds could potentially be feasible here. However, since Lasso requires a cost function minimization, it is significantly slower than OLS and Ridge, especially for high $p$. Therefore, we get a tradeoff between the number of $(p,\lambda)$ to try and the number of folds $k$, where $k=7$ was found to allow for high parameter resolution while still being completed in a feasible amount of time.
-            \newline
-            \comment{Some general disc about Bootstrapping here, and after that some comparison?}
-            \newline
-            The Bootstrap holds the test set constant during calculation of metrics. This is in contrast to cross-validation where the test set is different (with no overlapping points) for each fitted model. Holding the test set constant might be beneficial since every model calculates metrics based on the same data, thus averaging over MSE scores gives a more accurate picture of the MSE present in that specific test set. However, this introduces bias since we assume that the selected test set accurately represents the population, which it may not. Cross-validation on the other hand does not average MSE values over the same test data and larger variations may occur. The advantage of this is that metrics are calculated on the entire data set, not just a specific partition.
+
+            The bootstrap holds the test set constant during calculation of metrics. This is in contrast to cross-validation where the test set is different (with no overlapping points) for each fitted model. Holding the test set constant might be beneficial since every model calculates metrics based on the same data, thus averaging over MSE scores gives a more accurate picture of the MSE present in that specific test set. However, this introduces bias since we assume that the selected test set accurately represents the population, which it may not. Cross-validation on the other hand does not average MSE values over the same test data and larger variations may occur. The advantage of this is that metrics are calculated on the entire data set, not just a specific partition.
 
         \subsubsection{Bias Variance Tradeoff}
             \comment{General bv disc here} \\
