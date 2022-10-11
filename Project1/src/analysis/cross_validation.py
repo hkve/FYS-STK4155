@@ -28,7 +28,7 @@ def plot_train_mse_kfold(degrees, mse_across_folds, title="OLS", lmbda=None, fil
     ax.set_ylabel(r"$MSE$", fontsize=14)
     ax.legend(fontsize=14)
     title = rf"{title} Cross validation, $k \in [{ks[0]},{ks[-1]}]$"
-    if title:
+    if lmbda:
         exp = np.log10(lmbda)
         title += f" $\lambda = 10^" + "{" + str(int(exp)) + "}$"
     ax.set_title(title, fontsize=16)
