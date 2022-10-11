@@ -356,24 +356,24 @@ if __name__ == "__main__":
 #         BS_lists_rounds.append(BS_list_rounds)
 #         plot_mse_across_rounds(BS_list_rounds, rounds, model)
 
-    # models = [LinearRegression]
-    # BS_lists_deg = []
-    # for model in models:
-    #     if model in [Ridge, Lasso]:
-    #         degrees_grid, lmbdas_grid, MSEs = load(model_names[model].lower()+'_grid')
-    #         optimal_lmbdas = lmbdas_grid[0, np.argmin(MSEs, axis=1)]
-    #         optimal_lmbda = lmbdas_grid[np.unravel_index(np.argmin(MSEs), MSEs.shape)]
-    #         optimal_degree = degrees_grid[(np.unravel_index(np.argmin(MSEs), MSEs.shape))[0]][0]
-    #     else:
-    #         optimal_degree = 7
-    #         optimal_lmbda = None
-    #         optimal_lmbdas = None
-    #     #across degrees:
-    #     BS_list_deg = bootstrap_across_degrees(D, model, round=4, degrees=degrees, lmbdas=optimal_lmbdas)
-    #     BS_lists_deg.append(BS_list_deg)
-    #     # plot_train_test_mse(BS_list_deg, degrees, model)
-    #     # plot_bias_var(BS_list_deg, degrees, model)
-    #     print(model)
+    models = [LinearRegression]
+    BS_lists_deg = []
+    for model in models:
+        if model in [Ridge, Lasso]:
+            degrees_grid, lmbdas_grid, MSEs = load(model_names[model].lower()+'_grid')
+            optimal_lmbdas = lmbdas_grid[0, np.argmin(MSEs, axis=1)]
+            optimal_lmbda = lmbdas_grid[np.unravel_index(np.argmin(MSEs), MSEs.shape)]
+            optimal_degree = degrees_grid[(np.unravel_index(np.argmin(MSEs), MSEs.shape))[0]][0]
+        else:
+            optimal_degree = 7
+            optimal_lmbda = None
+            optimal_lmbdas = None
+        #across degrees:
+        BS_list_deg = bootstrap_across_degrees(D, model, round=400, degrees=degrees, lmbdas=optimal_lmbdas)
+        BS_lists_deg.append(BS_list_deg)
+        plot_train_test_mse(BS_list_deg, degrees, model)
+        # plot_bias_var(BS_list_deg, degrees, model)
+        print(np.argmin([BS.mse_test for BS in BS_list_deg]))
 
     # plot_comparison(BS_lists_deg)
 
@@ -408,12 +408,12 @@ if __name__ == "__main__":
 ###
 #Across lambdas
 ###
-    models = [Ridge, Lasso]
-    lmbdas = np.logspace(-8,0,15)
-    for model in models:
-        degrees_grid, lmbdas_grid, MSEs = load(model_names[model].lower()+'_grid')
-        optimal_degree = degrees_grid[(np.unravel_index(np.argmin(MSEs), MSEs.shape))[0]][0]
-        print(optimal_degree)
+    # models = [Ridge, Lasso]
+    # lmbdas = np.logspace(-8,0,15)
+    # for model in models:
+    #     degrees_grid, lmbdas_grid, MSEs = load(model_names[model].lower()+'_grid')
+    #     optimal_degree = degrees_grid[(np.unravel_index(np.argmin(MSEs), MSEs.shape))[0]][0]
+    #     print(optimal_degree)
         # BS_list_lam = bootstrap_across_lmbdas(D, lmbdas, model, round=400, degree=optimal_degree)
         # plot_bias_var_lmbdas(BS_list_lam, lmbdas, model)
 
