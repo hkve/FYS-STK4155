@@ -391,14 +391,14 @@
             \end{figure}
         
 
-            When deciding the optimal number of bootstrap rounds we look at the mean of the MSE values for each number of rounds (see Figure~\ref{res:fig:bs_mse_across_rounds}). 
+            When deciding the optimal number of bootstrap rounds we look at the mean of the MSE values for each number of rounds (see Figure~\ref{res:fig:bs_mse_across_rounds}). We can see from the plot that the mean MSE value varies a lot in the beginning, but stabilises around 400 rounds and remains rather constant thereafter. The same goes for the standard deviation divided by $\sqrt{L}$ (the blue field around the graph). For further exploration of the number of bootstrap rounds and the distributions of the MSE values see Appendix~\ref{app:sec:BS rounds}.
             \begin{figure}[ht]
                 \centering
                 \includegraphics[width=.9\linewidth]{BS_mse_across_rounds_OLS.pdf}
                 \caption{Plot of the MSE value as a function of number of bootstrap rounds. Each MSE value in the plot is the mean of the MSE values for that number of rounds. The blue field around the graph is the standard deviation of the MSE distribution divided by the square root of the number of bootstrap rounds. Implementing polynomial degree 7.}
                 \label{res:fig:bs_mse_across_rounds}
             \end{figure}
-            We can see from the plot that the mean MSE value varies a lot in the beginning, but stabilises around 400 rounds and remains rather constant thereafter. The same goes for the standard deviation divided by $\sqrt{L}$ (the blue field around the graph). For further exploration of the number of bootstrap rounds and the distributions of the MSE values see Appendix~\ref{app:sec:BS rounds}. 
+ 
 
 
         \subsubsection{Applying Resampling}
@@ -410,9 +410,8 @@
                 \caption{Plot of the MSE values calculated using the training and testing data for various bootstraps. The solid line is the mean of all the bootstrapped models.}
                 \label{res:fig:bs_train_test_ols}
             \end{figure}
-            This is an indication that the model is overfitted to the training data; it has adapted to the noise, 
   
-            When looking at the bias-variance decomposition of the MSE value (Figure~\ref{res:fig:bs_OLS_bias_variance_tradeoff_ols}), it is evident that when adding the decomposed parts together, it results in something very close to the original MSE, meaning the implementation is sound. The bias of the models starts high and decreases with increasing model complexity. The variance on the other hand is initially $0$ at $p=1$ and increases with the polynomial degree. 
+            When looking at the bias-variance decomposition of the MSE value (Figure~\ref{res:fig:bs_OLS_bias_variance_tradeoff_ols}), it is evident that when adding the decomposed parts together, it results in something very close to the original MSE, meaning the implementation is sound. The bias of the models starts high and decreases with increasing model complexity. The variance on the other hand is initially $0$ at $p=1$ and increases with the polynomial degree. The lowest MSE value occurs at $p_{opt}=6$. 
             \begin{figure}[ht]
                 \centering
                 \includegraphics[width=.9\linewidth]{BS_Bias_var_decomp_OLS.pdf}
@@ -420,8 +419,7 @@
                 \label{res:fig:bs_OLS_bias_variance_tradeoff_ols}
             \end{figure}
 
-            The change in variance coincides with the results in Figure~\ref{res:fig:bs_train_test_ols}.
-            When using the MSE as a measure of the goodness of fit, the model yielding the lowest value will be considered the best. At this point in Figure~\ref{res:fig:bs_OLS_bias_variance_tradeoff_ols} ($p_{opt}=6$) the bias is at its lowest and the variance has not yet increased much. This is an example of the bias-variance tradeoff.  
+
 
             \comment{Remove the titles op the plots -\Anna}
             In Figure~\ref{res:fig:bs_bias_var_data_points} we see the change in the bias-variance decomposition when varying the number of data points. For $n=60$ the bias remains at negligible for all model complexities while the MSE and variance are identical and increase with the polynomial degree. Conversely, for $n=1500$ the MSE and bias reaches a minimum and seemingly stabilises, while the variance barely increases. 
@@ -445,8 +443,6 @@
                 \caption{Bias-variance decomposition of OLS models when varying the number of data points.}
                 \label{res:fig:bs_bias_var_data_points}
             \end{figure}
-            The fact that the bias remains low for small numbers of data points corresponds with the notion that little complexity is required to approximate few data points. It also makes sense that the variance and MSE quickly increase with the model complexity; the model is easily overfitted. For $n=1500$ the number of data points impedes the model from overfitting at such low polynomial degrees. Had we further increased the model complexity, we should again see the signs of overfitting. 
-
     
 
     \subsection{Ridge and Lasso}
@@ -608,7 +604,7 @@
 
         The value of resampling rather comes from creating a way to emphasise different parts of the original dataset when fitting our model, and consequently comparing what this does to the predictions of the model. For instance, an overfitted model might contort to accommodate a statistical outlier in the original dataset, and thereby make a poor prediction on new data. However, when resampling, many of the new datasets sampled to make new fits from our model will not include this statistical outlier, and should make predictions not influenced too heavily by this. There should then be a medium where the particular `oddities' in the original dataset can be smoothed over, and the bias of the original dataset is not brought out to the front.
 
-        \subsubsection{Cross-Validation and Bootstrap}
+        \subsubsection{Cross-Validation and Bootstrap} 
             Looking back at fold varying test- and train MSEs for our regularised methods, we see that the low $\lambda = 10^{-7}$ graphs (Figure~\ref{res:fig:ridgelasso_cv_goodlambda}) closely resembles the results obtained for OLS (Figure~\ref{res:fig:OLS_mse_kfold}). This is in agreement with regaining OLS for $\lambda \xrightarrow{} 0$. For the more regularised $\lambda = 0.1$ graph (Figure~\ref{res:fig:ridgelasso_cv_badlambda}), we observe almost no variation between different $k$ values. This might be due to $\theta$-parameter space being smaller, since we add a large penalty on our coefficients. Since many of the same data points are used for fitting across different $k$ values and the penalty term gives a large constraint on the possible $\theta$ values, the fitted models across different folds will be more similar.  
         
             The choice of $k=7$ used for our parameter grid search is influenced by the computational aspect of the approach. Since a model has to be fitted $k$ times for each set of parameter $(p,\lambda)$, it is clear that this increases the time taken to search the parameter space. However, for both OLS and Ridge, the closed form expressions (Eqs.~\eqref{theo:eq:OLS_coefs} and~\eqref{theo:eq:Ridge_coefs} respectively) only require matrix multiplication and inversion. Adding more folds could potentially be feasible here. However, since Lasso requires a cost function minimization, it is significantly slower than OLS and Ridge, especially for high $p$. Therefore, we get a tradeoff between the number of $(p,\lambda)$ to try and the number of folds $k$, where $k=7$ was found to allow for high parameter resolution while still being completed in a feasible amount of time.
@@ -617,7 +613,9 @@
 
         \subsubsection{Bias Variance Tradeoff}
             \comment{General bv disc here} \\
-            
+            We analyse bias variance tradeoff through decomposition of the MSE. For OLS we see the decomposition visualised in multiple plots. In the plots in Figures~\ref{res:fig:bs_OLS_bias_variance_tradeoff_ols} and~\ref{res:fig:bs_train_test_ols} the change in variance coincides; the difference between the various bootstrapped models increase with model complexity, and this is what we see as variance in the bias-variance decomposition. When using the MSE as a measure of the goodness of fit, the model yielding the lowest value will be considered the best. At this point in Figure~\ref{res:fig:bs_OLS_bias_variance_tradeoff_ols} ($p_{opt}=6$) the bias is at its lowest and the variance has not yet increased much. This is an example of the bias-variance tradeoff.  
+
+            The fact that the bias remains low for small numbers of data points corresponds with the notion that little complexity is required to approximate few data points. It also makes sense that the variance and MSE quickly increase with the model complexity; the model is easily overfitted. For $n=1500$ the number of data points impedes the model from overfitting at such low polynomial degrees. Had we further increased the model complexity, we should again see the signs of overfitting. 
             
             The bias-variance decomposition is a method for further analysing the MSE value of a model and find out what makes the model preform well/badly. As the model approximates the training data (the complexity increases), it gets closer to capturing the true relationship between the input and the output; the bias of the model decreases. Simultaneously the model gets more dependent on exactly which data it is trained on; the variance increases. An ideal model will have a low bias and a low variance, but it is rare that these coincide and one is forced to find a tradeoff. 
 
