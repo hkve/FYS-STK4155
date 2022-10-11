@@ -296,8 +296,12 @@
             Together with the MSE, the bias and variance of the model are in our case relevant measures for goodness of fit. By implementing bootstrapping we wish to study the bias-variance trade off. Given a model of a certain complexity, we are interested in calculating these measures, not for each bootstrapped model, but across them. Given $L$ number of bootstrap rounds (and corresponding bootstrapped models), we want the bias and variance between all the bootstrapped models at each point compared to the testing data (see Eqs.~\eqref
             {theo:eq:bias and var}). This will create a bias value and variance value for each of the input data points. When evaluating a model of a certain polynomial degree, we found an appropriate measure of the bias and variance for the \textit{entire} model would be the mean across data points. 
             
+<<<<<<< HEAD
             When employing bootstrap it is important to find an appropriate number of rounds to preform the resampling. There is a trade-off between getting an accurate distribution of the values and keeping the process computationally feasible. To find the optimal number of rounds we preform bootstrap on the Franke data for a variety of rounds while  calculating the MSE values. In this case we implement polynomial degree $7$ and bootstrap rounds from $30-1000$. There will be a distribution of MSE values for each number of rounds. By taking the mean of each distribution we can plot it as a function of rounds and find where it stabilises. One can argue that any number of rounds above this point will be excessive. 
 >>>>>>> f53594088f8380ffb7a05a3fcc064f8794bf6e91
+=======
+            When employing bootstrap it is important to find an appropriate number of rounds to preform the resampling. There is a trade-off between getting an accurate distribution of the values and keeping the process computationally feasible. To find the optimal number of rounds we preform bootstrap on the Franke data for a variety of rounds while  calculating the MSE values. In this case we implement polynomial degree $7$ and bootstrap rounds at consant intervals from $30-1000$. There will be a distribution of MSE values for each number of rounds. By taking the mean of each distribution we can plot it as a function of rounds and find where it stabilises. One can argue that any number of rounds above this point will be excessive. We will also for each number of rounds plot the standard deviation of the corresponding MSE value distribution divided by the number of rounds to visualise variation. 
+>>>>>>> 963a9e7c944c3db33ed53c9874ec6f0a6c075a4b
 
 
         \subsubsection{Cross-Validation}
@@ -330,7 +334,7 @@
 
     \subsection{Application on Real Data}
         Finally, we will apply the three regression methods on our Nicaraguan terrain data, \comment{'now always with some sort of resampling method' - \Anna}. We carry out many of the same analyses as done earlier, starting by varying the number of degrees for a simple OLS fit, finding the optimal degree by minimising the MSE found using cross-validation.
-        When moving to our regularised methods, the same method grid searching for hyperparameter optimisation will be used. Using the optimal parameters for each model, a comparison between them will be performed to find which model most accurately recreates the test data. We do bias-variance decomposition of the models as they fit the test data, varying the complexity of the design matrix from expansion up to power $p=5\text{--}25$. This will be used as a basis for a comparison of the validity of the three models in their application in recreating mountainous terrain. Finally, for completeness, we plot our best fit to the terrain and \comment{'qualitatively' -\Anna} compare with the actual terrain.
+        When moving to our regularised methods, the same method grid searching for hyperparameter optimisation will be used. Using the optimal parameters for each model, a comparison between them will be performed to find which model most accurately recreates the test data. We do bias-variance decomposition of the models as they fit the test data, varying the complexity of the design matrix from expansion up to power $p=5\text{--}25$. This will be used as a basis for a comparison of the validity of the three models in their application in recreating mountainous terrain. Lastly, for completeness, we plot our best fit to the terrain and \comment{'qualitatively' -\Anna} compare with the actual terrain.
 
 
 \section{Results}
@@ -402,7 +406,7 @@
 
         
 
-            When deciding the optimal number of bootstrap rounds we look at the mean of the MSE values for each number of bootstrap rounds (see Figure~\ref{res:fig:bs_mse_across_rounds}). 
+            When deciding the optimal number of bootstrap rounds we look at the mean of the MSE values for each number of rounds (see Figure~\ref{res:fig:bs_mse_across_rounds}). 
             \begin{figure}[ht]
                 \centering
                 \includegraphics[width=\linewidth]{BS_mse_across_rounds_OLS.pdf}
@@ -410,7 +414,7 @@
                 \label{res:fig:bs_mse_across_rounds}
             \end{figure}
             We can see from the plot that the mean MSE value varies a lot in the beginning, but stabilises around 400 rounds and remains rather constant thereafter. The same goes for the standard deviation divided by number of rounds (the blue field around the graph). For further exploration of the number of bootstrap rounds and the distributions of the MSE values see Appendix~\ref{app:sec:BS rounds}. 
-            \comment{Should maybe comment on the choice of the blue field.}
+            \comment{Should maybe comment on the choice of the blue field.} 
 
 
         \subsubsection{Applying Resampling}
