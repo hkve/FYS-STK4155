@@ -349,13 +349,13 @@
             \begin{figure*}
                 \begin{subfigure}{\textwidth}
                     \centering
-                    \includegraphics[width=.9\linewidth]{OLS_coefs_plots.pdf}
+                    \includegraphics[width=\linewidth]{OLS_coefs_plots.pdf}
                     \caption{Showing values of polynomial coefficients for degree 1, 3 and 5 from left to right. The shaded regions are given by $\pm 2\sigma_\theta$. Note the different y-axes.} 
                     \label{res:fig:OLS_coefs_values_plot}
                 \end{subfigure}
                 \begin{subfigure}{\textwidth}
                     \centering
-                    \includegraphics[width=.9\linewidth]{OLS_coefs_table.pdf}
+                    \includegraphics[width=\linewidth]{OLS_coefs_table.pdf}
                     \caption{Showing $\theta_{ab}$ corresponding to the term $x^a y^b$ present in the fit.}
                     \label{res:fig:OLS_coefs_values_table}    
                 \end{subfigure}
@@ -453,12 +453,12 @@
         We repeated the same analysis for Ridge and Lasso regression, implementing resampling techniques. For cross-validation this was done for two different $\lambda$ values, $0.1$ and $10^{-7}$, both with Ridge and Lasso regression. This can be seen in Figures~\ref{res:fig:ridgelasso_cv_badlambda} and \ref{res:fig:ridgelasso_cv_goodlambda} respectively. For $\lambda = 10^{-7}$ we again see that the test MSE stabilises when reaching $k=7$. In the $\lambda=0.1$ case however, there is little variation across the different $k$ values.
 
         \begin{figure}[ht]
-            \begin{subfigure}{.9\linewidth}
+            \begin{subfigure}{\linewidth}
                 \centering
                 \includegraphics[width=.9\linewidth]{bad_lmbda_Ridge_mse_kfold.pdf}
             \end{subfigure}
             \hfill
-            \begin{subfigure}{.9\linewidth}
+            \begin{subfigure}{\linewidth}
                 \centering
                 \includegraphics[width=.9\linewidth]{bad_lmbda_Lasso_mse_kfold.pdf}
             \end{subfigure}
@@ -466,12 +466,12 @@
             \label{res:fig:ridgelasso_cv_badlambda}
         \end{figure}
         \begin{figure}[ht]
-            \begin{subfigure}{.9\linewidth}
+            \begin{subfigure}{\linewidth}
                 \centering
                 \includegraphics[width=.9\linewidth]{good_lmbda_Ridge_mse_kfold.pdf}
             \end{subfigure}
             \hfill
-            \begin{subfigure}{.9\linewidth}
+            \begin{subfigure}{\linewidth}
                 \centering
                 \includegraphics[width=.9\linewidth]{good_lmbda_Lasso_mse_kfold.pdf}
             \end{subfigure}
