@@ -529,7 +529,7 @@
 
             We can see that the models of optimal $\lambda$s reach a minimum MSE value and thereafter increase with the model complexity. This is not the case for the models of the larger $\lambda$s, but it is plausible that it would be if we were to increase the polynomial degree further. Ridge and Lasso are not directly comparable as they differ in their definition of $\lambda$ (see Eqs.~\eqref{theo:eq:Ridge_coefs} and~\eqref{theo:eq:Lasso_costfunction}).   
             
-            Lastly we plot the bias variance decomposition as a function of $\lambda$ (see Figure~\ref{res:fig:bs_bias_var_lmbdas_Ridge_Lasso}) using the optimal degrees $p=8$ for both Ridge and Lasso, taken from Figure~\ref{res:fig:Franke_heatmaps}.  
+            Lastly we plot the bias-variance decomposition as a function of $\lambda$ (see Figure~\ref{res:fig:bs_bias_var_lmbdas_Ridge_Lasso}) using the optimal degrees $p=8$ for both Ridge and Lasso, taken from Figure~\ref{res:fig:Franke_heatmaps}.  
 
             \begin{figure}[ht]
                 \begin{subfigure}{\linewidth}
@@ -617,8 +617,14 @@
 
         \subsubsection{Bias Variance Tradeoff}
             \comment{General bv disc here} \\
+            
+            
+            The bias-variance decomposition is a method for further analysing the MSE value of a model and find out what makes the model preform well/badly. As the model approximates the training data (the complexity increases), it gets closer to capturing the true relationship between the input and the output; the bias of the model decreases. Simultaneously the model gets more dependent on exactly which data it is trained on; the variance increases. An ideal model will have a low bias and a low variance, but it is rare that these coincide and one is forced to find a tradeoff. 
 
             \comment{Accros $\lambda$-disc here}\\
+            When keeping the polynomial degree fixed and varying $\lambda$ in Figure~\ref{res:fig:bs_bias_var_lmbdas_Ridge_Lasso}, we saw similar results between Ridge and Lasso, mainly that the variance decreased as $\lambda$ is increased, while the bias initially decreases before shooting up again. This mirrors the plots where the polynomial degree is fixed, telling us that large $\lambda$-values limit the complexity of our models, resulting in low variance and large bias. As we decreased $\lambda$, we find an optimum tradeoff between the bias and variance before they approach the OLS results.
+
+            The difference in the response to an increased $\lambda$ between Ridge and Lasso is that Ridge seemingly moves more smoothly from mimicking OLS before turning the effective degrees of freedom off, whereas Lasso suddenly does so (at around $\lambda=10^{-3}$ in our case). This difference can be leveraged depending on the situation, but as long as we optimise thoroughly, as we have done, this difference does not matter as much.
 
 
     \subsection{Fit to Terrain Data}
