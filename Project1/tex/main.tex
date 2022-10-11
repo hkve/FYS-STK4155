@@ -344,23 +344,23 @@
                     \label{res:fig:OLS_R2_noresample}
                 \end{figure}
 
-                To investigate the stability of our fits with varying polynomial degrees, we also plot coefficient values with varying polynomial degree. In Figure~\ref{res:fig:OLS_beta_values_plot} we see these plotted for $p = 1,2,3$ with 95\% confidence intervals. These are calculated using the diagonal $\sigma^2_{\theta_a} = \var{(\vec{\hat{\theta}})_{aa}}$. Additionally, in Figure~\ref{res:fig:OLS_beta_values_table} we see the values of these coefficients tabulated for $p \in [1,5]$.
+                To investigate the stability of our fits with varying polynomial degrees, we also plot coefficient values with varying polynomial degree. In Figure~\ref{res:fig:OLS_coefs_values_plot} we see these plotted for $p = 1,2,3$ with 95\% confidence intervals. These are calculated using the diagonal $\sigma^2_{\theta_a} = \var{(\vec{\hat{\theta}})_{aa}}$. Additionally, in Figure~\ref{res:fig:OLS_coefs_values_table} we see the values of these coefficients tabulated for $p \in [1,5]$.
 
             \begin{figure*}
                 \begin{subfigure}{\textwidth}
                     \centering
                     \includegraphics[width=\linewidth]{OLS_coefs_plots.pdf}
                     \caption{Showing values of polynomial coefficients for degree 1, 3 and 5 from left to right. The shaded regions are given by $\pm 2\sigma_\theta$. Note the different y-axes.} 
-                    \label{res:fig:OLS_beta_values_plot}
+                    \label{res:fig:OLS_coefs_values_plot}
                 \end{subfigure}
                 \begin{subfigure}{\textwidth}
                     \centering
                     \includegraphics[width=\linewidth]{OLS_coefs_table.pdf}
                     \caption{Showing $\theta_{ab}$ corresponding to the term $x^a y^b$ present in the fit.}
-                    \label{res:fig:OLS_beta_values_table}    
+                    \label{res:fig:OLS_coefs_values_table}    
                 \end{subfigure}
                 \caption{Summary of the effect on the OLS parameters as model complexity is increased.}
-                \label{res:fig:OLS_beta_values}
+                \label{res:fig:OLS_coefs_values}
             \end{figure*} 
 
         \subsubsection{Exploring Resampling}
@@ -601,7 +601,7 @@
         From this, we can conclude that scaling of the inputs is not strictly necessary when using OLS, as there is no regularisation penalty associated with the dimension of the parameters. However, the MSE is still a dimensionful quantity, and it is useful then to scale the data for OLS too for consistency and ease of comparison of the results between the models.
 
     \subsection{OLS}
-        Looking back at Figures~\ref{res:fig:OLS_mse_noresample} and~\ref{res:fig:OLS_R2_noresample} showing the MSE and $\Rsquared$ scores calculated using the train and test set, we recognise a common sign of overfitting when moving past $\msub{p}{opt} = 5$. Since the polynomial degree increases, we can make many more $x^ay^b$ combination, which in turn gives more coefficients $\theta_{ab}$ to determine. This introduces many new degrees of freedom to the fit, which allows our model to accurately recreate the exact points present in the training set, but at the cost of fitting the added noise $\epsilon$ and/or assuming a too complex structure to the underlying function $f(x)$. This can be seen by the large MSE values calculated on the test data, telling us that our model performs poorly on data which it has not yet been exposed to.
+        Looking back at Figures~\ref{res:fig:OLS_mse_noresample} and~\ref{res:fig:OLS_R2_noresample} showing the MSE and $\Rsquared$ scores calculated using the train and test set, we recognise a common sign of overfitting when moving past $\msub{p}{opt} = 5$. Since the polynomial degree increases, we can make many more $x^ay^b$ combination, which in turn gives more coefficients $\theta_{ab}$ to determine. This introduces many new degrees of freedom to the fit, which allows our model to accurately recreate the exact points present in the training set, but at the cost of fitting the added noise $\epsilon$ and/or assuming a too complex structure to the underlying function $f(x)$. This can be seen by the large MSE values calculated on the test data, telling us that our model performs poorly on data which it has not yet been exposed to. In Figure~\ref{res:fig:OLS_coefs_values} we see the coefficient sizes across degrees $1,3$ and $5$ (Figure~\ref{res:fig:OLS_coefs_values_plot}) and $1-5$ (Figure~\ref{res:fig:OLS_coefs_values_table}). It is clear that when we allow for higher polynomial terms (increasing the complexity of our fit), the general size of $\theta_{ab}$ increases. We interpret this as different coefficients working together to produces the overall best fit to the data. That is, if for instance turn on the $p=5$ terms, many of the $p=4$ terms might need to be changed (rather much) to allow for minimizing the sum of the squared residuals. The $\pm 2\sigma_{\beta}$      
 
     \subsection{Resampling}
         Resampling a given data set seems on the face of it to be truly the work of magic. Somehow we invoke the law of large samples from the central limit theorem~\eqref{theo:eq:CLM} that our statistical quantities, like the mean value, approaches the true value as the sample size grows. However, that is not exactly what we are doing when we are resampling. To illustrate this, we can think of a coin-flipping experiment where are results are categorically heads or tails. If we perform the experiment an \textit{odd} number of times, we must necessarily end up with either more heads or more tails. If we then continuously resample from this dataset, a mean value should, by the central limit theorem, rather approach the \textit{biased} mean value of the original dataset.
