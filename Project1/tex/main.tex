@@ -83,7 +83,7 @@
 % \tableofcontents
 
 \section{Introduction}
-    In this project, we will introduce some of the most important general properties of machine learning models in the context of linear regression. Specifically the mean squared error (MSE), the bias, and the variance of data predictions are essential in evaluating the quality of a statistical model. We look at the phenomena of under fitting and overfitting, and explore them in the context of bias-variance trade-off. The three models we will use explicitly are Ordinary Least Squares (OLS), Ridge regression and Least-Absolute-Shrinkage-and-Selection-Operation (Lasso) regression. These will first be tested on the 2D Franke function, and later on real geographical terrain data.
+    In this project, we will introduce some of the most important general properties of machine learning models in the context of linear regression. Specifically the mean squared error (MSE), the bias, and the variance of data predictions are essential in evaluating the quality of a statistical model. We look at the phenomena of under fitting and overfitting, and explore them in the context of bias-variance tradeoff. The three models we will use explicitly are Ordinary Least Squares (OLS), Ridge regression and Least-Absolute-Shrinkage-and-Selection-Operation (Lasso) regression. These will first be tested on the 2D Franke function, and later on real geographical terrain data.
 
     The aforementioned models will be explored using resampling techniques, which will be employed to extract the relevant statistical quantities in an accurate way. We will use the standard methods of Bootstrapping and $k$-fold cross-validation and compare the results we get between them across the three linear models.
 
@@ -402,8 +402,7 @@
                 \caption{Plot of the MSE value as a function of number of bootstrap rounds. Each MSE value in the plot is the mean of the MSE values for that number of rounds. The blue field around the graph is the standard deviation of the MSE distribution divided by the square root of the number of bootstrap rounds. Implementing polynomial degree 7.}
                 \label{res:fig:bs_mse_across_rounds}
             \end{figure}
-            We can see from the plot that the mean MSE value varies a lot in the beginning, but stabilises around 400 rounds and remains rather constant thereafter. The same goes for the standard deviation divided by number of rounds (the blue field around the graph). For further exploration of the number of bootstrap rounds and the distributions of the MSE values see Appendix~\ref{app:sec:BS rounds}. 
-            \comment{Should maybe comment on the choice of the blue field.} 
+            We can see from the plot that the mean MSE value varies a lot in the beginning, but stabilises around 400 rounds and remains rather constant thereafter. The same goes for the standard deviation divided by $\sqrt{L}$ (the blue field around the graph). For further exploration of the number of bootstrap rounds and the distributions of the MSE values see Appendix~\ref{app:sec:BS rounds}. 
 
 
         \subsubsection{Applying Resampling}
@@ -426,7 +425,7 @@
             \end{figure}
 
             The change in variance coincides with the results in Figure~\ref{res:fig:bs_train_test_ols}.
-            When using the MSE as a measure of the goodness of fit, the model yielding the lowest value will be considered the best. At this point in Figure~\ref{res:fig:bs_OLS_bias_variance_tradeoff_ols} (around $p=6$) the bias is at its lowest and the variance has not yet increased much. This is an example of the bias-variance trade-off.  
+            When using the MSE as a measure of the goodness of fit, the model yielding the lowest value will be considered the best. At this point in Figure~\ref{res:fig:bs_OLS_bias_variance_tradeoff_ols} (around $p=6$) the bias is at its lowest and the variance has not yet increased much. This is an example of the bias-variance tradeoff.  
 
             \comment{Remove the titles -\Anna}
             In Figure~\ref{res:fig:bs_bias_var_data_points} we see the change in the bias-variance decomposition when varying the number of data points. For $n=60$ the bias remains at negligible for all model complexities while the MSE and variance are identical and increase with the polynomial degree. Conversely, for $n=1500$ the MSE and bias reaches a minimum and seemingly stabilises, while the variance barely increases. 
@@ -536,7 +535,7 @@
 
             We can see that the models of optimal $\lambda$s reach a minimum MSE value and thereafter increase with the model complexity. This is not the case for the models of the larger $\lambda$s, but it is plausible that it would be if we were to increase the polynomial degree further. Ridge and Lasso are not directly comparable as they differ in their definition of $\lambda$ (see Eqs.~\eqref{theo:eq:Ridge_coefs} and~\eqref{theo:eq:Lasso_costfunction}).   
             
-            Lastly we will examine the bias variance decomposition as a function of $\lambda$ (see Figure~\ref{res:fig:bs_bias_var_lmbdas_Ridge_Lasso}).  
+            Lastly we plot the bias variance decomposition as a function of $\lambda$ (see Figure~\ref{res:fig:bs_bias_var_lmbdas_Ridge_Lasso}) using the optimal degrees $p=8$ for both Ridge and Lasso, taken from Figure~\ref{res:fig:Franke_heatmaps}.  
 
             \begin{figure}[ht]
                 \begin{subfigure}{\linewidth}
@@ -556,7 +555,7 @@
 
 
     \subsection{Nicaraguan Terrain Data}
-    Initially, we fit the OLS method to the terrain data with $p\in[5, 25]$; this can be seen in Figure~\ref{res:fig:Nica_OLS}. From this, we conclude that $p=12$ is the optimal degree for OLS with $n=600$ data points on this terrain data, where the MSE has a minimum at $0.1808$. We see the recognisable signs of overfitting starting at around $p=18$.
+        Initially, we fit the OLS method to the terrain data with $p\in[5, 25]$; this can be seen in Figure~\ref{res:fig:Nica_OLS}. From this, we conclude that $p=12$ is the optimal degree for OLS with $n=600$ data points on this terrain data, where the MSE has a minimum at $0.1808$. We see the recognisable signs of overfitting starting at around $p=18$.
         \begin{figure} [ht]
             \centering
             \includegraphics[width=\linewidth]{OPT_OLS_mse_kfold.pdf}
@@ -564,7 +563,7 @@
             \label{res:fig:Nica_OLS}
         \end{figure}
 
-    This leads us to optimise the regularised methods, seen in Figure~\ref{res:fig:Nica_heatmap}. We find $(p=12, \lambda = 3\cdot 10^{-9})$ as the optimum for Ridge, and $(p=13, \lambda=6 \cdot 10^{-5})$ for Lasso, with respective minima MSEs $0.1865$ and $0.1887$ --- slightly underperforming OLS.
+        This leads us to optimise the regularised methods, seen in Figure~\ref{res:fig:Nica_heatmap}. We find $(p=12, \lambda = 3\cdot 10^{-9})$ as the optimum for Ridge, and $(p=13, \lambda=6 \cdot 10^{-5})$ for Lasso, with respective minima MSEs $0.1865$ and $0.1887$ --- slightly underperforming OLS.
     
         \begin{figure} [ht]
             \centering
@@ -574,7 +573,7 @@
             \label{res:fig:Nica_heatmap}
         \end{figure}
 
-    Finally, we fit our OLS model with $p=12$ on the entire terrain dataset, and plot the prediction against the original data in Figure~\ref{res:fig:Nica_terrain}.
+        Finally, we fit our OLS model with $p=12$ on the entire terrain dataset, and plot the prediction against the original data in Figure~\ref{res:fig:Nica_terrain}.
 
         \begin{figure} [ht]
             \begin{subfigure}{\linewidth}
@@ -616,7 +615,7 @@
         The value of resampling rather comes from creating a way to emphasise different parts of the original dataset when fitting our model, and consequently comparing what this does to the predictions of the model. For instance, an overfitted model might contort to accommodate a statistical outlier in the original dataset, and thereby make a poor prediction on new data. However, when resampling, many of the new datasets sampled to make new fits from our model will not include this statistical outlier, and should make predictions not influenced too heavily by this. There should then be a medium where the particular `oddities' in the original dataset can be smoothed over, and the bias of the original dataset is not brought out to the front.
 
         \subsubsection{Cross-Validation and Bootstrap} 
-            The choice of $k=7$ used for our parameter grid search is influenced by the computational aspect of the approach. Since a model has to be fitted $k$ times for each set of parameter $(p,\lambda)$, it is clear that this increases the time taken to search the parameter space. However, for both OLS and Ridge, the closed form expressions (Eqs.~\eqref{theo:eq:OLS_coefs} and~\eqref{theo:eq:Ridge_coefs} respectively) only require matrix multiplication and inversion. Adding more folds could potentially be feasible here. However, since Lasso requires a cost function minimization, it is significantly slower than OLS and Ridge, especially for high $p$. Therefore, we get a trade-off between the number of $(p,\lambda)$ to try and the number of folds $k$, where $k=7$ was found to allow for high parameter resolution while still being completed in a feasible amount of time.
+            The choice of $k=7$ used for our parameter grid search is influenced by the computational aspect of the approach. Since a model has to be fitted $k$ times for each set of parameter $(p,\lambda)$, it is clear that this increases the time taken to search the parameter space. However, for both OLS and Ridge, the closed form expressions (Eqs.~\eqref{theo:eq:OLS_coefs} and~\eqref{theo:eq:Ridge_coefs} respectively) only require matrix multiplication and inversion. Adding more folds could potentially be feasible here. However, since Lasso requires a cost function minimization, it is significantly slower than OLS and Ridge, especially for high $p$. Therefore, we get a tradeoff between the number of $(p,\lambda)$ to try and the number of folds $k$, where $k=7$ was found to allow for high parameter resolution while still being completed in a feasible amount of time.
             \newline
             \comment{Some general disc about Bootstrapping here, and after that some comparison?}
             \newline
@@ -625,9 +624,9 @@
         \subsection{Fit to Terrain Data}
             First, we should take a minute to discuss the choice of terrain data to fit to, and how this could change things. We naturally chose a mountainous terrain, for there to be more interesting features for the models to recapture. However, we chose a large region, with a full resolution ($300\times 300$ points) on which we could not hope to do our full analysis, using of all the models and resampling adequately. We could either choose a smaller sub-area or sample more sparsely from the region. We chose the latter, as this would more closely resemble noisy data or a situation where we might not have all the data we would want for our regression. This highlights the power of regression methods to sift through data and find the most salient features. This is seen in Figure~\ref{res:fig:Nica_terrain}, where our fitted model recreates a smoothed version of the jagged mountains where the difference from the low valley to the high peak is obvious, but without the sharpness and details of the original data.
 
-            The different regression methods we used on the terrain data all performed similarly when optimised, with optimal MSEs of $0.1808$, $0.1865$ and $0.1887$ respectively for OLS, Ridge and Lasso. However, the window within which the OLS method works well is narrow, quickly moving from high bias to high variance, as evidenced in our earlier analyses. In Figure~\ref{res:fig:Nica_heatmap} we see that there are larger areas where Ridge and Lasso perform well, but at the cost of `fine-tuning' both the $\lambda$-parameters and the model complexity. The regularised methods are more consistent across model complexities, but come at the cost of an additional parameter to tune; in a sense they are `safer' to employ.
+        The different regression methods we used on the terrain data all performed similarly when optimised, with optimal MSEs of $0.1808$, $0.1865$ and $0.1887$ respectively for OLS, Ridge and Lasso. However, the window within which the OLS method works well is narrow, quickly moving from high bias to high variance, as evidenced in our earlier analyses. In Figure~\ref{res:fig:Nica_heatmap} we see that there are larger areas where Ridge and Lasso perform well, but at the cost of `fine-tuning' both the $\lambda$-parameters and the model complexity. The regularised methods are more consistent across model complexities, but come at the cost of an additional parameter to tune; in a sense they are `safer' to employ.
 
-            Ultimately, none of the methods do a brilliant job of reproducing the exact features of the jagged terrain we apply them on, as we do try to fit smooth functions to something inherently irregular. Had we focused on a smaller region with a larger resolution, our results would surely be better.
+        Ultimately, none of the methods do a brilliant job of reproducing the exact features of the jagged terrain we apply them on, as we do try to fit smooth functions to something inherently irregular. Had we focused on a smaller region with a larger resolution, our results would surely be better.
 
 
 \section{Concluding remarks}
