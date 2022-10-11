@@ -287,10 +287,10 @@
         \subsubsection{Bootstrap}
             Bootstrapping consists of generating new training data by sampling data points from the original training data with replacement; meaning the same data points can be selected more than once. The new set of training data is called a bootstrapped dataset and is used to train a model. Then the relevant measures for goodness of fit are calculated. This process of resampling and calculating measures is repeated a certain number of times (bootstrap rounds), giving a distribution of the measures. The mean of the measures is then calculated across the bootstrapped models. Through the central limit theorem this mean is assumed to be the more accurate measure for goodness of fit and therefore a better evaluation of the model in question. Bootstrapping is also a method of weighing some data points more than others, which might shed new light on the data. 
 
-            Together with the MSE, the bias and variance of the model are in our case relevant measures for goodness of fit. By implementing bootstrapping we wish to study the bias-variance trade off. Given a model of a certain complexity, we are interested in calculating these measures, not for each bootstrapped model, but across them. Given $L$ number of bootstrap rounds (and corresponding bootstrapped models), we want the bias and variance between all the bootstrapped models at each point compared to the testing data (see Eqs.~\eqref
+            Together with the MSE, the bias and variance of the model are in our case relevant measures for goodness of fit. By implementing bootstrapping we wish to study the bias-variance tradeoff. Given a model of a certain complexity, we are interested in calculating these measures, not for each bootstrapped model, but across them. Given $L$ number of bootstrap rounds (and corresponding bootstrapped models), we want the bias and variance between all the bootstrapped models at each point compared to the testing data (see Eqs.~\eqref
             {theo:eq:bias and var}). This will create a bias value and variance value for each of the input data points. When evaluating a model of a certain polynomial degree, we found an appropriate measure of the bias and variance for the \textit{entire} model would be the mean across data points. 
             
-            When employing bootstrap it is important to find an appropriate number of rounds to preform the resampling. There is a trade-off between getting an accurate distribution of the values and keeping the process computationally feasible. To find the optimal number of rounds we preform bootstrap on the Franke data for a variety of rounds while  calculating the MSE values. In this case we implement polynomial degree $7$ and bootstrap rounds at constant intervals from $30-1000$. There will be a distribution of MSE values for each number of rounds. By taking the mean of each distribution we can plot it as a function of rounds and find where it stabilises. One can argue that any number of rounds above this point will be excessive. We will also for each number of rounds plot the standard deviation of the corresponding MSE distribution divided by $\sqrt{L}$. 
+            When employing bootstrap it is important to find an appropriate number of rounds to preform the resampling. There is a tradeoff between getting an accurate distribution of the values and keeping the process computationally feasible. To find the optimal number of rounds we preform bootstrap on the Franke data for a variety of rounds while  calculating the MSE values. In this case we implement polynomial degree $7$ and bootstrap rounds at constant intervals from $30-1000$. There will be a distribution of MSE values for each number of rounds. By taking the mean of each distribution we can plot it as a function of rounds and find where it stabilises. One can argue that any number of rounds above this point will be excessive. We will also for each number of rounds plot the standard deviation of the corresponding MSE distribution divided by $\sqrt{L}$. 
 
 
         \subsubsection{Cross-Validation}
@@ -349,13 +349,13 @@
             \begin{figure*}
                 \begin{subfigure}{\textwidth}
                     \centering
-                    \includegraphics[width=\linewidth]{OLS_coefs_plots.pdf}
+                    \includegraphics[width=.9\linewidth]{OLS_coefs_plots.pdf}
                     \caption{Showing values of polynomial coefficients for degree 1, 3 and 5 from left to right. The shaded regions are given by $\pm 2\sigma_\theta$. Note the different y-axes.} 
                     \label{res:fig:OLS_coefs_values_plot}
                 \end{subfigure}
                 \begin{subfigure}{\textwidth}
                     \centering
-                    \includegraphics[width=\linewidth]{OLS_coefs_table.pdf}
+                    \includegraphics[width=.9\linewidth]{OLS_coefs_table.pdf}
                     \caption{Showing $\theta_{ab}$ corresponding to the term $x^a y^b$ present in the fit.}
                     \label{res:fig:OLS_coefs_values_table}    
                 \end{subfigure}
@@ -385,7 +385,7 @@
             
             \begin{figure}[ht]
                 \centering
-                \includegraphics[width=\linewidth]{OLS_mse_kfold.pdf}
+                \includegraphics[width=.9\linewidth]{OLS_mse_kfold.pdf}
                 \caption{MSE values as a function of polynomial degrees, calculated using $k$-fold cross-validation for $k = 5, 7$ and $10$. }
                 \label{res:fig:OLS_mse_kfold}
             \end{figure}
@@ -394,7 +394,7 @@
             When deciding the optimal number of bootstrap rounds we look at the mean of the MSE values for each number of rounds (see Figure~\ref{res:fig:bs_mse_across_rounds}). 
             \begin{figure}[ht]
                 \centering
-                \includegraphics[width=\linewidth]{BS_mse_across_rounds_OLS.pdf}
+                \includegraphics[width=.9\linewidth]{BS_mse_across_rounds_OLS.pdf}
                 \caption{Plot of the MSE value as a function of number of bootstrap rounds. Each MSE value in the plot is the mean of the MSE values for that number of rounds. The blue field around the graph is the standard deviation of the MSE distribution divided by the square root of the number of bootstrap rounds. Implementing polynomial degree 7.}
                 \label{res:fig:bs_mse_across_rounds}
             \end{figure}
@@ -406,7 +406,7 @@
             As we can see from the plot in Figure~\ref{res:fig:bs_train_test_ols} the bootstrapped models tested on the training data yield more or less identical MSE values and decrease as the model complexity increases. However, this is not the case when implementing the testing data. After the optimal polynomial degree ($ p_{opt} = 6$) the MSE value not only increases (as is seen also in Figure~\ref{res:fig:OLS_mse_noresample}), but there is a large variance in results of the bootstrapped models.  
             \begin{figure}[ht]
                 \centering
-                \includegraphics[width=\linewidth]{BS_train_test_mse_OLS.pdf}
+                \includegraphics[width=.9\linewidth]{BS_train_test_mse_OLS.pdf}
                 \caption{Plot of the MSE values calculated using the training and testing data for various bootstraps. The solid line is the mean of all the bootstrapped models.}
                 \label{res:fig:bs_train_test_ols}
             \end{figure}
@@ -415,7 +415,7 @@
             When looking at the bias-variance decomposition of the MSE value (Figure~\ref{res:fig:bs_OLS_bias_variance_tradeoff_ols}), it is evident that when adding the decomposed parts together, it results in something very close to the original MSE, meaning the implementation is sound. The bias of the models starts high and decreases with increasing model complexity. The variance on the other hand is initially $0$ at $p=1$ and increases with the polynomial degree. 
             \begin{figure}[ht]
                 \centering
-                \includegraphics[width=\linewidth]{BS_Bias_var_decomp_OLS.pdf}
+                \includegraphics[width=.9\linewidth]{BS_Bias_var_decomp_OLS.pdf}
                 \caption{Plot of the bias-variance decomposition. $n=600$ }
                 \label{res:fig:bs_OLS_bias_variance_tradeoff_ols}
             \end{figure}
@@ -428,17 +428,17 @@
             \begin{figure}[ht]
                 \begin{subfigure}{.5\textwidth}
                     \centering
-                    \includegraphics[width=\linewidth]{BS_Bias_var_decomp_OLS_60_data_points.pdf}
+                    \includegraphics[width=.9\linewidth]{BS_Bias_var_decomp_OLS_60_data_points.pdf}
                     \caption{$n=60$}
                     \end{subfigure}
                 % \begin{subfigure}{.5\textwidth}
                 %     \centering
-                %     \includegraphics[width=\linewidth]{BS_Bias_var_decomp_OLS_600_data_points.pdf}
+                %     \includegraphics[width=.9\linewidth]{BS_Bias_var_decomp_OLS_600_data_points.pdf}
                 %     \caption{$n=600$}
                 % \end{subfigure}
                 \begin{subfigure}{.5\textwidth}
                     \centering
-                    \includegraphics[width=\linewidth]{BS_Bias_var_decomp_OLS_1500_data_points.pdf}
+                    \includegraphics[width=.9\linewidth]{BS_Bias_var_decomp_OLS_1500_data_points.pdf}
                     \caption{$n=1500$}
                 \end{subfigure}
                 
@@ -457,12 +457,12 @@
         \begin{figure}[ht]
             \begin{subfigure}{.9\linewidth}
                 \centering
-                \includegraphics[width=\linewidth]{bad_lmbda_Ridge_mse_kfold.pdf}
+                \includegraphics[width=.9\linewidth]{bad_lmbda_Ridge_mse_kfold.pdf}
             \end{subfigure}
             \hfill
             \begin{subfigure}{.9\linewidth}
                 \centering
-                \includegraphics[width=\linewidth]{bad_lmbda_Lasso_mse_kfold.pdf}
+                \includegraphics[width=.9\linewidth]{bad_lmbda_Lasso_mse_kfold.pdf}
             \end{subfigure}
             \caption{Test and train MSE calculated across different polynomial degrees using Ridge and Lasso regression with $\lambda = 10^{-1}$}
             \label{res:fig:ridgelasso_cv_badlambda}
@@ -470,12 +470,12 @@
         \begin{figure}[ht]
             \begin{subfigure}{.9\linewidth}
                 \centering
-                \includegraphics[width=\linewidth]{good_lmbda_Ridge_mse_kfold.pdf}
+                \includegraphics[width=.9\linewidth]{good_lmbda_Ridge_mse_kfold.pdf}
             \end{subfigure}
             \hfill
             \begin{subfigure}{.9\linewidth}
                 \centering
-                \includegraphics[width=\linewidth]{good_lmbda_Lasso_mse_kfold.pdf}
+                \includegraphics[width=.9\linewidth]{good_lmbda_Lasso_mse_kfold.pdf}
             \end{subfigure}
             \caption{Test and train MSE calculated across different polynomial degrees using Ridge and Lasso regression with $\lambda = 10^{-7}$}
             \label{res:fig:ridgelasso_cv_goodlambda}
@@ -484,11 +484,11 @@
         \begin{figure}[ht]
             \begin{subfigure}{\linewidth}
                 \centering
-                \includegraphics[width=\linewidth]{heatmap_ridge.pdf}
+                \includegraphics[width=.9\linewidth]{heatmap_ridge.pdf}
             \end{subfigure}
             \begin{subfigure}{\linewidth}
                 \centering
-                \includegraphics[width=\linewidth]{heatmap_lasso.pdf}
+                \includegraphics[width=.9\linewidth]{heatmap_lasso.pdf}
             \end{subfigure}
             \caption{Grid search of the MSE of the Ridge and Lasso methods fitted to the Franke function with $k=7$ CV resampling. The red crosses denote the best $\lambda$-value for each degree, the large cross denoting the global minimum of the MSE.}
             \label{res:fig:Franke_heatmaps}
@@ -500,11 +500,11 @@
             \begin{figure}[ht]
                 \begin{subfigure}{\linewidth}
                     \centering
-                    \includegraphics[width=\linewidth]{BS_Bias_var_decomp_Ridge.pdf}
+                    \includegraphics[width=.9\linewidth]{BS_Bias_var_decomp_Ridge.pdf}
                 \end{subfigure}
                 \begin{subfigure}{\linewidth}
                     \centering
-                    \includegraphics[width=\linewidth]{BS_Bias_var_decomp_Lasso.pdf}
+                    \includegraphics[width=.9\linewidth]{BS_Bias_var_decomp_Lasso.pdf}
                 \end{subfigure}
                 \caption{Bias-variance decomposition of Ridge and Lasso on Franke data with $n=600$.}
                 \label{res:fig:bs_bias_var_Ridge_Lasso}
@@ -516,11 +516,11 @@
             \begin{figure}[ht]
                 \begin{subfigure}{\linewidth}
                     \centering
-                    \includegraphics[width=\linewidth]{BS_bias_var_two_lmbdas_Ridge.pdf}
+                    \includegraphics[width=.9\linewidth]{BS_bias_var_two_lmbdas_Ridge.pdf}
                 \end{subfigure}
                 \begin{subfigure}{\linewidth}
                     \centering
-                    \includegraphics[width=\linewidth]{BS_bias_var_two_lmbdas_Lasso.pdf}
+                    \includegraphics[width=.9\linewidth]{BS_bias_var_two_lmbdas_Lasso.pdf}
                 \end{subfigure}
                 \caption{Bias-variance decomposition of Ridge and Lasso on Franke data with $n=600$, now with two different $\lambda$s; one optimal (found through cross-validation) and one larger.}
                 \label{res:fig:bs_bias_var_two_lmbdas_Ridge_Lasso}
@@ -534,11 +534,11 @@
             \begin{figure}[ht]
                 \begin{subfigure}{\linewidth}
                     \centering
-                    \includegraphics[width=\linewidth]{BS_bias_var_lmbdas_Ridge.pdf}
+                    \includegraphics[width=.9\linewidth]{BS_bias_var_lmbdas_Ridge.pdf}
                 \end{subfigure}
                 \begin{subfigure}{\linewidth}
                     \centering
-                    \includegraphics[width=\linewidth]{BS_bias_var_lmbdas_Lasso.pdf}
+                    \includegraphics[width=.9\linewidth]{BS_bias_var_lmbdas_Lasso.pdf}
                 \end{subfigure}
                 \caption{Bias-variance decomposition as a function of $\lambda$s of Ridge and Lasso on Franke data with $n=600$.}
                 \label{res:fig:bs_bias_var_lmbdas_Ridge_Lasso}
@@ -552,7 +552,7 @@
         Initially, we fit the OLS method to the terrain data with $p\in[5, 25]$; this can be seen in Figure~\ref{res:fig:Nica_OLS}. From this, we conclude that $p=12$ is the optimal degree for OLS with $n=600$ data points on this terrain data, where the MSE has a minimum at $0.1808$. We see the recognisable signs of overfitting starting at around $p=18$.
         \begin{figure} [ht]
             \centering
-            \includegraphics[width=\linewidth]{OPT_OLS_mse_kfold.pdf}
+            \includegraphics[width=.9\linewidth]{OPT_OLS_mse_kfold.pdf}
             \caption{Optimisation of the MSE of OLS on the terrain data using $k=7$ cross-validation. The thinner lines denote the MSE by fold, and the thicker line the mean. Minimum at $p=12$ with $\mse = 0.1808$.}
             \label{res:fig:Nica_OLS}
         \end{figure}
@@ -561,8 +561,8 @@
     
         \begin{figure} [ht]
             \centering
-            \includegraphics[width=\linewidth]{HM_Nica_Ridge_heatmap.pdf}
-            \includegraphics[width=\linewidth]{HM_Nica_Lasso_heatmap.pdf}
+            \includegraphics[width=.9\linewidth]{HM_Nica_Ridge_heatmap.pdf}
+            \includegraphics[width=.9\linewidth]{HM_Nica_Lasso_heatmap.pdf}
             \caption{Grid search of the MSE of the Ridge and Lasso methods fitted to Nicaraguan terrain data with $k=7$ CV resampling. The red crosses denote the best $\lambda$-value for each degree, the large cross denoting the global minimum of the MSE.}
             \label{res:fig:Nica_heatmap}
         \end{figure}
@@ -572,14 +572,14 @@
         \begin{figure} [ht]
             \begin{subfigure}{\linewidth}
                 \centering
-                \includegraphics[width=\linewidth]{Nica_test_plot.pdf}
+                \includegraphics[width=.9\linewidth]{Nica_test_plot.pdf}
                 \caption{$n=600$ randomly sampled points from our Nicaraguan terrain data.}
                 \label{res:subfig:Nica_test}
             \end{subfigure}
             \\
             \begin{subfigure}{\linewidth}
                 \centering
-                \includegraphics[width=\linewidth]{Nica_predict_plot.pdf}
+                \includegraphics[width=.9\linewidth]{Nica_predict_plot.pdf}
                 \caption{Best fit to the Nicaraguan terrain data found using OLS with $p=12$.}
                 \label{res:subfig:Nica_predict}
             \end{subfigure}
@@ -630,7 +630,7 @@
 
 
 \section{Concluding remarks}
-    Applying linear regression methods is pretty straight forward on scalar data generated from 2D inputs. It can give good insight into an underlying function generating noisy data, as long as the function is somewhat smooth. The fundamental problem to solve when using these methods is to find a good balance between model complexity, introducing variance into the fits, and simplicity, introducing bias. We found that this was quite easily done with the OLS method on both the Franke function and on our Nicaraguan terrain data. Bootstrap resampling was used to explore these quantities, while both bootstrapping and $k$-fold cross validation was used and to invoke the CLM to extract more accurate quantities to quantity the goodness of fit, like the MSE and $\Rsquared$ scores. We then expanded to regularised methods like Ridge and Lasso regression, which introduce a hyperparameter which penalises overfitting models, and makes for more stable fits. Effectively, these gave us a complexity slider that allowed for more smooth variation of model complexity than discrete changes to our polynomial feature expansion. In the end, these methods were not necessary to employ on our datasets, and rather introduced another dimension to optimise to create the best possible fit to the data. Bootstrap resampling allowed us to explore the bias-variance tradeoff of these methods, whereas cross validation was employed in the more computationally expensive optimisations of the regularised methods due to its computationally lower cost while retaining adequate results.
+    Applying linear regression methods is pretty straight forward on scalar data generated from 2D inputs. It can give good insight into an underlying function generating noisy data, as long as the function is somewhat smooth. The fundamental problem to solve when using these methods is to find a good balance between model complexity, introducing variance into the fits, and simplicity, introducing bias. We found that this was quite easily done with the OLS method on both the Franke function and on our Nicaraguan terrain data. Bootstrap resampling was used to explore these quantities, while both bootstrapping and $k$-fold cross-validation was used and to invoke the CLM to extract more accurate quantities to quantity the goodness of fit, like the MSE and $\Rsquared$ scores. We then expanded to regularised methods like Ridge and Lasso regression, which introduce a hyperparameter which penalises overfitting models, and makes for more stable fits. Effectively, these gave us a complexity slider that allowed for more smooth variation of model complexity than discrete changes to our polynomial feature expansion. In the end, these methods were not necessary to employ on our datasets, and rather introduced another dimension to optimise to create the best possible fit to the data. Bootstrap resampling allowed us to explore the bias-variance tradeoff of these methods, whereas cross-validation was employed in the more computationally expensive optimisations of the regularised methods due to its computationally lower cost while retaining adequate results.
 
 % for numbering appendix equations more appropriately
 \numberwithin{equation}{section}
@@ -682,24 +682,24 @@
         \begin{figure*}
             \begin{subfigure}{.5\textwidth}
                 \centering
-                \includegraphics[width=\linewidth]{franke_functions_0.pdf}
+                \includegraphics[width=.9\linewidth]{franke_functions_0.pdf}
                 \caption{$\sigma = 0$}
                 \end{subfigure}
             \hfill
             \begin{subfigure}{.5\textwidth}
                 \centering
-                \includegraphics[width=\linewidth]{franke_functions_0_01.pdf}
+                \includegraphics[width=.9\linewidth]{franke_functions_0_01.pdf}
                 \caption{$\sigma = 0.01$}
             \end{subfigure}
             \hfill
             \begin{subfigure}{.5\textwidth}
                 \centering
-                \includegraphics[width=\linewidth]{franke_functions_0_1.pdf}
+                \includegraphics[width=.9\linewidth]{franke_functions_0_1.pdf}
                 \caption{$\sigma = 0.1$}
             \end{subfigure}
             \begin{subfigure}{.5\textwidth}
                 \centering
-                \includegraphics[width=\linewidth]{franke_functions_0_2.pdf}
+                \includegraphics[width=.9\linewidth]{franke_functions_0_2.pdf}
                 \caption{$\sigma = 0.2$}
 
             \end{subfigure}
@@ -714,27 +714,27 @@
         \begin{figure*}
             \begin{subfigure}{.5\textwidth}
                 \centering
-                \includegraphics[width=\linewidth]{BS_hist_bootstraped_30_rounds_of_degree_7.pdf}
+                \includegraphics[width=.9\linewidth]{BS_hist_bootstraped_30_rounds_of_degree_7.pdf}
                 \caption{}
                 \label{app:fig:histograms for rounds:30}
                 \end{subfigure}
             \hfill
             \begin{subfigure}{.5\textwidth}
                 \centering
-                \includegraphics[width=\linewidth]{BS_hist_bootstraped_102_rounds_of_degree_7.pdf}
+                \includegraphics[width=.9\linewidth]{BS_hist_bootstraped_102_rounds_of_degree_7.pdf}
                 \caption{}
                 \label{app:fig:histograms for rounds:102}
             \end{subfigure}
             \hfill
             \begin{subfigure}{.5\textwidth}
                 \centering
-                \includegraphics[width=\linewidth]{BS_hist_bootstraped_408_rounds_of_degree_7.pdf}
+                \includegraphics[width=.9\linewidth]{BS_hist_bootstraped_408_rounds_of_degree_7.pdf}
                 \caption{}
                 \label{app:fig:histograms for rounds:408}
             \end{subfigure}
             \begin{subfigure}{.5\textwidth}
                 \centering
-                \includegraphics[width=\linewidth]{BS_hist_bootstraped_606_rounds_of_degree_7.pdf}
+                \includegraphics[width=.9\linewidth]{BS_hist_bootstraped_606_rounds_of_degree_7.pdf}
                 \caption{}
                 \label{app:fig:histograms for rounds:606}
             \end{subfigure}
