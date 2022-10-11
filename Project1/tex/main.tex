@@ -274,7 +274,7 @@
             \end{subequations}
             where $\bar{z} = \frac{1}{n} \sum_{i=1}^n z_n$ denotes the sample mean of $\vec{z}$ and $\sigma_{\vec{z}}^2 = \frac{1}{n} \sum_{i=1}^n {(z_i-\bar{z})}^2$ denotes the sample std of $\vec{z}$. When we calculate MSE scores to compare between models and resampling techniques, we will use the scaled $\vec{y}$.
 
-            To get a proper assessment of our model, we will split the dataset into a \textit{training set} and \textit{testing set}. The training set is used to fit the model, giving our coefficient estimates $\vec{\hat{\theta}}$. Using the fitted model and the training data, we can calculate metrics to quantify how good our model replicates this data. In the case that our model perfectly predicts the training data $\vec{y}$ based on $X$, the calculated metrics MSE and $\Rsquared$ (Eqs.~\ref{theo:eq:mse},~\ref{theo:eq:r2}) should be 0 and 1 respectively. However, using these scores to assess the goodness of our fit has an underlying problem. Since the model has seen the training data to estimate $\vec{\hat{\theta}}$, we can run into problems where the model fits the $\epsilon$ values and not the (assumed) underlying function $f(x)$. This phenomenon is called \textit{overfitting}. To mediate this, we calculate our metrics based on a testing data which was not used for fitting. This serves as a way to estimate the errors on data which the model has not seen before. For the artificial data made using the Franke function, we went for a split where $\sfrac{2}{3}$ of the data is used for the training set, while other $\sfrac{1}{3}$ is reserved for the testing set.
+            To get a proper assessment of our model, we will split the dataset into a \textit{training set} and \textit{testing set}. The training set is used to fit the model, giving our coefficient estimates $\vec{\hat{\theta}}$. Using the fitted model and the training data, we can calculate metrics to quantify how good our model replicates this data. In the case that our model perfectly predicts the training data $\vec{y}$ based on $X$, the calculated metrics MSE and $\Rsquared$ (Eqs.~\ref{theo:eq:mse},~\ref{theo:eq:r2}) should be 0 and 1 respectively. However, using these scores to assess the goodness of our fit has an underlying problem. Since the model has seen the training data to estimate $\vec{\hat{\theta}}$, we can run into problems where the model fits the $\epsilon$ values and not the (assumed) underlying function $f(x)$. This phenomenon is called \textit{overfitting}. To mediate this, we calculate our metrics based on a testing data which was not used for fitting. This serves as a way to estimate the errors on data which the model has not seen before. For the artificial data made using the Franke function, we went for a split where $\sfrac{3}{4}$ of the data is used for the training set, while other $\sfrac{1}{4}$ is reserved for the testing set.
 
 
     \subsection{Initial Application of OLS}
@@ -313,7 +313,7 @@
 
     
     \subsection{Expanding to Regularised Regression}
-        With the regularised regression methods, Ridge and Lasso, we introduce a hyperparameter $\lambda$ that affects our fit. To explore this, we will study the MSE of the fits using cross-validation resampling as the polynomial degree and $\lambda$-value is changed. We will use the same polynomial degrees as when exploring OLS, and look at a wide range of $\lambda \in [10^{-9}, 10^1]$ with logarithmically spaced values. This effectively results in a grid search over ($p$,$\lambda$), where the lowest MSE value will give us the optimal set of paramters $(\msub{p}{opt}, \msub{\lambda}{opt})$. To be more confident in our optimal parameters we will apply the resampling technique cross-validation when searching for the test MSE minimum. We choose to employ cross-validation as it is computationally less expensive than bootstrap. Computational costs and accuracy will decide the number of rounds/folds to apply for each $(p,\lambda)$ value. \comment{400 rounds vs 7 folds}. 
+        With the regularised regression methods, Ridge and Lasso, we introduce a hyperparameter $\lambda$ that affects our fit. To explore this, we will study the MSE of the fits using cross-validation resampling as the polynomial degree and $\lambda$-value is changed. We will use the same polynomial degrees as when exploring OLS, and look at a wide range of $\lambda \in [10^{-9}, 10^1]$ with logarithmically spaced values. This effectively results in a grid search over ($p$,$\lambda$), where the lowest MSE value will give us the optimal set of paramters $(\msub{p}{opt}, \msub{\lambda}{opt})$. To be more confident in our optimal parameters we will apply the resampling technique cross-validation when searching for the test MSE minimum. We choose to employ cross-validation as it is computationally less expensive than bootstrap (7 folds vs. 400 rounds). Computational costs and accuracy will decide the number of rounds/folds to apply for each $(p,\lambda)$ value. 
         
         When we know $\lambda$-values relation to the polynomial degree, we will study the bias-variance tradeoff as a function of the complexity of our parametrisation of $X$ for Ridge and Lasso using bootstrap resampling. When employing bootstrap as a reampling techniquie, the number of rounds applied will be 400, as with OLS.  The analysis includes a decomposition and comparison with our previous OLS method. In this case we will apply an optimale $\lambda$ for each polynomial degree (found through cross-validation).
         
@@ -322,8 +322,8 @@
         Finally, we will study the bias-variance tradeoff as a function of $\lambda$, with the polynomial degree fixed at a value which balances complexity and overfitting. The hope is that this will give insight into the effective degrees of freedom of the regularised methods.
 
     \subsection{Application on Real Data}
-        Finally, we will apply the three regression methods on our Nicaraguan terrain data, \comment{'now always with some sort of resampling method' - \Anna}. We carry out many of the same analyses as done earlier, starting by varying the number of degrees for a simple OLS fit, finding the optimal degree by minimising the MSE found using cross-validation.
-        When moving to our regularised methods, the same method grid searching for hyperparameter optimisation will be used. Using the optimal parameters for each model, a comparison between them will be performed to find which model most accurately recreates the test data. We do bias-variance decomposition of the models as they fit the test data, varying the complexity of the design matrix from expansion up to power $p=5\text{--}25$. This will be used as a basis for a comparison of the validity of the three models in their application in recreating mountainous terrain. Lastly, for completeness, we plot our best fit to the terrain and \comment{'qualitatively' -\Anna} compare with the actual terrain.
+        Finally, we will apply the three regression methods on our Nicaraguan terrain data, always employing a resampling method. We carry out many of the same analyses as done earlier, starting by varying the number of degrees for a simple OLS fit, finding the optimal degree by minimising the MSE found using cross-validation.
+        When moving to our regularised methods, the same method grid searching for hyperparameter optimisation will be used. Using the optimal parameters for each model, a comparison between them will be performed to find which model most accurately recreates the test data. We do bias-variance decomposition of the models as they fit the test data, varying the complexity of the design matrix from expansion up to power $p=5\text{--}25$. This will be used as a basis for a comparison of the validity of the three models in their application in recreating mountainous terrain. Lastly, for completeness, we plot our best fit to the terrain and qualitatively compare with the actual terrain.
 
 
 \section{Results}
@@ -413,7 +413,7 @@
             When looking at the bias-variance decomposition of the bootstrapped MSE value (Figure~\ref{res:fig:bs_OLS_bias_variance_tradeoff_ols}), it is evident that when adding the decomposed parts together, it results in something very close to the original MSE, meaning the implementation is sound. The bias of the models starts high and decreases with increasing model complexity. The variance on the other hand is initially $0$ at $p=1$ and increases with the polynomial degree. The lowest MSE value occurs at $p_{opt}=6$, for which the bias is at its lowest and variance is still small. 
             \begin{figure}[ht]
                 \centering
-                \includegraphics[width=.9\linewidth]{BS_Bias_var_decomp_OLS.pdf}
+                \includegraphics[width=.9\linewidth]{BS_Bias_var_OLS.pdf}
                 \caption{Plot of the bias-variance decomposition. $n=600$ }
                 \label{res:fig:bs_OLS_bias_variance_tradeoff_ols}
             \end{figure}
@@ -421,7 +421,7 @@
             \comment{Remove the titles op the plots -\Anna}
             In Figure~\ref{res:fig:bs_bias_var_data_points} we see the change in the bias-variance decomposition when varying the number of data points. For $n=60$ the bias remains at negligible for all model complexities while the MSE and variance are identical and increase with the polynomial degree. Conversely, for $n=1500$ the MSE and bias reach a minimum and seemingly stabilise, while the variance barely increases. 
             \begin{figure}[ht]
-                \begin{subfigure}{.5\textwidth}
+                \begin{subfigure}{\linewidth}
                     \centering
                     \includegraphics[width=.9\linewidth]{BS_Bias_var_decomp_OLS_60_data_points.pdf}
                     \caption{$n=60$}
@@ -431,7 +431,7 @@
                 %     \includegraphics[width=.9\linewidth]{BS_Bias_var_decomp_OLS_600_data_points.pdf}
                 %     \caption{$n=600$}
                 % \end{subfigure}
-                \begin{subfigure}{.5\textwidth}
+                \begin{subfigure}{\linewidth}
                     \centering
                     \includegraphics[width=.9\linewidth]{BS_Bias_var_decomp_OLS_1500_data_points.pdf}
                     \caption{$n=1500$}
@@ -492,11 +492,11 @@
             \begin{figure}[ht]
                 \begin{subfigure}{\linewidth}
                     \centering
-                    \includegraphics[width=.9\linewidth]{BS_Bias_var_decomp_Ridge.pdf}
+                    \includegraphics[width=.9\linewidth]{BS_Bias_var_Ridge.pdf}
                 \end{subfigure}
                 \begin{subfigure}{\linewidth}
                     \centering
-                    \includegraphics[width=.9\linewidth]{BS_Bias_var_decomp_Lasso.pdf}
+                    \includegraphics[width=.9\linewidth]{BS_Bias_var_Lasso.pdf}
                 \end{subfigure}
                 \caption{Bias-variance decomposition of Ridge and Lasso on Franke data with $n=600$.}
                 \label{res:fig:bs_bias_var_Ridge_Lasso}
@@ -604,7 +604,7 @@
 
             The bootstrap holds the test set constant during calculation of metrics. This is in contrast to cross-validation where the test set is different (with no overlapping points) for each fitted model. Holding the test set constant might be beneficial since every model calculates metrics based on the same data, thus averaging over MSE scores gives a more accurate picture of the MSE present in that specific test set. However, this introduces bias since we assume that the selected test set accurately represents the population, which it may not. Cross-validation on the other hand does not average MSE values over the same test data and larger variations may occur. The advantage of this is that metrics are calculated on the entire data set, not just a specific partition.
             
-            When extracting the optimal hyperparameter, $\lambda_{opt}$, from the cross-validation heatmaps it has a corresponding optimal polynomial degree , $p_{opt}$. However, we notice that when implementing that $\lambda_{opt}$ in the bias variance decomposition using bootstrap as the resampling technique, it yields a different $p_{opt}$. This have multiple plausible explainations. As the bootstrapped MSE value more or less stabilises after a certain degree and then fluctuates (see Figure~\ref{res:fig:bs_bias_var_Ridge_Lasso}), the fluctuations might indicate exactly which polynomial degree yields the best results and it might therefore differ from cross-validation. Furthermore, in our implementation of cross-validation we end up changing the amount of training data we have. With 7-fold cross validation, only $1/7$ of the data remains as testing data, while in bootstrapping this amount is $1/3$. This will also have an impact on the MSE values themselves.             
+            When extracting the optimal hyperparameter, $\lambda_{opt}$, from the cross-validation heatmaps it has a corresponding optimal polynomial degree , $p_{opt}$. However, we notice that when implementing that $\lambda_{opt}$ in the bias variance decomposition using bootstrap as the resampling technique, it yields a different $p_{opt}$. This have multiple plausible explainations. As the bootstrapped MSE value more or less stabilises after a certain degree and then fluctuates (see Figure~\ref{res:fig:bs_bias_var_Ridge_Lasso}), the fluctuations might indicate exactly which polynomial degree yields the best results and it might therefore differ from cross-validation. Furthermore, in our implementation of cross-validation we end up changing the amount of training data we have. With 7-fold cross validation, only $\sfrac{1}{7}$ of the data remains as testing data, while in bootstrapping this amount is $\sfrac{1}{4}$. This will also have an impact on the MSE values themselves.             
 
 
         \subsubsection{Bias Variance Tradeoff}
