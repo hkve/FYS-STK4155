@@ -402,8 +402,7 @@
 
 
         \subsubsection{Applying Resampling}
-        \comment{I  have written what is supposed to be objective above the figures and subjective below (in case we want to move it to 'discussion') -\Anna}
-            As we can see from the plot in Figure~\ref{res:fig:bs_train_test_ols} the bootstrapped models tested on the training data yield more or less identical MSE values and decrease as the model complexity increases. However, this is not the case when implementing the testing data. After the optimal polynomial degree ($ p_{opt} = 6$) the MSE value not only increases (as is seen also in Figure~\ref{res:fig:OLS_mse_noresample}), but there is a large variance in results of the bootstrapped models.  
+            Implementing bootstrapping we can see from the plot in Figure~\ref{res:fig:bs_train_test_ols} that the bootstrapped models tested on the training data yield more or less identical MSE values and decrease as the model complexity increases. However, this is not the case when employing the testing data. After the optimal polynomial degree ($ p_{opt} = 6$) the MSE value not only increases (as is seen also in Figure~\ref{res:fig:OLS_mse_noresample}), but there is a large variance in results of the bootstrapped models.  
             \begin{figure}[ht]
                 \centering
                 \includegraphics[width=.9\linewidth]{BS_train_test_mse_OLS.pdf}
@@ -411,7 +410,7 @@
                 \label{res:fig:bs_train_test_ols}
             \end{figure}
   
-            When looking at the bias-variance decomposition of the MSE value (Figure~\ref{res:fig:bs_OLS_bias_variance_tradeoff_ols}), it is evident that when adding the decomposed parts together, it results in something very close to the original MSE, meaning the implementation is sound. The bias of the models starts high and decreases with increasing model complexity. The variance on the other hand is initially $0$ at $p=1$ and increases with the polynomial degree. The lowest MSE value occurs at $p_{opt}=6$. 
+            When looking at the bias-variance decomposition of the bootstrapped MSE value (Figure~\ref{res:fig:bs_OLS_bias_variance_tradeoff_ols}), it is evident that when adding the decomposed parts together, it results in something very close to the original MSE, meaning the implementation is sound. The bias of the models starts high and decreases with increasing model complexity. The variance on the other hand is initially $0$ at $p=1$ and increases with the polynomial degree. The lowest MSE value occurs at $p_{opt}=6$, for which the bias is at its lowest and variance is still small. 
             \begin{figure}[ht]
                 \centering
                 \includegraphics[width=.9\linewidth]{BS_Bias_var_decomp_OLS.pdf}
@@ -419,10 +418,8 @@
                 \label{res:fig:bs_OLS_bias_variance_tradeoff_ols}
             \end{figure}
 
-
-
             \comment{Remove the titles op the plots -\Anna}
-            In Figure~\ref{res:fig:bs_bias_var_data_points} we see the change in the bias-variance decomposition when varying the number of data points. For $n=60$ the bias remains at negligible for all model complexities while the MSE and variance are identical and increase with the polynomial degree. Conversely, for $n=1500$ the MSE and bias reaches a minimum and seemingly stabilises, while the variance barely increases. 
+            In Figure~\ref{res:fig:bs_bias_var_data_points} we see the change in the bias-variance decomposition when varying the number of data points. For $n=60$ the bias remains at negligible for all model complexities while the MSE and variance are identical and increase with the polynomial degree. Conversely, for $n=1500$ the MSE and bias reach a minimum and seemingly stabilise, while the variance barely increases. 
             \begin{figure}[ht]
                 \begin{subfigure}{.5\textwidth}
                     \centering
@@ -439,7 +436,6 @@
                     \includegraphics[width=.9\linewidth]{BS_Bias_var_decomp_OLS_1500_data_points.pdf}
                     \caption{$n=1500$}
                 \end{subfigure}
-                
                 \caption{Bias-variance decomposition of OLS models when varying the number of data points.}
                 \label{res:fig:bs_bias_var_data_points}
             \end{figure}
@@ -491,7 +487,7 @@
         \end{figure}
 
         \subsubsection{Bias-Variance Decomposition}
-            Using the optimal $\lambda$ found from cross-validation heatmap (see Figure~\ref{res:fig:Franke_heatmaps}) we now plot the bias-variance decomposition of Ridge and Lasso as functions of model complexity. The results can be seen in Figure~\ref{res:fig:bs_bias_var_Ridge_Lasso}. As opposed to OLS, the MSE values of Ridge and Lasso do not increase with polynomial degree after a certain threshold, but rather always decreases (apart from some fluctuations). The plots resemble the OLS for $n=1500$. 
+            Using the optimal $\lambda$ found from the cross-validation heatmap (see Figure~\ref{res:fig:Franke_heatmaps}) we now plot the bias-variance decomposition of Ridge and Lasso as functions of model complexity. The results can be seen in Figure~\ref{res:fig:bs_bias_var_Ridge_Lasso}. As opposed to OLS, where the MSE value quickly increase with polynomial degree after a certain threshold, the MSE values of Ridge and Lasso reaches a more or less stable value with only a slight increase with some fluctuation. The plots resemble the OLS for $n=1500$. The optimal polynomial degree for Ridge is $p_{opt} = 10$ and for Lasso $p_{opt} = 9$.
 
             \begin{figure}[ht]
                 \begin{subfigure}{\linewidth}
@@ -505,7 +501,7 @@
                 \caption{Bias-variance decomposition of Ridge and Lasso on Franke data with $n=600$.}
                 \label{res:fig:bs_bias_var_Ridge_Lasso}
             \end{figure}
-            This means that there is little to no occurrence of overfitting when applying these methods.     
+    
 
             We would now like to do the bias-variance decomposition for one optimal and one suboptimal $\lambda$ for Ridge and Lasso. The plot of this can be found in Figure~\ref{res:fig:bs_bias_var_two_lmbdas_Ridge_Lasso}. To clarify, here the $\lambda$s are constant across all polynomials degree. It is evident that in both approaches the suboptimal $\lambda$ preforms better than the optimal $\lambda$ for larger degrees (a result of the choice of optimal $\lambda$), but never reaches an MSE as low as the optimal $\lambda$. 
 
@@ -521,9 +517,6 @@
                 \caption{Bias-variance decomposition of Ridge and Lasso on Franke data with $n=600$, now with two different $\lambda$s; one optimal (found through cross-validation) and one larger.}
                 \label{res:fig:bs_bias_var_two_lmbdas_Ridge_Lasso}
             \end{figure}
-            It is in other words underfitted. 
-
-            We can see that the models of optimal $\lambda$s reach a minimum MSE value and thereafter increase with the model complexity. This is not the case for the models of the larger $\lambda$s, but it is plausible that it would be if we were to increase the polynomial degree further. Ridge and Lasso are not directly comparable as they differ in their definition of $\lambda$ (see Eqs.~\eqref{theo:eq:Ridge_coefs} and~\eqref{theo:eq:Lasso_costfunction}).   
             
             Lastly we plot the bias-variance decomposition as a function of $\lambda$ (see Figure~\ref{res:fig:bs_bias_var_lmbdas_Ridge_Lasso}) using the optimal degrees $p=8$ for both Ridge and Lasso, taken from Figure~\ref{res:fig:Franke_heatmaps}.  
 
@@ -611,13 +604,19 @@
 
             The bootstrap holds the test set constant during calculation of metrics. This is in contrast to cross-validation where the test set is different (with no overlapping points) for each fitted model. Holding the test set constant might be beneficial since every model calculates metrics based on the same data, thus averaging over MSE scores gives a more accurate picture of the MSE present in that specific test set. However, this introduces bias since we assume that the selected test set accurately represents the population, which it may not. Cross-validation on the other hand does not average MSE values over the same test data and larger variations may occur. The advantage of this is that metrics are calculated on the entire data set, not just a specific partition.
 
-        \subsubsection{Bias Variance Tradeoff}
-            \comment{General bv disc here} \\
-            We analyse bias variance tradeoff through decomposition of the MSE. For OLS we see the decomposition visualised in multiple plots. In the plots in Figures~\ref{res:fig:bs_OLS_bias_variance_tradeoff_ols} and~\ref{res:fig:bs_train_test_ols} the change in variance coincides; the difference between the various bootstrapped models increase with model complexity, and this is what we see as variance in the bias-variance decomposition. When using the MSE as a measure of the goodness of fit, the model yielding the lowest value will be considered the best. At this point in Figure~\ref{res:fig:bs_OLS_bias_variance_tradeoff_ols} ($p_{opt}=6$) the bias is at its lowest and the variance has not yet increased much. This is an example of the bias-variance tradeoff.  
 
-            The fact that the bias remains low for small numbers of data points corresponds with the notion that little complexity is required to approximate few data points. It also makes sense that the variance and MSE quickly increase with the model complexity; the model is easily overfitted. For $n=1500$ the number of data points impedes the model from overfitting at such low polynomial degrees. Had we further increased the model complexity, we should again see the signs of overfitting. 
-            
+
+        \subsubsection{Bias Variance Tradeoff}
             The bias-variance decomposition is a method for further analysing the MSE value of a model and find out what makes the model preform well/badly. As the model approximates the training data (the complexity increases), it gets closer to capturing the true relationship between the input and the output; the bias of the model decreases. Simultaneously the model gets more dependent on exactly which data it is trained on; the variance increases. An ideal model will have a low bias and a low variance, but it is rare that these coincide and one is forced to find a tradeoff. 
+
+            We analyse bias variance tradeoff through decomposition of the MSE. For OLS we see the decomposition visualised in multiple plots. In the plots in Figures~\ref{res:fig:bs_OLS_bias_variance_tradeoff_ols} and~\ref{res:fig:bs_train_test_ols} the change in variance coincides; the difference between the various bootstrapped models increase with model complexity, and this is what we see as variance in the bias-variance decomposition. Further in Figure~\ref{res:fig:bs_OLS_bias_variance_tradeoff_ols} the model yielding the lowest MSE value is given by ($p_{opt}=6$), where the bias is at its lowest and the variance has not yet increased much. This is an example of the bias-variance tradeoff.  
+
+            When looking at the bias variance tradeoff for various $n$ we see that the bias remains low for small numbers of data points, which corresponds with the notion that little complexity is required to approximate few data points. It also makes sense that the variance and MSE in that case quickly increase with the model complexity; the model is easily overfitted. For $n=1500$ the number of data points impedes the model from overfitting at such low polynomial degrees. Had we further increased the model complexity, we should again see the signs of overfitting. 
+
+            In the bias variance decomposition of Ridge and Lasso where there is one optimal $\lambda$ per polynomial degree (see Figure~\ref{res:fig:bs_bias_var_Ridge_Lasso}) there is little to no occurence of overfitting. However, in the results from the suboptimal and larger $\lambda$ (see Figure~\ref{res:fig:bs_bias_var_two_lmbdas_Ridge_Lasso}) one can see that the lowest MSE value of the optimal $\lambda$ is never reached. This is a clear sign of underfitting. We can also see that the models of optimal $\lambda$s reach a minimum MSE value and thereafter increase with the model complexity. This is not the case for the models of the larger $\lambda$s, but it is plausible that it would be if we were to increase the polynomial degree further. 
+            
+            The value of the hyperparameter, $\lambda$, in Ridge and Lasso is not directly comparable as they differ in its definition (see Eqs.~\eqref{theo:eq:Ridge_coefs} and~\eqref{theo:eq:Lasso_costfunction}).   
+
 
             \comment{Accros $\lambda$-disc here}\\
             When keeping the polynomial degree fixed and varying $\lambda$ in Figure~\ref{res:fig:bs_bias_var_lmbdas_Ridge_Lasso}, we saw similar results between Ridge and Lasso, mainly that the variance decreased as $\lambda$ is increased, while the bias initially decreases before shooting up again. This mirrors the plots where the polynomial degree is fixed, telling us that large $\lambda$-values limit the complexity of our models, resulting in low variance and large bias. As we decreased $\lambda$, we find an optimum tradeoff between the bias and variance before they approach the OLS results.
