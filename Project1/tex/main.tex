@@ -349,13 +349,13 @@
             \begin{figure*}
                 \begin{subfigure}{\textwidth}
                     \centering
-                    \includegraphics[width=.9\linewidth]{OLS_coefs_plots.pdf}
+                    \includegraphics[width=\linewidth]{OLS_coefs_plots.pdf}
                     \caption{Showing values of polynomial coefficients for degree 1, 3 and 5 from left to right. The shaded regions are given by $\pm 2\sigma_\theta$. Note the different y-axes.} 
                     \label{res:fig:OLS_coefs_values_plot}
                 \end{subfigure}
                 \begin{subfigure}{\textwidth}
                     \centering
-                    \includegraphics[width=.9\linewidth]{OLS_coefs_table.pdf}
+                    \includegraphics[width=\linewidth]{OLS_coefs_table.pdf}
                     \caption{Showing $\theta_{ab}$ corresponding to the term $x^a y^b$ present in the fit.}
                     \label{res:fig:OLS_coefs_values_table}    
                 \end{subfigure}
@@ -449,12 +449,12 @@
         We repeated the same analysis for Ridge and Lasso regression, implementing resampling techniques. For cross-validation this was done for two different $\lambda$ values, $0.1$ and $10^{-7}$, both with Ridge and Lasso regression. This can be seen in Figures~\ref{res:fig:ridgelasso_cv_badlambda} and \ref{res:fig:ridgelasso_cv_goodlambda} respectively. For $\lambda = 10^{-7}$ we again see that the test MSE stabilises when reaching $k=7$. In the $\lambda=0.1$ case however, there is little variation across the different $k$ values.
 
         \begin{figure}[ht]
-            \begin{subfigure}{.9\linewidth}
+            \begin{subfigure}{\linewidth}
                 \centering
                 \includegraphics[width=.9\linewidth]{bad_lmbda_Ridge_mse_kfold.pdf}
             \end{subfigure}
             \hfill
-            \begin{subfigure}{.9\linewidth}
+            \begin{subfigure}{\linewidth}
                 \centering
                 \includegraphics[width=.9\linewidth]{bad_lmbda_Lasso_mse_kfold.pdf}
             \end{subfigure}
@@ -462,12 +462,12 @@
             \label{res:fig:ridgelasso_cv_badlambda}
         \end{figure}
         \begin{figure}[ht]
-            \begin{subfigure}{.9\linewidth}
+            \begin{subfigure}{\linewidth}
                 \centering
                 \includegraphics[width=.9\linewidth]{good_lmbda_Ridge_mse_kfold.pdf}
             \end{subfigure}
             \hfill
-            \begin{subfigure}{.9\linewidth}
+            \begin{subfigure}{\linewidth}
                 \centering
                 \includegraphics[width=.9\linewidth]{good_lmbda_Lasso_mse_kfold.pdf}
             \end{subfigure}
@@ -525,7 +525,7 @@
 
             We can see that the models of optimal $\lambda$s reach a minimum MSE value and thereafter increase with the model complexity. This is not the case for the models of the larger $\lambda$s, but it is plausible that it would be if we were to increase the polynomial degree further. Ridge and Lasso are not directly comparable as they differ in their definition of $\lambda$ (see Eqs.~\eqref{theo:eq:Ridge_coefs} and~\eqref{theo:eq:Lasso_costfunction}).   
             
-            Lastly we plot the bias variance decomposition as a function of $\lambda$ (see Figure~\ref{res:fig:bs_bias_var_lmbdas_Ridge_Lasso}) using the optimal degrees $p=8$ for both Ridge and Lasso, taken from Figure~\ref{res:fig:Franke_heatmaps}.  
+            Lastly we plot the bias-variance decomposition as a function of $\lambda$ (see Figure~\ref{res:fig:bs_bias_var_lmbdas_Ridge_Lasso}) using the optimal degrees $p=8$ for both Ridge and Lasso, taken from Figure~\ref{res:fig:Franke_heatmaps}.  
 
             \begin{figure}[ht]
                 \begin{subfigure}{\linewidth}
@@ -607,7 +607,7 @@
         \subsubsection{Cross-Validation and Bootstrap} 
             Looking back at fold varying test- and train MSEs for our regularised methods, we see that the low $\lambda = 10^{-7}$ graphs (Figure~\ref{res:fig:ridgelasso_cv_goodlambda}) closely resembles the results obtained for OLS (Figure~\ref{res:fig:OLS_mse_kfold}). This is in agreement with regaining OLS for $\lambda \xrightarrow{} 0$. For the more regularised $\lambda = 0.1$ graph (Figure~\ref{res:fig:ridgelasso_cv_badlambda}), we observe almost no variation between different $k$ values. This might be due to $\theta$-parameter space being smaller, since we add a large penalty on our coefficients. Since many of the same data points are used for fitting across different $k$ values and the penalty term gives a large constraint on the possible $\theta$ values, the fitted models across different folds will be more similar.  
         
-            The choice of $k=7$ used for our parameter grid search is influenced by the computational aspect of the approach. Since a model has to be fitted $k$ times for each set of parameter $(p,\lambda)$, it is clear that this increases the time taken to search the parameter space. However, for both OLS and Ridge, the closed form expressions (Eqs.~\eqref{theo:eq:OLS_coefs} and~\eqref{theo:eq:Ridge_coefs} respectively) only require matrix multiplication and inversion. Adding more folds could potentially be feasible here. However, since Lasso requires a cost function minimization, it is significantly slower than OLS and Ridge, especially for high $p$. Therefore, we get a tradeoff between the number of $(p,\lambda)$ to try and the number of folds $k$, where $k=7$ was found to allow for high parameter resolution while still being completed in a feasible amount of time.
+            The choice of $k=7$ used for our parameter grid search is influenced by the computational aspect of the approach. Since a model has to be fitted $k$ times for each set of parameter $(p,\lambda)$, it is clear that this increases the time taken to search the parameter space. However, for both OLS and Ridge, the closed form expressions (Eqs.~\eqref{theo:eq:OLS_coefs} and~\eqref{theo:eq:Ridge_coefs} respectively) only require matrix multiplication and inversion. Adding more folds could potentially be feasible here. However, since Lasso requires a cost function minimization, it is significantly slower than OLS and Ridge, especially for high $p$. Therefore, we get a tradeoff between the number of $(p,\lambda)$ to try and the number of folds $k$, where $k=7$ was found to allow for high parameter resolution while still being completed in a feasible amount of time. As discussed, if bootstrapping would be applied for the grid search, the computational costs would be even worse since we would need to fit $L = 400$ models for each $(p,\lambda)$.  
 
             The bootstrap holds the test set constant during calculation of metrics. This is in contrast to cross-validation where the test set is different (with no overlapping points) for each fitted model. Holding the test set constant might be beneficial since every model calculates metrics based on the same data, thus averaging over MSE scores gives a more accurate picture of the MSE present in that specific test set. However, this introduces bias since we assume that the selected test set accurately represents the population, which it may not. Cross-validation on the other hand does not average MSE values over the same test data and larger variations may occur. The advantage of this is that metrics are calculated on the entire data set, not just a specific partition.
 
@@ -620,6 +620,9 @@
             The bias-variance decomposition is a method for further analysing the MSE value of a model and find out what makes the model preform well/badly. As the model approximates the training data (the complexity increases), it gets closer to capturing the true relationship between the input and the output; the bias of the model decreases. Simultaneously the model gets more dependent on exactly which data it is trained on; the variance increases. An ideal model will have a low bias and a low variance, but it is rare that these coincide and one is forced to find a tradeoff. 
 
             \comment{Accros $\lambda$-disc here}\\
+            When keeping the polynomial degree fixed and varying $\lambda$ in Figure~\ref{res:fig:bs_bias_var_lmbdas_Ridge_Lasso}, we saw similar results between Ridge and Lasso, mainly that the variance decreased as $\lambda$ is increased, while the bias initially decreases before shooting up again. This mirrors the plots where the polynomial degree is fixed, telling us that large $\lambda$-values limit the complexity of our models, resulting in low variance and large bias. As we decreased $\lambda$, we find an optimum tradeoff between the bias and variance before they approach the OLS results.
+
+            The difference in the response to an increased $\lambda$ between Ridge and Lasso is that Ridge seemingly moves more smoothly from mimicking OLS before turning the effective degrees of freedom off, whereas Lasso suddenly does so (at around $\lambda=10^{-3}$ in our case). This difference can be leveraged depending on the situation, but as long as we optimise thoroughly, as we have done, this difference does not matter as much.
 
 
     \subsection{Fit to Terrain Data}
@@ -680,7 +683,7 @@
 
 
     \section{Parameters for Artificial Data} \label{app:sec:frankefunction N and sigma}
-        To fairly compare between methods, a constant number of sampled points $N$ from the Franke function (Eq.~\ref{met:eq:Franke_Function}) and the noise magnitude $\sigma$ needs to be set. We decided that $N = 600$ points should be sufficient to get enough data points in both the train and test set, while still being small enough to not bring in too much computational complexity. The points $(x,y)$ are drawn from a uniform distribution $x,y \distas \mathcal{U}(0,1)$ limited to their domain. Trough visual inspection, we decided on $\sigma = 0.1$ for the noise $\epsilon \distas \normal{0}{\sigma^2}$. We found that this scale gave our function plenty of noise, while still being recognizable (Figure~\ref{app:fig:frankefunction varying noise}).   
+        To fairly compare between methods, a constant number of sampled points $N$ from the Franke function (Eq.~\ref{met:eq:Franke_Function}) and the noise magnitude $\sigma$ needs to be set. We decided that $N = 600$ points should be sufficient to get enough data points in both the train and test set, while still being small enough to not bring in too much computational complexity. The points $(x,y)$ are drawn from a uniform distribution $x,y \distas \mathcal{U}(0,1)$ limited to their domain. Trough visual inspection, we decided on $\sigma = 0.1$ for the noise $\epsilon \distas \normal{0}{\sigma^2}$. We found that this scale gave our function plenty of noise, while still being recognisable (Figure~\ref{app:fig:frankefunction varying noise}).   
         \begin{figure*}
             \begin{subfigure}{.5\textwidth}
                 \centering
