@@ -223,7 +223,6 @@
     We will initially employ OLS on the Franke function, before moving on to using resampling techniques to explore the goodness of fit. We will then move on to the regularised regression methods, Ridge and Lasso, comparing their application on the Franke function with that of OLS. Finally, we use what we have learned to compare the three methods on real terrain data.
     
     \subsection{Datasets}
-        We will examine models from two 2D terrain-like data sets; firstly the Franke data and then real terrain data from Nicaragua.
         \subsubsection{Franke Function}
 
             For the initial testing of our implemented fitting routines, we will use the so called \textit{Franke function}. Being able to control the number of sample points and noise levels will serve as a good examination of our models advantages and disadvantaged. Defined for $x, y \in [0,1]$
@@ -284,15 +283,14 @@
     \subsection{Resampling Techniques}
         With the intent to compute more accurate measures for goodness of fit (such as MSE and $\Rsquared$) to evaluate our model, we 
         artificially increase the data set by repeatedly fitting the model on subsamples of our data. This approach is called resampling and consists of a variety of methods. In this project we have applied \textit{Bootstrapping} and \textit{$k$-fold cross-validation}. 
-        \comment{Reminder: Address how we calculate and compare bias-variance --- that we find them for every test data point, and compare the average values over all data points.}
 
         \subsubsection{Bootstrap}
-            Bootstrapping consists of generating new training data by sampling data points from the original training data with replacement; meaning the same data points can be selected more than once. The new set of training data is called a bootstrapped dataset and is used to train a model. Then the relevant measures for goodness of fit are calculated. This process of resampling and calculating measures is repeated a certain number of times (bootstrap rounds), giving a distribution of these measures. The mean of the measures is then calculated across the bootstrapped models. Through the central limit theorem this mean is assumed to be the more accurate measure for goodness of fit and therefore a better evaluation of the model in question. Bootstrapping is also a method of weighing some data points more than others. This might shed new light on the data. 
+            Bootstrapping consists of generating new training data by sampling data points from the original training data with replacement; meaning the same data points can be selected more than once. The new set of training data is called a bootstrapped dataset and is used to train a model. Then the relevant measures for goodness of fit are calculated. This process of resampling and calculating measures is repeated a certain number of times (bootstrap rounds), giving a distribution of thex measures. The mean of the measures is then calculated across the bootstrapped models. Through the central limit theorem this mean is assumed to be the more accurate measure for goodness of fit and therefore a better evaluation of the model in question. Bootstrapping is also a method of weighing some data points more than others, which might shed new light on the data. 
 
             Together with the MSE, the bias and variance of the model are in our case relevant measures for goodness of fit. By implementing bootstrapping we wish to study the bias-variance trade off. Given a model of a certain complexity, we are interested in calculating these measures, not for each bootstrapped model, but across them. Given $L$ number of bootstrap rounds (and corresponding bootstrapped models), we want the bias and variance between all the bootstrapped models at each point compared to the testing data (see Eqs.~\eqref
-            {theo:eq:bias and var}). This will create a bias value and variance value for each of the input data points. When evaluating a model of a certain polynomial degree, we find an appropriate measure of the bias and variance for the \textit{entire} model would be the mean across data points. 
+            {theo:eq:bias and var}). This will create a bias value and variance value for each of the input data points. When evaluating a model of a certain polynomial degree, we found an appropriate measure of the bias and variance for the \textit{entire} model would be the mean across data points. 
             
-            When employing bootstrap it is important to find an appropriate number of rounds to preform the resampling. There is a trade-off between getting an accurate distribution of the values and keeping the process computationally feasible. To find the optimal number of rounds we preform bootstrap on the Franke data for a variety of rounds while  calculating the MSE values. There will be a distribution of MSE values for each number of rounds. By taking the mean of each distribution we can plot it as a function of rounds and find where it stabilises. One can argue that any number of rounds above this point will be excessive. 
+            When employing bootstrap it is important to find an appropriate number of rounds to preform the resampling. There is a trade-off between getting an accurate distribution of the values and keeping the process computationally feasible. To find the optimal number of rounds we preform bootstrap on the Franke data for a variety of rounds while  calculating the MSE values. In this case we implement polynomial degree $7$ and bootstrap rounds from $30-1000$. There will be a distribution of MSE values for each number of rounds. By taking the mean of each distribution we can plot it as a function of rounds and find where it stabilises. One can argue that any number of rounds above this point will be excessive. 
 
 
         \subsubsection{Cross-Validation}
@@ -303,9 +301,9 @@
             When preforming cross-validation, the computational cost is dependent on the number of folds $k$. Increasing $k$ will presumably give us more confidence in our calculated metrics, but has the downside of being more computationally expensive. We wish to study the effect that $k$ has on the calculated metrics for different polynomial degrees. This will be done by calculating the train and test MSE for $k \in [5,10]$ and studying the differences between results obtained for different  $k$ values. The stability of the test MSE metric will be our main focus, trying to find the lowest value of $k$ where increasing it does not yield drastically different results. Looking qualitatively for when the test MSE stabilises across folds will then presumably give us the lowest $k$ value required while still giving accurate results.
 
     \subsection{OLS Revisited}
-        As discussed in the section above, resampling the data should yield a more precise evaluation of our model. We will therefore revisit the implementation of OLS, now employing resampling techniques. 
+        As discussed in the previous section, resampling the data should yield a more precise evaluation of our model. We will therefore revisit the implementation of OLS, now employing resampling techniques. 
         \subsubsection{Application of Bootstrapping}
-            As before, we start by using our algorithm on the Franke data with $n=600$ data points. For every model of a given polynomial degree (from $p=1\text{--}12$) we now calculate the MSE for the training and testing data multiple times; after each round of bootstrap (in total 400 rounds). We take the mean of the MSE values for each model and plot this as well as the individual bootstrap rounds as functions of model complexity. 
+            As before, we start by using our algorithm on the Franke data with $n=600$ data points. For every model of a given polynomial degree (from $p=1\text{--}15$) we now calculate the MSE for the training and testing data multiple times; after each of the 400 bootstrap rounds. We take the mean of the MSE values across rounds and plot the bootstrapped models as functions of model complexity. In addition we again take the mean of these models for each degree and plot it. 
         
             Thereafter, we plot the bias-variance decomposition of the MSE value from the testing data. Again we implement the mean across bootstrap rounds as a measure for the model of that certain complexity.
         
@@ -329,6 +327,7 @@
 
 
 \section{Results}
+    Introduction 
     \subsection{Ordinary Least Squares}
             \subsubsection{Without Resampling}
                 We begin by calculating the MSE and $\Rsquared$ score (Eqs.~\ref{theo:eq:mse},~\ref{theo:eq:r2}) fitted to the Franke function for different polynomial degrees. This can be seen in Figures~\ref{res:fig:OLS_mse_noresample} and~\ref{res:fig:OLS_R2_noresample} respectively. Based on the MSE calculated for the test data, the optimal degree was found to be $\msub{p}{opt} = 5$ with $\mse \approx 0.134$. We observe that the train MSE decreases steadily with higher $p$, while the test MSE decreases until we reach $\msub{p}{opt}$, after which it increases. The opposite relationship is seen for the $\Rsquared$ score.   
@@ -400,7 +399,7 @@
             \begin{figure}[ht]
                 \centering
                 \includegraphics[width=\linewidth]{BS_mse_across_rounds_OLS.pdf}
-                \caption{Plot of the MSE value as a function of number of bootstrap rounds. Each MSE value in the plot is the mean of the MSE values for that number of rounds. The blue field around the graph is the standard deviation of the MSE distribution divided by the square root of the number of bootstrap rounds.}
+                \caption{Plot of the MSE value as a function of number of bootstrap rounds. Each MSE value in the plot is the mean of the MSE values for that number of rounds. The blue field around the graph is the standard deviation of the MSE distribution divided by the square root of the number of bootstrap rounds. Implementing polynomial degree 7.}
                 \label{res:fig:bs_mse_across_rounds}
             \end{figure}
             We can see from the plot that the mean MSE value varies a lot in the beginning, but stabilises around 400 rounds and remains rather constant thereafter. The same goes for the standard deviation divided by number of rounds (the blue field around the graph). For further exploration of the number of bootstrap rounds and the distributions of the MSE values see Appendix~\ref{app:sec:BS rounds}. 
