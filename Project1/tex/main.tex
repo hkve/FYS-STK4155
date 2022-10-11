@@ -144,7 +144,7 @@
         \begin{align}
             \bar{z}_n \distas \normal{\mu}{\frac{\sigma^2}{n}}
         \end{align}
-        becomes sound. Colloquially we say the sample mean approaches the true mean $\mu$. This is powerful, as it means not only that the sample mean becomes better as the sample size grows, but quantities derived from its distribution are also determined more precisely. Note also that this holds with only very weak restrictions on the distribution of the $z_i$'s -- their sample mean will approach normal distribution regardless. This lays the foundation for statistically informed models such as regression methods.
+        becomes sound. Colloquially we say the sample mean approaches the true mean $\mu$. This is powerful, as it means not only that the sample mean becomes better as the sample size grows, but quantities derived from its distribution are also determined more precisely. Note also that this holds with only very weak restrictions on the distribution of the $z_i$'s --- their sample mean will approach normal distribution regardless. This lays the foundation for statistically informed models such as regression methods.
 
         
 
@@ -156,7 +156,7 @@
         \begin{align}
             P(\vec{\theta}|X, \vec{y}) = \frac{P(\vec{y}|X,\vec{\vec{\theta}})P(\vec{\theta})}{P(X,\vec{y})},
         \end{align}
-        where $P(\vec{y}|X, \vec{\theta})$ is the \textit{likelihood} of observing the values $\vec{y}$ at points $X$ given parameters $\vec{\theta}$, and $P(\vec{\theta})$ is our \textit{prior} confidence in $\vec{\theta}$, before the data was seen. $P(X,\vec{y})$ plays the role of a normalisation, and can safely be ignored -- either because we look for values of $\vec{\theta}$ that maximise the probability, or because we assume the probabilities $P(\vec{y}|X,\vec{\theta})$ and $P(\vec{\theta})$ which we can then properly normalise. Now we have a framework through which we can build a model by making assumptions about the probability distributions $P(\vec{y}|X,\vec{\theta})$ and $P(\vec{\theta})$ to give us a probability distribution for the parameters $\vec{\theta}$ that we can maximise.
+        where $P(\vec{y}|X, \vec{\theta})$ is the \textit{likelihood} of observing the values $\vec{y}$ at points $X$ given parameters $\vec{\theta}$, and $P(\vec{\theta})$ is our \textit{prior} confidence in $\vec{\theta}$, before the data was seen. $P(X,\vec{y})$ plays the role of a normalisation, and can safely be ignored --- either because we look for values of $\vec{\theta}$ that maximise the probability, or because we assume the probabilities $P(\vec{y}|X,\vec{\theta})$ and $P(\vec{\theta})$ which we can then properly normalise. Now we have a framework through which we can build a model by making assumptions about the probability distributions $P(\vec{y}|X,\vec{\theta})$ and $P(\vec{\theta})$ to give us a probability distribution for the parameters $\vec{\theta}$ that we can maximise.
 
 
         \subsubsection{Ordinary Least Squares}
@@ -283,7 +283,7 @@
     \subsection{Resampling Techniques}
         With the intent to compute more accurate measures for goodness of fit (such as MSE and $\Rsquared$) to evaluate our model, we 
         artificially increase the data set by repeatedly fitting the model on subsamples of our data. This approach is called resampling and consists of a variety of methods. In this project we have applied \textit{Bootstrapping} and \textit{$k$-fold cross-validation}. 
-        \comment{Reminder: Address how we calculate and compare bias-variance -- that we find them for every test data point, and compare the average values over all data points.}
+        \comment{Reminder: Address how we calculate and compare bias-variance --- that we find them for every test data point, and compare the average values over all data points.}
 
         \subsubsection{Bootstrap}
             Bootstrapping consists of generating new training data by sampling data points from the original training data with replacement; meaning the same data points can be selected more than once. The new set of training data is called a bootstrapped dataset and is used to train a model. Then the relevant measures for goodness of fit are calculated. This process of resampling and calculating measures is repeated a certain number of times (bootstrap rounds), giving a distribution of these measures. The mean of the measures is then calculated across the bootstrapped models. Through the central limit theorem this mean is assumed to be the more accurate measure for goodness of fit and therefore a better evaluation of the model in question. Bootstrapping is also a method of weighing some data points more than others. This might shed new light on the data. 
@@ -502,7 +502,7 @@
         \end{figure}
 
         \subsubsection{Bias-Variance Decomposition}
-            Using the optimal $\lambda$ found from cross-validation heatmap (see Figure~\ref{res:fig:Franke_heatmaps}) we now plot the bias-variance decomposition of Ridge and Lasso as funtions of model complexity. The results can be seen in Figure~\ref{res:fig:bs_bias_var_Ridge_Lasso}. As apposed to OLS, the MSE values of Ridge and Lasso do not increase with polynomial degree after a certain threshold, but rather always decreases (apart from some fluctuations). The plots resemble the OLS for $n=1500$. 
+            Using the optimal $\lambda$ found from cross-validation heatmap (see Figure~\ref{res:fig:Franke_heatmaps}) we now plot the bias-variance decomposition of Ridge and Lasso as functions of model complexity. The results can be seen in Figure~\ref{res:fig:bs_bias_var_Ridge_Lasso}. As opposed to OLS, the MSE values of Ridge and Lasso do not increase with polynomial degree after a certain threshold, but rather always decreases (apart from some fluctuations). The plots resemble the OLS for $n=1500$. 
 
             \begin{figure}[ht]
                 \begin{subfigure}{\linewidth}
@@ -516,7 +516,7 @@
                 \caption{Bias-variance decomposition of Ridge and Lasso on Franke data with $n=600$.}
                 \label{res:fig:bs_bias_var_Ridge_Lasso}
             \end{figure}
-            This means that there is little to no occurence of overfitting when applying these methods.     
+            This means that there is little to no occurrence of overfitting when applying these methods.     
         
 
             We would now like to do the bias-variance decomposition for one optimal and one suboptimal $\lambda$ for Ridge and Lasso. The plot of this can be found in Figure~\ref{res:fig:bs_bias_var_two_lmbdas_Ridge_Lasso}. To clarify, here the $\lambda$s are constant across all polynomials degree. It is evident that in both approaches the suboptimal $\lambda$ preforms better than the optimal $\lambda$ for larger degrees (a result of the choice of optimal $\lambda$), but never reaches an MSE as low as the optimal $\lambda$. 
@@ -536,7 +536,7 @@
 
             We can see that the models of optimal $\lambda$s reach a minimum MSE value and thereafter increase with the model complexity. This is not the case for the models of the larger $\lambda$s, but it is plausible that it would be if we were to increase the polynomial degree further. Ridge and Lasso are not directly comparable as they differ in their definition of $\lambda$ (see Eqs.~\eqref{theo:eq:Ridge_coefs} and~\eqref{theo:eq:Lasso_costfunction}).   
             
-            Lastly we will examine the bias variance decomposition as a funtion of $\lambda$ (see Figure~\ref{res:fig:bs_bias_var_lmbdas_Ridge_Lasso}).  
+            Lastly we will examine the bias variance decomposition as a function of $\lambda$ (see Figure~\ref{res:fig:bs_bias_var_lmbdas_Ridge_Lasso}).  
 
             \begin{figure}[ht]
                 \begin{subfigure}{\linewidth}
@@ -564,7 +564,7 @@
             \label{res:fig:Nica_OLS}
         \end{figure}
 
-    This leads us to optimise the regularised methods, seen in Figure~\ref{res:fig:Nica_heatmap}. We find $(p=12, \lambda = 3\cdot 10^{-9})$ as the optimum for Ridge, and $(p=13, \lambda=6 \cdot 10^{-5})$ for Lasso, with respective minima MSEs $0.1865$ and $0.1887$ -- slightly underperforming OLS.
+    This leads us to optimise the regularised methods, seen in Figure~\ref{res:fig:Nica_heatmap}. We find $(p=12, \lambda = 3\cdot 10^{-9})$ as the optimum for Ridge, and $(p=13, \lambda=6 \cdot 10^{-5})$ for Lasso, with respective minima MSEs $0.1865$ and $0.1887$ --- slightly underperforming OLS.
     
         \begin{figure} [ht]
             \centering
@@ -623,7 +623,7 @@
             The Bootstrap holds the test set constant during calculation of metrics. This is in contrast to cross-validation where the test set is different (with no overlapping points) for each fitted model. Holding the test set constant might be beneficial since every model calculates metrics based on the same data, thus averaging over MSE scores gives a more accurate picture of the MSE present in that specific test set. However, this introduces bias since we assume that the selected test set accurately represents the population, which it may not. Cross-validation on the other hand does not average MSE values over the same test data and larger variations may occur. The advantage of this is that metrics are calculated on the entire data set, not just a specific partition.          
 
         \subsection{Fit to Terrain Data}
-            Firstly, we should take a minute to discuss the choice of terrain data to fit to, and how this could change things. We naturally chose a mountainous terrain, for there to be more interesting features for the models to recapture. However, we chose a large region, with a full resolution ($300\times 300$ points) which we could not hope to do our full analysis, using of all the models and resampling adequately. We could either choose a smaller sub-area or sample more sparsely from the region. We chose the latter, as this would more closely resemble noisy data or a situation where we might not have all the data we would want for our regression. This highlights the power of regression methods to sift through data and find the most salient features. This is seen in Figure~\ref{res:fig:Nica_terrain}, where our fitted model recreates a smoothed version of the jagged mountains where the difference from the low valley to the high peak is obvious, but without the sharpness and details of the original data.
+            First, we should take a minute to discuss the choice of terrain data to fit to, and how this could change things. We naturally chose a mountainous terrain, for there to be more interesting features for the models to recapture. However, we chose a large region, with a full resolution ($300\times 300$ points) on which we could not hope to do our full analysis, using of all the models and resampling adequately. We could either choose a smaller sub-area or sample more sparsely from the region. We chose the latter, as this would more closely resemble noisy data or a situation where we might not have all the data we would want for our regression. This highlights the power of regression methods to sift through data and find the most salient features. This is seen in Figure~\ref{res:fig:Nica_terrain}, where our fitted model recreates a smoothed version of the jagged mountains where the difference from the low valley to the high peak is obvious, but without the sharpness and details of the original data.
 
             The different regression methods we used on the terrain data all performed similarly when optimised, with optimal MSEs of $0.1808$, $0.1865$ and $0.1887$ respectively for OLS, Ridge and Lasso. However, the window within which the OLS method works well is narrow, quickly moving from high bias to high variance, as evidenced in our earlier analyses. In Figure~\ref{res:fig:Nica_heatmap} we see that there are larger areas where Ridge and Lasso perform well, but at the cost of `fine-tuning' both the $\lambda$-parameters and the model complexity. The regularised methods are more consistent across model complexities, but come at the cost of an additional parameter to tune; in a sense they are `safer' to employ.
 
@@ -650,7 +650,7 @@
         where in the last line, we used that $\expval(\epsilon\hat{f}) = \expval(\epsilon)\expval(\hat{f})=0$.\footnote{At first glance, this might seem odd, as there is noise involved in the fitting of $\hat{f}$ too. However, under the assumption that the noise is i.i.d. between experiments, the noise in the data used to fit $\hat{f}$ is independent of the noise in a test sample. It is worth noting that this would not be true if we were comparing with the same data used to fit the model, which explains the optimism of the training MSE.}
 
     \section{Theoretical Proof of Concept of the OLS Model} \label{app:sec:OLS_proof}
-        Supposing that we have data generated from $y_i = f(x_i)+\epsilon$ as before, we look statistical quantities derived from the distribution of our parameters $\vec{\theta}$ inherited from $\epsilon\distas \normal{0}{\sigma^2}$. Under the assumption that $f(x) \in \operatorname{span}\cclosed{x}_a, a\in 1,\ldots,p$ of our design matrix $X$, we can write the data $\vec{y} = X\vec{\theta} + \vec{\epsilon}$ for some $\vec{\theta}$ which would be a `true' optimum for our parameters.
+        Supposing that we have data generated from $y_i = f(x_i)+\epsilon$ as before, we look statistical quantities derived from the distribution of our parameters $\vec{\theta}$ inherited from $\epsilon\distas \normal{0}{\sigma^2}$. Under the assumption that $f(x) \in \operatorname{span}\cclosed{x_a}, a\in 1,\ldots,p$ of our design matrix $X$, we can write the data $\vec{y} = X\vec{\theta} + \vec{\epsilon}$ for some $\vec{\theta}$ which would be a `true' optimum for our parameters.
 
         The expectation value of a data point $y_i$ is\footnote{In this appendix, we understand repeated indices to be summed over.}
         \begin{align}
