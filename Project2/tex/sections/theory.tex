@@ -1,3 +1,28 @@
 Theory goes here
 
 In this project, I thought we could use \verb|cleveref| to reference things like \cref{int:fig:example}.
+
+
+Before we delve into to details of the theory section, it is useful to take a moment to define the quantities we will be dealing with. Let $\vec{y}$ denote a vector of a series of measured values $y_i$, $i\in 1, 2,\ldots, n$ at points $X$, where $X$ is a matrix where the rows $x_i$ correspond to the input values that produced the measurement $y_i$. For completeness, we refer to the columns of $X$ as $\vec{x}_a$, $a=1, 2,\ldots, p$.\footnote{Throughout this project, $a, b$ will always index the $p$ features for a model, and $i, j$ the $n$ data points.} Together, these form the dataset $\mathcal{D} = \cclosed{(y_i, x_i)}$. Another important set of values is $\vec{\theta}$ which contains the parameters that will define the model we will use to predict the data.
+
+We will assume that the measurements $y_i$ are generated from an exact function $f(x)$ with stochastic noise $\epsilon$ added, such that $y_i = f(x_i) + \epsilon$. Throughout this project, we will assume that the noise to be distributed normally with zero mean and some standard deviation (std) $\sigma$; $\epsilon \distas \normal{0}{\sigma^2}$. Furthermore, we will assume that the noise between different measurements is independent and identically distributed (i.i.d.). Our job then is to model an $\hat{f}(x)$ that we want to be close to $f(x)$.
+\comment{Copied this section from previous project, as it will be useful here too. Needs rewriting, -\Carl}
+\subsection{Gradient Descent Methods}
+    \comment{This section might well be moved to method, it is not too theoretical. -\Carl}\\
+    Optimisation of the parameters of the models we will be employing in this project is formulated as minimisation problems, with an associated cost function $C(\vec{\theta})$ to be minimised to find the optimal parameters.
+    \subsubsection{Plain Gradient Descent}
+        We will compare different variants of GD algorithm, starting first with the plain one. Assume the gradient of the cost function $C(\vec{\theta})$ w.r.t. the parameters $\vec{\theta}$ is well-defined on the entirety of our parameter space, and is calculable either analytically or approximated numerically\footnote{Now this is not always the case, e.g. with $L_1$-penalisation on the parameters.}. The idea is that the fastest direction to move in parameter space to reduce $C(\vec{\theta})$ is to follow the direction of $-\Nablatheta C(\vec{\theta})$. Plain gradient descent implements this idea iteratively, starting from an initial guess $\vec{\theta}_0$, finding the next point by
+        \begin{align}
+            \vec{\theta}_{k+1} = \vec{\theta}_k - \eta \Nablatheta C(\vec{\theta}_k),
+        \end{align}
+        where $k=0,1,\ldots,N$ for $N$ iterations, and $\eta$ is an introduced hyperparameter called the learning rate.
+
+    \subsubsection{Adding Momentum}
+        The simple GD can be fleshed out by giving the algorithm a sense of inertia, helping it continue to move in a certain direction. This combats tendency to oscillate around saddle points, for instance. It starts as earlier, but with the additional initialisation $\vec{p}_0 = 0$, finding $\vec{\theta}_k$ iteratively by 
+        \begin{subequations}
+            \begin{align}
+                \vec{\theta}_{k+1} &= \vec{\theta}_k - \vec{p}_k, \\
+                \vec{p}_{k+1} &= \gamma \vec{p}_k + \eta \Nablatheta C(\vec{\theta}),
+            \end{align}
+        \end{subequations}
+        where $\gamma$ is a new hyperparameter characterising the memory of earlier gradients.

@@ -26,10 +26,10 @@
 % Referecing sections, equations etc
 \usepackage[capitalize]{cleveref}
 \crefdefaultlabelformat{\textbf{#2}}
-\crefname{equation}{Eq.}{Eq.}
-\crefname{section}{Sec.}{Sec.}
-\crefname{appendix}{App.}{App.}
-\crefname{figure}{Fig.}{Fig.}
+\crefname{eq}{Eq.}{Eq.}
+\crefname{sec}{Sec.}{Sec.}
+\crefname{app}{App.}{App.}
+\crefname{fig}{Fig.}{Fig.}
 \crefdefaultlabelformat{#2#1#3}
 
 % Misc
@@ -62,9 +62,12 @@
 \DeclareMathOperator{\Rsquared}{R^2}
 \DeclareMathOperator{\eye}{\mathbb{I}}
 \DeclareMathOperator{\sgn}{sgn}
+\DeclareMathOperator{\Nabla}{\boldsymbol{\nabla}}
+\DeclareMathOperator{\Nablatheta}{\Nabla_{\vec{\theta}}}
 
 \newcommand{\thetahat}{\hat{\theta}}
 \newcommand{\msub}[2]{\ensuremath{{#1}_\text{#2}}}
+\newcommand{\evalat}[2]{\left.#1\right|_{#2}}
 
 \newcommand{\Hakon}{$\mathcal{H}$}
 \newcommand{\Carl}{$\mathbb{CM}$}
