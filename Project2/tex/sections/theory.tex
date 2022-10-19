@@ -26,3 +26,8 @@ We will assume that the measurements $y_i$ are generated from an exact function 
             \end{align}
         \end{subequations}
         where $\gamma$ is a new hyperparameter characterising the memory of earlier gradients.
+
+    \subsubsection{Stochastic Gradient Descent} 
+        Stochastic Gradient Descent (SGD) is based on functions to minimise that are on the form $C(\vec{\theta}) = \sum_{i \in A} c_i(\vec{\theta}) + c_0(\vec{\theta})$ for $A=1,2,\ldots,n$. This is often the case, as in MSE-scores, where a cost is associated with every observation $y_i$ separately. The idea of SGD is to not compute gradient on the whole of $C$, but rather split it into mini-batches $C_k(\vec{\theta}) = \sum_{i\in A_k} c_i(\vec{\theta}) + c_0(\vec{\theta})$ for some subset $A_k \subseteq A$, and compute the gradient only on one of these smaller batches. This helps solve two problems: First, it makes the computational cost of calculating the gradient smaller, as we no longer compute the full one, and second, it adds a degree of stochasticity to the movement in parameter space since we no longer will follow the `true' gradient, which prevents getting stuck in local minima.
+
+        SGD is done in so-called epochs, where we divide the full set $A$ into equally sized batches $A_k$, and do one GD iteration on every batch once. After this, $A$ is reshuffled and new mini-batches are drawn.
