@@ -3,53 +3,63 @@ import numpy as np
 class GradientDescent:
     """_summary_
     """
-    def __init__(self, method, params, its):
+    def __init__(self, method:str, params:dict[float], its:int) -> None:
         """Set the type of gradient descent  
 
         Args:
-            method (_type_): Type of gradient descent 
+            method (str): Type of gradient descent 
             params (dict): The hyperparameters for the GD (eta, gamma, betas, etc.)
             its (int): Number of iterations 
         """
         self.method, self.params, self.its = method, params, its
         if method in self.methods.keys():
             init, update = self.methods[method]
-            self._initialize = init
-            self._update_rule = lambda self, x, grad : update(self, x, grad, **params)
-        
+            self._initialize = init # set initializing function
+            self._update_rule = lambda self, x, grad : update(self, x, grad, **params) # set update rule
+        else:
+            raise KeyError(f"Method '{method}' not supported, available methods are: " + ", ".join([f"'{method}'" for method in self.methods.keys()]))
 
-    def call(self, grad, x0, args=()):
+
+    def call(self, grad:callable, x0:np.ndarray, args:tuple=()) -> np.ndarray:
         """Set the problem to be gradient-descended. Create the for-loop with call to method.
         Args:
-            cost_func (_type_): The cost function 
-            grad (): 
+            grad (callable): The gradient function, returns np.ndarray of same shape as x0 
             x0 (np.ndarray): Starting point
-            args (tuple, optional): _description_. Defaults to ().
+            args (tuple, optional): arguments to be passed to grad-function. Defaults to ().
         """
+        # assert that grad works as intended
+        grad0 = grad(x0, *args) 
+        assert grad0.shape == x0.shape, f"grad-function returns array of shape {grad0.shape} instead of shape {x0.shape}."
+        del grad0
+
+        # initialize algorithm
         self._initialize(self, x0)
         for it in range(self.its):
+            # run iterations
             g = grad(self.x, *args)
             self.x = self._update_rule(self, self.x, g) 
         print(self.method, self.x)
+        return self.x
 
 
-    def plain_init(self, x0):
+    def _plain_init(self, x0:np.ndarray) -> None:
         self.x = x0 
 
-    def plain_update(self, x, grad, eta):
+    def _plain_update(self, x:np.ndarray, grad:np.ndarray, eta:float) -> np.ndarray:
         return x - eta * grad
 
-    def momentum_init(self, x0):
+    def _momentum_init(self, x0:np.ndarray) -> None:
         self.x = x0
         self.p = 0
 
-    def momentum_update(self, x, grad, eta, gamma):
+    def _momentum_update(self, x:np.ndarray, grad:np.ndarray, eta:float, gamma:float) -> np.ndarray:
         self.p = gamma * self.p + eta * grad 
         return x - self.p
 
+    # dict containing the available methods
     methods = {
-        "plain": (plain_init, plain_update),
-        "momentum": (momentum_init, momentum_update)
+        "plain": (_plain_init, _plain_update),
+        "momentum": (_momentum_init, _momentum_update)
     }
 
 
