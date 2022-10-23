@@ -80,9 +80,11 @@ class GradientDescent:
         self.s = np.zeros_like(x0)
 
     def _adam_update(self, x:np.ndarray, grad:np.ndarray, eta:float, beta1:float, beta2:float, epsilon:float=sys.float_info.epsilon**0.5) -> np.ndarray:
-        self.m = ( beta1 * self.m + (1. - beta1) * grad ) / (1 - beta1**self._it)
-        self.s = ( beta2 * self.s + (1. - beta2) * np.square(grad) ) / (1 - beta2**self._it)
-        return x - eta / (np.sqrt(self.s) + epsilon) * self.m
+        self.m = beta1 * self.m + (1. - beta1) * grad
+        self.s = beta2 * self.s + (1. - beta2) * np.square(grad)
+        mhat = self.m / (1 - beta1**self._it)
+        shat = self.s / (1 - beta2**self._it)
+        return x - eta / (np.sqrt(shat) + epsilon) * mhat
 
     # dict containing the available methods
     methods = {
@@ -107,6 +109,7 @@ if __name__=="__main__":
     X = np.c_[np.ones(n), x, x**2]
 
     grad = lambda theta, X, y: (2./n) * X.T @ (X @ theta - y)
+    theta0 = np.random.randn(X.shape[1])
     GD = GradientDescent(
         method = "plain",
         params = {"eta":0.8},
@@ -114,7 +117,7 @@ if __name__=="__main__":
     )
     plain_x = GD.call(
         grad=grad, 
-        x0=np.random.randn(3),
+        x0=theta0,
         args=(X,y)
     )
 
@@ -125,7 +128,7 @@ if __name__=="__main__":
     )
     mom_x = GD_mom.call(
         grad=grad, 
-        x0=np.random.randn(3),
+        x0=theta0,
         args=(X,y)
     )
 
@@ -136,7 +139,7 @@ if __name__=="__main__":
     )
     adam_x = GD_adam.call(
         grad=grad, 
-        x0=np.random.randn(3),
+        x0=theta0,
         args=(X,y)
     )
 
