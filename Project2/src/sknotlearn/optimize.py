@@ -1,9 +1,9 @@
 import numpy as np
-
+import sys
 class GradientDescent:
     """_summary_
     """
-    def __init__(self, method:str, params:dict[float], its:int) -> None:
+    def __init__(self, method:str, params:dict[str, float], its:int) -> None:
         """Set the type of gradient descent  
 
         Args:
@@ -34,8 +34,10 @@ class GradientDescent:
 
         # initialize algorithm
         self._initialize(self, x0)
+        # run iterations
+        self._it = 0 # tracking iteration for adam/learning schedule
         for it in range(self.its):
-            # run iterations
+            self._it += 1
             g = grad(self.x, *args)
             self.x = self._update_rule(self, self.x, g) 
         print(self.method, self.x)
@@ -56,10 +58,39 @@ class GradientDescent:
         self.p = gamma * self.p + eta * grad 
         return x - self.p
 
+    def _adagrad_init(self, x0:np.ndarray):
+        self.x = x0
+        self.G = np.zeros_like(x0)
+
+    def _adagrad_update(self, x:np.ndarray, grad:np.ndarray, eta:float, epsilon:float=sys.float_info.epsilon**0.5) -> np.ndarray:
+        self.G += grad**2
+        return x - eta / (np.sqrt(self.G) + epsilon) * grad
+
+    def _rmsprop_init(self, x0:np.ndarray):
+        self.x = x0
+        self.s = np.zeros_like(x0)
+
+    def _rmsprop_update(self, x:np.ndarray, grad:np.ndarray, eta:float, beta:float, epsilon:float=sys.float_info.epsilon**0.5) -> np.ndarray:
+        self.s = beta * self.s + (1. - beta) * grad**2
+        return x - eta / (np.sqrt(self.s) + epsilon) * grad
+
+    def _adam_init(self, x0:np.ndarray):
+        self.x = x0
+        self.m = np.zeros_like(x0)
+        self.s = np.zeros_like(x0)
+
+    def _adam_update(self, x:np.ndarray, grad:np.ndarray, eta:float, beta1:float, beta2:float, epsilon:float=sys.float_info.epsilon**0.5) -> np.ndarray:
+        self.m = ( beta1 * self.m + (1. - beta1) * grad ) / (1 - beta1**self._it)
+        self.s = ( beta2 * self.s + (1. - beta2) * np.square(grad) ) / (1 - beta2**self._it)
+        return x - eta / (np.sqrt(self.s) + epsilon) * self.m
+
     # dict containing the available methods
     methods = {
         "plain": (_plain_init, _plain_update),
-        "momentum": (_momentum_init, _momentum_update)
+        "momentum": (_momentum_init, _momentum_update),
+        "adagrad": (_adagrad_init, _adagrad_update),
+        "rmsprop": (_rmsprop_init, _rmsprop_update),
+        "adam": (_adam_init, _adam_update)
     }
 
 
@@ -74,15 +105,16 @@ if __name__=="__main__":
     x = np.random.uniform(-1, 1, n)
     y = x**2 + np.random.normal(scale = 0.1, size=n)
     X = np.c_[np.ones(n), x, x**2]
-    grad = lambda theta, X, y: (2./n)*X.T@(X@theta - y)
+
+    grad = lambda theta, X, y: (2./n) * X.T @ (X @ theta - y)
     GD = GradientDescent(
         method = "plain",
         params = {"eta":0.8},
         its=100
     )
-    GD.call(
+    plain_x = GD.call(
         grad=grad, 
-        x0=np.random.randn(3), 
+        x0=np.random.randn(3),
         args=(X,y)
     )
 
@@ -91,10 +123,27 @@ if __name__=="__main__":
         params = {"gamma":0.1, "eta":0.8},
         its=100
     )
-    GD_mom.call(
+    mom_x = GD_mom.call(
         grad=grad, 
-        x0=np.random.randn(3), 
+        x0=np.random.randn(3),
         args=(X,y)
     )
-    
-    print("Analytic", np.linalg.pinv(X.T@X) @ X.T@y)
+
+    GD_adam = GradientDescent(
+        method="adam",
+        params = {"eta":0.1, "beta1":0.5, "beta2":0.5},
+        its=100
+    )
+    adam_x = GD_adam.call(
+        grad=grad, 
+        x0=np.random.randn(3),
+        args=(X,y)
+    )
+
+
+    analytic_x = np.linalg.pinv(X.T@X) @ X.T@y
+    print("Analytic", analytic_x)
+
+    print(f"Plain rel error    : {abs( (plain_x-analytic_x)/analytic_x )}")
+    print(f"Momentum rel error : {abs( (mom_x-analytic_x)/analytic_x )}")
+    print(f"ADAM rel error     : {abs( (adam_x-analytic_x)/analytic_x )}")
