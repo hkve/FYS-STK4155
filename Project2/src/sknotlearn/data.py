@@ -31,7 +31,7 @@ class Data:
     def __init__(self, y:np.ndarray, X:np.ndarray, unscale=None, scale=None) -> None:
         self.y = np.array(y)
         self.X = np.array(X)
-        self.n_features = X.shape[-1]
+        self.n_points, self.n_features = X.shape
 
         # initiating unscale function, defaults to trivial function
         self.unscale = unscale or (lambda data : data)
@@ -39,12 +39,12 @@ class Data:
 
         # initiating scale function, defaults to trivial function
         self.scale = scale or (lambda data : data)
-        assert callable(self.unscale), f"Specified scaler is not callable (is {type(self.unscaler)})"
+        assert callable(self.scale), f"Specified scaler is not callable (is {type(self.scaler)})"
 
 
     # The following methods are there for indexing and iteration of Data
     def __len__(self) -> int:
-        return self.n_features+1
+        return self.n_points
 
     def __getitem__(self, key):
         try:
