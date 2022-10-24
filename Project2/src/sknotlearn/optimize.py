@@ -21,7 +21,7 @@ class GradientDescent:
             raise KeyError(f"Method '{method}' not supported, available methods are: " + ", ".join([f"'{method}'" for method in self.methods.keys()]))
 
 
-    def call(self, grad:callable, x0:np.ndarray, args:tuple=()) -> np.ndarray:
+    def call(self, grad, x0:np.ndarray, args:tuple=()) -> np.ndarray:
         """Set the problem to be gradient-descended. Create the for-loop with call to method.
         Args:
             grad (callable): The gradient function, returns np.ndarray of same shape as x0 
@@ -103,23 +103,26 @@ class SGradientDescent(GradientDescent):
 
 
 if __name__=="__main__":
+    from linear_model import OLS_gradient
+    from data import Data
+
     np.random.seed(321)
     n = 100
     x = np.random.uniform(-1, 1, n)
     y = x**2 + np.random.normal(scale = 0.1, size=n)
     X = np.c_[np.ones(n), x, x**2]
 
-    grad = lambda theta, X, y: (2./n) * X.T @ (X @ theta - y)
-    theta0 = np.random.randn(X.shape[1])
+    # grad = lambda theta, X, y: (2./n) * X.T @ (X @ theta - y)
+    theta0 = np.random.randn(X.shape[1]) # makes sure all methods have same starting value
     GD = GradientDescent(
         method = "plain",
         params = {"eta":0.8},
         its=100
     )
     plain_x = GD.call(
-        grad=grad, 
+        grad=OLS_gradient, 
         x0=theta0,
-        args=(X,y)
+        args=(Data(y,X),)
     )
 
     GD_mom = GradientDescent(
@@ -128,9 +131,9 @@ if __name__=="__main__":
         its=100
     )
     mom_x = GD_mom.call(
-        grad=grad, 
+        grad=OLS_gradient, 
         x0=theta0,
-        args=(X,y)
+        args=(Data(y,X),)
     )
 
     GD_ada = GradientDescent(
@@ -138,10 +141,10 @@ if __name__=="__main__":
         params = {"eta":0.8},
         its=100
     )
-    adam_x = GD_ada.call(
-        grad=grad, 
+    ada_x = GD_ada.call(
+        grad=OLS_gradient, 
         x0=theta0,
-        args=(X,y)
+        args=(Data(y,X),)
     )
 
 
@@ -150,4 +153,4 @@ if __name__=="__main__":
 
     print(f"Plain rel error    : {abs( (plain_x-analytic_x)/analytic_x )}")
     print(f"Momentum rel error : {abs( (mom_x-analytic_x)/analytic_x )}")
-    print(f"ADAM rel error     : {abs( (adam_x-analytic_x)/analytic_x )}")
+    print(f"AdaGrad rel error  : {abs( (ada_x-analytic_x)/analytic_x )}")
