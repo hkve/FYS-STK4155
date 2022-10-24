@@ -12,23 +12,23 @@ We will assume that the measurements $y_i$ are generated from an exact function 
     Optimisation of the parameters of the models we will be employing in this project is formulated as minimisation problems, with an associated cost function $C(\vec{\theta})$ to be minimised to find the optimal parameters.
     \subsubsection{Plain Gradient Descent}
         We will compare different variants of GD algorithm, starting first with the plain one. Assume the gradient of the cost function $C(\vec{\theta})$ w.r.t. the parameters $\vec{\theta}$ is well-defined on the entirety of our parameter space, and is calculable either analytically or approximated numerically\footnote{Now this is not always the case, e.g. with $L_1$-penalisation on the parameters.}. The idea is that the fastest direction to move in parameter space to reduce $C(\vec{\theta})$ is to follow the direction of $-\Nablatheta C(\vec{\theta})$. Plain gradient descent implements this idea iteratively, starting from an initial guess $\vec{\theta}_0$, finding the next point by
-        \begin{align}
-            \vec{\theta}_{k+1} = \vec{\theta}_k - \eta \Nablatheta C(\vec{\theta}_k),
-        \end{align}
-        where $k=0,1,\ldots,N$ for $N$ iterations, and $\eta$ is an introduced hyperparameter called the learning rate.
+        \begin{align*}
+            \vec{\theta}_{k} = \vec{\theta}_{k-1} - \eta \Nablatheta C(\vec{\theta}_{k-1}),
+        \end{align*}
+        where $k=1,2,\ldots,N$ for $N$ iterations, and $\eta$ is an introduced hyperparameter called the learning rate.
 
     \subsubsection{Adding Momentum}
         The simple GD can be fleshed out by giving the algorithm a sense of inertia, helping it continue to move in a certain direction. This combats tendency to oscillate around saddle points, for instance. It starts as earlier, but with the additional initialisation $\vec{p}_0 = 0$, finding $\vec{\theta}_k$ iteratively by 
         \begin{subequations}
-            \begin{align}
-                \vec{\theta}_{k+1} &= \vec{\theta}_k - \vec{p}_k, \\
-                \vec{p}_{k+1} &= \gamma \vec{p}_k + \eta \Nablatheta C(\vec{\theta}),
-            \end{align}
+            \begin{align*}
+                \vec{p}_{k} &= \gamma \vec{p}_{k-1} + \eta \Nablatheta C(\vec{\theta}_{k-1}), \\
+                \vec{\theta}_k &= \vec{\theta}_{k-1} - \vec{p}_k,
+            \end{align*}
         \end{subequations}
         where $\gamma$ is a new hyperparameter characterising the memory of earlier gradients.
 
     \subsubsection{Stochastic Gradient Descent} 
-        Stochastic Gradient Descent (SGD) is based on functions to minimise that are on the form $C(\vec{\theta}) = \sum_{i \in A} c_i(\vec{\theta}) + c_0(\vec{\theta})$ for $A=1,2,\ldots,n$. This is often the case, as in MSE-scores, where a cost is associated with every observation $y_i$ separately. The idea of SGD is to not compute gradient on the whole of $C$, but rather split it into mini-batches $C_k(\vec{\theta}) = \sum_{i\in A_k} c_i(\vec{\theta}) + c_0(\vec{\theta})$ for some subset $A_k \subseteq A$, and compute the gradient only on one of these smaller batches. This helps solve two problems: First, it makes the computational cost of calculating the gradient smaller, as we no longer compute the full one, and second, it adds a degree of stochasticity to the movement in parameter space since we no longer will follow the `true' gradient, which prevents getting stuck in local minima.
+        Stochastic Gradient Descent (SGD) is based on functions to minimise that are on the form $C(\vec{\theta}) = \sum_{i \in A} c_i(\vec{\theta}) + c_0(\vec{\theta})$ for $A=\cclosed{1,2,\ldots,n}$. This is often the case, as in MSE-scores, where a cost is associated with every observation $y_i$ separately. The idea of SGD is to avoid computing the gradient of the whole of $C$, but rather split it into mini-batches $C_k(\vec{\theta}) = \sum_{i\in A_k} c_i(\vec{\theta}) + c_0(\vec{\theta})$ for some subset $A_k \subseteq A$, and compute the gradient only on one of these smaller batches. This helps solve two problems: First, it makes the computational cost of calculating the gradient smaller, as we no longer compute the full one, and second, it adds a degree of stochasticity to the movement in parameter space since we no longer will follow the `true' gradient, which prevents getting stuck in local minima.
 
         SGD is done in so-called epochs, where we divide the full set $A$ into equally sized batches $A_k$, and do one GD iteration on every batch once. After this, $A$ is reshuffled and new mini-batches are drawn.
 
@@ -36,25 +36,34 @@ We will assume that the measurements $y_i$ are generated from an exact function 
         As stochasticity is added to the algorithm, the rate of convergence does slow down. As such, it would be nice to add algorithms that can adapt the learning rate $\eta$ in such a way as to increase the rate of convergence. The AdaGrad algorithm does this with the idea to use different learning rates along different directions in parameter space; i.e. use larger learning rates in flat directions, while keeping it small in steep directions. This is done by keeping a running sum $G_k$ of the outer product of the gradients $\vec{g}_k$ at the points $\vec{\theta}_k$, and use this to adapt the learning rate.
         \comment{I don't know whether to include the update rules in the \LaTeX-document, or maybe move them to method, or whatever. -\Carl}
         \begin{align*}
-            \vec{g}_k &= \Nablatheta C(\vec{\theta}_k) \\
+            \vec{g}_k &= \Nablatheta C_k(\vec{\theta}_{k-1}) \\
             G_k &= G_{k-1} + \vec{g}_j \otimes \vec{g}_j \\
-            \vec{\theta}_{k+1} &= \vec{\theta}_k - \eta G_k^{-\sfrac{1}{2}} \vec{g}_k
+            \vec{\theta}_k &= \vec{\theta}_{k-1} - \eta G_k^{-\sfrac{1}{2}} \vec{g}_k
         \end{align*}
         where $\vec{v} \otimes \vec{u}$ denotes the outer product of two vectors $\vec{v}, \vec{u}$, and a matrix $m = M^{-1/2}$ is understood to the matrix satisfying $m^2 = M^{-1}$. Inverting and finding the root of $G_k$ comes at a computational cost, so we will employ the much cheaper version where we update
         \begin{align*}
-            \vec{\theta}_{k+1} = \vec{\theta}_k - \eta \pclosed{\diag(G_k)+\epsilon}^{-\sfrac{1}{2}} \odot \vec{g}_k,
+            \vec{\theta}_{k} = \vec{\theta}_{k-1} - \frac{\eta}{\sqrt{\diag(G_k)}+\epsilon} \odot \vec{g}_k,
         \end{align*}
         where the power is understood to be element-wise and $\vec{v}\odot \vec{u}$ represents the element-wise multiplication of two vectors $\vec{v}, \vec{u}$, and $\epsilon$ is a small number to avoid zero-division.
 
         Another way to adapt the learning rate to the parameter space `terrain' is found in the Root Mean Square Propagation (RMSProp) algorithm. Here we approximate a running average of the second moment of the gradient $\vec{s} = \expval(\vec{g} \odot \vec{g})$, then use this to scale the learning rate appropriately.
         \begin{align*}
-            \vec{g}_k &= \Nablatheta C(\vec{\theta}_k) \\
+            \vec{g}_k &= \Nablatheta C_k(\vec{\theta}_{k-1}) \\
             \vec{s}_k &= \beta \vec{s}_{k-1} + (1-\beta) \vec{g}_k \odot \vec{g}_k \\
-            \vec{\theta}_{k+1} &= \vec{\theta}_k - \frac{\eta}{\sqrt{\vec{s}_k}+\epsilon} \odot \vec{g}_k
+            \vec{\theta}_k &= \vec{\theta}_{k-1} - \frac{\eta}{\sqrt{\vec{s}_k}+\epsilon} \odot \vec{g}_k
         \end{align*}
         where again $\epsilon$ is a small number to avoid zero-division, and the arithmetic operations are understood to be element-wise. Here $\beta \in [0,1]$ is a new hyperparameter parametrising the rate at which previous gradients should inform the current average of the second moment.
 
+        Finally, an algorithm which aims to combine RMSProp with momentum is Adam. Here we also keep a running average of $\vec{m} = \expval(\vec{g})$, i.e. the first moment of the gradient. Moreover, bias-corrected values are used in lieu of the `bare' estimates of the first and second moments, here denoted with hats. This ensures that a bias for low values of $\vec{m}_k, \vec{s}_k$ in early iterations with high $\beta$-values is avoided.
+        \begin{align*}
+            \vec{g}_k &= \Nablatheta C_k(\vec{\theta}_{k-1}) \\
+            \vec{m}_k &= \beta_1 \vec{m}_{k-1} + (1-\beta_1) \vec{g}_k \\
+            \vec{s}_k &= \beta_2 \vec{s}_{k-1} + (1-\beta_2) \vec{g}_k \odot \vec{g}_k \\
+            \vec{\hat{m}}_k &= \frac{\vec{m}_k}{1-\beta_1^k} \\
+            \vec{\hat{s}}_k &= \frac{\vec{s}_k}{1-\beta_2^k} \\
+            \vec{\theta}_k &= \vec{\theta}_{k-1} - \frac{\eta}{\sqrt{\vec{\hat{s}}_k}+\epsilon} \odot \vec{\hat{m}}_k
+        \end{align*}
 
 
-
-        \comment{Discussion notes: Adagrad accumulates G such that the learning rate becomes smaller with iterations --- AKA GD is `turned off'.}
+        \comment{Discussion notes: Adagrad accumulates G such that the learning rate becomes smaller with iterations --- AKA GD is `turned off'. -\Carl \\
+        Not entirely true, rather learning rate stabilizes, I think. -\Carl}
