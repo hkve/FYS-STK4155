@@ -1,5 +1,6 @@
 import numpy as np
-import sys
+from sys import float_info, exit
+EPSILON = float_info.epsilon**0.5
 class GradientDescent:
     """_summary_
     """
@@ -62,7 +63,7 @@ class GradientDescent:
         self.x = x0
         self.G = np.zeros_like(x0)
 
-    def _adagrad_update(self, x:np.ndarray, grad:np.ndarray, eta:float, epsilon:float=sys.float_info.epsilon**0.5) -> np.ndarray:
+    def _adagrad_update(self, x:np.ndarray, grad:np.ndarray, eta:float, epsilon:float=EPSILON) -> np.ndarray:
         self.G += grad**2
         return x - eta / (np.sqrt(self.G) + epsilon) * grad
 
@@ -70,7 +71,7 @@ class GradientDescent:
         self.x = x0
         self.s = np.zeros_like(x0)
 
-    def _rmsprop_update(self, x:np.ndarray, grad:np.ndarray, eta:float, beta:float, epsilon:float=sys.float_info.epsilon**0.5) -> np.ndarray:
+    def _rmsprop_update(self, x:np.ndarray, grad:np.ndarray, eta:float, beta:float, epsilon:float=EPSILON) -> np.ndarray:
         self.s = beta * self.s + (1. - beta) * grad**2
         return x - eta / (np.sqrt(self.s) + epsilon) * grad
 
@@ -79,7 +80,7 @@ class GradientDescent:
         self.m = np.zeros_like(x0)
         self.s = np.zeros_like(x0)
 
-    def _adam_update(self, x:np.ndarray, grad:np.ndarray, eta:float, beta1:float, beta2:float, epsilon:float=sys.float_info.epsilon**0.5) -> np.ndarray:
+    def _adam_update(self, x:np.ndarray, grad:np.ndarray, eta:float, beta1:float, beta2:float, epsilon:float=EPSILON) -> np.ndarray:
         self.m = beta1 * self.m + (1. - beta1) * grad
         self.s = beta2 * self.s + (1. - beta2) * np.square(grad)
         mhat = self.m / (1 - beta1**self._it)
@@ -132,12 +133,12 @@ if __name__=="__main__":
         args=(X,y)
     )
 
-    GD_adam = GradientDescent(
-        method="adam",
-        params = {"eta":0.1, "beta1":0.5, "beta2":0.5},
+    GD_ada = GradientDescent(
+        method="adagrad",
+        params = {"eta":0.8},
         its=100
     )
-    adam_x = GD_adam.call(
+    adam_x = GD_ada.call(
         grad=grad, 
         x0=theta0,
         args=(X,y)
