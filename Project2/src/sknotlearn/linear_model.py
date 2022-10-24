@@ -1,5 +1,6 @@
 import numpy as np
 from cvxopt import matrix, solvers
+solvers.options['show_progress'] = False # suppresses cvxopt messages
 
 import os
 import sys
@@ -313,4 +314,24 @@ class Lasso(Model):
 		self.coef_ = np.array(l1regls(A, b))[:,0]
 		return self
 
-solvers.options['show_progress'] = False # suppresses cvxopt messages
+
+def OLS_gradient(coef:np.ndarray, data:Data, idcs:np.ndarray=None) -> np.ndarray:
+	if idcs is None:
+		idcs = np.arange(len(data))
+	y, X = data[idcs].unpacked()
+	n = len(y)
+	return (2./n) * X.T @ (X @ coef - y)
+
+def ridge_gradient(coef:np.ndarray, data:Data, lmbda, idcs:np.ndarray=None) -> np.ndarray:
+	if idcs is None:
+		idcs = np.arange(len(data))
+	y, X = data[idcs].unpacked()
+	n = len(y)
+	return (2./n) * X.T @ (X @ coef - y) + 2. * lmbda * coef
+
+def lasso_gradient(coef:np.ndarray, data:Data, lmbda, idcs:np.ndarray=None) -> np.ndarray:
+	if idcs is None:
+		idcs = np.arange(len(data))
+	y, X = data[idcs].unpacked()
+	n = len(y)
+	return (2./n) * X.T @ (X @ coef - y) + 2. * lmbda * np.sign(coef)
