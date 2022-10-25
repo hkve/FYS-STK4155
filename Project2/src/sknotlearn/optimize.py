@@ -2,7 +2,12 @@ import numpy as np
 from sys import float_info, exit
 EPSILON = float_info.epsilon**0.5
 class GradientDescent:
-    """_summary_
+    """Implements Gradient Descent minimization of a problem defined by the gradient g of scalar function wrt. argument(s) x. Implemented update rules are:
+    "plain" (eta): Ordinary GD with a learning rate eta.
+    "momentum" (eta, gamma): Conjugate GD with learning rate eta and inertia gamma.
+    "adagrad" (eta): Adaptive Gradient alogrithm with learning rate eta and simplified diagonal implementation.
+    "rmsprop" (eta, beta): Root-Mean-Square-Propagation algorithm with learning rate eta and running average of second moment of gradient weighted with beta.
+    "adam" (eta, beta1, beta2): Adam algorithm with learning rate eta, running average of gradient weighted with beta1 and running average of second moment of gradient weighted with beta1. Bias correction of estimates are included.
     """
     def __init__(self, method:str, params:dict, its:int) -> None:
         """Set the type of gradient descent  
@@ -98,13 +103,17 @@ class GradientDescent:
 
 
 class SGradientDescent(GradientDescent):
+    """Implements Gradient Descent minimization of a problem defined by the gradient g of scalar function wrt. argument(s) x. Assumes stochastic form of gradient g(x, idcs) = sum(gi[idcs]) + g0.
+    """
     def __init__(self, method:str, params:dict, epochs:int, batch_size:int, random_state=None) -> None:
         """Set the type of gradient descent  
 
         Args:
             method (str): Type of gradient descent 
             params (dict): The hyperparameters for the GD (eta, gamma, betas, etc.)
-            its (int): Number of iterations 
+            epochs (int): Number of epochs
+            batch_size (int): Size of each batch
+            random_state (int): random seed to use with numpy.random module 
         """
         if random_state:
             np.random.seed(random_state)
@@ -112,11 +121,12 @@ class SGradientDescent(GradientDescent):
         self.batch_size = batch_size
         self.epochs = epochs
 
-    def call(self, grad, x0:np.ndarray, all_idcs, args:tuple=()) -> np.ndarray:
+    def call(self, grad, x0:np.ndarray, all_idcs:np.ndarray, args:tuple=()) -> np.ndarray:
         """Set the problem to be gradient-descended. Create the for-loop with call to method.
         Args:
-            grad (callable): The gradient function, returns np.ndarray of same shape as x0 
-            x0 (np.ndarray): Starting point
+            grad (callable): The gradient function, returns np.ndarray of same shape as x0.
+            x0 (np.ndarray): Starting point.
+            all_idcs (np.ndarray): The full set of indices to pass to stochastic gradient function.
             args (tuple, optional): arguments to be passed to grad-function. Defaults to ().
         """
         # assert that grad works as intended
@@ -137,8 +147,13 @@ class SGradientDescent(GradientDescent):
         print(self.method, self.x)
         return self.x
 
-    def _make_batches(self, idcs):
-        np.random.shuffle(idcs)
+    def _make_batches(self, idcs:np.ndarray) -> list:
+        """Shuffle idcs and divide into batches with size self.batch_size.
+
+        Args:
+            idcs (np.ndarray): Indices to divide into batches.
+        """
+        np.random.shuffle(idcs) # shuffle indices
         n_batches = len(idcs) // self.batch_size
         return [idcs[i*self.batch_size:(i+1)*self.batch_size] for i in range(n_batches)]
 
