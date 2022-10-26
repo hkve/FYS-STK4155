@@ -42,15 +42,15 @@ We will assume that the measurements $y_i$ are generated from an exact function 
         \end{align*}
         where $\vec{v} \otimes \vec{u}$ denotes the outer product of two vectors $\vec{v}, \vec{u}$, and a matrix $m = M^{-1/2}$ is understood to the matrix satisfying $m^2 = M^{-1}$. Inverting and finding the root of $G_k$ comes at a computational cost, so we will employ the much cheaper version where we update
         \begin{align*}
-            \vec{\theta}_{k} = \vec{\theta}_{k-1} - \frac{\eta}{\sqrt{\diag(G_k)}+\epsilon} \odot \vec{g}_k,
+            \vec{\theta}_{k} = \vec{\theta}_{k-1} - \frac{\eta}{\sqrt{\diag(G_k)}+\epsilon} \circ \vec{g}_k,
         \end{align*}
-        where the power is understood to be element-wise and $\vec{v}\odot \vec{u}$ represents the element-wise multiplication of two vectors $\vec{v}, \vec{u}$, and $\epsilon$ is a small number to avoid zero-division.
+        where the arithmetic operations are understood to be element-by-element and $\vec{v}\circ \vec{u}$ represents the element-wise multiplication of two vectors $\vec{v}, \vec{u}$, and $\epsilon$ is a small number to avoid zero-division.
 
-        Another way to adapt the learning rate to the parameter space `terrain' is found in the Root Mean Square Propagation (RMSProp) algorithm. Here we approximate a running average of the second moment of the gradient $\vec{s} = \expval(\vec{g} \odot \vec{g})$, then use this to scale the learning rate appropriately.
+        Another way to adapt the learning rate to the parameter space `terrain' is found in the Root Mean Square Propagation (RMSProp) algorithm. Here we approximate a running average of the second moment of the gradient $\vec{s} = \expval(\vec{g} \circ \vec{g})$, then use this to scale the learning rate appropriately.
         \begin{align*}
             \vec{g}_k &= \Nablatheta C_k(\vec{\theta}_{k-1}) \\
-            \vec{s}_k &= \beta \vec{s}_{k-1} + (1-\beta) \vec{g}_k \odot \vec{g}_k \\
-            \vec{\theta}_k &= \vec{\theta}_{k-1} - \frac{\eta}{\sqrt{\vec{s}_k}+\epsilon} \odot \vec{g}_k
+            \vec{s}_k &= \beta \vec{s}_{k-1} + (1-\beta) \vec{g}_k \circ \vec{g}_k \\
+            \vec{\theta}_k &= \vec{\theta}_{k-1} - \frac{\eta}{\sqrt{\vec{s}_k}+\epsilon} \circ \vec{g}_k
         \end{align*}
         where again $\epsilon$ is a small number to avoid zero-division, and the arithmetic operations are understood to be element-wise. Here $\beta \in [0,1]$ is a new hyperparameter parametrising the rate at which previous gradients should inform the current average of the second moment.
 
@@ -58,10 +58,10 @@ We will assume that the measurements $y_i$ are generated from an exact function 
         \begin{align*}
             \vec{g}_k &= \Nablatheta C_k(\vec{\theta}_{k-1}) \\
             \vec{m}_k &= \beta_1 \vec{m}_{k-1} + (1-\beta_1) \vec{g}_k \\
-            \vec{s}_k &= \beta_2 \vec{s}_{k-1} + (1-\beta_2) \vec{g}_k \odot \vec{g}_k \\
+            \vec{s}_k &= \beta_2 \vec{s}_{k-1} + (1-\beta_2) \vec{g}_k \circ \vec{g}_k \\
             \vec{\hat{m}}_k &= \frac{\vec{m}_k}{1-\beta_1^k} \\
             \vec{\hat{s}}_k &= \frac{\vec{s}_k}{1-\beta_2^k} \\
-            \vec{\theta}_k &= \vec{\theta}_{k-1} - \frac{\eta}{\sqrt{\vec{\hat{s}}_k}+\epsilon} \odot \vec{\hat{m}}_k
+            \vec{\theta}_k &= \vec{\theta}_{k-1} - \frac{\eta}{\sqrt{\vec{\hat{s}}_k}+\epsilon} \circ \vec{\hat{m}}_k
         \end{align*}
 
 
