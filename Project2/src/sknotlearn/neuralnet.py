@@ -9,14 +9,16 @@ class NeuralNetwork:
     def __init__(
         self, 
         optimizer:opt.GradientDescent,
-        nodes:tuple[int],
-        activationHidden:str="sigmoid",
-        activationOutput:str="sigmoid"
+        nodes:tuple,
+        activation_hidden:str="sigmoid",
+        activation_output:str="sigmoid"
         ) -> None:
         """
         Args:
             optimizer (GradientDescent):
             nodes (tuple[int]): 
+            activation_hidden (str):
+            activation_output (str):
         """
         self.n_hidden_nodes, self.n_output_nodes = nodes
         self.n_hidden_layers = len(self.n_hidden_nodes)
@@ -24,10 +26,10 @@ class NeuralNetwork:
         self.weights = [None]*self.n_hidden_layers
         self.biases = [None]*self.n_hidden_layers
 
-        self._activationHidden = self.activation_functions[activationHidden]
-        self._activationOutput = self.activation_functions[activationOutput]
+        self._activation_hidden = self.activation_functions[activation_hidden]
+        self._activation_output = self.activation_functions[activation_output]
 
-    def init_biases_and_weights(self) -> None:
+    def _init_biases_and_weights(self) -> None:
         pass
 
     def _backprop_pass(self) -> None:
