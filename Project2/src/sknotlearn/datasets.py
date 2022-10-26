@@ -35,6 +35,15 @@ def make_FrankeFunction(n=1000, linspace=False, noise_std=0, random_state=42):
 
 	return Data(z, np.c_[x,y])
 
+
+def make_debugdata(n=100, scale=0.1, random_state=321):
+	np.random.seed(random_state)
+	x = np.random.uniform(-1, 1, n)
+	y = x**2 + np.random.normal(scale=scale, size=n)
+	X = np.c_[np.ones(n), x, x**2]
+
+	return x, y, X
+
 def plot_surf(D):
 	sns.set_style("white")
 	fig = plt.figure()
@@ -114,8 +123,4 @@ def load_Terrain(filename="SRTM_data_Nica.tif", n=900, random_state=321):
 
 
 if __name__ == "__main__":
-	# D = make_FrankeFunction(n=625, uniform=False, noise_std=0.1)
-	# plot_FrankeFunction(D)
-
-	D = load_Terrain(n = 9000)
-	plot_Terrain(D, angle=(22,-55))
+	pass
