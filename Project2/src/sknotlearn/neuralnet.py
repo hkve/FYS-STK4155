@@ -1,6 +1,5 @@
-from random import weibullvariate
-import numpy as np
-from autograd import grad
+import autograd.numpy as np
+from autograd import grad, elementwise_grad
 from datasets import make_debugdata
 
 import optimize as opt
@@ -40,27 +39,60 @@ class NeuralNetwork:
         self._activation_output = self.activation_functions[activation_output]
 
     def _init_biases_and_weights(self) -> None:
-        self.weights[0] = np.random.randn(self.n_hidden_nodes[0], self.n_features)
+        self.weights[0] = np.random.randn(self.n_hidden_nodes[0], self.n_input_features)
         self.weights[1:-1] = [np.random.randn(self.n_hidden_nodes[layer+1],self.n_hidden_nodes[layer]) for layer in range(self.n_hidden_layers-1)]
         self.weights[-1] = np.random.randn(1, self.n_hidden_nodes[-1])
         
         self.biases[:-1] = [0.1*np.ones(nodes) for nodes in self.n_hidden_nodes]
         self.biases[-1] = np.array([0.1]) 
 
+    def _flat_features(self):
+        """The language of GD<3
+
+        Returns:
+            _type_: _description_
+        """
+        flat_features = np.zeros(self.n_features)
+        idx = 0
+        for weights, biases in zip(self.weights, self.biases):
+            w_size = weights.size
+            b_size = biases.size
+            flat_features[idx:idx+w_size] = weights.ravel()
+            idx += w_size
+            flat_features[idx:idx+b_size] = biases.ravel()
+            idx += b_size
+        return flat_features
+        
+    def _curvy_features(self, flat_features): #;)
+        idx = 0
+        for i, (weights, biases) in enumerate(zip(self.weights, self.biases)):
+            w_size = weights.size
+            b_size = biases.size
+            self.weights[i] = flat_features[idx:idx+w_size].reshape(weights.shape)
+            idx += w_size
+            self.biases[i] = flat_features[idx:idx+b_size].reshape(biases.shape)
+            idx += b_size
+
+
+
     def _backprop_pass(self, y, y_pred) -> None:
         # TODO: Save deltas and update weights after the loop.
         # TODO: Look at GD 
+        delta_output = np.dot(elementwise_grad(self._activation_output)(y_pred), elementwise_grad(lambda ypred : self.cost_func(y, ypred))(y_pred)) / len(y)
 
-        grad_cost = grad(lambda ypred : self.cost_func(y, ypred))
-        grad_act_out = grad(self._activation_output) 
-        delta = grad_cost * grad_act_out
+        grad_cost = elementwise_grad(lambda ypred : self.cost_func(y, ypred))
+        grad_act_out = elementwise_grad(self._activation_output)
+        deltas = np.zeros(self.n_hidden_layers + 1)
+        deltas[0] = grad_cost * grad_act_out
 
         for h in reversed(range(self.n_hidden_layers)):
-            grad_act_hid = grad(self._activation_hidden)
-            delta = self.weights[h+1].T @ delta * grad_act_hid
+            grad_act_hid = elementwise_grad(self._activation_hidden)
+            deltas[h] = self.weights[h+1].T @ deltas[h+1] * grad_act_hid
+
+        #update weights 
+        self.weights = self.weights * deltas 
               
         
-
     def _forward_pass(self, x) -> None:
         #hidden layer:
         a = x
@@ -80,12 +112,17 @@ class NeuralNetwork:
 
     def train(self, D:Data, trainsize=3/4):
         self.D_train, self.D_test = D.train_test_split(ratio=trainsize,random_state=self.random_state)
-        self.n_features = D.n_features
+        self.n_input_features = D.n_features
 
         #Initialize weights and biases: 
         self._init_biases_and_weights()
+        self.n_features = sum([weights.size + biases.size for weights, biases in zip(self.weights, self.biases)])
+        flat_features = self._flat_features()
+        # print(self.weights, f'\n', self.biases)
+        # self._curvy_features(flat_features)
+        # print(self.weights, f'\n', self.biases)
 
-        #A loop here!
+        #NB! Remember a loop here!
 
         # Call forward for every datapoint: 
         n = len(self.D_train)
@@ -95,7 +132,7 @@ class NeuralNetwork:
             y_pred[i] = self._forward_pass(xi)
 
         # and backprop ...
-        self._backprop_pass(y, y_pred)
+        # self._backprop_pass(y, y_pred)
 
     def _sigmoid(x):
         return 1/(1+np.exp(-x))
@@ -124,7 +161,12 @@ if __name__ == "__main__":
 
     
     nodes = ((10, 9, 10), 1)
-    NN = NeuralNetwork(GD, nodes, random_state=321)
+    NN = NeuralNetwork(
+        GD, 
+        nodes, 
+        random_state=321,
+        cost_func="MSE"
+    )
     NN.train(D)
 
 
