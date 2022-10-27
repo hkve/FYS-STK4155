@@ -58,7 +58,7 @@ class GradientDescent:
 
     def _momentum_init(self, x0:np.ndarray) -> None:
         self.x = x0
-        self.p = 0
+        self.p = np.zeros_like(x0)
 
     def _momentum_update(self, x:np.ndarray, grad:np.ndarray, eta:float, gamma:float) -> np.ndarray:
         self.p = gamma * self.p + eta * grad 

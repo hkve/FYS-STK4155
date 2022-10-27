@@ -39,38 +39,38 @@ class NeuralNetwork:
         self._activation_output = self.activation_functions[activation_output]
 
     def _init_biases_and_weights(self) -> None:
-        self.weights[0] = np.random.randn(self.n_hidden_nodes[0], self.n_input_features)
+        self.weights[0] = np.random.randn(self.n_hidden_nodes[0], self.n_features)
         self.weights[1:-1] = [np.random.randn(self.n_hidden_nodes[layer+1],self.n_hidden_nodes[layer]) for layer in range(self.n_hidden_layers-1)]
         self.weights[-1] = np.random.randn(1, self.n_hidden_nodes[-1])
         
         self.biases[:-1] = [0.1*np.ones(nodes) for nodes in self.n_hidden_nodes]
         self.biases[-1] = np.array([0.1]) 
 
-    def _flat_features(self):
+    def _flat_parameters(self):
         """The language of GD<3
 
         Returns:
             _type_: _description_
         """
-        flat_features = np.zeros(self.n_features)
+        flat_parameters = np.zeros(self.n_parameters)
         idx = 0
         for weights, biases in zip(self.weights, self.biases):
             w_size = weights.size
             b_size = biases.size
-            flat_features[idx:idx+w_size] = weights.ravel()
+            flat_parameters[idx:idx+w_size] = weights.ravel()
             idx += w_size
-            flat_features[idx:idx+b_size] = biases.ravel()
+            flat_parameters[idx:idx+b_size] = biases.ravel()
             idx += b_size
-        return flat_features
+        return flat_parameters
         
-    def _curvy_features(self, flat_features): #;)
+    def _curvy_parameters(self, flat_parameters): #;)
         idx = 0
         for i, (weights, biases) in enumerate(zip(self.weights, self.biases)):
             w_size = weights.size
             b_size = biases.size
-            self.weights[i] = flat_features[idx:idx+w_size].reshape(weights.shape)
+            self.weights[i] = flat_parameters[idx:idx+w_size].reshape(weights.shape)
             idx += w_size
-            self.biases[i] = flat_features[idx:idx+b_size].reshape(biases.shape)
+            self.biases[i] = flat_parameters[idx:idx+b_size].reshape(biases.shape)
             idx += b_size
 
 
@@ -112,14 +112,14 @@ class NeuralNetwork:
 
     def train(self, D:Data, trainsize=3/4):
         self.D_train, self.D_test = D.train_test_split(ratio=trainsize,random_state=self.random_state)
-        self.n_input_features = D.n_features
+        self.n_features = D.n_features
 
         #Initialize weights and biases: 
         self._init_biases_and_weights()
-        self.n_features = sum([weights.size + biases.size for weights, biases in zip(self.weights, self.biases)])
-        flat_features = self._flat_features()
+        self.n_parameters = sum([weights.size + biases.size for weights, biases in zip(self.weights, self.biases)])
+        flat_parameters = self._flat_parameters()
         # print(self.weights, f'\n', self.biases)
-        # self._curvy_features(flat_features)
+        # self._curvy_parameters(flat_parameters)
         # print(self.weights, f'\n', self.biases)
 
         #NB! Remember a loop here!
