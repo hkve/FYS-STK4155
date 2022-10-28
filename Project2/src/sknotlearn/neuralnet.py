@@ -134,19 +134,38 @@ class NeuralNetwork:
         # and backprop ...
         # self._backprop_pass(y, y_pred)
 
+    #Activation funtions:
     def _sigmoid(x):
         return 1/(1+np.exp(-x))
+    
+    def _relu(x):
+        return np.maximum(np.zeros_like(x),x)
 
+    def _leaky_relu(x):
+        if  x < 0:
+            return 0.1 * x
+        else: 
+            return x
+    
+    def _tanh(x):
+        return np.tanh(x)
+
+    #Cost functions: 
     def _MSE(y, y_pred):
         return np.mean((y - y_pred)**2)
-        
+
+    #Dicts:        
+    activation_functions = {
+        "sigmoid": _sigmoid,
+        "relu": _relu,
+        "leaky_relu": _leaky_relu,
+        "tanh": _tanh 
+    }
+
     cost_funcitons = {
         "MSE": _MSE,
     }
 
-    activation_functions = {
-        "sigmoid": _sigmoid, # Add ReLU and such...    
-    }
 
 
 if __name__ == "__main__":
