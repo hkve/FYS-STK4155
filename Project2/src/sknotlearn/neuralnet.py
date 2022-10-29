@@ -142,10 +142,7 @@ class NeuralNetwork:
         return np.maximum(np.zeros_like(x),x)
 
     def _leaky_relu(x):
-        if  x < 0:
-            return 0.1 * x
-        else: 
-            return x
+        return np.maximum(0.1*x, x)
     
     def _tanh(x):
         return np.tanh(x)
