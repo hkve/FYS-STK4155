@@ -135,6 +135,9 @@ class NeuralNetwork:
         # self._backprop_pass(y, y_pred)
 
     #Activation funtions:
+    def _no_activation(x):
+        return x
+
     def _sigmoid(x):
         return 1/(1+np.exp(-x))
     
