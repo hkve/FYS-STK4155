@@ -91,24 +91,28 @@ class NeuralNetwork:
 
         # #update weights 
         # self.weights = self.weights * deltas
-        delta_ls = [0]*self.n_hidden_layers 
+        delta_ls = [0]*(self.n_hidden_layers+1) 
         grad_cost = elementwise_grad(lambda y_pred : self.cost_func(y, y_pred))
         grad_activation_output = elementwise_grad(self._activation_output)
         grad_activation_hidden = elementwise_grad(self._activation_hidden)
         
         delta_L = grad_activation_output(self.zs[-1])*grad_cost(y_pred)  
         delta_ls[-1] = delta_L        
+        print(delta_L.shape)
 
-        for i in range(self.n_hidden_layers-2, -1, -1):
+        print(len(self.weights))
+        for i in reversed(range(self.n_hidden_layers)):
             fp = grad_activation_hidden(self.zs[i])
             W = self.weights[i+1].T
             delta_ls_i = delta_ls[i+1]
-            print(f"fp = {fp.shape}, W+1.T = {W.T.shape}, delta_ls+1 = {delta_ls_i.shape}")
+            print(f"fp = {fp.shape}, W.T = {W.shape}, delta_l = {delta_ls_i.shape}")
+            
             delta_ls[i] = grad_activation_hidden(self.zs[i]) @ self.weights[i+1].T * delta_ls[i+1]
-
+            print(f"res = {delta_ls[i].shape}")
+            # print(f"delta_l next = {delta_ls[i].shape}")
         #     print(self.weights[i+1].T.shape, delta_ls[i+1].shape)
 
-        exit()   
+        exit()
         
     def _forward_pass(self, x) -> None:
         #hidden layer:
@@ -198,7 +202,7 @@ if __name__ == "__main__":
     )
 
     
-    nodes = ((10, 9, 10), 1)
+    nodes = ((10, 10, 10), 1)
     NN = NeuralNetwork(
         GD, 
         nodes, 
