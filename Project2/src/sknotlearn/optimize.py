@@ -29,6 +29,14 @@ class GradientDescent:
         else:
             raise KeyError(f"Method '{method}' not supported, available methods are: " + ", ".join([f"'{method}'" for method in self.methods.keys()]))
 
+    def set_params(self, params:dict) -> None:
+        if not callable(params["eta"]): # wrap learning rate if constant
+            eta = params["eta"]
+            params["eta"] = lambda it : eta
+        self.params = params
+        init, update = self.methods[self.method]
+        self._initialize = init
+        self._update_rule = lambda self, x, grad : update(self, x, grad, **params)
 
     def call(self, grad, x0:np.ndarray, args:tuple=()) -> np.ndarray:
         """Set the problem to be gradient-descended. Create the for-loop with call to method.
@@ -134,7 +142,7 @@ class SGradientDescent(GradientDescent):
             args (tuple, optional): arguments to be passed to grad-function. Defaults to ().
         """
         # assert that grad works as intended
-        grad0 = grad(x0, *args) 
+        grad0 = grad(x0, *args, all_idcs) 
         assert grad0.shape == x0.shape, f"grad-function returns array of shape {grad0.shape} instead of shape {x0.shape}."
         del grad0
 
@@ -181,7 +189,7 @@ if __name__=="__main__":
     ##################
     # GD = GradientDescent(
     #     method = "plain",
-    #     params = {"eta":0.8},
+    #     params = {"eta":lambda it : 0.8 / (1+0.008*it)},
     #     its=100,
     # )
     # plain_x = GD.call(
@@ -192,7 +200,7 @@ if __name__=="__main__":
 
     # GD_mom = GradientDescent(
     #     method="momentum",
-    #     params = {"gamma":0.1, "eta":0.8},
+    #     params = {"gamma":0.1, "eta":lambda it : 0.8 / (1+0.008*it)},
     #     its=100
     # )
     # mom_x = GD_mom.call(
@@ -217,10 +225,14 @@ if __name__=="__main__":
     ##############
     # Stochastic #
     ##############
+    eta = 0.05
+    def learning_schedule(it):
+        epoch = it // 10
+        return eta / (1 + eta/100*epoch)
 
     SGD = SGradientDescent(
         method = "plain",
-        params = {"eta":0.1},
+        params = {"eta":learning_schedule},
         epochs=100,
         batch_size=10
     )
@@ -233,7 +245,7 @@ if __name__=="__main__":
 
     SGD_mom = SGradientDescent(
         method="momentum",
-        params = {"gamma":0.1, "eta":0.1},
+        params = {"gamma":0.1, "eta":learning_schedule},
         epochs=100,
         batch_size=10
     )
@@ -246,7 +258,7 @@ if __name__=="__main__":
 
     SGD_ada = SGradientDescent(
         method="adagrad",
-        params = {"eta":0.1},
+        params = {"eta":0.2},
         epochs=100,
         batch_size=10
     )
@@ -258,8 +270,13 @@ if __name__=="__main__":
     )
 
     analytic_x = np.linalg.pinv(X.T@X) @ X.T@y
-    print("Analytic", analytic_x)
+    # print("Analytic", analytic_x)
 
-    print(f"Plain rel error    : {abs( (plain_x-analytic_x)/analytic_x )}")
-    print(f"Momentum rel error : {abs( (mom_x-analytic_x)/analytic_x )}")
-    print(f"AdaGrad rel error  : {abs( (ada_x-analytic_x)/analytic_x )}")
+    # print(f"Plain rel error    : {abs( (plain_x-analytic_x) )}")
+    # print(f"Momentum rel error : {abs( (mom_x-analytic_x) )}")
+    # print(f"AdaGrad rel error  : {abs( (ada_x-analytic_x) )}")
+
+    print(f"Analytic MSE : {np.mean((X@analytic_x-y)**2)}" )
+    print(f"Plain MSE    : {np.mean((X@plain_x-y)**2)}" )
+    print(f"Momentum MSE : {np.mean((X@mom_x-y)**2)}" )
+    print(f"AdaGrad MSE  : {np.mean((X@ada_x-y)**2)}" )
