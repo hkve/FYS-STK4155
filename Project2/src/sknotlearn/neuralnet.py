@@ -42,6 +42,8 @@ class NeuralNetwork:
         self._activation_output = self.activation_functions[activation_output]
 
     def _init_biases_and_weights(self) -> None:
+        """NB: Weights might be initialized opposite to the convension
+        """
         self.weights[0] = np.random.randn(self.n_hidden_nodes[0], self.n_features)
         self.weights[1:-1] = [np.random.randn(self.n_hidden_nodes[layer+1],self.n_hidden_nodes[layer]) for layer in range(self.n_hidden_layers-1)]
         self.weights[-1] = np.random.randn(1, self.n_hidden_nodes[-1])
@@ -94,7 +96,11 @@ class NeuralNetwork:
 
         # #update weights 
         # self.weights = self.weights * deltas
-        delta_ls = [0]*(self.n_hidden_layers+1) 
+
+        delta_ls = [0]*(self.n_hidden_layers+1)
+        grad_Ws = [0]*(self.n_hidden_layers+1) 
+        grad_bs = [0]*(self.n_hidden_layers+1)
+
         grad_cost = elementwise_grad(lambda y_pred : self.cost_func(y, y_pred))
         grad_activation_output = elementwise_grad(self._activation_output)
         grad_activation_hidden = elementwise_grad(self._activation_hidden)
@@ -102,6 +108,10 @@ class NeuralNetwork:
         delta_L = grad_activation_output(self.zs[-1])*grad_cost(y_pred)  
         delta_ls[-1] = delta_L        
 
+        #Calculate the weight- and bias gradients: 
+        grad_Ws[-1] = self._activation_hidden(self.zs[-2]).T @ delta_L
+        grad_bs[-1] = np.sum(delta_L)
+        print(f"{delta_L.shape} {self._activation_hidden(self.zs[-2]).shape} grad_W_L = {grad_Ws[-1].shape}  grad_b_L = {grad_bs[-1]}")
 
         for i in reversed(range(self.n_hidden_layers)):
             fp = grad_activation_hidden(self.zs[i])
@@ -109,11 +119,14 @@ class NeuralNetwork:
             delta_ls_i = delta_ls[i+1]
             print(f"i = {i} fp = {fp.shape}, W.T = {W.shape}, delta_l = {delta_ls_i.shape}")
             delta_ls[i] = delta_ls_i @ W * fp
-            # delta_ls[i] = grad_activation_hidden(self.zs[i]) @ self.weights[i+1].T * delta_ls[i+1]
-            # delta_ls[i] = delta_ls[i+1] @ self.weights[i+1].T * grad_activation_hidden(self.zs[i])
-            
             print(f"delta_l next = {delta_ls[i].shape}")
-
+            if i != 0:
+                grad_Ws[i] = self._activation_hidden(self.zs[i-1]).T @ delta_ls_i
+            else: 
+                grad_Ws[i] = self._activation_hidden(X).T @ delta_ls[i]
+            grad_bs[-1] = np.sum(delta_ls[i])
+            print(grad_Ws[i].shape)
+            # print(f"grad_W = {grad_Ws[i].shape} grad_b = {grad_bs[i].shape}")
         exit()
         
     def _forward_pass(self, x) -> None:
