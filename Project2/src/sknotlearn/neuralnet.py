@@ -105,10 +105,13 @@ class NeuralNetwork:
 
         for i in reversed(range(self.n_hidden_layers)):
             fp = grad_activation_hidden(self.zs[i])
-            W = self.weights[i+1].T
+            W = self.weights[i+1]
             delta_ls_i = delta_ls[i+1]
             print(f"i = {i} fp = {fp.shape}, W.T = {W.shape}, delta_l = {delta_ls_i.shape}")
-            delta_ls[i] = grad_activation_hidden(self.zs[i]) @ self.weights[i+1].T * delta_ls[i+1]
+            delta_ls[i] = delta_ls_i @ W * fp
+            # delta_ls[i] = grad_activation_hidden(self.zs[i]) @ self.weights[i+1].T * delta_ls[i+1]
+            # delta_ls[i] = delta_ls[i+1] @ self.weights[i+1].T * grad_activation_hidden(self.zs[i])
+            
             print(f"delta_l next = {delta_ls[i].shape}")
 
         exit()
@@ -208,7 +211,7 @@ if __name__ == "__main__":
     )
 
     
-    nodes = ((10, 10, 10), 1)
+    nodes = ((10, 9, 8), 1)
     NN = NeuralNetwork(
         GD, 
         nodes, 
