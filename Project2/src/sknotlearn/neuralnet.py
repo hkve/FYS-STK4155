@@ -78,6 +78,7 @@ class NeuralNetwork:
     def _backprop_pass(self, y, y_pred) -> None:
         # TODO: Save deltas and update weights after the loop.
         # TODO: Look at GD 
+
         delta_output = np.dot(elementwise_grad(self._activation_output)(y_pred), elementwise_grad(lambda ypred : self.cost_func(y, ypred))(y_pred)) / len(y)
 
         grad_cost = elementwise_grad(lambda ypred : self.cost_func(y, ypred))
@@ -122,7 +123,7 @@ class NeuralNetwork:
         # self._curvy_parameters(flat_parameters)
         # print(self.weights, f'\n', self.biases)
 
-        #NB! Remember a loop here!
+        #NB! Remember a loop here! One iteration consists of a FF pass and a BP pass. This continues till cost function converges. 
 
         # Call forward for every datapoint: 
         n = len(self.D_train)
@@ -133,6 +134,8 @@ class NeuralNetwork:
 
         # and backprop ...
         # self._backprop_pass(y, y_pred)
+        print(y_pred)
+
 
     #Activation funtions:
     def _sigmoid(x):
@@ -184,5 +187,8 @@ if __name__ == "__main__":
         cost_func="MSE"
     )
     NN.train(D)
+
+
+
 
 
