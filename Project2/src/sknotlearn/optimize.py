@@ -1,5 +1,6 @@
 import numpy as np
 from sys import float_info, exit
+from collections.abc import Callable
 EPSILON = float_info.epsilon**0.5
 class GradientDescent:
     """Implements Gradient Descent minimization of a problem defined by the gradient g of scalar function wrt. argument(s) x. Implemented update rules are:
@@ -19,6 +20,9 @@ class GradientDescent:
         """
         self.method, self.params, self.its = method, params, its
         if method in self.methods.keys():
+            if not callable(params["eta"]): # wrap learning rate if constant
+                eta = params["eta"]
+                params["eta"] = lambda it : eta
             init, update = self.methods[method]
             self._initialize = init # set initializing function
             self._update_rule = lambda self, x, grad : update(self, x, grad, **params) # set update rule
@@ -46,46 +50,46 @@ class GradientDescent:
             self._it += 1
             g = grad(self.x, *args)
             self.x = self._update_rule(self, self.x, g) 
-        print(self.method, self.x)
+        # print(self.method, self.x)
         return self.x
 
 
     def _plain_init(self, x0:np.ndarray) -> None:
         self.x = x0 
 
-    def _plain_update(self, x:np.ndarray, grad:np.ndarray, eta:float) -> np.ndarray:
-        return x - eta * grad
+    def _plain_update(self, x:np.ndarray, grad:np.ndarray, eta:Callable) -> np.ndarray:
+        return x - eta(self._it) * grad
 
     def _momentum_init(self, x0:np.ndarray) -> None:
         self.x = x0
         self.p = np.zeros_like(x0)
 
-    def _momentum_update(self, x:np.ndarray, grad:np.ndarray, eta:float, gamma:float) -> np.ndarray:
-        self.p = gamma * self.p + eta * grad 
+    def _momentum_update(self, x:np.ndarray, grad:np.ndarray, eta:Callable, gamma:float) -> np.ndarray:
+        self.p = gamma * self.p + eta(self._it) * grad 
         return x - self.p
 
     def _adagrad_init(self, x0:np.ndarray):
         self.x = x0
         self.G = np.zeros_like(x0)
 
-    def _adagrad_update(self, x:np.ndarray, grad:np.ndarray, eta:float, epsilon:float=EPSILON) -> np.ndarray:
+    def _adagrad_update(self, x:np.ndarray, grad:np.ndarray, eta:Callable, epsilon:float=EPSILON) -> np.ndarray:
         self.G += grad**2
-        return x - eta / (np.sqrt(self.G) + epsilon) * grad
+        return x - eta(self._it) / (np.sqrt(self.G) + epsilon) * grad
 
     def _rmsprop_init(self, x0:np.ndarray):
         self.x = x0
         self.s = np.zeros_like(x0)
 
-    def _rmsprop_update(self, x:np.ndarray, grad:np.ndarray, eta:float, beta:float, epsilon:float=EPSILON) -> np.ndarray:
+    def _rmsprop_update(self, x:np.ndarray, grad:np.ndarray, eta:Callable, beta:float, epsilon:float=EPSILON) -> np.ndarray:
         self.s = beta * self.s + (1. - beta) * grad**2
-        return x - eta / (np.sqrt(self.s) + epsilon) * grad
+        return x - eta(self._it) / (np.sqrt(self.s) + epsilon) * grad
 
     def _adam_init(self, x0:np.ndarray):
         self.x = x0
         self.m = np.zeros_like(x0)
         self.s = np.zeros_like(x0)
 
-    def _adam_update(self, x:np.ndarray, grad:np.ndarray, eta:float, beta1:float, beta2:float, epsilon:float=EPSILON) -> np.ndarray:
+    def _adam_update(self, x:np.ndarray, grad:np.ndarray, eta:Callable, beta1:float, beta2:float, epsilon:float=EPSILON) -> np.ndarray:
         self.m = beta1 * self.m + (1. - beta1) * grad
         self.s = beta2 * self.s + (1. - beta2) * np.square(grad)
         mhat = self.m / (1 - beta1**self._it)
@@ -144,7 +148,7 @@ class SGradientDescent(GradientDescent):
                 self._it += 1
                 g = grad(self.x, *args, batch)
                 self.x = self._update_rule(self, self.x, g) 
-        print(self.method, self.x)
+        # print(self.method, self.x)
         return self.x
 
     def _make_batches(self, idcs:np.ndarray) -> list:

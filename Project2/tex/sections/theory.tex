@@ -1,3 +1,4 @@
+\comment{Suggestion: present tense}\\
 Theory goes here
 
 In this project, I thought we could use \verb|cleveref| to reference things like \cref{int:fig:example}.
@@ -40,7 +41,7 @@ We will assume that the measurements $y_i$ are generated from an exact function 
             G_k &= G_{k-1} + \vec{g}_j \otimes \vec{g}_j \\
             \vec{\theta}_k &= \vec{\theta}_{k-1} - \eta G_k^{-\sfrac{1}{2}} \vec{g}_k
         \end{align*}
-        where $\vec{v} \otimes \vec{u}$ denotes the outer product of two vectors $\vec{v}, \vec{u}$, and a matrix $m = M^{-1/2}$ is understood to the matrix satisfying $m^2 = M^{-1}$. Inverting and finding the root of $G_k$ comes at a computational cost, so we will employ the much cheaper version where we update
+        where $\vec{v} \otimes \vec{u}$ denotes the outer product of two vectors $\vec{v}, \vec{u}$, and a matrix $m = M^{-1/2}$ is understood to the matrix satisfying $m^2 = M^{-1}$. Inverting and finding the root of $G_k$ comes at a computational cost, so we will employ the much cheaper version where we update \comment{Discussion note: mention uncorrelated features bettering this approximation, perhaps. -\Carl}
         \begin{align*}
             \vec{\theta}_{k} = \vec{\theta}_{k-1} - \frac{\eta}{\sqrt{\diag(G_k)}+\epsilon} \circ \vec{g}_k,
         \end{align*}
