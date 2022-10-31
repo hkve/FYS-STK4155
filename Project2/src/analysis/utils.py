@@ -1,5 +1,5 @@
 import pathlib as pl 
-from sknotlearn.linear_model import LinearRegression, Ridge, Lasso
+# from sknotlearn.linear_model import LinearRegression, Ridge, Lasso
 import seaborn as sns
 
 def make_figs_path(filename):
@@ -9,7 +9,7 @@ def make_figs_path(filename):
     while root_path.name != "FYS-STK4155":
         root_path = root_path.parent
 
-    figs_path = root_path / pl.Path("Project1/tex/figs")
+    figs_path = root_path / pl.Path("Project2/tex/figs")
 
     if not figs_path.exists():
         return None
@@ -20,7 +20,7 @@ def make_figs_path(filename):
 
     return str(figs_path)
 
-model_names = {LinearRegression:'OLS', Ridge:'Ridge', Lasso:'Lasso'}
+# model_names = {LinearRegression:'OLS', Ridge:'Ridge', Lasso:'Lasso'}
 
 colors = [
     sns.color_palette('husl')[-3],
