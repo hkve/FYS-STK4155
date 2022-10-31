@@ -78,30 +78,43 @@ class NeuralNetwork:
     def _backprop_pass(self, y, y_pred) -> None:
         # TODO: Save deltas and update weights after the loop.
         # TODO: Look at GD 
-        delta_output = np.dot(elementwise_grad(self._activation_output)(y_pred), elementwise_grad(lambda ypred : self.cost_func(y, ypred))(y_pred)) / len(y)
+        # delta_output = np.dot(elementwise_grad(self._activation_output)(y_pred), elementwise_grad(lambda ypred : self.cost_func(y, ypred))(y_pred)) / len(y)
 
-        grad_cost = elementwise_grad(lambda ypred : self.cost_func(y, ypred))
-        grad_act_out = elementwise_grad(self._activation_output)
-        deltas = np.zeros(self.n_hidden_layers + 1)
-        deltas[0] = grad_cost * grad_act_out
+        # grad_act_out = elementwise_grad(self._activation_output)
+        # deltas = np.zeros(self.n_hidden_layers + 1)
+        # deltas[0] = grad_cost * grad_act_out
 
-        for h in reversed(range(self.n_hidden_layers)):
-            grad_act_hid = elementwise_grad(self._activation_hidden)
-            deltas[h] = self.weights[h+1].T @ deltas[h+1] * grad_act_hid
+        # for h in reversed(range(self.n_hidden_layers)):
+        #     grad_act_hid = elementwise_grad(self._activation_hidden)
+        #     deltas[h] = self.weights[h+1].T @ deltas[h+1] * grad_act_hid
 
-        #update weights 
-        self.weights = self.weights * deltas 
-              
+        # #update weights 
+        # self.weights = self.weights * deltas
+        delta_ls = [0]*self.n_hidden_layers 
+        grad_cost = elementwise_grad(lambda y_pred : self.cost_func(y, y_pred))
+        grad_activation_output = elementwise_grad(self._activation_output)
+        grad_activation_hidden = elementwise_grad(self._activation_hidden)
+        delta_L = grad_cost(y_pred)*grad_activation_output(self.last_z)  
+        print(grad_activation_output(self.last_z).shape)
+        exit()
+        delta_ls[-1] = delta_L
+        for i in range(self.n_hidden_layers-2, -1, -1):
+            print(self.weights[i+1].T.shape, delta_ls[i+1].shape)
+            delta_ls[i] = delta_ls[i+1] @ self.weights[i+1].T
+
+        exit()   
         
     def _forward_pass(self, x) -> None:
         #hidden layer:
         a = x
         for h in range(self.n_hidden_layers):
-            z = self.weights[h] @ a + self.biases[h]
+            z = a @ self.weights[h].T + self.biases[h]
             a = self._activation_hidden(z)
 
         #output layer: 
-        z = self.weights[-1] @ a + self.biases[-1]
+        z = a @ self.weights[-1].T + self.biases[-1]
+        self.last_z = z
+        self.last_a = a
         y = self._activation_output(z)
         return y
 
@@ -118,21 +131,17 @@ class NeuralNetwork:
         self._init_biases_and_weights()
         self.n_parameters = sum([weights.size + biases.size for weights, biases in zip(self.weights, self.biases)])
         flat_parameters = self._flat_parameters()
-        # print(self.weights, f'\n', self.biases)
-        # self._curvy_parameters(flat_parameters)
-        # print(self.weights, f'\n', self.biases)
-
-        #NB! Remember a loop here!
 
         # Call forward for every datapoint: 
         n = len(self.D_train)
         y, X = self.D_train.unpacked()
         y_pred = np.zeros(n)
-        for i, xi in enumerate(X):
-            y_pred[i] = self._forward_pass(xi)
 
+        y_pred = self._forward_pass(X)
+        self._backprop_pass(y, y_pred)
         # and backprop ...
         # self._backprop_pass(y, y_pred)
+
 
     #Activation funtions:
     def _no_activation(x):
@@ -150,6 +159,9 @@ class NeuralNetwork:
     def _tanh(x):
         return np.tanh(x)
 
+    def _linear(x):
+        return x
+
     #Cost functions: 
     def _MSE(y, y_pred):
         return np.mean((y - y_pred)**2)
@@ -159,7 +171,8 @@ class NeuralNetwork:
         "sigmoid": _sigmoid,
         "relu": _relu,
         "leaky_relu": _leaky_relu,
-        "tanh": _tanh 
+        "tanh": _tanh,
+        "linear": _linear, 
     }
 
     cost_funcitons = {
@@ -184,8 +197,12 @@ if __name__ == "__main__":
         GD, 
         nodes, 
         random_state=321,
-        cost_func="MSE"
+        cost_func="MSE",
+        activation_output="linear"
     )
-    NN.train(D)
-
+    D_train, D_test = D.train_test_split(random_state=42)
+    D_train = D_train.scaled(scheme="Standard")    
+    D_test = D_train.scale(D_test)
+    
+    NN.train(D_train)
 
