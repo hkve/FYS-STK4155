@@ -105,11 +105,8 @@ class NeuralNetwork:
             W = self.weights[i+1].T
             delta_ls_i = delta_ls[i+1]
             print(f"i = {i} fp = {fp.shape}, W.T = {W.shape}, delta_l = {delta_ls_i.shape}")
-            
-            delta_ls[i] = grad_activation_hidden(self.zs[i]) * self.weights[i+1] * delta_ls[i+1]
-            print(f"res = {delta_ls[i].shape}")
+            delta_ls[i] = grad_activation_hidden(self.zs[i]) @ self.weights[i+1].T * delta_ls[i+1]
             print(f"delta_l next = {delta_ls[i].shape}")
-            print(self.weights[i+1].T.shape, delta_ls[i+1].shape)
 
         exit()
         
