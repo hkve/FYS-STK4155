@@ -2,6 +2,7 @@ import numpy as np
 from sys import float_info, exit
 from collections.abc import Callable
 EPSILON = float_info.epsilon**0.5
+MAX = 1 / float_info.epsilon
 class GradientDescent:
     """Implements Gradient Descent minimization of a problem defined by the gradient g of scalar function wrt. argument(s) x. Implemented update rules are:
     "plain" (eta): Ordinary GD with a learning rate eta.
@@ -58,7 +59,11 @@ class GradientDescent:
             self._it += 1
             g = grad(self.x, *args)
             self.x = self._update_rule(self, self.x, g) 
+            if any((np.abs(self.x) > MAX)):
+                self.coverged = False
+                return self.x
         # print(self.method, self.x)
+        self.converged = True
         return self.x
 
 
@@ -83,6 +88,16 @@ class GradientDescent:
     def _adagrad_update(self, x:np.ndarray, grad:np.ndarray, eta:Callable, epsilon:float=EPSILON) -> np.ndarray:
         self.G += grad**2
         return x - eta(self._it) / (np.sqrt(self.G) + epsilon) * grad
+
+    def _adagrad_momentum_init(self, x0:np.ndarray):
+        self.x = x0
+        self.p = np.zeros_like(x0)
+        self.G = np.zeros_like(x0)
+
+    def _adagrad_momentum_update(self, x:np.ndarray, grad:np.ndarray, eta:Callable, gamma:float, epsilon:float=EPSILON) -> np.ndarray:
+        self.G += grad**2
+        self.p = gamma * self.p + eta(self._it) * grad
+        return x - self.p / (np.sqrt(self.G) + epsilon)
 
     def _rmsprop_init(self, x0:np.ndarray):
         self.x = x0
@@ -109,6 +124,7 @@ class GradientDescent:
         "plain": (_plain_init, _plain_update),
         "momentum": (_momentum_init, _momentum_update),
         "adagrad": (_adagrad_init, _adagrad_update),
+        "adagrad_momentum": (_adagrad_momentum_init, _adagrad_momentum_update),
         "rmsprop": (_rmsprop_init, _rmsprop_update),
         "adam": (_adam_init, _adam_update)
     }
@@ -155,8 +171,12 @@ class SGradientDescent(GradientDescent):
             for batch in batches:
                 self._it += 1
                 g = grad(self.x, *args, batch)
-                self.x = self._update_rule(self, self.x, g) 
+                self.x = self._update_rule(self, self.x, g)
+                if any((np.abs(self.x) > MAX)):
+                    self.coverged = 0
+                    return self.x
         # print(self.method, self.x)
+        self.converged = 1
         return self.x
 
     def _make_batches(self, idcs:np.ndarray) -> list:

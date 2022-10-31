@@ -3,7 +3,7 @@ from autograd import elementwise_grad
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sys import exit
-# import plot_utils
+import plot_utils
 from utils import make_figs_path
 
 import context
@@ -13,7 +13,7 @@ from sknotlearn.optimize import GradientDescent, SGradientDescent
 
 def tune_learning_rate(
     data:Data,
-    train_split:float,
+    trainsize:float,
     learning_rates:np.ndarray,
     optimizers:tuple,
     optimizer_names:tuple,
@@ -28,7 +28,7 @@ def tune_learning_rate(
 
     Args:
         data (Data): Data to train on. Is train-test split.
-        train_split (float): The ratio of data to be used for training.
+        trainsize (float): The ratio of data to be used for training.
         learning_rates (np.ndarray): Array of learning rates to use.
         optimizers (tuple): Iterable of instances of GradientDescent to plot for.
         optimizer_names (tuple): Legend names for the GradientDescent methods.
@@ -45,7 +45,7 @@ def tune_learning_rate(
         np.random.seed(random_state)
 
     # Split data into training and validation data
-    data_train, data_val = data.train_test_split(ratio=train_split, random_state=random_state)
+    data_train, data_val = data.train_test_split(ratio=trainsize, random_state=random_state)
     y_train, X_train = data_train.unpacked()
     y_val, X_val = data_val.unpacked()
 
@@ -86,7 +86,7 @@ def tune_learning_rate(
             
             MSE_list.append(np.mean((X_val@theta_opt - y_val)**2))
         if verbose:
-            print(f"{name} MSE score: {np.min(MSE_list)} (Learning rate {learning_rates[np.argmin(MSE_list)]})")
+            print(f"{name} MSE score: {np.nanmin(MSE_list)} (Learning rate {learning_rates[np.nanargmin(MSE_list)]})")
         plt.plot(learning_rates, MSE_list, label=name)
 
     # Calculating analytical solution from matrix inversion
@@ -113,7 +113,7 @@ def tune_learning_rate(
 
 def tune_lambda_learning_rate(
     data:Data,
-    train_split:float,
+    trainsize:float,
     learning_rates:np.ndarray,
     lmbdas:np.ndarray,
     optimizer:GradientDescent,
@@ -126,7 +126,7 @@ def tune_lambda_learning_rate(
 
     Args:
         data (Data): Data to train on. Is train-test split.
-        train_split (float): The ratio of data to be used for training.
+        trainsize (float): The ratio of data to be used for training.
         learning_rates (np.ndarray): Array of learning rates to use.
         lmbdas (np.ndarray): Array of lambda-values to use for cost function.
         optimizer (GradientDescent): GradientDescent instance to use for optimization.
@@ -140,7 +140,7 @@ def tune_lambda_learning_rate(
         np.random.seed(random_state)
 
     # Split data into training and validation data
-    data_train, data_val = data.train_test_split(ratio=train_split, random_state=random_state)
+    data_train, data_val = data.train_test_split(ratio=trainsize, random_state=random_state)
     y_train, X_train = data_train.unpacked()
     y_val, X_val = data_val.unpacked()
 
@@ -188,7 +188,7 @@ def tune_lambda_learning_rate(
         np.arange(len(learning_rates))[::2],
         labels=[f"{lrate:.4g}" for lrate in learning_rates][::2]
     )
-    ax.set_ylabel(r"$\lambda$")
+    ax.set_ylabel(r"$\log_{10}(\lambda)$")
     ax.set_yticks(
         np.arange(len(lmbdas)),
         labels=np.log10(lmbdas)
@@ -206,33 +206,38 @@ if __name__=="__main__":
     D = make_FrankeFunction(n=600, noise_std=0.1, random_state=random_state)
     D = D.polynomial(degree=5).scaled(scheme="Standard")
 
-    learning_rates = np.linspace(1e-3, 0.1, 30, endpoint=False)
-    max_iter = 100
+    max_iter = 500
+
+    n_batches = 16
+    batch_size = (3 * len(D) // 4) // n_batches
 
     GD = GradientDescent("plain", {"eta":0.}, its=max_iter)
     mGD = GradientDescent("momentum", {"gamma":0.8, "eta":0.}, its=max_iter)
-    SGD = SGradientDescent("plain", {"eta":0.}, epochs=max_iter, batch_size=54, random_state=random_state)
-    mSGD = SGradientDescent("momentum", {"gamma":0.8, "eta":0.}, epochs=max_iter, batch_size=54, random_state=random_state)
-    aSGD = SGradientDescent("adagrad", {"eta":0.}, epochs=max_iter, batch_size=54, random_state=random_state)
+    SGD = SGradientDescent("plain", {"eta":0.}, epochs=max_iter, batch_size=batch_size, random_state=random_state)
+    mSGD = SGradientDescent("momentum", {"gamma":0.8, "eta":0.}, epochs=max_iter, batch_size=batch_size, random_state=random_state)
+    aSGD = SGradientDescent("adagrad", {"eta":0.}, epochs=max_iter, batch_size=batch_size, random_state=random_state)
+    maSGD = SGradientDescent("adagrad_momentum", {"gamma":0.8, "eta":0.}, epochs=max_iter, batch_size=batch_size)
+    rmSGD = SGradientDescent("rmsprop", {"eta":0., "beta":0.5}, epochs=max_iter, batch_size=batch_size, random_state=random_state)
+    adSGD = SGradientDescent("adam", {"eta":0., "beta1":0.5, "beta2":0.5}, epochs=max_iter, batch_size=batch_size, random_state=random_state)
 
-    tune_learning_rate(
-        data=D,
-        train_split=3/4,
-        learning_rates=learning_rates,
-        optimizers=(mGD,mSGD,aSGD),
-        optimizer_names=("Momentum GD", "Momentum SGD", "Adagrad SGD"),
-        cost="OLS",
-        ylims=(0,3),
-        random_state=random_state,
-        verbose=True
-    )
-
-    # tune_lambda_learning_rate(
+    # tune_learning_rate(
     #     data=D,
-    #     train_split=3/4,
-    #     learning_rates=np.linspace(0.001, 0.05, 10, endpoint=False),
-    #     lmbdas=np.logspace(-8,0,9),
-    #     optimizer=SGD,
+    #     trainsize=3/4,
+    #     learning_rates=np.linspace(1e-3, 0.1, 31, endpoint=True),
+    #     optimizers=(SGD,mSGD,aSGD,maSGD),
+    #     optimizer_names=("Plain SGD", "Momentum SGD", "Adagrad SGD", "Momentum AdaGrad SGD"),
+    #     cost="OLS",
     #     ylims=(0,1),
-    #     random_state=random_state
+    #     random_state=random_state,
+    #     verbose=True
     # )
+
+    tune_lambda_learning_rate(
+        data=D,
+        trainsize=3/4,
+        learning_rates=np.linspace(0.001, 0.1, 11, endpoint=True),
+        lmbdas=np.logspace(-9,-1,9),
+        optimizer=SGD,
+        ylims=(None,None),
+        random_state=random_state
+    )
