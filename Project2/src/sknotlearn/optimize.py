@@ -102,7 +102,7 @@ class GradientDescent:
         self.s = beta2 * self.s + (1. - beta2) * np.square(grad)
         mhat = self.m / (1 - beta1**self._it)
         shat = self.s / (1 - beta2**self._it)
-        return x - eta / (np.sqrt(shat) + epsilon) * mhat
+        return x - eta(self._it) / (np.sqrt(shat) + epsilon) * mhat
 
     # dict containing the available methods
     methods = {
