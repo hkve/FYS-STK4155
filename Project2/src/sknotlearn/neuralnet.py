@@ -32,6 +32,7 @@ class NeuralNetwork:
 
         self.weights = [None]*(self.n_hidden_layers + 1)
         self.biases = [None]*(self.n_hidden_layers + 1)
+        self.zs = [None]*(self.n_hidden_layers + 1)
 
         self.cost_func = self.cost_funcitons[cost_func]
 
@@ -94,13 +95,18 @@ class NeuralNetwork:
         grad_cost = elementwise_grad(lambda y_pred : self.cost_func(y, y_pred))
         grad_activation_output = elementwise_grad(self._activation_output)
         grad_activation_hidden = elementwise_grad(self._activation_hidden)
-        delta_L = grad_cost(y_pred)*grad_activation_output(self.last_z)  
-        print(grad_activation_output(self.last_z).shape)
-        exit()
-        delta_ls[-1] = delta_L
+        
+        delta_L = grad_activation_output(self.zs[-1])*grad_cost(y_pred)  
+        delta_ls[-1] = delta_L        
+
         for i in range(self.n_hidden_layers-2, -1, -1):
-            print(self.weights[i+1].T.shape, delta_ls[i+1].shape)
-            delta_ls[i] = delta_ls[i+1] @ self.weights[i+1].T
+            fp = grad_activation_hidden(self.zs[i])
+            W = self.weights[i+1].T
+            delta_ls_i = delta_ls[i+1]
+            print(f"fp = {fp.shape}, W+1.T = {W.T.shape}, delta_ls+1 = {delta_ls_i.shape}")
+            delta_ls[i] = grad_activation_hidden(self.zs[i]) @ self.weights[i+1].T * delta_ls[i+1]
+
+        #     print(self.weights[i+1].T.shape, delta_ls[i+1].shape)
 
         exit()   
         
@@ -109,12 +115,12 @@ class NeuralNetwork:
         a = x
         for h in range(self.n_hidden_layers):
             z = a @ self.weights[h].T + self.biases[h]
+            self.zs[h] = z
             a = self._activation_hidden(z)
 
         #output layer: 
         z = a @ self.weights[-1].T + self.biases[-1]
-        self.last_z = z
-        self.last_a = a
+        self.zs[-1] = z
         y = self._activation_output(z)
         return y
 
