@@ -121,27 +121,32 @@ class NeuralNetwork:
             grad_Ws (List[np.array]): List of arrays representing the weights for each layer
             grad_bs (List[np.array]): List of arrays representing the bias for each layer
         """
-        
+
+        # Error in each layer, weight and bias gradients 
         delta_ls = [None]*(self.n_hidden_layers+1)
         grad_Ws = [None]*(self.n_hidden_layers+1) 
         grad_bs = [None]*(self.n_hidden_layers+1)
 
+        # What FWP predicted
         y_pred = a_fwp[-1]
 
+        # Calculate the gradient of cost function corresponding to this set of y values
         grad_cost = elementwise_grad(lambda y_pred : self.cost_func(y, y_pred))
+
+        # Delta in output layer
         delta_ls[-1] = self._grad_activation_output(z_fwp[-1])*grad_cost(y_pred)
 
         for i, (w,b) in enumerate(zip(self.weights, self.biases)):
             print(f"Layer({i}), W = {w.shape}, b = {b.shape}")
 
-
+        # Iterate backwards over hidden layers to calculate layer errors
         for i in reversed(range(self.n_hidden_layers)):
             fp = self._grad_activation_hidden(z_fwp[i])
             W = self.weights[i+1]
             delta_prev = delta_ls[i+1]
             delta_ls[i] = delta_prev @ W * fp
 
-
+        # Iterate backwards over hidden layers to calculate gradients
         for i in reversed(range(0, self.n_hidden_layers+1)):
             grad_Ws[i] = delta_ls[i].T @ a_fwp[i]
             grad_bs[i] = delta_ls[i].sum(axis=0)
