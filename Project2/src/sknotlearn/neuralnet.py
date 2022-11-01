@@ -41,6 +41,9 @@ class NeuralNetwork:
         self._activation_hidden = self.activation_functions[activation_hidden]
         self._activation_output = self.activation_functions[activation_output]
 
+        self._grad_activation_output = elementwise_grad(self._activation_output)
+        self._grad_activation_hidden = elementwise_grad(self._activation_hidden)
+
     def _init_biases_and_weights(self) -> None:
         """NB: Weights might be initialized opposite to the convension
         """
@@ -78,68 +81,77 @@ class NeuralNetwork:
             self.biases[i] = flat_parameters[idx:idx+b_size].reshape(biases.shape)
             idx += b_size
 
+    def _forward_pass(self, x:np.array) -> tuple:
+        """
+        
+        """
+        # Store z and f(z) values
+        z_fwp = [None]*(self.n_hidden_layers+1)
+        a_fwp = [None]*(self.n_hidden_layers+2)
+        
+        a = a_fwp[0] = x
+
+        #hidden layer:
+        for h in range(self.n_hidden_layers):
+            z = a @ self.weights[h].T + self.biases[h]
+            a = self._activation_hidden(z)
+
+            z_fwp[h] = z
+            a_fwp[h+1] = a
+
+        #output layer: 
+        z = z_fwp[-1] = a @ self.weights[-1].T + self.biases[-1]
+        y = a_fwp[-1] = self._activation_output(z)
+        
+        return (y, z_fwp, a_fwp)
 
 
-    def _backprop_pass(self, y, y_pred) -> None:
-        # TODO: Save deltas and update weights after the loop.
-        # TODO: Look at GD 
+    def _backprop_pass(self, y, z_fwp, a_fwp) -> tuple:
+        """
+        Function to perform backwards propagation. Takes target values y, in addition
+        to z and a values calculated during the forward pass. Calculates the gradient of 
+        weights and biases.
 
-        # delta_output = np.dot(elementwise_grad(self._activation_output)(y_pred), elementwise_grad(lambda ypred : self.cost_func(y, ypred))(y_pred)) / len(y)
+        Args:
+            y (np.array): Target value to use for cost function derivative evaluation
+            z_fwp (List[np.array]): The output from each layer, before the activation functions is used.
+            a_fwp (List[np.array]): The output from each layer, after the activation function is used. Also includes the X data
+        
+        Returns:
+            grad_Ws (List[np.array]): List of arrays representing the weights for each layer
+            grad_bs (List[np.array]): List of arrays representing the bias for each layer
+        """
+        
+        delta_ls = [None]*(self.n_hidden_layers+1)
+        grad_Ws = [None]*(self.n_hidden_layers+1) 
+        grad_bs = [None]*(self.n_hidden_layers+1)
 
-        # grad_act_out = elementwise_grad(self._activation_output)
-        # deltas = np.zeros(self.n_hidden_layers + 1)
-        # deltas[0] = grad_cost * grad_act_out
-
-        # for h in reversed(range(self.n_hidden_layers)):
-        #     grad_act_hid = elementwise_grad(self._activation_hidden)
-        #     deltas[h] = self.weights[h+1].T @ deltas[h+1] * grad_act_hid
-
-        # #update weights 
-        # self.weights = self.weights * deltas
-
-        delta_ls = [0]*(self.n_hidden_layers+1)
-        grad_Ws = [0]*(self.n_hidden_layers+1) 
-        grad_bs = [0]*(self.n_hidden_layers+1)
+        y_pred = a_fwp[-1]
 
         grad_cost = elementwise_grad(lambda y_pred : self.cost_func(y, y_pred))
-        grad_activation_output = elementwise_grad(self._activation_output)
-        grad_activation_hidden = elementwise_grad(self._activation_hidden)
-        
-        delta_ls[-1] = grad_activation_output(self.zs[-1])*grad_cost(y_pred)        
+        delta_ls[-1] = self._grad_activation_output(z_fwp[-1])*grad_cost(y_pred)
 
         for i, (w,b) in enumerate(zip(self.weights, self.biases)):
             print(f"Layer({i}), W = {w.shape}, b = {b.shape}")
 
+
         for i in reversed(range(self.n_hidden_layers)):
-            fp = grad_activation_hidden(self.zs[i])
+            fp = self._grad_activation_hidden(z_fwp[i])
             W = self.weights[i+1]
             delta_prev = delta_ls[i+1]
             delta_ls[i] = delta_prev @ W * fp
 
-        for i in reversed(range(1, self.n_hidden_layers+1)):
-            grad_Ws[i] = delta_ls[i].T @ self._activation_hidden(self.zs[i-1])
+
+        for i in reversed(range(0, self.n_hidden_layers+1)):
+            grad_Ws[i] = delta_ls[i].T @ a_fwp[i]
             grad_bs[i] = delta_ls[i].sum(axis=0)
 
-        grad_Ws[0] = delta_ls[0].T @ self.D_train.X
-        grad_bs[0] = delta_ls[0].sum(axis=0)
 
         for i, (wp,bp) in enumerate(zip(grad_Ws, grad_bs)):
             print(f"Layer({i}), W' = {wp.shape}, b' = {bp.shape}")
 
+        return grad_Ws, grad_bs
 
-    def _forward_pass(self, x) -> None:
-        #hidden layer:
-        a = x
-        for h in range(self.n_hidden_layers):
-            z = a @ self.weights[h].T + self.biases[h]
-            self.zs[h] = z
-            a = self._activation_hidden(z)
-
-        #output layer: 
-        z = a @ self.weights[-1].T + self.biases[-1]
-        self.zs[-1] = z
-        y = self._activation_output(z)
-        return y
 
     def predict(self, X:np.array) -> np.array:
         y_pred = None
@@ -154,21 +166,14 @@ class NeuralNetwork:
         self._init_biases_and_weights()
         self.n_parameters = sum([weights.size + biases.size for weights, biases in zip(self.weights, self.biases)])
         flat_parameters = self._flat_parameters()
-        # print(self.weights, f'\n', self.biases)
-        # self._curvy_parameters(flat_parameters)
-        # print(self.weights, f'\n', self.biases)
 
-        #NB! Remember a loop here! One iteration consists of a FF pass and a BP pass. This continues till cost function converges. 
 
         # Call forward for every datapoint: 
         n = len(self.D_train)
         y, X = self.D_train.unpacked()
-        y_pred = np.zeros(n)
 
-        y_pred = self._forward_pass(X)
-        self._backprop_pass(y, y_pred)
-        # and backprop ...
-        # self._backprop_pass(y, y_pred)
+        y_pred, z_fwp, a_fwp = self._forward_pass(X)
+        grad_Ws, grad_bs = self._backprop_pass(y, z_fwp, a_fwp)
 
 
 
