@@ -109,26 +109,39 @@ class NeuralNetwork:
         delta_ls[-1] = delta_L        
 
         #Calculate the weight- and bias gradients: 
-        grad_Ws[-1] = self._activation_hidden(self.zs[-2]).T @ delta_L
-        grad_bs[-1] = np.sum(delta_L)
-        print(f"{delta_L.shape} {self._activation_hidden(self.zs[-2]).shape} grad_W_L = {grad_Ws[-1].shape}  grad_b_L = {grad_bs[-1]}")
+        # grad_Ws[-1] = self._activation_hidden(self.zs[-2]).T @ delta_L
+        # grad_bs[-1] = np.sum(delta_L) # , axis=0?
+
+        for i, (w,b) in enumerate(zip(self.weights, self.biases)):
+            print(f"Layer({i}), W = {w.shape}, b = {b.shape}")
+        # print(f"{delta_L.shape} {self._activation_hidden(self.zs[-2]).shape} grad_W_L = {grad_Ws[-1].shape}  grad_b_L = {grad_bs[-1]}")
 
         for i in reversed(range(self.n_hidden_layers)):
             fp = grad_activation_hidden(self.zs[i])
             W = self.weights[i+1]
-            delta_ls_i = delta_ls[i+1]
-            print(f"i = {i} fp = {fp.shape}, W.T = {W.shape}, delta_l = {delta_ls_i.shape}")
-            delta_ls[i] = delta_ls_i @ W * fp
-            print(f"delta_l next = {delta_ls[i].shape}")
-            if i != 0:
-                grad_Ws[i] = self._activation_hidden(self.zs[i-1]).T @ delta_ls_i
-            else: 
-                grad_Ws[i] = self._activation_hidden(X).T @ delta_ls[i]
-            grad_bs[-1] = np.sum(delta_ls[i])
-            print(grad_Ws[i].shape)
+            delta_prev = delta_ls[i+1]
+            delta_ls[i] = delta_prev @ W * fp
+            # print(f"i = {i} fp = {fp.shape}, W.T = {W.shape}, delta_l = {delta_prev.shape}")
+            # print(f"delta_l next = {delta_ls[i].shape}")
+            # if i != 0:
+            #     grad_Ws[i] = self._activation_hidden(self.zs[i-1]).T @ delta_prev
+            # else: 
+            #     grad_Ws[i] = self._activation_hidden(X).T @ delta_ls[i]
+            
+            # grad_bs[-1] = np.sum(delta_ls[i])
+            # print(grad_Ws[i].shape)
             # print(f"grad_W = {grad_Ws[i].shape} grad_b = {grad_bs[i].shape}")
-        exit()
-        
+
+        for i in reversed(range(1, self.n_hidden_layers+1)):
+            grad_Ws[i] = delta_ls[i].T @ self._activation_hidden(self.zs[i-1])
+            grad_bs[i] = delta_ls[i].sum(axis=0)
+
+        grad_Ws[0] = delta_ls[0].T @ self.D_train.X
+        grad_bs[0] = delta_ls[0].sum(axis=0)
+
+        for i, (wp,bp) in enumerate(zip(grad_Ws, grad_bs)):
+            print(f"Layer({i}), W' = {wp.shape}, b' = {bp.shape}")
+
     def _forward_pass(self, x) -> None:
         #hidden layer:
         a = x
@@ -171,7 +184,6 @@ class NeuralNetwork:
         self._backprop_pass(y, y_pred)
         # and backprop ...
         # self._backprop_pass(y, y_pred)
-        print(y_pred)
 
 
 
