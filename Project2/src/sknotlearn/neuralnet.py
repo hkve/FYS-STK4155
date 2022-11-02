@@ -1,7 +1,5 @@
-from audioop import bias
 import autograd.numpy as np
 from autograd import grad, elementwise_grad
-from datasets import make_debugdata
 
 import optimize as opt
 from data import Data
@@ -35,9 +33,8 @@ class NeuralNetwork:
 
         self.weights = [None]*(self.n_hidden_layers + 1)
         self.biases = [None]*(self.n_hidden_layers + 1)
-        self.zs = [None]*(self.n_hidden_layers + 1)
 
-        self.cost_func = self.cost_funcitons[cost_func]
+        self.cost_func = self.cost_function[cost_func]
 
         self._activation_hidden = self.activation_functions[activation_hidden]
         self._activation_output = self.activation_functions[activation_output]
@@ -52,8 +49,8 @@ class NeuralNetwork:
         self.weights[1:-1] = [np.random.randn(self.n_hidden_nodes[layer+1],self.n_hidden_nodes[layer]) for layer in range(self.n_hidden_layers-1)]
         self.weights[-1] = np.random.randn(1, self.n_hidden_nodes[-1])
         
-        self.biases[:-1] = [0.1*np.ones(nodes) for nodes in self.n_hidden_nodes]
-        self.biases[-1] = np.array([0.1]) 
+        self.biases[:-1] = [10*np.ones(nodes) for nodes in self.n_hidden_nodes]
+        self.biases[-1] = np.array([10]) 
 
     def _flat_parameters(self, weights, biases):
         """The language of GD<3
@@ -96,17 +93,15 @@ class NeuralNetwork:
         z_fwp = [None]*(self.n_hidden_layers+1)
         a_fwp = [None]*(self.n_hidden_layers+2)
         
+        # input layer
         a = a_fwp[0] = X
 
-        #hidden layer:
+        # hidden layer:
         for h in range(self.n_hidden_layers):
-            z = a @ self.weights[h].T + self.biases[h]
-            a = self._activation_hidden(z)
+            z = z_fwp[h] = a @ self.weights[h].T + self.biases[h]
+            a = a_fwp[h+1] = self._activation_hidden(z)
 
-            z_fwp[h] = z
-            a_fwp[h+1] = a
-
-        #output layer: 
+        # output layer: 
         z = z_fwp[-1] = a @ self.weights[-1].T + self.biases[-1]
         y = a_fwp[-1] = self._activation_output(z)
         
@@ -141,17 +136,17 @@ class NeuralNetwork:
         grad_cost = elementwise_grad(lambda y_pred : self.cost_func(y, y_pred))
 
         # Delta in output layer
-        delta_ls[-1] = self._grad_activation_output(z_fwp[-1])*grad_cost(y_pred)
+        delta_ls[-1] = self._grad_activation_output(z_fwp[-1]) * grad_cost(y_pred)
 
         # for i, (w,b) in enumerate(zip(self.weights, self.biases)):
         #     print(f"Layer({i}), W = {w.shape}, b = {b.shape}")
 
         # Iterate backwards over hidden layers to calculate layer errors
         for i in reversed(range(self.n_hidden_layers)):
-            fp = self._grad_activation_hidden(z_fwp[i])
+            fprime = self._grad_activation_hidden(z_fwp[i])
             W = self.weights[i+1]
             delta_prev = delta_ls[i+1]
-            delta_ls[i] = delta_prev @ W * fp
+            delta_ls[i] = delta_prev @ W * fprime
 
         # Iterate backwards over hidden layers to calculate gradients
         for i in reversed(range(0, self.n_hidden_layers+1)):
@@ -181,9 +176,10 @@ class NeuralNetwork:
 
     def grad(self, coef: np.array, data:Data, idcs:np.ndarray=None) -> np.array:
         # Reshape coef array to fit FWP/BWP
+        data = data[idcs]
         weights, biases = self._curvy_parameters(coef)
         
-        # Set them as  the networks weights and biases
+        # Set them as the networks weights and biases
         self.weights = weights
         self.biases = biases
 
@@ -194,10 +190,15 @@ class NeuralNetwork:
         # Flatten gradients
         grad_coef = self._flat_parameters(grad_Ws, grad_bs)
 
+        # print(grad_coef)
+        # print(np.mean(np.abs(self._flat_parameters(self.weights, self.biases))))
+        # print(self.cost_func(y=self.D_train.y, y_pred=self.predict(self.D_train.X)))
+        # print(np.mean(np.abs(grad_coef)))
+        # print(np.mean(np.abs(y_pred)))
         return grad_coef
 
     def train(self, D:Data, trainsize=3/4):
-        self.D_train, self.D_test = D.train_test_split(ratio=trainsize,random_state=self.random_state)
+        self.D_train, self.D_test = D.train_test_split(ratio=trainsize,random_state=self.random_state,shuffle=False)
         self.n_features = D.n_features
 
         #Initialize weights and biases: 
@@ -206,7 +207,6 @@ class NeuralNetwork:
 
         # Call forward for every datapoint: 
         n = len(self.D_train)
-        y, X = self.D_train.unpacked()
 
         x0 = self._flat_parameters(self.weights, self.biases)
 
@@ -223,9 +223,6 @@ class NeuralNetwork:
         self.biases = biases
 
     #Activation funtions:
-    def _no_activation(x):
-        return x
-
     def _sigmoid(x):
         return 1/(1+np.exp(-x))
     
@@ -254,43 +251,43 @@ class NeuralNetwork:
         "linear": _linear, 
     }
 
-    cost_funcitons = {
+    cost_function = {
         "MSE": _MSE,
     }
 
-def main():
-    x, y, X = make_debugdata()
-    D = Data(y,X)
-
-    eta = 0.05
-    def learning_schedule(it):
-        epoch = it // 10
-        return eta / (1 + eta/100*epoch)
-
-    SGD = opt.SGradientDescent(
-        method = "plain",
-        params = {"eta":learning_schedule},
-        epochs=100,
-        batch_size=10
-    )        
-    
-    nodes = ((10, 9, 8), 1)
-    NN = NeuralNetwork(
-        SGD, 
-        nodes, 
-        random_state=321,
-        cost_func="MSE",
-        activation_output="linear"
-    )
-    D_train, D_test = D.train_test_split(random_state=42)
-    D_train = D_train.scaled(scheme="Standard")    
-    D_test = D_train.scale(D_test)
-    
-    NN.train(D_train)
-
-    y_pred = NN.predict(D_test.X).reshape(-1, 1)
-
-    print(y_pred, D_test.y)
 
 if __name__ == "__main__":
+    from datasets import make_debugdata, make_FrankeFunction
+    def main():
+        x, y, X = make_debugdata(n=300)
+        D = Data(y,x.reshape(-1,1))
+
+        SGD = opt.SGradientDescent(
+            method = "adagrad",
+            params = {"eta":0.1},
+            epochs=50,
+            batch_size=32,
+            random_state=321
+        )
+
+        nodes = ((10,9,8), 1)
+        NN = NeuralNetwork(
+            SGD, 
+            nodes, 
+            random_state=321,
+            cost_func="MSE",
+            activation_hidden="tanh",
+            activation_output="linear"
+        )
+
+        D_train, D_test = D.train_test_split(ratio=3/4, random_state=42)
+        D_train = D_train.scaled(scheme="Standard")    
+        D_test = D_train.scale(D_test)
+        
+        NN.train(D_train, trainsize=1)
+
+        y_pred = NN.predict(D_train.X)
+        print(np.column_stack((y_pred[:,0],D_train.y)))
+
+    
     main()
