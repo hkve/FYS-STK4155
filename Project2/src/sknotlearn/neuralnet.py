@@ -1,3 +1,4 @@
+from audioop import bias
 import autograd.numpy as np
 from autograd import grad, elementwise_grad
 from datasets import make_debugdata
@@ -54,7 +55,7 @@ class NeuralNetwork:
         self.biases[:-1] = [0.1*np.ones(nodes) for nodes in self.n_hidden_nodes]
         self.biases[-1] = np.array([0.1]) 
 
-    def _flat_parameters(self):
+    def _flat_parameters(self, weights, biases):
         """The language of GD<3
 
         Returns:
@@ -62,26 +63,32 @@ class NeuralNetwork:
         """
         flat_parameters = np.zeros(self.n_parameters)
         idx = 0
-        for weights, biases in zip(self.weights, self.biases):
-            w_size = weights.size
-            b_size = biases.size
-            flat_parameters[idx:idx+w_size] = weights.ravel()
+        for w, b in zip(weights, biases):
+            w_size = w.size
+            b_size = b.size
+            flat_parameters[idx:idx+w_size] = w.ravel()
             idx += w_size
-            flat_parameters[idx:idx+b_size] = biases.ravel()
+            flat_parameters[idx:idx+b_size] = b.ravel()
             idx += b_size
+
         return flat_parameters
         
     def _curvy_parameters(self, flat_parameters): #;)
         idx = 0
-        for i, (weights, biases) in enumerate(zip(self.weights, self.biases)):
-            w_size = weights.size
-            b_size = biases.size
-            self.weights[i] = flat_parameters[idx:idx+w_size].reshape(weights.shape)
+        weights = [None]*len(self.weights)
+        biases = [None]*len(self.biases) 
+
+        for i, (w, b) in enumerate(zip(self.weights, self.biases)):
+            w_size = w.size
+            b_size = b.size
+            weights[i] = flat_parameters[idx:idx+w_size].reshape(w.shape)
             idx += w_size
-            self.biases[i] = flat_parameters[idx:idx+b_size].reshape(biases.shape)
+            biases[i] = flat_parameters[idx:idx+b_size].reshape(b.shape)
             idx += b_size
 
-    def _forward_pass(self, x:np.array) -> tuple:
+        return weights, biases
+
+    def _forward_pass(self, X:np.array) -> tuple:
         """
         
         """
@@ -89,7 +96,7 @@ class NeuralNetwork:
         z_fwp = [None]*(self.n_hidden_layers+1)
         a_fwp = [None]*(self.n_hidden_layers+2)
         
-        a = a_fwp[0] = x
+        a = a_fwp[0] = X
 
         #hidden layer:
         for h in range(self.n_hidden_layers):
@@ -136,8 +143,8 @@ class NeuralNetwork:
         # Delta in output layer
         delta_ls[-1] = self._grad_activation_output(z_fwp[-1])*grad_cost(y_pred)
 
-        for i, (w,b) in enumerate(zip(self.weights, self.biases)):
-            print(f"Layer({i}), W = {w.shape}, b = {b.shape}")
+        # for i, (w,b) in enumerate(zip(self.weights, self.biases)):
+        #     print(f"Layer({i}), W = {w.shape}, b = {b.shape}")
 
         # Iterate backwards over hidden layers to calculate layer errors
         for i in reversed(range(self.n_hidden_layers)):
@@ -152,16 +159,42 @@ class NeuralNetwork:
             grad_bs[i] = delta_ls[i].sum(axis=0)
 
 
-        for i, (wp,bp) in enumerate(zip(grad_Ws, grad_bs)):
-            print(f"Layer({i}), W' = {wp.shape}, b' = {bp.shape}")
+        # for i, (wp,bp) in enumerate(zip(grad_Ws, grad_bs)):
+        #     print(f"Layer({i}), W' = {wp.shape}, b' = {bp.shape}")
 
         return grad_Ws, grad_bs
 
 
     def predict(self, X:np.array) -> np.array:
-        y_pred = None
+        a = X
+        #hidden layer:
+        for h in range(self.n_hidden_layers):
+            z = a @ self.weights[h].T + self.biases[h]
+            a = self._activation_hidden(z)
 
+        #output layer: 
+        z = a @ self.weights[-1].T + self.biases[-1]
+        y_pred = self._activation_output(z)
+        
         return y_pred
+
+
+    def grad(self, coef: np.array, data:Data, idcs:np.ndarray=None) -> np.array:
+        # Reshape coef array to fit FWP/BWP
+        weights, biases = self._curvy_parameters(coef)
+        
+        # Set them as  the networks weights and biases
+        self.weights = weights
+        self.biases = biases
+
+        # Preform forward and backward pass
+        y_pred, z_fwp, a_fwp = self._forward_pass(data.X)
+        grad_Ws, grad_bs = self._backprop_pass(data.y, z_fwp, a_fwp)
+
+        # Flatten gradients
+        grad_coef = self._flat_parameters(grad_Ws, grad_bs)
+
+        return grad_coef
 
     def train(self, D:Data, trainsize=3/4):
         self.D_train, self.D_test = D.train_test_split(ratio=trainsize,random_state=self.random_state)
@@ -170,17 +203,24 @@ class NeuralNetwork:
         #Initialize weights and biases: 
         self._init_biases_and_weights()
         self.n_parameters = sum([weights.size + biases.size for weights, biases in zip(self.weights, self.biases)])
-        flat_parameters = self._flat_parameters()
-
 
         # Call forward for every datapoint: 
         n = len(self.D_train)
         y, X = self.D_train.unpacked()
 
-        y_pred, z_fwp, a_fwp = self._forward_pass(X)
-        grad_Ws, grad_bs = self._backprop_pass(y, z_fwp, a_fwp)
+        x0 = self._flat_parameters(self.weights, self.biases)
 
+        # TODO: Evaluate error after FWP based on Test data for each iteration.
+        coef_opt = self.optimizer.call(
+            grad=self.grad, 
+            x0=x0,
+            args=(self.D_train,),
+            all_idcs=np.arange(n)
+        )
 
+        weights, biases = self._curvy_parameters(coef_opt)
+        self.weights = weights
+        self.biases = biases
 
     #Activation funtions:
     def _no_activation(x):
@@ -218,22 +258,25 @@ class NeuralNetwork:
         "MSE": _MSE,
     }
 
-
-
-if __name__ == "__main__":
+def main():
     x, y, X = make_debugdata()
     D = Data(y,X)
 
-    GD = opt.GradientDescent(
-        method = "plain",
-        params = {"eta":0.8},
-        its=100
-    )
+    eta = 0.05
+    def learning_schedule(it):
+        epoch = it // 10
+        return eta / (1 + eta/100*epoch)
 
+    SGD = opt.SGradientDescent(
+        method = "plain",
+        params = {"eta":learning_schedule},
+        epochs=100,
+        batch_size=10
+    )        
     
     nodes = ((10, 9, 8), 1)
     NN = NeuralNetwork(
-        GD, 
+        SGD, 
         nodes, 
         random_state=321,
         cost_func="MSE",
@@ -245,6 +288,9 @@ if __name__ == "__main__":
     
     NN.train(D_train)
 
+    y_pred = NN.predict(D_test.X).reshape(-1, 1)
 
+    print(y_pred, D_test.y)
 
-
+if __name__ == "__main__":
+    main()
