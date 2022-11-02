@@ -1,2 +1,9 @@
 \comment{Suggestion: past tense}\\
-Results go here
+
+\subsection{Gradient Descent analysis}
+    \begin{figure}[ht]
+        \centering
+        \includegraphics[width=\linewidth]{figs/learning_rates_PGD_MGD_PSGD_MSGD.pdf}
+        \caption{Plot of the validation MSE of the parameters found from optimising the OLS cost function on Franke function data with $n=600$ data points. For the momentum methods we used $\gamma=0.8$. The stochastic methods used 8 batches and 100 epochs, while the standard GD did 100 iterations.}
+        \label[fig]{res:fig:lrate1}
+    \end{figure}
