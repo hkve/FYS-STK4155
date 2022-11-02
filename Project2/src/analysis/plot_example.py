@@ -10,7 +10,7 @@ ax.set_title(r"$V(\gamma)$")
 ax.set_ylabel(r"$y$ blabla")
 ax.set_xlabel(r"$x$ blabla")
 
-for i in [1,2,3]:
+for i in [1,2,3,4,5,6]:
     ax.plot(x, np.sin(x)/i, label=f"blabla {i}")
 
 
