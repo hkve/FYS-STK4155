@@ -1,6 +1,4 @@
 \comment{Suggestion: present tense}\\
-Theory goes here
-
 In this project, I thought we could use \verb|cleveref| to reference things like \cref{int:fig:example}.
 
 
@@ -34,6 +32,7 @@ We will assume that the measurements $y_i$ are generated from an exact function 
         SGD is done in so-called epochs, where we divide the full set $A$ into equally sized batches $A_k$, and do one GD iteration on every batch once. After this, $A$ is reshuffled and new mini-batches are drawn.
 
     \subsubsection{Improving Convergence Rate}
+        \comment{Talk about learning schedules.}\\
         As stochasticity is added to the algorithm, the rate of convergence does slow down. As such, it would be nice to add algorithms that can adapt the learning rate $\eta$ in such a way as to increase the rate of convergence. The AdaGrad algorithm does this with the idea to use different learning rates along different directions in parameter space; i.e. use larger learning rates in flat directions, while keeping it small in steep directions. This is done by keeping a running sum $G_k$ of the outer product of the gradients $\vec{g}_k$ at the points $\vec{\theta}_k$, and use this to adapt the learning rate.
         \comment{I don't know whether to include the update rules in the \LaTeX-document, or maybe move them to method, or whatever. -\Carl}
         \begin{align*}
@@ -46,6 +45,7 @@ We will assume that the measurements $y_i$ are generated from an exact function 
             \vec{\theta}_{k} = \vec{\theta}_{k-1} - \frac{\eta}{\sqrt{\diag(G_k)}+\epsilon} \circ \vec{g}_k,
         \end{align*}
         where the arithmetic operations are understood to be element-by-element and $\vec{v}\circ \vec{u}$ represents the element-wise multiplication of two vectors $\vec{v}, \vec{u}$, and $\epsilon$ is a small number to avoid zero-division.
+        \comment{Add the bastard that is AdaGrad `with momentum'.}\\
 
         Another way to adapt the learning rate to the parameter space `terrain' is found in the Root Mean Square Propagation (RMSProp) algorithm. Here we approximate a running average of the second moment of the gradient $\vec{s} = \expval(\vec{g} \circ \vec{g})$, then use this to scale the learning rate appropriately.
         \begin{align*}
