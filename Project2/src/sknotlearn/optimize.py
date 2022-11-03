@@ -168,8 +168,8 @@ class SGradientDescent(GradientDescent):
         self._it = 0 # tracking iteration for adam/learning schedule
         for epoch in range(self.its):
             batches = self._make_batches(all_idcs)
+            self._it += 1
             for batch in batches:
-                self._it += 1
                 g = grad(self.x, *args, batch)
                 self.x = self._update_rule(self, self.x, g)
                 if any((np.abs(self.x) > MAX)):
@@ -186,117 +186,33 @@ class SGradientDescent(GradientDescent):
             idcs (np.ndarray): Indices to divide into batches.
         """
         np.random.shuffle(idcs) # shuffle indices
-        n_batches = len(idcs) // self.batch_size
-        return [idcs[i*self.batch_size:(i+1)*self.batch_size] for i in range(n_batches)]
+        n = len(idcs)
+        n_batches = n // self.batch_size
+        return [idcs[i:i+n//n_batches] for i in range(n_batches)]
 
 
 
 if __name__=="__main__":
     from linear_model import OLS_gradient
-    from data import Data
+    from datasets import make_FrankeFunction
+    random_state = 321
+    np.random.seed(random_state)
+    D = make_FrankeFunction(n=600, noise_std=0.1, random_state=random_state)
+    D = D.polynomial(degree=5).scaled(scheme="Standard")
 
-    np.random.seed(321)
-    n = 100
-    x = np.random.uniform(-1, 1, n)
-    y = x**2 + np.random.normal(scale=0.1, size=n)
-    X = np.c_[np.ones(n), x, x**2]
+    D_train, D_test = D.train_test_split(ratio=3/4, random_state=random_state)
 
-    # grad = lambda theta, X, y: (2./n) * X.T @ (X @ theta - y)
-    theta0 = np.random.randn(X.shape[1]) # makes sure all methods have same starting value
-    
-    ##################
-    # Non-Stochastic #
-    ##################
-    # GD = GradientDescent(
-    #     method = "plain",
-    #     params = {"eta":lambda it : 0.8 / (1+0.008*it)},
-    #     its=100,
-    # )
-    # plain_x = GD.call(
-    #     grad=OLS_gradient, 
-    #     x0=theta0,
-    #     args=(Data(y,X),),
-    # )
+    max_iter = 100000
 
-    # GD_mom = GradientDescent(
-    #     method="momentum",
-    #     params = {"gamma":0.1, "eta":lambda it : 0.8 / (1+0.008*it)},
-    #     its=100
-    # )
-    # mom_x = GD_mom.call(
-    #     grad=OLS_gradient, 
-    #     x0=theta0,
-    #     args=(Data(y,X),)
-    # )
-
-    # GD_ada = GradientDescent(
-    #     method="adagrad",
-    #     params = {"eta":0.8},
-    #     its=100
-    # )
-    # ada_x = GD_ada.call(
-    #     grad=OLS_gradient, 
-    #     x0=theta0,
-    #     args=(Data(y,X),)
-    # )
-
-
-
-    ##############
-    # Stochastic #
-    ##############
-    eta = 0.05
-    def learning_schedule(it):
-        epoch = it // 10
-        return eta / (1 + eta/100*epoch)
-
-    SGD = SGradientDescent(
-        method = "plain",
-        params = {"eta":learning_schedule},
-        epochs=100,
-        batch_size=10
+    GD = GradientDescent("momentum", {"eta":0.08, "gamma":0.8}, its=max_iter)
+    theta_opt = GD.call(
+        grad = OLS_gradient,
+        x0 = np.random.randn(D.n_features),
+        args = (D_train,)
     )
-    plain_x = SGD.call(
-        grad=OLS_gradient, 
-        x0=theta0,
-        args=(Data(y,X),),
-        all_idcs=np.arange(n)
-    )
+    theta_ana = np.linalg.pinv(D_train.X.T@D_train.X) @ D_train.X.T @ D_train.y
 
-    SGD_mom = SGradientDescent(
-        method="momentum",
-        params = {"gamma":0.1, "eta":learning_schedule},
-        epochs=100,
-        batch_size=10
-    )
-    mom_x = SGD_mom.call(
-        grad=OLS_gradient, 
-        x0=theta0,
-        args=(Data(y,X),),
-        all_idcs=np.arange(n)
-    )
+    MSE_GD = np.mean((D_test.X@theta_opt - D_test.y)**2)
+    MSE_ana = np.mean((D_test.X@theta_ana - D_test.y)**2)
 
-    SGD_ada = SGradientDescent(
-        method="adagrad",
-        params = {"eta":0.2},
-        epochs=100,
-        batch_size=10
-    )
-    ada_x = SGD_ada.call(
-        grad=OLS_gradient, 
-        x0=theta0,
-        args=(Data(y,X),),
-        all_idcs=np.arange(n)
-    )
-
-    analytic_x = np.linalg.pinv(X.T@X) @ X.T@y
-    # print("Analytic", analytic_x)
-
-    # print(f"Plain rel error    : {abs( (plain_x-analytic_x) )}")
-    # print(f"Momentum rel error : {abs( (mom_x-analytic_x) )}")
-    # print(f"AdaGrad rel error  : {abs( (ada_x-analytic_x) )}")
-
-    print(f"Analytic MSE : {np.mean((X@analytic_x-y)**2)}" )
-    print(f"Plain MSE    : {np.mean((X@plain_x-y)**2)}" )
-    print(f"Momentum MSE : {np.mean((X@mom_x-y)**2)}" )
-    print(f"AdaGrad MSE  : {np.mean((X@ada_x-y)**2)}" )
+    print(MSE_GD, MSE_ana)
