@@ -253,20 +253,20 @@ class NeuralNetwork:
 
 
 if __name__ == "__main__":
-    from datasets import make_debugdata, make_FrankeFunction, plot_FrankeFunction
+    from datasets import make_debugdata, make_FrankeFunction, plot_FrankeFunction, load_Terrain, plot_Terrain
     def main():
-        D = make_FrankeFunction(n=600, random_state=321, noise_std=0.1).scaled(scheme="Standard")
+        D = load_Terrain(random_state=321)
         # D = Data(y,x.reshape(-1,1))
 
         SGD = opt.SGradientDescent(
-            method = "plain",
-            params = {"eta":0.06},
-            epochs=100,
-            batch_size=8,
+            method = "adam",
+            params = {"eta":0.06, "beta1":0.9, "beta2":0.99},
+            epochs=800,
+            batch_size=50,
             random_state=321
         )
 
-        nodes = ((10,), 1)
+        nodes = ((40,), 1)
         NN = NeuralNetwork(
             SGD, 
             nodes, 
@@ -287,11 +287,13 @@ if __name__ == "__main__":
         # print(np.column_stack((y_pred,D.y)))
         print(np.mean((y_pred - D_test.y)**2))
 
-        D_temp = Data(y_pred, D_test.X)
+        D_pred = Data(y_pred, D_test.X)
+        D_pred = D_train.unscale(D_pred)
 
-        D_temp = D_temp.unscaled()
-        # plot_FrankeFunction(D_train.unscale(D_test))
-        plot_FrankeFunction(D_temp)
+        plot_Terrain(D_train.unscale(D_test), angle=(16,-165))
+        plot_Terrain(D_pred, angle=(16,-165))
+
+        #One dimensional:
         # import matplotlib.pyplot as plt
         # sorted_idcs = D_test.X[:,0].argsort()
         # plt.scatter(D_test.X[:,0], D_test.y, c="r")
