@@ -13,7 +13,8 @@ class NeuralNetwork:
         cost_func,
         activation_hidden:str="sigmoid",
         activation_output:str="linear",
-        random_state = None
+        random_state = None,
+        lmbda = None
         ) -> None:
         """
         Args:
@@ -41,6 +42,8 @@ class NeuralNetwork:
 
         self._grad_activation_output = elementwise_grad(self._activation_output)
         self._grad_activation_hidden = elementwise_grad(self._activation_hidden)
+
+        self.lmbda = lmbda 
 
     def _init_biases_and_weights(self) -> None:
         """NB: Weights might be initialized opposite to the convension
@@ -132,8 +135,8 @@ class NeuralNetwork:
         # What FWP predicted
         y_pred = a_fwp[-1]
 
-        # Calculate the gradient of cost function corresponding to this set of y values
-        grad_cost = elementwise_grad(lambda y_pred : self.cost_func(y, y_pred))
+        # Calculate the gradient of cost function corresponding to this set of y values    
+        grad_cost = elementwise_grad(lambda y_pred : self.cost_func(y, y_pred)) 
 
         # Delta in output layer
         delta_ls[-1] = self._grad_activation_output(z_fwp[-1]) * grad_cost(y_pred)
@@ -148,6 +151,8 @@ class NeuralNetwork:
         # Iterate backwards over hidden layers to calculate gradients
         for i in range(self.n_hidden_layers+1):
             grad_Ws[i] = a_fwp[i].T @ delta_ls[i]
+            if self.lmbda: 
+                grad_Ws[i] += self.lmbda * self.weights
             grad_bs[i] = delta_ls[i].sum(axis=0)
 
 
@@ -230,6 +235,7 @@ class NeuralNetwork:
 
     #Cost functions: 
     def _MSE(y, y_pred):
+        assert y.shape == y_pred.shape, f"y and y_pred have different shapes. {y.shape =}, {y_pred.shape =}"
         return np.mean((y - y_pred)**2)
 
     #Dicts:        
@@ -247,10 +253,10 @@ class NeuralNetwork:
 
 
 if __name__ == "__main__":
-    from datasets import make_debugdata, make_FrankeFunction
+    from datasets import make_debugdata, make_FrankeFunction, plot_FrankeFunction
     def main():
-        x, y, X = make_debugdata(n=256, random_state=123)
-        D = Data(y,x.reshape(-1,1))
+        D = make_FrankeFunction(n=600, random_state=321, noise_std=0.1).scaled(scheme="Standard")
+        # D = Data(y,x.reshape(-1,1))
 
         SGD = opt.SGradientDescent(
             method = "plain",
@@ -281,10 +287,15 @@ if __name__ == "__main__":
         # print(np.column_stack((y_pred,D.y)))
         print(np.mean((y_pred - D_test.y)**2))
 
-        import matplotlib.pyplot as plt
-        sorted_idcs = D_test.X[:,0].argsort()
-        plt.scatter(D_test.X[:,0], D_test.y, c="r")
-        plt.plot(D_test.X[sorted_idcs,0], y_pred[sorted_idcs])
-        plt.show()
+        D_temp = Data(y_pred, D_test.X)
+
+        D_temp = D_temp.unscaled()
+        # plot_FrankeFunction(D_train.unscale(D_test))
+        plot_FrankeFunction(D_temp)
+        # import matplotlib.pyplot as plt
+        # sorted_idcs = D_test.X[:,0].argsort()
+        # plt.scatter(D_test.X[:,0], D_test.y, c="r")
+        # plt.plot(D_test.X[sorted_idcs,0], y_pred[sorted_idcs])
+        # plt.show()
     
     main()
