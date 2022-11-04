@@ -148,7 +148,7 @@ class SGradientDescent(GradientDescent):
         self.epochs = epochs
         self.random_state = random_state
 
-    def call(self, grad, x0:np.ndarray, all_idcs:np.ndarray, args:tuple=(), random_state=None) -> np.ndarray:
+    def call(self, grad, x0:np.ndarray, all_idcs:np.ndarray, args:tuple=()) -> np.ndarray:
         """Set the problem to be gradient-descended. Create the for-loop with call to method.
         Args:
             grad (callable): The gradient function, returns np.ndarray of same shape as x0.
