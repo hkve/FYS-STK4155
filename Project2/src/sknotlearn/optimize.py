@@ -143,11 +143,10 @@ class SGradientDescent(GradientDescent):
             batch_size (int): Size of each batch
             random_state (int): random seed to use with numpy.random module 
         """
-        if random_state:
-            np.random.seed(random_state)
         super().__init__(method, params, epochs)
         self.batch_size = batch_size
         self.epochs = epochs
+        self.random_state = random_state
 
     def call(self, grad, x0:np.ndarray, all_idcs:np.ndarray, args:tuple=()) -> np.ndarray:
         """Set the problem to be gradient-descended. Create the for-loop with call to method.
@@ -157,6 +156,9 @@ class SGradientDescent(GradientDescent):
             all_idcs (np.ndarray): The full set of indices to pass to stochastic gradient function.
             args (tuple, optional): arguments to be passed to grad-function. Defaults to ().
         """
+        # random_state is set, every call will use the same batches
+        if self.random_state:
+            np.random.seed(self.random_state)
         # assert that grad works as intended
         grad0 = grad(x0, *args, all_idcs) 
         assert grad0.shape == x0.shape, f"grad-function returns array of shape {grad0.shape} instead of shape {x0.shape}."
