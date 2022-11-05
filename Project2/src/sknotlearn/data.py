@@ -242,7 +242,7 @@ class Data:
         """
         return data
 
-    def polynomial(self, degree:int, return_powers:bool=False):
+    def polynomial(self, degree:int, with_intercept:bool=True, return_powers:bool=False):
         """
         Makes polynomials based on features (columns) in X. Optionally,
         the ordering of powers can be saved to data object.
@@ -254,7 +254,7 @@ class Data:
         Returns:
             Data: at Data-instance with a new design matrix based on polynomials of prior features.
         """
-        poly = PolynomialFeatures(degree=degree)
+        poly = PolynomialFeatures(degree=degree, include_bias=with_intercept)
         X = poly.fit_transform(self.X)
         out = Data(self.y, X)
         
