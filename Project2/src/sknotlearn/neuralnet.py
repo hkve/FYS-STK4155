@@ -176,6 +176,24 @@ class NeuralNetwork:
         return y_pred[:,0]
 
 
+    def classify(self, X:np.array, return_prob:bool=False) -> np.array:
+        proba = self.predict(X)
+        threshold = 0.5
+
+        y_pred = np.where(proba > threshold, 1, 0).astype(int)
+
+        if return_prob:
+            return y_pred, proba
+        else:
+            return y_pred
+
+    def accuracy(self, X:np.array, y:np.array):
+        n = len(y)
+
+        y_pred = self.classify(X)
+
+        return np.sum(y_pred == y)/n
+
     def grad(self, coef: np.array, data:Data, idcs:np.ndarray=None) -> np.array:
         data = data[idcs]
         # Reshape coef array to fit FWP/BWP
@@ -241,6 +259,11 @@ class NeuralNetwork:
         assert y.shape == y_pred.shape, f"y and y_pred have different shapes. {y.shape =}, {y_pred.shape =}"
         return np.mean((y - y_pred)**2)
 
+    def _binary_crossentropy(y, y_pred):
+        n = len(y)
+        assert y.shape == y_pred.shape, f"y and y_pred have different shapes. {y.shape =}, {y_pred.shape =}"
+        return -np.sum(y*np.log(y_pred)+(1-y)*np.log(1-y_pred))/n
+
     #Dicts:        
     activation_functions = {
         "sigmoid": _sigmoid,
@@ -252,6 +275,7 @@ class NeuralNetwork:
 
     cost_function = {
         "MSE": _MSE,
+        "BCE": _binary_crossentropy,
     }
 
 
