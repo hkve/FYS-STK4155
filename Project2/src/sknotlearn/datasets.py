@@ -125,11 +125,12 @@ def load_Terrain(filename="SRTM_data_Nica.tif", n=900, random_state=321):
 def load_BreastCancer(filename="breast_cancer.csv"):
 	import pandas as pd
 	
-	df = pd.read_csv(filename)
+	path = pl.Path(__file__).parent / filename
+	df = pd.read_csv(path)
 
 	# Target (y) is saved under "diagnosis" col with values M = malignant (bad), B = benign (good)
 	# Save these as M == 1, B == 0
-	y = np.where(df.diagnosis == "M", 1, 0)	
+	y = np.where(df.diagnosis == "M", 1, 0).astype(int)
 	
 	# Drop the target col and id
 	df.drop(columns=["diagnosis", "id"], inplace=True)
