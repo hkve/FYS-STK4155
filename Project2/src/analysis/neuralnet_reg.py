@@ -1,0 +1,157 @@
+"The analysis for the application of neural networks on regression."
+
+import autograd.numpy as np
+from autograd import grad, elementwise_grad
+import matplotlib.pyplot as plt
+import seaborn as sns
+import plot_utils
+from utils import make_figs_path
+import time 
+
+import context
+import sknotlearn.optimize as opt
+from sknotlearn.data import Data
+from sknotlearn.neuralnet import NeuralNetwork
+from sknotlearn.datasets import make_debugdata, make_FrankeFunction, plot_FrankeFunction, load_Terrain, plot_Terrain
+
+def nodes_etas_heatmap(D_train, D_test, etas, nodes, layers=2, epochs=800, batch_size=80, random_state=321, filename=None):
+    """Plot the heatmap of MSE-values given various number of nodes and learning rates for a given number of layers . 
+
+    Args:
+        D_train (Data): Training data.
+        D_test (Data): Testing data
+        etas (ndarray, list): A list (or array) of the various learning rates. 
+        nodes (ndarray, list): A list (or array) of the various number of nodes in each layer. (NB: All layers have the same number of nodes) 
+        layers (int): Number of layers. Defaults to 2.
+        epochs (int): Number of epochs for which each gradient is calculated. Defaults to 800.
+        batch_size (int): The size of each bach in the SGD. Defaults to 80.
+        random_state (int): Defaults to 321.
+        filename (_type_, str): Filename of plot. Needs to be implemented to save plot. Defaults to None.
+    """
+
+    start_time = time.time()
+
+    MSE_grid = list()
+    for eta in etas: 
+        MSE_list = list()
+        SGD = opt.SGradientDescent(
+            method = "adam",
+            params = {"eta":eta, "beta1":0.9, "beta2":0.99},
+            epochs=epochs,
+            batch_size=batch_size,
+            random_state=random_state
+        )
+        for n in nodes:
+            #create the nodes of the network:
+            nodes_ = ((n,)*layers, 1)
+            NN = NeuralNetwork(
+                SGD, 
+                nodes_, 
+                random_state=random_state,
+                cost_func="MSE",
+                # lmbda=0.001,
+                activation_hidden="sigmoid",
+                activation_output="linear"
+            )
+
+            NN.train(D_train, trainsize=1)
+            y_pred = NN.predict(D_test.X)
+
+            MSE_list.append(MSE(D_test.y, y_pred))
+        MSE_grid.append(MSE_list)
+        
+    run_time = time.time() - start_time 
+    print(f"{epochs = } and {batch_size = } gives {run_time = :.3f} s")
+
+    
+    # Ploting the heatmap
+    fig, ax = plt.subplots()
+    sns.heatmap(MSE_grid, annot=True, cmap="viridis", ax=ax, cbar_kws={'label':'MSE'})
+    # Plot a red triangle around best value. I think this code is Messi<3
+    arg_best_MSE = np.unravel_index(np.argmin(MSE_grid), np.shape(MSE_grid))
+    ax.add_patch(plt.Rectangle((arg_best_MSE[1], arg_best_MSE[0]), 1, 1, fc='none', ec='red', lw=5, clip_on=False))
+
+    # Set xylabels and ticks. This code is ronaldo, but it works.
+    ax.set_xlabel("Nodes in each layer")
+    ax.set_xticks(
+        np.arange(len(nodes))+.5,
+        labels=nodes
+    )
+    ax.set_ylabel("Learning rate")
+    ax.set_yticks(
+        np.arange(len(etas))+.5,
+        labels=list(reversed(etas))
+    )
+    if filename:
+        plt.savefig(make_figs_path(filename), dpi=300)
+    plt.show()
+
+
+def MSE(y_test, y_pred):
+    assert y_test.shape == y_pred.shape, f"y and y_pred have different shapes. {y_test.shape =}, {y_pred.shape =}"
+    return np.mean((y_test - y_pred)**2)
+
+
+
+if __name__ == "__main__":
+    epochs = 800
+    batch_size = 80
+
+    D = load_Terrain(random_state=123)
+    D_train, D_test = D.train_test_split(ratio=3/4, random_state=42)
+    D_train = D_train.scaled(scheme="Standard")    
+    D_test = D_train.scale(D_test)
+    y_test = D_test.y   
+
+    # nodes = [10,20,50]
+    # etas = [0.001, 0.01, 0.08]
+    # layers = [1]
+    nodes = [2, 10, 20, 50, 100, 200]
+    etas = [0.001, 0.01, 0.06, 0.08, 0.1, 0.8]
+    layers = [1,3,5]
+    for l in layers:
+        filename = f"nodes_etas_heatmap_{l}.pdf"
+        nodes_etas_heatmap(
+            D_train=D_train, 
+            D_test=D_test, 
+            etas=etas, 
+            nodes=nodes, 
+            layers=l, 
+            epochs=epochs, 
+            batch_size=batch_size, 
+            filename=filename
+        )
+
+
+    # start_time = time.time()
+    # # etas = np.linspace(0.001, 0.9, 5)
+    # etas = [0.001, 0.01, 0.06, 0.1, 0.8]
+    # y_preds = [None] * len(etas)
+    # for i, eta in enumerate(etas): 
+    #     y_preds[i] = nodes_etas_heatmap(D_train=D_train, D_test=D_test, etas=[eta], epochs=epochs, batch_size=batch_size)
+    #     print(f"{eta = :.3f}, MSE = {MSE(y_test, y_preds[i]) :.3f}")
+    # run_time = time.time() - start_time
+    # print(f"{epochs = } and {batch_size = } gives {run_time = :.3f} s")
+
+    #Plot: 
+    # D_pred = Data(y_pred, D_test.X)
+    # D_pred = D_train.unscale(D_pred)
+
+    # plot_Terrain(D_train.unscale(D_test), angle=(16,-165))
+    # plot_Terrain(D_pred, angle=(16,-165))
+
+    #One dimensional:
+    # import matplotlib.pyplot as plt
+    # sorted_idcs = D_test.X[:,0].argsort()
+    # plt.scatter(D_test.X[:,0], D_test.y, c="r")
+    # plt.plot(D_test.X[sorted_idcs,0], y_pred[sorted_idcs])
+    # plt.show()
+
+
+
+    "SGD"
+    #Interesting parameters:
+    eta_plain = [0.001, 0.01, 0.1, 0.9] #The best is eta=0.1
+    gamma_momentum = 0.8 #The best when eta=0.1
+
+    "Layers and nodes"

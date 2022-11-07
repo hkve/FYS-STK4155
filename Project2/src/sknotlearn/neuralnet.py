@@ -1,6 +1,9 @@
 import autograd.numpy as np
 from autograd import grad, elementwise_grad
 
+import os 
+import sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import optimize as opt
 from data import Data
 
@@ -279,7 +282,7 @@ class NeuralNetwork:
 if __name__ == "__main__":
     from datasets import make_debugdata, make_FrankeFunction, plot_FrankeFunction, load_Terrain, plot_Terrain
     def main():
-        D = load_Terrain(random_state=321)
+        D = load_Terrain(random_state=123)
         # D = Data(y,x.reshape(-1,1))
 
         SGD = opt.SGradientDescent(
