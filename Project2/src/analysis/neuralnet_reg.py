@@ -14,6 +14,39 @@ from sknotlearn.data import Data
 from sknotlearn.neuralnet import NeuralNetwork
 from sknotlearn.datasets import make_debugdata, make_FrankeFunction, plot_FrankeFunction, load_Terrain, plot_Terrain
 
+def plot_NN_vs_test(D_train, D_test, eta, nodes, epochs=800, batch_size=80, random_state=321, filename=None):
+
+    SGD = opt.SGradientDescent(
+        method = "adam",
+        params = {"eta":eta, "beta1":0.9, "beta2":0.99},
+        epochs=epochs,
+        batch_size=batch_size,
+        random_state=random_state
+    )
+
+    NN = NeuralNetwork(
+        SGD, 
+        nodes, 
+        random_state=random_state,
+        cost_func="MSE",
+        # lmbda=0.001,
+        activation_hidden="sigmoid",
+        activation_output="linear"
+        )
+
+    NN.train(D_train, trainsize=1)
+    y_pred = NN.predict(D_test.X)
+
+    print(MSE(D_test.y, y_pred))
+
+    #Plot: 
+    D_pred = Data(y_pred, D_test.X)
+    D_pred = D_train.unscale(D_pred)
+
+    plot_Terrain(D_train.unscale(D_test), angle=(16,-165))
+    plot_Terrain(D_pred, angle=(16,-165), filename=filename)
+
+
 def nodes_etas_heatmap(D_train, D_test, etas, nodes, layers=2, epochs=800, batch_size=80, random_state=321, filename=None):
     """Plot the heatmap of MSE-values given various number of nodes and learning rates for a given number of layers . 
 
@@ -68,7 +101,7 @@ def nodes_etas_heatmap(D_train, D_test, etas, nodes, layers=2, epochs=800, batch
     fig, ax = plt.subplots()
     sns.heatmap(MSE_grid, annot=True, cmap="viridis", ax=ax, cbar_kws={'label':'MSE'})
     # Plot a red triangle around best value. I think this code is Messi<3
-    arg_best_MSE = np.unravel_index(np.argmin(MSE_grid), np.shape(MSE_grid))
+    arg_best_MSE = np.unravel_index(np.nanargmin(MSE_grid), np.shape(MSE_grid))
     ax.add_patch(plt.Rectangle((arg_best_MSE[1], arg_best_MSE[0]), 1, 1, fc='none', ec='red', lw=5, clip_on=False))
 
     # Set xylabels and ticks. This code is ronaldo, but it works.
@@ -80,7 +113,7 @@ def nodes_etas_heatmap(D_train, D_test, etas, nodes, layers=2, epochs=800, batch
     ax.set_ylabel("Learning rate")
     ax.set_yticks(
         np.arange(len(etas))+.5,
-        labels=list(reversed(etas))
+        labels=etas
     )
     if filename:
         plt.savefig(make_figs_path(filename), dpi=300)
@@ -106,22 +139,32 @@ if __name__ == "__main__":
     # nodes = [10,20,50]
     # etas = [0.001, 0.01, 0.08]
     # layers = [1]
-    nodes = [2, 10, 20, 50, 100, 200]
-    etas = [0.001, 0.01, 0.06, 0.08, 0.1, 0.8]
-    layers = [1,3,5]
-    for l in layers:
-        filename = f"nodes_etas_heatmap_{l}.pdf"
-        nodes_etas_heatmap(
-            D_train=D_train, 
-            D_test=D_test, 
-            etas=etas, 
-            nodes=nodes, 
-            layers=l, 
-            epochs=epochs, 
-            batch_size=batch_size, 
-            filename=filename
-        )
+    # nodes = [2, 10, 20, 50, 100, 200]
+    # etas = [0.001, 0.01, 0.06, 0.08, 0.1, 0.8]
+    # layers = [1,3,5]
+    # for l in layers:
+    #     filename = f"nodes_etas_heatmap_{l}.pdf"
+    #     nodes_etas_heatmap(
+    #         D_train=D_train, 
+    #         D_test=D_test, 
+    #         etas=etas, 
+    #         nodes=nodes, 
+    #         layers=l, 
+    #         epochs=epochs, 
+    #         batch_size=batch_size, 
+    #         filename=filename
+    #     )
 
+    nodes = ((100,)*5, 1)
+    eta = 0.001
+    plot_NN_vs_test(
+        D_train=D_train, 
+        D_test=D_test, 
+        eta=eta, nodes=nodes, 
+        epochs=epochs, 
+        batch_size=batch_size,
+        filename="predicted_terrain.pdf"
+    )
 
     # start_time = time.time()
     # # etas = np.linspace(0.001, 0.9, 5)
