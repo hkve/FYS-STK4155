@@ -15,3 +15,17 @@
     with a polynomial expansion of degree $5$ of the Franke function arguments $x,y$. 
 
     \comment{Mention initialising SGDs with same random seed for every learning rate.}
+
+\subsection{Classification problems}
+    Thus far, we have only aimed at solving regression problems. The machinery regarding neural networks we have introduced here, can with some modification be used to approach \textit{classification} problems. Instead of predicting targets in a continuous domain ($y_i \in \mathbb{R}$), we aim to put the target $y_i$ in a specific class ($y_i \in \mathcal{Q}$), where $\mathcal{Q}$ is the set of possible outcomes. 
+
+    In this work we will consider the famous Wisconsin Breast Cancer data set \cite{Dua:2019}. Tumors are characterized as malignant (M) or benign (B), with attributes such as radius, texture and area computed from digitized images. We wish to classify each tumor as either M or B, based on the tumors various attributes. These categories are mutually exclusive, thus determining M or not M is sufficient (i.e. $\mathcal{Q} = \{ M, \neg M \}$). This leaves us with a binary problem. 
+
+    \subsubsection*{Logistic Regression}
+    To be continued ...
+
+    \subsubsection*{Neural Network approach}
+    \cite{BCE}
+    \begin{align}
+        \msub{C}{BCE} = -\frac{1}{n}\sum_{i=1}^{n} y_i \log{p_i} + (1-y_i) \log{(1-p_i)}
+    \end{align}

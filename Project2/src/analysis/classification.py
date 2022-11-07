@@ -16,13 +16,13 @@ def main():
 
     SGD = SGradientDescent(
         method = "adam",
-        params = {"eta":0.1, "beta1": 0.9, "beta2": 0.99},
+        params = {"eta":0.05, "beta1": 0.9, "beta2": 0.99},
         epochs=100,
         batch_size=20,
         random_state=321
     )
 
-    nodes = ((20, ), 1)
+    nodes = ((1, ), 1)
     NN = NeuralNetwork(
         SGD, 
         nodes=nodes, 
@@ -37,13 +37,17 @@ def main():
     y_test, X_test = D_test.unpacked()
 
     scaler = StandardScaler().fit(X_train)
-    X_train, X_test = scaler.fit_transform(X_train), scaler.fit_transform(X_test)
+    X_train, X_test = scaler.transform(X_train), scaler.transform(X_test)
 
 
     D_train.X = X_train
     NN.train(D_train, trainsize=1)
     print(NN.accuracy(X_test, y_test))
-    
+
+    y_pred, proba =  NN.classify(X_test, return_prob=True)
+
+    for a, b, c in zip(y_pred, y_test, proba):
+        print(a, b, c)
 
 def test_logreg():
     from sklearn.linear_model import LogisticRegression
@@ -53,6 +57,7 @@ def test_logreg():
     clf = LogisticRegression(max_iter=10000).fit(D_train.X, D_train.y)
 
     y_pred = clf.predict(D_test.X)
+    
 
     acc = np.sum(y_pred == D_test.y)/len(y_pred)
     print(acc)
