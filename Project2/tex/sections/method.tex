@@ -17,9 +17,20 @@
     \comment{Mention initialising SGDs with same random seed for every learning rate.}
 
 \subsection{Classification problems}
-    Thus far, we have only aimed at solving regression problems. The machinery regarding neural networks we have introduced here, can with some modification be used to approach \textit{classification} problems. Instead of predicting targets in a continuous domain ($y_i \in \mathbb{R}$), we aim to put the target $y_i$ in a specific class ($y_i \in \mathcal{Q}$), where $\mathcal{Q}$ is the set of possible outcomes. 
+    Thus far, we have only aimed at solving regression problems. The machinery regarding neural networks we have introduced here, can with some modification be used to approach \textit{classification} problems. Instead of predicting targets in a continuous domain ($y_i \in \mathbb{R}$), we aim to put the target $y_i$ in a specific class ($y_i \in \mathcal{Q}$), where $\mathcal{Q}$ is the set of possible outcomes. For comparison purposes, we will also implement a logistic regression method.
 
-    In this work we will consider the famous Wisconsin Breast Cancer data set \cite{Dua:2019}. Tumors are characterized as malignant (M) or benign (B), with 30 attributes such as radius, texture and area computed from digitized images. With $n = 569$ instances present in the data set, it serves a good real-world benchmarking set. We wish to classify each tumor as either M or B, based on the tumors various attributes. These categories are mutually exclusive, thus determining M or not M is sufficient (i.e. $\mathcal{Q} = \{ M, \neg M \}$). This leaves us with a binary problem, represented with $y_i \in \{ 1, 0 \}$ where $y_i = 1$ implies M and $y_i = 0$ not M.   
+    In this work we will consider the famous Wisconsin Breast Cancer data set \cite{Dua:2019}. Tumors are characterized as malignant (M) or benign (B), with 30 attributes such as radius, texture and area computed from digitized images. With $n = 569$ instances present in the data set, it serves a good real-world benchmarking set. We wish to classify each tumor as either M or B, based on the tumors various attributes. These categories are mutually exclusive, thus determining M or not M is sufficient (i.e. $\mathcal{Q} = \{ M, \neg M \}$). This leaves us with a binary problem, represented with $y_i \in \{ 1, 0 \}$ where $y_i = 1$ implies M and $y_i = 0$ not M.
+
+    To measure the goodness of fit in for our classification problems, we use the \textit{accuracy} score. This metric simply counts the number correctly classified cases, divided by the total number of cases:
+
+    \begin{align}
+        A(y_i, \hat{y}_i) = \frac{1}{n}\sum_{i=1}^{n} I(\hat{y}_i = y_i), \\
+        I(\hat{y}_i = y) = \begin{cases}
+            1\hspace{10px}&\text{if }\hat{y}_i = y \\
+            0\hspace{10px}&\text{else}
+        \end{cases} \nonumber
+    \end{align}
+    Where $I$ is the indicator function. We note that if all cases are classified correctly, the sum will evaluate to $n$ and if all are classified wrongly, it will evaluate to 0. Thus, the accuracy is bounded by $0 \leq A(y_i, \hat{y}_i) \leq 1$.
 
     \subsubsection*{Logistic Regression}
     To be continued ...
@@ -28,5 +39,6 @@
     As a loss function suitable for classification problems, the Binary Cross Entropy (BCE) \cite{BCE} will be used:
     \begin{align}
         \msub{C}{BCE} = -\frac{1}{n}\sum_{i=1}^{n} y_i \log{\hat{p}_i} + (1-y_i) \log{(1-\hat{p}_i)}
+        \label{eq:BCE_loss_function}
     \end{align} 
     Where $\hat{p}_i$ is the predicted probability of $y_i = 1$ given $x_i$.  
