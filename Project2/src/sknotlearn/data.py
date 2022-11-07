@@ -28,7 +28,7 @@ class Data:
     Features can be expanded to polynomials by
         data = data.polynomial(degree)
     """
-    def __init__(self, y:np.ndarray, X:np.ndarray, unscale=None, scale=None) -> None:
+    def __init__(self, y:np.ndarray, X:np.ndarray, unscale=None, scale=None, col_names=None) -> None:
         self.y = np.array(y)
         self.X = np.array(X)
         self.n_points, self.n_features = X.shape
@@ -41,6 +41,9 @@ class Data:
         self.scale = scale or (lambda data : data)
         assert callable(self.scale), f"Specified scaler is not callable (is {type(self.scaler)})"
 
+        if col_names is not None:
+            assert len(col_names) == self.n_features, f"Number of coulom names {len(col_names)} does not match number of couloms in X {self.n_features}"
+            self.col_names = col_names
 
     # The following methods are there for indexing and iteration of Data
     def __len__(self) -> int:

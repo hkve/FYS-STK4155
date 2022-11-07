@@ -11,8 +11,9 @@ from sknotlearn.linear_model import OLS_gradient, ridge_gradient
 from sknotlearn.optimize import GradientDescent, SGradientDescent
 
 def tune_learning_rate(
-    data:Data,
-    trainsize:float,
+    data_train:Data,
+    data_val:Data,
+    theta0:np.ndarray,
     learning_rates:np.ndarray,
     optimizers:tuple,
     optimizer_names:tuple,
@@ -20,7 +21,6 @@ def tune_learning_rate(
     lmbda:float=None,
     ylims:tuple = (0,3),
     filename:str = None,
-    random_state:int = None,
     verbose:bool = False
 ) -> None:
     """Plots the MSE score on validation data of the minimisation of either OLS or Ridge cost functions using given GradientDescent instances.
@@ -39,16 +39,12 @@ def tune_learning_rate(
         verbose (bool, optional): Whether to print best MSE-scores of each optimizer. Defaults to False.
     """
 
-    # Split data into training and validation data
-    data_train, data_val = data.train_test_split(ratio=trainsize, random_state=random_state)
     y_train, X_train = data_train.unpacked()
     y_val, X_val = data_val.unpacked()
 
     # Set random seed
     if random_state:
         np.random.seed(random_state)
-    # Set starting point for of minimisation
-    theta0 = np.random.randn(X_val.shape[1])
 
     # Set correct gradient to use
     if cost == "OLS":
@@ -110,14 +106,14 @@ def tune_learning_rate(
 
 
 def tune_lambda_learning_rate(
-    data:Data,
-    trainsize:float,
+    data_train:Data,
+    data_val:Data,
+    theta0:np.ndarray,
     learning_rates:np.ndarray,
     lmbdas:np.ndarray,
     optimizer:GradientDescent,
     ylims:tuple = (0,3),
     filename:str = None,
-    random_state:int = None,
     verbose:bool = False
 ) -> None:
     """Plots heatmap of validation MSE scores of minimization of Ridge cost function using given GradientDescent instance.
@@ -135,15 +131,8 @@ def tune_lambda_learning_rate(
     """
 
     # Split data into training and validation data
-    data_train, data_val = data.train_test_split(ratio=trainsize, random_state=random_state)
     y_train, X_train = data_train.unpacked()
     y_val, X_val = data_val.unpacked()
-
-    # Set random seed
-    if random_state:
-        np.random.seed(random_state)
-    # Set starting point for of minimisation
-    theta0 = np.random.randn(X_val.shape[1])
 
     # Iterate through every combination of lambda and learning rate.
     MSE_grid = list()
@@ -198,64 +187,105 @@ def tune_lambda_learning_rate(
 
     
 if __name__=="__main__":
+    # Import data
     from sknotlearn.datasets import make_FrankeFunction
+    D = make_FrankeFunction(n=600, noise_std=0.1, random_state=321)
+    D = D.polynomial(degree=5,with_intercept=False).scaled(scheme="Standard")
+    D_train, D_val = D.train_test_split(ratio=3/4, random_state=42)
+
+    # Setting some general params
     random_state = 321
-    D = make_FrankeFunction(n=600, noise_std=0.1, random_state=random_state)
-    D = D.polynomial(degree=5).scaled(scheme="Standard")
-    D.X = D.X[:,1:]
+    np.random.seed(random_state)
+    theta0 = np.random.randn(D_val.X.shape[1])
 
     max_iter = 100
 
-    n_batches = 32
-    batch_size = (3 * len(D) // 4) // n_batches
-    # batch_size = 32
+    n_batches = 16
+    batch_size = len(D_train) // n_batches
 
-    # GD = GradientDescent("plain", {"eta":0.}, its=max_iter)
-    # mGD = GradientDescent("momentum", {"gamma":0.8, "eta":0.}, its=max_iter)
+    # All the gradient descent instances
+    GD = GradientDescent("plain", {"eta":0.}, its=max_iter)
+    mGD = GradientDescent("momentum", {"gamma":0.8, "eta":0.}, its=max_iter)
     SGD = SGradientDescent("plain", {"eta":0.}, epochs=max_iter, batch_size=batch_size, random_state=random_state)
-    # mSGD = SGradientDescent("momentum", {"gamma":0.8, "eta":0.}, epochs=max_iter, batch_size=batch_size, random_state=random_state)
+    mSGD = SGradientDescent("momentum", {"gamma":0.8, "eta":0.}, epochs=max_iter, batch_size=batch_size, random_state=random_state)
+    mSGD2 = SGradientDescent("momentum", {"gamma":0.01, "eta":0.}, epochs=max_iter, batch_size=batch_size, random_state=random_state)
+    mSGD3 = SGradientDescent("momentum", {"gamma":0.1, "eta":0.}, epochs=max_iter, batch_size=batch_size, random_state=random_state)
+    mSGD4 = SGradientDescent("momentum", {"gamma":0.5, "eta":0.}, epochs=max_iter, batch_size=batch_size, random_state=random_state)
     SGDb = SGradientDescent("plain", {"eta":0.}, epochs=max_iter, batch_size=batch_size//4, random_state=random_state)
     SGDe = SGradientDescent("plain", {"eta":0.}, epochs=4*max_iter, batch_size=batch_size, random_state=random_state)
     SGDbe = SGradientDescent("plain", {"eta":0.}, epochs=4*max_iter, batch_size=batch_size//4, random_state=random_state)
-    # aGD = GradientDescent("adagrad", {"eta":0.}, its=max_iter)
-    # maGD = GradientDescent("adagrad_momentum", {"gamma":0.8, "eta":0.}, its=max_iter)
-    # aSGD = SGradientDescent("adagrad", {"eta":0.}, epochs=max_iter, batch_size=batch_size, random_state=random_state)
-    # maSGD = SGradientDescent("adagrad_momentum", {"gamma":0.8, "eta":0.}, epochs=max_iter, batch_size=batch_size, random_state=random_state)
-    # rmSGD = SGradientDescent("rmsprop", {"eta":0., "beta":0.9}, epochs=max_iter, batch_size=batch_size, random_state=random_state)
-    # adSGD = SGradientDescent("adam", {"eta":0., "beta1":0.9, "beta2":0.9}, epochs=max_iter, batch_size=batch_size, random_state=random_state)
+    aGD = GradientDescent("adagrad", {"eta":0.}, its=max_iter)
+    maGD = GradientDescent("adagrad_momentum", {"gamma":0.8, "eta":0.}, its=max_iter)
+    aSGD = SGradientDescent("adagrad", {"eta":0.}, epochs=max_iter, batch_size=batch_size, random_state=random_state)
+    maSGD = SGradientDescent("adagrad_momentum", {"gamma":0.8, "eta":0.}, epochs=max_iter, batch_size=batch_size, random_state=random_state)
+    rmSGD = SGradientDescent("rmsprop", {"eta":0., "beta":0.9}, epochs=max_iter, batch_size=batch_size, random_state=random_state)
+    adSGD = SGradientDescent("adam", {"eta":0., "beta1":0.9, "beta2":0.99}, epochs=max_iter, batch_size=batch_size, random_state=random_state)
+
+    # Valid plot names
+    plots = [
+        "PGD_MGD_PSGD_MSGD",
+        "SGD_batches_epochs",
+        "adagrad",
+        "momentum",
+        "test"
+    ]
+
+    # Choosing plot to plot
+    plot = plots[-1]
+
+    # Parameters defining the plot
+    params = {
+        "PGD_MGD_PSGD_MSGD" : {
+            "learning_rates" : np.linspace(0.001, 0.13, 101),
+            "optimizers" : (GD,mGD,SGD,mSGD),
+            "optimizer_names" : (f"Plain GD",f"Momentum GD", "Plain SGD", "Momentum SGD"),
+            "ylims" : (0,0.8)
+        },
+        "SGD_batches_epochs": {
+            "learning_rates" : np.linspace(0.001, 0.05, 101),
+            "optimizers" : (SGD,SGDb,SGDe,SGDbe),
+            "optimizer_names" : (f"SGD",fr"SGD, $4\times$batches", fr"SGD, $4\times$epochs", fr"SGD, $4\times$batches/epcochs"),
+            "ylims" : (0,0.6)
+        },
+        "adagrad" : {
+            "learning_rates" : np.linspace(0.001, 0.6, 101),
+            "optimizers" : (aGD,maGD,aSGD,maSGD),
+            "optimizer_names" : (f"AdaGrad GD",f"AdaGradMom GD", "AdaGrad SGD", "AdaGradMom SGD"),
+            "ylims" : (0,0.8)
+        },
+        "momentum" : {
+            "learning_rates" : np.linspace(0.001, 0.08, 101),
+            "optimizers" : (mSGD2,mSGD3,mSGD4,mSGD),
+            "optimizer_names" : (r"mSGD $\gamma=0.01$",r"mSGD $\gamma=0.1$", r"mSGD $\gamma=0.5$", r"mSGD $\gamma=0.8$"),
+            "ylims" : (0,0.6)
+        },
+        "test" : {
+            "learning_rates" : np.linspace(0.0001, 0.5, 101),
+            "optimizers" : (aSGD, maSGD, rmSGD, adSGD),
+            "optimizer_names" : ("AdaGrad SGD", "AdaGradMom SGD", "RMSprop", "Adam"),
+            "ylims" : (0,0.6)
+        }
+    }
 
 
-    # learning_rates = np.linspace(0.001, 0.13, 101)
-    learning_rates = np.linspace(0.001, 0.05, 101)
-    # learning_rates = np.linspace(0.001, 0.6, 101)
-    # learning_rates = np.linspace(0.001, 0.13, 101)
+    # Plotting
+
     tune_learning_rate(
-        data=D,
-        trainsize=3/4,
-        learning_rates=learning_rates,
-        # optimizers=(GD,mGD,SGD,mSGD),
-        optimizers=(SGD,SGDb,SGDe,SGDbe),
-        # optimizers=(aGD,maGD,aSGD,maSGD),
-        # optimizers=(rmSGD,adSGD),
-        # optimizer_names=(f"Plain GD",f"Momentum GD", "Plain SGD", "Momentum SGD"),
-        optimizer_names=(f"SGD",fr"SGD, $4\times$batches", fr"SGD, $4\times$epochs", fr"SGD, $4\times$batches/epcochs"),
-        # optimizer_names=(f"AdaGrad GD",f"AdaGradMom GD", "AdaGrad SGD", "AdaGradMom SGD"),
-        # optimizer_names=("RMSprop","Adam"),
+        data_train=D_train,
+        data_val=D_val,
+        theta0=theta0,
         cost="OLS",
-        ylims=(0,0.8),
         verbose=True,
-        random_state=random_state,
-        # filename="learning_rates_PGD_MGD_PSGD_MSGD"
-        filename="learning_rates_SGD_batches_epochs"
-        # filename="learning_rates_adagrad"
+        **params[plot],
+        filename="learning_rates_"+plot
     )
 
     # tune_lambda_learning_rate(
-    #     data=D,
-    #     trainsize=3/4,
-    #     learning_rates=np.linspace(0.001, 0.08, 11, endpoint=True),
-    #     lmbdas=np.logspace(-11,-1,11),
-    #     optimizer=SGD,
+    #     data_train=D_train,
+    #     data_val=D_val,
+    #     theta0=theta0,
+    #     learning_rates=np.linspace(0.001, 0.05, 11),
+    #     lmbdas=np.logspace(-13,-1,13),
+    #     optimizer=adSGD,
     #     ylims=(None,0.4),
-    #     random_state=random_state
     # )

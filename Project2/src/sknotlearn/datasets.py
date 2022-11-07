@@ -122,5 +122,27 @@ def load_Terrain(filename="SRTM_data_Nica.tif", n=900, random_state=321):
 	return Data(y, X.astype(float))
 
 
+def load_BreastCancer(filename="breast_cancer.csv"):
+	import pandas as pd
+	
+	df = pd.read_csv(filename)
+
+	# Target (y) is saved under "diagnosis" col with values M = malignant (bad), B = benign (good)
+	# Save these as M == 1, B == 0
+	y = np.where(df.diagnosis == "M", 1, 0)	
+	
+	# Drop the target col and id
+	df.drop(columns=["diagnosis", "id"], inplace=True)
+	
+	# One strange col named "Unnamed: 32" with all NaNs want to stay for some reason...
+	# Drop cols where all values as NaN
+	df.dropna(how="all", axis=1, inplace=True)
+	X = df.to_numpy()
+
+	# Save col names
+	col_names = list(df.columns)
+
+	return Data(y, X, col_names=col_names)
+
 if __name__ == "__main__":
 	pass
