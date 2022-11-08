@@ -39,7 +39,7 @@ def make_FrankeFunction(n=1000, linspace=False, noise_std=0, random_state=42):
 def make_debugdata(n=100, scale=0.1, random_state=321):
 	np.random.seed(random_state)
 	x = np.random.uniform(-1, 1, n)
-	y = x**4 + x**3 + np.random.normal(scale=scale, size=n)
+	y = x**2 + np.random.normal(scale=scale, size=n)
 	X = np.c_[np.ones(n), x, x**2]
 
 	return x, y, X
