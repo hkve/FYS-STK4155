@@ -46,3 +46,12 @@ def get_NN_params(NN):
     params.update(NN.func_names)
 
     return params
+
+def get_all_params(NN):
+    d1 = get_NN_params(NN)
+    d2 = get_opt_params(NN.optimizer)
+
+    d1["random_state_opt"] = d1.pop("random_state")
+    d2["random_state_NN"] = d2.pop("random_state")
+
+    return {**d1, **d2}
