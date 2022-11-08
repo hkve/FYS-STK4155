@@ -5,7 +5,7 @@ from autograd import grad, elementwise_grad
 import matplotlib.pyplot as plt
 import seaborn as sns
 import plot_utils
-from utils import make_figs_path
+from plot_utils import make_figs_path
 import time 
 
 import context
@@ -14,7 +14,7 @@ from sknotlearn.data import Data
 from sknotlearn.neuralnet import NeuralNetwork
 from sknotlearn.datasets import make_debugdata, make_FrankeFunction, plot_FrankeFunction, load_Terrain, plot_Terrain
 
-def plot_NN_vs_test(D_train, D_test, eta, nodes, epochs=800, batch_size=80, random_state=321, filename=None):
+def plot_NN_vs_test(D_train, D_test, eta, nodes, epochs=800, batch_size=80, random_state=321, filename_test=None, filename_pred=None):
 
     SGD = opt.SGradientDescent(
         method = "adam",
@@ -43,8 +43,10 @@ def plot_NN_vs_test(D_train, D_test, eta, nodes, epochs=800, batch_size=80, rand
     D_pred = Data(y_pred, D_test.X)
     D_pred = D_train.unscale(D_pred)
 
-    plot_Terrain(D_train.unscale(D_test), angle=(16,-165))
-    plot_Terrain(D_pred, angle=(16,-165), filename=filename)
+    D_test = D_train.unscale(D_test)
+
+    plot_Terrain(D_test, angle=(16,-165), filename=filename_test)
+    plot_Terrain(D_pred, angle=(16,-165), filename=filename_pred)
 
 
 def nodes_etas_heatmap(D_train, D_test, etas, nodes, layers=2, epochs=800, batch_size=80, random_state=321, filename=None):
@@ -117,7 +119,7 @@ def nodes_etas_heatmap(D_train, D_test, etas, nodes, layers=2, epochs=800, batch
     )
     if filename:
         plt.savefig(make_figs_path(filename), dpi=300)
-    plt.show()
+    # plt.show()
 
 
 def MSE(y_test, y_pred):
@@ -127,10 +129,10 @@ def MSE(y_test, y_pred):
 
 
 if __name__ == "__main__":
-    epochs = 800
-    batch_size = 80
+    epochs = 500
+    batch_size = 15
 
-    D = load_Terrain(random_state=123)
+    D = load_Terrain(random_state=123, n=600)
     D_train, D_test = D.train_test_split(ratio=3/4, random_state=42)
     D_train = D_train.scaled(scheme="Standard")    
     D_test = D_train.scale(D_test)
@@ -140,7 +142,7 @@ if __name__ == "__main__":
     # etas = [0.001, 0.01, 0.08]
     # layers = [1]
     # nodes = [2, 10, 20, 50, 100, 200]
-    # etas = [0.001, 0.01, 0.06, 0.08, 0.1, 0.8]
+    # etas = [0.0005, 0.001, 0.01, 0.06, 0.08, 0.1, 0.8]
     # layers = [1,3,5]
     # for l in layers:
     #     filename = f"nodes_etas_heatmap_{l}.pdf"
@@ -155,41 +157,63 @@ if __name__ == "__main__":
     #         filename=filename
     #     )
 
-    nodes = ((100,)*5, 1)
-    eta = 0.001
-    plot_NN_vs_test(
-        D_train=D_train, 
-        D_test=D_test, 
-        eta=eta, nodes=nodes, 
-        epochs=epochs, 
-        batch_size=batch_size,
-        filename="predicted_terrain.pdf"
-    )
+    # nodes = ((50,)*3, 1)
+    # eta = 0.001
+    # plot_NN_vs_test(
+    #     D_train=D_train, 
+    #     D_test=D_test, 
+    #     eta=eta, nodes=nodes, 
+    #     epochs=epochs, 
+    #     batch_size=batch_size,
+    #     # filename_test="terrain_test.pdf", 
+    #     # filename_pred="terrain_predicted.pdf"
+    # )
 
-    # start_time = time.time()
-    # # etas = np.linspace(0.001, 0.9, 5)
-    # etas = [0.001, 0.01, 0.06, 0.1, 0.8]
-    # y_preds = [None] * len(etas)
-    # for i, eta in enumerate(etas): 
-    #     y_preds[i] = nodes_etas_heatmap(D_train=D_train, D_test=D_test, etas=[eta], epochs=epochs, batch_size=batch_size)
-    #     print(f"{eta = :.3f}, MSE = {MSE(y_test, y_preds[i]) :.3f}")
-    # run_time = time.time() - start_time
-    # print(f"{epochs = } and {batch_size = } gives {run_time = :.3f} s")
-
-    #Plot: 
-    # D_pred = Data(y_pred, D_test.X)
-    # D_pred = D_train.unscale(D_pred)
-
-    # plot_Terrain(D_train.unscale(D_test), angle=(16,-165))
-    # plot_Terrain(D_pred, angle=(16,-165))
-
-    #One dimensional:
+    #One dimensional :
     # import matplotlib.pyplot as plt
     # sorted_idcs = D_test.X[:,0].argsort()
     # plt.scatter(D_test.X[:,0], D_test.y, c="r")
     # plt.plot(D_test.X[sorted_idcs,0], y_pred[sorted_idcs])
     # plt.show()
 
+    # Check activation function:
+    #Plot in same plot, include MSE 
+    
+    x, y, X = make_debugdata(n = 100, random_state=321)
+    D = Data(y,x.reshape(-1,1))
+    D_train, D_test = D.train_test_split(ratio=3/4, random_state=42)
+
+    nodes = ((100,), 1)
+    eta = 0.001
+    epochs = 500
+    batch_size = 15
+
+    SGD = opt.SGradientDescent(
+        method = "adam",
+        params = {"eta":eta, "beta1":0.9, "beta2":0.99},
+        epochs=epochs,
+        batch_size=batch_size,
+        random_state=321
+    )
+
+    NN = NeuralNetwork(
+        SGD, 
+        nodes, 
+        random_state=321,
+        cost_func="MSE",
+        # lmbda=0.001,
+        activation_hidden="tanh",
+        activation_output="linear"
+        )    
+    
+    NN.train(D_train, trainsize=1)
+    y_pred = NN.predict(D_test.X)
+
+    sorted_idcs = D_test.X[:,0].argsort()
+    print(D_test.X, sorted_idcs.shape)
+    plt.scatter(D_test.X[:,0], D_test.y)
+    plt.plot(D_test.X[sorted_idcs,0], y_pred[sorted_idcs], color=plot_utils.colors[1])
+    plt.show()
 
 
     "SGD"
