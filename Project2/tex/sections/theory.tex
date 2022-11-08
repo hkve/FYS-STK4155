@@ -1,4 +1,4 @@
-\comment{Suggestion: present tense}\\
+\comment{Suggestion: present tense, makes sense but might mess up some times H}\\
 In this project, I thought we could use \verb|cleveref| to reference things like \cref{int:fig:example}.
 
 
@@ -6,6 +6,7 @@ Before we delve into to details of the theory section, it is useful to take a mo
 
 We will assume that the measurements $y_i$ are generated from an exact function $f(x)$ with stochastic noise $\epsilon$ added, such that $y_i = f(x_i) + \epsilon$. Throughout this project, we will assume that the noise to be distributed normally with zero mean and some standard deviation (std) $\sigma$; $\epsilon \distas \normal{0}{\sigma^2}$. Furthermore, we will assume that the noise between different measurements is independent and identically distributed (i.i.d.). Our job then is to model an $\hat{f}(x)$ that we want to be close to $f(x)$.
 \comment{Copied this section from previous project, as it will be useful here too. Needs rewriting, -\Carl}
+\comment{Also add somewhere: } \cite{Project1}.
 \subsection{Gradient Descent Methods}
     \comment{This section might well be moved to method, it is not too theoretical. -\Carl}\\
     Optimisation of the parameters of the models we will be employing in this project is formulated as minimisation problems, with an associated cost function $C(\vec{\theta})$ to be minimised to find the optimal parameters.
