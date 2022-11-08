@@ -46,7 +46,7 @@ class NeuralNetwork:
         self._grad_activation_output = elementwise_grad(self._activation_output)
         self._grad_activation_hidden = elementwise_grad(self._activation_hidden)
 
-        self.lmbda = lmbda 
+        self.lmbda = lmbda
 
     def _init_biases_and_weights(self) -> None:
         """NB: Weights might be initialized opposite to the convension
@@ -154,8 +154,8 @@ class NeuralNetwork:
         # Iterate backwards over hidden layers to calculate gradients
         for i in range(self.n_hidden_layers+1):
             grad_Ws[i] = a_fwp[i].T @ delta_ls[i]
-            if self.lmbda: 
-                grad_Ws[i] += self.lmbda * self.weights
+            if self.lmbda:
+                grad_Ws[i] += self.lmbda * self.weights[i]
             grad_bs[i] = delta_ls[i].sum(axis=0)
 
 
