@@ -46,6 +46,12 @@ class NeuralNetwork:
         self._grad_activation_output = elementwise_grad(self._activation_output)
         self._grad_activation_hidden = elementwise_grad(self._activation_hidden)
 
+        self.func_names = {
+            "cost_func": cost_func,
+            "activation_hidden": activation_hidden,
+            "activation_output": activation_output
+        }
+
         self.lmbda = lmbda
 
     def _init_biases_and_weights(self) -> None:
