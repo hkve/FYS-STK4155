@@ -283,22 +283,61 @@ class Data:
         data_std = np.where(data_std != 0, data_std, 1) # sets unvaried data-columns to 0
         data_scaled = (data_array - data_mean) / data_std
 
+        # function to unscale scaled Data
+        unscaler = lambda data_ : data_*data_std + data_mean
         # function to replicate exact scaling done here
         def fit_scaler(data):
             out = (data - data_mean) / data_std
-            out.unscale = lambda data_ : data_*data_std + data_mean
+            out.unscale = unscaler
             return out
 
         # packing result into new Data-instance
         scaled_data = Data(
             data_scaled[:,0],
             data_scaled[:,1:],
-            unscale = lambda data : data*data_std + data_mean, # teching new Data how to unscale
+            unscale = unscaler, # teching new Data how to unscale
+            scale = fit_scaler, # teaching new Data how to scale other Data the same way.
+        )
+        return scaled_data
+
+    def min_max_(data):
+        """Scales y, *X to be distributed between -1 and 1.
+
+        Args:
+            data (Data): Data to scale
+
+        Returns:
+            Data: Scaled Data
+        """
+        # extracting data from Data-class to more versatile numpy array
+        data_array = np.c_[data.y, data.X]
+        # vectorised scaling
+        data_max = np.max(data_array, axis=0)
+        data_min = np.min(data_array, axis=0)
+        data_diff = data_max - data_min
+        data_scaled = np.where(data_diff == 0,
+                               0, (data_array-data_min) / data_diff)
+
+        # function to unscale scaled Data
+        unscaler = lambda data_ : np.where(data_diff == 0,
+                                           data_min, data_diff*data + data_min)
+        # function to replicate exact scaling done here
+        def fit_scaler(data):
+            out = (data - data_min) / data_diff
+            out.unscale = unscaler
+            return out
+
+        # packing result into new Data-instance
+        scaled_data = Data(
+            data_scaled[:,0],
+            data_scaled[:,1:],
+            unscale = unscaler, # teching new Data how to unscale
             scale = fit_scaler, # teaching new Data how to scale other Data the same way.
         )
         return scaled_data
     
     scalers_ = {
         "None" : none_scaler_,
-        "Standard" : standard_scaler_
+        "Standard" : standard_scaler_,
+        "Minmax" : min_max_,
     }

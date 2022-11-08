@@ -8,7 +8,6 @@ import seaborn as sns
 from sys import exit
 from time import time
 import plot_utils
-from plot_utils import make_figs_path
 
 import context
 from sknotlearn.data import Data
@@ -132,7 +131,7 @@ def tune_learning_rate(
         mode="expand"
     )
     if filename:
-        plt.savefig(make_figs_path(filename))
+        plt.savefig(plot_utils.make_figs_path(filename))
     plt.show()
 
 
@@ -243,7 +242,7 @@ def tune_lambda_learning_rate(
     )
 
     if filename:
-        plt.savefig(make_figs_path(filename))
+        plt.savefig(plot_utils.make_figs_path(filename))
     plt.show()
 
     
@@ -252,8 +251,10 @@ if __name__=="__main__":
     from sknotlearn.datasets import make_FrankeFunction, load_Terrain
     # D = load_Terrain(n=600, random_state=321)
     D = make_FrankeFunction(n=600, noise_std=0.1, random_state=321)
-    D = D.polynomial(degree=5,with_intercept=False).scaled(scheme="Standard")
+    D = D.polynomial(degree=5,with_intercept=False)
     D_train, D_val = D.train_test_split(ratio=3/4, random_state=42)
+    D_train = D_train.scaled(scheme="Standard")
+    D_val = D_train.scale(D_val)
 
     # Setting some general params
     random_state = 321
@@ -289,7 +290,7 @@ if __name__=="__main__":
     #####################
     params1 = {
         "PGD_MGD_PSGD_MSGD" : {
-            "learning_rates" : np.linspace(0.001, 0.13, 101),
+            "learning_rates" : np.linspace(0.001, 0.14, 101),
             "optimizers" : (GD,mGD,SGD,mSGD),
             "optimizer_names" : (f"Plain GD",f"Momentum GD", "Plain SGD", "Momentum SGD"),
             "ylims" : (0,0.8)
@@ -360,10 +361,10 @@ if __name__=="__main__":
     ]
 
     # Plotting
-    # plot1 = plots1[1]
-    plot1 = None
-    plot2 = plots2[1]
-    # plot2 = None
+    plot1 = plots1[4]
+    # plot1 = None
+    # plot2 = plots2[0]
+    plot2 = None
 
     if plot1:
         tune_learning_rate(
