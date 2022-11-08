@@ -1,9 +1,13 @@
+'''
+This script intends to make analysis plots comparing different Gradient Descent
+methods.
+'''
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sys import exit
+from time import time
 import plot_utils
-from utils import make_figs_path
 
 import context
 from sknotlearn.data import Data
@@ -17,71 +21,92 @@ def tune_learning_rate(
     learning_rates:np.ndarray,
     optimizers:tuple,
     optimizer_names:tuple,
-    cost:str = "OLS",
+    cost:str="OLS",
     lmbda:float=None,
-    ylims:tuple = (0,3),
-    filename:str = None,
-    verbose:bool = False
+    ylims:tuple=(0,3),
+    filename:str=None,
+    verbose:bool=False
 ) -> None:
-    """Plots the MSE score on validation data of the minimisation of either OLS or Ridge cost functions using given GradientDescent instances.
+    """Plots the MSE score on validation data of the minimisation of either OLS
+    or Ridge cost functions using given GradientDescent instances.
 
     Args:
-        data (Data): Data to train on. Is train-test split.
-        trainsize (float): The ratio of data to be used for training.
+        data_train (Data): Data to optimise linear regression.
+        data_val (Data): Validation data to apply linear regression on.
+        theta0 (np.ndarray): Initial parameters for descent. If list or tuple
+                             starting points are iterated over.
         learning_rates (np.ndarray): Array of learning rates to use.
-        optimizers (tuple): Iterable of instances of GradientDescent to plot for.
+        optimizers (tuple): Iterable of instances of GradientDescent to plot.
         optimizer_names (tuple): Legend names for the GradientDescent methods.
-        cost (str, optional): Cost function to use. Etiher "OLS" or "ridge". Defaults to "OLS".
-        lmbda (float, optional): In case of "ridge" cost function requiring a lmbda hyperparameter. Defaults to None.
-        ylims (tuple, optional): Limits for MSE score in plot. Defaults to (0,3).
+        cost (str, optional): Cost function to use. Etiher "OLS" or "ridge".
+                              Defaults to "OLS".
+        lmbda (float, optional): In case of "ridge" cost function requiring a
+                                 lmbda hyperparameter. Defaults to None.
+        ylims (tuple, optional): Limits for MSE score in plot.
+                                 Defaults to (0,3).
         filename (str, optional): Filename to save figure as. Defaults to None.
-        random_state (int, optional): np.random seed to use for rng. Defaults to None.
-        verbose (bool, optional): Whether to print best MSE-scores of each optimizer. Defaults to False.
+        verbose (bool, optional): Whether to print best MSE-scores of each
+                                  optimizer. Defaults to False.
     """
+    # Wrapping theta0 in tuple if 1 starting point is given.
+    if not isinstance(theta0, (tuple, list)):
+        theta0 = (theta0,)
 
+    # Unpacking data
     y_train, X_train = data_train.unpacked()
     y_val, X_val = data_val.unpacked()
 
-    # Set random seed
-    if random_state:
-        np.random.seed(random_state)
-
     # Set correct gradient to use
     if cost == "OLS":
-        grad = lambda theta, idcs : OLS_gradient(theta, data_train, idcs)
+        grad = lambda theta, idcs : OLS_gradient(theta,
+                                                 data_train,
+                                                 idcs)
         theta_ana = np.linalg.pinv(X_train.T@X_train) @ X_train.T @ y_train
     elif cost == "ridge":
-        grad = lambda theta, idcs : ridge_gradient(theta, data_train, lmbda, idcs)
-        theta_ana = np.linalg.pinv(X_train.T@X_train + lmbda*np.eye(X_train.shape[1])) @ X_train.T @ y_train
+        grad = lambda theta, idcs : ridge_gradient(theta,
+                                                   data_train,
+                                                   lmbda,
+                                                   idcs)
+        theta_ana = np.linalg.pinv(X_train.T@X_train +
+                    lmbda*np.eye(X_train.shape[1])) @ X_train.T @ y_train
 
     # Iterate through optimizers and compute/plot scores
-    for optimizer, name in zip(optimizers, optimizer_names):
-        MSE_list = list()
-        for learning_rate in learning_rates:
-            # Setting the correct learning rate
-            params = optimizer.params
-            params["eta"] = learning_rate
-            optimizer.set_params(params)
+    for optimizer, name, color in zip(optimizers,
+                                      optimizer_names,
+                                      plot_utils.colors[:len(optimizers)]):
+        start_time = time() # For timing algorithms
+        MSE_array = np.zeros((len(theta0), len(learning_rates)))
+        for i, x0 in enumerate(theta0):
+            for j, learning_rate in enumerate(learning_rates):
+                # Setting the correct learning rate
+                params = optimizer.params
+                params["eta"] = learning_rate
+                optimizer.set_params(params)
 
-            # The call-signature of GD and SGD is slightly different
-            if isinstance(optimizer, SGradientDescent):
-                theta_opt = optimizer.call(
-                    grad=grad,
-                    x0=theta0,
-                    all_idcs=np.arange(len(data_train))
-                )
-            else:
-                theta_opt = optimizer.call(
-                    grad=grad,
-                    x0=theta0,
-                    args=(np.arange(len(data_train)),)
-                )
+                # The call-signature of GD and SGD is slightly different
+                if isinstance(optimizer, SGradientDescent):
+                    theta_opt = optimizer.call(
+                        grad=grad,
+                        x0=x0,
+                        all_idcs=np.arange(len(data_train))
+                    )
+                else:
+                    theta_opt = optimizer.call(
+                        grad=grad,
+                        x0=x0,
+                        args=(np.arange(len(data_train)),)
+                    )
+                MSE_array[i,j] = np.mean((X_val@theta_opt - y_val)**2)
+            # Plotting 'hairs' of MSEs by starting theta0
+            plt.plot(learning_rates, MSE_array[i], lw=0.5, alpha=0.5, c=color)
+        # Average MSE across theta0s
+        MSE_means = MSE_array.mean(axis=0)
+        plt.plot(learning_rates, MSE_means, label=name, c=color)
 
-            
-            MSE_list.append(np.mean((X_val@theta_opt - y_val)**2))
         if verbose:
-            print(f"{name} MSE score: {np.nanmin(MSE_list)} (Learning rate {learning_rates[np.nanargmin(MSE_list)]})")
-        plt.plot(learning_rates, MSE_list, label=name)
+            print(f"{name} MSE score: {np.nanmin(MSE_means)} "
+                  f"(Learning rate {learning_rates[np.nanargmin(MSE_means)]}) "
+                  f"({time()-start_time:.2f} s)")
 
     # Calculating analytical solution from matrix inversion
     MSE_ana = np.mean((X_val@theta_ana - y_val)**2)
@@ -99,9 +124,14 @@ def tune_learning_rate(
     plt.ylim(ylims)
     plt.xlabel("Learning rate")
     plt.ylabel("Validation MSE")
-    plt.legend(bbox_to_anchor=(0, 1.13, 1, 0.2), loc="upper left", ncol=2, mode="expand")
+    plt.legend(
+        bbox_to_anchor=(0, 1.13, 1, 0.2),
+        loc="upper left",
+        ncol=2,
+        mode="expand"
+    )
     if filename:
-        plt.savefig(make_figs_path(filename))
+        plt.savefig(plot_utils.make_figs_path(filename))
     plt.show()
 
 
@@ -112,62 +142,92 @@ def tune_lambda_learning_rate(
     learning_rates:np.ndarray,
     lmbdas:np.ndarray,
     optimizer:GradientDescent,
-    ylims:tuple = (0,3),
+    vlims:tuple = (0,3),
     filename:str = None,
     verbose:bool = False
 ) -> None:
-    """Plots heatmap of validation MSE scores of minimization of Ridge cost function using given GradientDescent instance.
+    """Plots heatmap of validation MSE scores of minimization of Ridge cost
+    function using given GradientDescent instance.
 
     Args:
         data (Data): Data to train on. Is train-test split.
         trainsize (float): The ratio of data to be used for training.
         learning_rates (np.ndarray): Array of learning rates to use.
         lmbdas (np.ndarray): Array of lambda-values to use for cost function.
-        optimizer (GradientDescent): GradientDescent instance to use for optimization.
+        optimizer (GradientDescent): GradientDescent instance to use
+                                     for optimization.
         vlims (tuple, optional): Limits for MSE colorbar. Defaults to (0,3).
         filename (str, optional): Filename to save figure as. Defaults to None.
-        random_state (int, optional): np.random seed to use for rng. Defaults to None.
-        verbose (bool, optional): Whether to print best MSE-scores of each optimizer. Defaults to False.
+        verbose (bool, optional): Whether to print best MSE-scores of each
+                                  optimizer. Defaults to False.
     """
+    # Wrapping theta0 in tuple if 1 starting point is given.
+    if not isinstance(theta0, (tuple, list)):
+        theta0 = (theta0,)
 
-    # Split data into training and validation data
+    # Unpacking data
     y_train, X_train = data_train.unpacked()
     y_val, X_val = data_val.unpacked()
 
     # Iterate through every combination of lambda and learning rate.
-    MSE_grid = list()
-    for lmbda in lmbdas:
-        MSE_list = list()
-        # Set gradient
-        grad = lambda theta, idcs : ridge_gradient(theta, data_train, lmbda, idcs)
-        for learning_rate in learning_rates:
-            # Set learning rate
-            params = optimizer.params
-            params["eta"] = learning_rate
-            optimizer.set_params(params)
+    MSE_grid = np.zeros((len(theta0), len(lmbdas), len(learning_rates)))
+    start_time = time() # For timing the algorithm
+    for i, x0 in enumerate(theta0):
+        for j, lmbda in enumerate(lmbdas):
+            # Set gradient function
+            grad = lambda theta, idcs : ridge_gradient(theta,
+                                                       data_train,
+                                                       lmbda,
+                                                       idcs)
+            for k, learning_rate in enumerate(learning_rates):
+                # Set learning rate
+                params = optimizer.params
+                params["eta"] = learning_rate
+                optimizer.set_params(params)
 
-            # Call signature is slightly different between GD and SGD.
-            if isinstance(optimizer, SGradientDescent):
-                theta_opt = optimizer.call(
-                    grad=grad,
-                    x0=theta0,
-                    all_idcs=np.arange(len(data_train))
-                )
-            else:
-                theta_opt = optimizer.call(
-                    grad=grad,
-                    x0=theta0,
-                    args=(np.arange(len(data_train)),)
-                )
-            MSE_list.append(np.mean((X_val@theta_opt-y_val)**2))
-        MSE_grid.append(MSE_list)
+                # Call signature is slightly different between GD and SGD.
+                if isinstance(optimizer, SGradientDescent):
+                    theta_opt = optimizer.call(
+                        grad=grad,
+                        x0=x0,
+                        all_idcs=np.arange(len(data_train))
+                    )
+                else:
+                    theta_opt = optimizer.call(
+                        grad=grad,
+                        x0=x0,
+                        args=(np.arange(len(data_train)),)
+                    )
+                MSE_grid[i,j,k] = np.mean((X_val@theta_opt-y_val)**2)
+    # Average MSE across theta0s
+    mean_MSE_grid = MSE_grid.mean(axis=0)
+    # Finding optimum
+    arg_best_MSE = np.unravel_index(
+        np.argmin(mean_MSE_grid),
+        np.shape(mean_MSE_grid)
+    )
+    if verbose:
+        print(f"Best MSE value is {mean_MSE_grid[arg_best_MSE]} "
+              f"with lmbda {lmbdas[arg_best_MSE[0]]} lrate "
+              f"{learning_rates[arg_best_MSE[1]]} ({time()-start_time:.2f} s)")
     
     fig, ax = plt.subplots()
     # Plot heatmap first
-    sns.heatmap(MSE_grid, vmin=ylims[0], vmax=ylims[1], annot=True, cmap="viridis", ax=ax)
+    sns.heatmap(
+        mean_MSE_grid,
+        vmin=vlims[0], vmax=vlims[1],
+        annot=True,
+        cmap="viridis",
+        ax=ax,
+        cbar_kws={'label':'Validation MSE'})
     # Plot a red triangle around best value. This code is messi (not ronaldo)
-    arg_best_MSE = np.unravel_index(np.argmin(MSE_grid), np.shape(MSE_grid))
-    ax.add_patch(plt.Rectangle((arg_best_MSE[1], arg_best_MSE[0]), 1, 1, fc='none', ec='red', lw=5, clip_on=False))
+    ax.add_patch(plt.Rectangle((arg_best_MSE[1],
+                                arg_best_MSE[0]),
+                                1, 1,
+                                fc='none',
+                                ec='red',
+                                lw=5,
+                                clip_on=False))
 
     # Set xylabels and ticks. This code is ronaldo, but it works.
     ax.set_xlabel("Learning rate")
@@ -182,21 +242,24 @@ def tune_lambda_learning_rate(
     )
 
     if filename:
-        plt.savefig(make_figs_path(filename))
+        plt.savefig(plot_utils.make_figs_path(filename))
     plt.show()
 
     
 if __name__=="__main__":
     # Import data
-    from sknotlearn.datasets import make_FrankeFunction
+    from sknotlearn.datasets import make_FrankeFunction, load_Terrain
+    # D = load_Terrain(n=600, random_state=321)
     D = make_FrankeFunction(n=600, noise_std=0.1, random_state=321)
-    D = D.polynomial(degree=5,with_intercept=False).scaled(scheme="Standard")
+    D = D.polynomial(degree=5,with_intercept=False)
     D_train, D_val = D.train_test_split(ratio=3/4, random_state=42)
+    D_train = D_train.scaled(scheme="Standard")
+    D_val = D_train.scale(D_val)
 
     # Setting some general params
     random_state = 321
     np.random.seed(random_state)
-    theta0 = np.random.randn(D_val.X.shape[1])
+    theta0 = [np.random.randn(D_val.n_features) for _ in range(5)]
 
     max_iter = 100
 
@@ -211,6 +274,7 @@ if __name__=="__main__":
     mSGD2 = SGradientDescent("momentum", {"gamma":0.01, "eta":0.}, epochs=max_iter, batch_size=batch_size, random_state=random_state)
     mSGD3 = SGradientDescent("momentum", {"gamma":0.1, "eta":0.}, epochs=max_iter, batch_size=batch_size, random_state=random_state)
     mSGD4 = SGradientDescent("momentum", {"gamma":0.5, "eta":0.}, epochs=max_iter, batch_size=batch_size, random_state=random_state)
+    mSGD5 = SGradientDescent("momentum", {"gamma":1, "eta":0.}, epochs=max_iter, batch_size=batch_size, random_state=random_state)
     SGDb = SGradientDescent("plain", {"eta":0.}, epochs=max_iter, batch_size=batch_size//4, random_state=random_state)
     SGDe = SGradientDescent("plain", {"eta":0.}, epochs=4*max_iter, batch_size=batch_size, random_state=random_state)
     SGDbe = SGradientDescent("plain", {"eta":0.}, epochs=4*max_iter, batch_size=batch_size//4, random_state=random_state)
@@ -221,22 +285,12 @@ if __name__=="__main__":
     rmSGD = SGradientDescent("rmsprop", {"eta":0., "beta":0.9}, epochs=max_iter, batch_size=batch_size, random_state=random_state)
     adSGD = SGradientDescent("adam", {"eta":0., "beta1":0.9, "beta2":0.99}, epochs=max_iter, batch_size=batch_size, random_state=random_state)
 
-    # Valid plot names
-    plots = [
-        "PGD_MGD_PSGD_MSGD",
-        "SGD_batches_epochs",
-        "adagrad",
-        "momentum",
-        "test"
-    ]
-
-    # Choosing plot to plot
-    plot = plots[-1]
-
-    # Parameters defining the plot
-    params = {
+    #####################
+    # lmbda plot params #
+    #####################
+    params1 = {
         "PGD_MGD_PSGD_MSGD" : {
-            "learning_rates" : np.linspace(0.001, 0.13, 101),
+            "learning_rates" : np.linspace(0.001, 0.14, 101),
             "optimizers" : (GD,mGD,SGD,mSGD),
             "optimizer_names" : (f"Plain GD",f"Momentum GD", "Plain SGD", "Momentum SGD"),
             "ylims" : (0,0.8)
@@ -255,37 +309,80 @@ if __name__=="__main__":
         },
         "momentum" : {
             "learning_rates" : np.linspace(0.001, 0.08, 101),
-            "optimizers" : (mSGD2,mSGD3,mSGD4,mSGD),
-            "optimizer_names" : (r"mSGD $\gamma=0.01$",r"mSGD $\gamma=0.1$", r"mSGD $\gamma=0.5$", r"mSGD $\gamma=0.8$"),
-            "ylims" : (0,0.6)
+            "optimizers" : (mSGD2,mSGD3,mSGD4,mSGD,mSGD5),
+            "optimizer_names" : (r"mSGD $\gamma=0.01$",r"mSGD $\gamma=0.1$", r"mSGD $\gamma=0.5$", r"mSGD $\gamma=0.8$", r"mSGD $\gamma=1$"),
+            "ylims" : (0,0.8)
         },
-        "test" : {
-            "learning_rates" : np.linspace(0.0001, 0.5, 101),
+        "tunable" : {
+            "learning_rates" : np.linspace(0.0001, 0.6, 101),
             "optimizers" : (aSGD, maSGD, rmSGD, adSGD),
             "optimizer_names" : ("AdaGrad SGD", "AdaGradMom SGD", "RMSprop", "Adam"),
-            "ylims" : (0,0.6)
+            "ylims" : (0,0.8)
+        },
+        "test2" : {
+            "learning_rates" : np.linspace(0.0001, 0.1, 101),
+            "optimizers" : (adSGD,),
+            "optimizer_names" : ("Adam",),
+            "ylims" : (0,0.8)
         }
     }
+    # Valid plot names
+    plots1 = [
+        "PGD_MGD_PSGD_MSGD",
+        "SGD_batches_epochs",
+        "adagrad",
+        "momentum",
+        "tunable",
+        "test2"
+    ]
 
+    # Choosing plot to plot
+
+    #######################
+    # heatmap plot params #
+    #######################
+    params2 = {
+        "plain_SGD" : {
+            "learning_rates" : np.linspace(0.001, 0.05, 11),
+            "lmbdas" : np.logspace(-9,1,11),
+            "optimizer" : SGD,
+            "vlims" : (None, 0.4)
+        },
+        "adagrad_SGD" : {
+            "learning_rates" : np.linspace(0.01, 0.6, 11),
+            "lmbdas" : np.logspace(-9,1,11),
+            "optimizer" : aSGD,
+            "vlims" : (None, 0.4)
+        },
+    }
+    plots2 = [
+        "plain_SGD",
+        "adagrad_SGD"
+    ]
 
     # Plotting
+    plot1 = plots1[4]
+    # plot1 = None
+    # plot2 = plots2[0]
+    plot2 = None
 
-    tune_learning_rate(
-        data_train=D_train,
-        data_val=D_val,
-        theta0=theta0,
-        cost="OLS",
-        verbose=True,
-        **params[plot],
-        filename="learning_rates_"+plot
-    )
+    if plot1:
+        tune_learning_rate(
+            data_train=D_train,
+            data_val=D_val,
+            theta0=theta0,
+            cost="OLS",
+            verbose=True,
+            **params1[plot1],
+            # filename="learning_rates_"+plot1
+        )
 
-    # tune_lambda_learning_rate(
-    #     data_train=D_train,
-    #     data_val=D_val,
-    #     theta0=theta0,
-    #     learning_rates=np.linspace(0.001, 0.05, 11),
-    #     lmbdas=np.logspace(-13,-1,13),
-    #     optimizer=adSGD,
-    #     ylims=(None,0.4),
-    # )
+    if plot2:
+        tune_lambda_learning_rate(
+            data_train=D_train,
+            data_val=D_val,
+            theta0=theta0,
+            verbose=True,
+            **params2[plot2],
+            # filename="lmbda_learning_rates_"+plot2
+        )

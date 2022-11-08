@@ -1,30 +1,57 @@
-import pathlib as pl 
-# from sknotlearn.linear_model import LinearRegression, Ridge, Lasso
-import seaborn as sns
+# Comming soon to a repo near you :,)
+import context
+from sknotlearn.optimize import SGradientDescent, GradientDescent
+from sknotlearn.neuralnet import NeuralNetwork
 
-def make_figs_path(filename):
-    cur_path = pl.Path(__file__)
-    root_path = cur_path
+def get_opt_params(opt):
+    assert type(opt) in (GradientDescent, SGradientDescent), f"{type(opt)} is not a Gradient decent object"
+    
+    params = {
+        "method": opt.method,
+    }
 
-    while root_path.name != "FYS-STK4155":
-        root_path = root_path.parent
+    eta1, eta2 = opt.params["eta"](0), opt.params["eta"](100)
+    if eta1 == eta2: 
+        eta = eta1
+    else:
+        eta = "varying"
 
-    figs_path = root_path / pl.Path("Project2/tex/figs")
+    params["eta"] = eta
 
-    if not figs_path.exists():
-        return None
-    if not filename.endswith(".pdf"):
-        filename += ".pdf"
+    for k, v in opt.params.items():
+        if k != "eta":
+            params[k] = v
 
-    figs_path /= filename
+    if type(opt) is GradientDescent:
+       params["its"] = opt.its
+    else:
+        params.update({
+            "random_state": opt.random_state,
+            "batch_size": opt.batch_size,
+            "epochs": opt.epochs
+        })
 
-    return str(figs_path)
+    return params
 
-# model_names = {LinearRegression:'OLS', Ridge:'Ridge', Lasso:'Lasso'}
+def get_NN_params(NN):
+    assert type(NN) is NeuralNetwork, f"{type(NN)} is not a NeuralNetwork object"
 
-colors = [
-    sns.color_palette('husl')[-3],
-    sns.color_palette('husl')[-2],
-    sns.color_palette('husl')[-1],
-    'mediumorchid'
-]
+    params = {
+        "random_state": NN.random_state,
+        "n_hidden_nodes": NN.n_hidden_nodes,
+        "n_hidden_layers": NN.n_hidden_layers,
+        "lmbda": NN.lmbda
+    }
+
+    params.update(NN.func_names)
+
+    return params
+
+def get_all_params(NN):
+    d1 = get_NN_params(NN)
+    d2 = get_opt_params(NN.optimizer)
+
+    d1["random_state_opt"] = d1.pop("random_state")
+    d2["random_state_NN"] = d2.pop("random_state")
+
+    return {**d1, **d2}
