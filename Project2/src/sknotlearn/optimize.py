@@ -58,7 +58,7 @@ class GradientDescent:
         for it in range(self.its):
             self._it += 1
             g = grad(self.x, *args)
-            if any((np.abs(g) > MAX)):
+            if any((np.abs(g) > MAX)) or any(np.isnan(g)):
                 self.converged = False
                 return self.x
             self.x = self._update_rule(self, self.x, g) 
