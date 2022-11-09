@@ -65,10 +65,13 @@ def varying_activation_functions(D_train, D_test,
         label = af.replace("_", " ").capitalize()
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         ax.plot(etas, acc, label=label)
 
     ax.set(xlabel="Learning rate", ylabel="Accuracy", ylim=(0.85,1))
 =======
+=======
+>>>>>>> f9bf63709dd3aec40f470d9b5de171ca13f9f411
 =======
 >>>>>>> f9bf63709dd3aec40f470d9b5de171ca13f9f411
 
@@ -79,6 +82,9 @@ def varying_activation_functions(D_train, D_test,
 
     ax.set(xlabel="Learning rate", ylabel="Accuracy")
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> f9bf63709dd3aec40f470d9b5de171ca13f9f411
+=======
 >>>>>>> f9bf63709dd3aec40f470d9b5de171ca13f9f411
 =======
 >>>>>>> f9bf63709dd3aec40f470d9b5de171ca13f9f411
@@ -235,6 +241,7 @@ if __name__ == "__main__":
     eta_ranges = [
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         (0.01, 0.4, 50),
         (0.001, 0.1, 50)
         (0.0001, 0.01, 50)
@@ -250,6 +257,8 @@ if __name__ == "__main__":
                                 filename=filename,
                                 eta_range=(0.01, 0.4, 50),
 =======
+=======
+>>>>>>> f9bf63709dd3aec40f470d9b5de171ca13f9f411
 =======
 >>>>>>> f9bf63709dd3aec40f470d9b5de171ca13f9f411
         (0.01, 0.4, 25),
@@ -275,6 +284,9 @@ if __name__ == "__main__":
                                 filename=filename,
                                 eta_range=eta_range,
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> f9bf63709dd3aec40f470d9b5de171ca13f9f411
+=======
 >>>>>>> f9bf63709dd3aec40f470d9b5de171ca13f9f411
 =======
 >>>>>>> f9bf63709dd3aec40f470d9b5de171ca13f9f411

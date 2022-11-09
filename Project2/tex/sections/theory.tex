@@ -122,11 +122,14 @@ We will assume that the measurements $y_i$ are generated from an exact function 
     \section{Logistic regression}
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     
 
     \begin{align*}
         P(\vec{y}|X,\vec{\vec{\theta}}) = \prod_{i = 1}^{n} \sigma(X_{ia} \theta_a)^{y_i}[1-\sigma(X_{ia}\theta_a)]^{1 - y_i}
 =======
+=======
+>>>>>>> f9bf63709dd3aec40f470d9b5de171ca13f9f411
 =======
 >>>>>>> f9bf63709dd3aec40f470d9b5de171ca13f9f411
     For comparison with our neural network we introduce maybe the most common classification method there is, \textit{logistic regression}. One might be confused by inclusion of the word \textit{regression} in the name of a classification method. This comes from preforming a fit to the \textit{log-odds} using a function linear in the input variables:
@@ -138,6 +141,9 @@ We will assume that the measurements $y_i$ are generated from an exact function 
     \begin{align*}
         P(\vec{y}|X,\vec{\vec{\theta}}) = \prod_{i = 1}^{n} \sigma(X_{ia} \theta_a)^{y_i}[1-\sigma(X_{ia}\theta_a)]^{1 - y_i} 
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> f9bf63709dd3aec40f470d9b5de171ca13f9f411
+=======
 >>>>>>> f9bf63709dd3aec40f470d9b5de171ca13f9f411
 =======
 >>>>>>> f9bf63709dd3aec40f470d9b5de171ca13f9f411
@@ -151,9 +157,12 @@ We will assume that the measurements $y_i$ are generated from an exact function 
     \begin{align*}
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         (\grad_{\theta} \msub{C}{BCE})_b &= \sum_{i = 1}^{n} y_i [1 - \sigma(X_{ia} \theta_a) ] X_{ib} + -(1 - y_i)\sigma(X_{ia} \theta_a)X_{ib} \\
         &= \sum_i^n (y_i - \sigma(X_{ia}\theta_a)) X_{ib}  
 =======
+=======
+>>>>>>> f9bf63709dd3aec40f470d9b5de171ca13f9f411
 =======
 >>>>>>> f9bf63709dd3aec40f470d9b5de171ca13f9f411
         \pdv{\theta_b} \msub{C}{BCE} &= \sum_{i = 1}^{n} \left( (1 - y_i)\sigma(X_{ia} \theta_a) - y_i [1 - \sigma(X_{ia} \theta_a) ] \right) X_{ib} \\
@@ -163,6 +172,9 @@ We will assume that the measurements $y_i$ are generated from an exact function 
     \begin{align*}
         \nabla_{\vec{\theta}} \msub{C}{BCE}(\vec{\theta}) = X^T (\hat{\vec{p}} - \vec{y}) 
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> f9bf63709dd3aec40f470d9b5de171ca13f9f411
+=======
 >>>>>>> f9bf63709dd3aec40f470d9b5de171ca13f9f411
 =======
 >>>>>>> f9bf63709dd3aec40f470d9b5de171ca13f9f411
