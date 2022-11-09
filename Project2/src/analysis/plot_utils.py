@@ -26,8 +26,8 @@ colors = [
     sns.color_palette('husl')[-2],
     sns.color_palette('husl')[-1],
     'mediumorchid',
-    'royalblue',
-    'seagreen'
+    sns.color_palette('deep')[-1],
+    sns.color_palette('dark')[-1]
 ]
 
 sns.set_style("darkgrid")
