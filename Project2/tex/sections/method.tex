@@ -24,7 +24,7 @@
 
 
     \subsection{Ridge Regression}
-        
+        Adding an $L_2$-penalisation term to the OLS cost function gives us the Ridge cost function. \comment{c'mon Carl, pick up the energy! -\Carl }
 
     \subsubsection{Initialisation}
         GD methods are quite sensitive to the initial parameters from which to descend, so made sure to initialise all the methods from the same point when comparing performance. We always initialised with randomly drawn parameter values from the standard normal distribution with mean zero and std one. To further combat the sensitivity to initial conditions, we did all the descents from five different starting points, and computed the average MSE scores we got.

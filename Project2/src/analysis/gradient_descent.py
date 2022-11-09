@@ -15,17 +15,17 @@ from sknotlearn.linear_model import OLS_gradient, ridge_gradient
 from sknotlearn.optimize import GradientDescent, SGradientDescent
 
 def tune_learning_rate(
-    data_train:Data,
-    data_val:Data,
-    theta0:np.ndarray,
-    learning_rates:np.ndarray,
-    optimizers:tuple,
-    optimizer_names:tuple,
-    cost:str="OLS",
-    lmbda:float=None,
-    ylims:tuple=(0,3),
-    filename:str=None,
-    verbose:bool=False
+    data_train: Data,
+    data_val: Data,
+    theta0: np.ndarray,
+    learning_rates: np.ndarray,
+    optimizers: tuple,
+    optimizer_names: tuple,
+    cost: str = "OLS",
+    lmbda: float = None,
+    ylims: tuple = (0,3),
+    filename: str = None,
+    verbose: bool = False
 ) -> None:
     """Plots the MSE score on validation data of the minimisation of either OLS
     or Ridge cost functions using given GradientDescent instances.
@@ -96,22 +96,27 @@ def tune_learning_rate(
                         x0=x0,
                         args=(np.arange(len(data_train)),)
                     )
-                MSE_array[i,j] = np.mean((X_val@theta_opt - y_val)**2)
-            # Plotting 'hairs' of MSEs by starting theta0
-            plt.plot(learning_rates, MSE_array[i], lw=0.5, alpha=0.5, c=color)
+                if not optimizer.converged:
+                    MSE_array[i,j] = np.nan
+                else:
+                    MSE_array[i,j] = np.mean((X_val@theta_opt - y_val)**2)
         # Average MSE across theta0s
+        MSE_array = np.where(MSE_array<3*ylims[1], MSE_array, np.nan)
         MSE_means = MSE_array.mean(axis=0)
         plt.plot(learning_rates, MSE_means, label=name, c=color)
+        if len(theta0) > 1: # Adding 95% confidence interval
+            MSE_stds = MSE_array.std(axis=0) / np.sqrt(len(theta0)-1)
+            plt.fill_between(learning_rates, MSE_means-2*MSE_stds, MSE_means+2*MSE_stds, alpha=0.3, color=color)
 
         if verbose:
-            print(f"{name} MSE score: {np.nanmin(MSE_means)} "
-                  f"(Learning rate {learning_rates[np.nanargmin(MSE_means)]}) "
+            print(f"{name} MSE score: {np.nanmin(MSE_means):.4} "
+                  f"(Learning rate {learning_rates[np.nanargmin(MSE_means)]:.3}) "
                   f"({time()-start_time:.2f} s)")
 
     # Calculating analytical solution from matrix inversion
     MSE_ana = np.mean((X_val@theta_ana - y_val)**2)
     if verbose:
-        print(f"Analytical MSE score: {MSE_ana}")
+        print(f"Analytical MSE score: {MSE_ana:.4}")
 
     # Plotting analytical solution as grey line
     plt.hlines(MSE_ana,
@@ -130,21 +135,21 @@ def tune_learning_rate(
         ncol=2,
         mode="expand"
     )
-    if filename:
+    if filename is not None:
         plt.savefig(plot_utils.make_figs_path(filename))
     plt.show()
 
 
 def tune_lambda_learning_rate(
-    data_train:Data,
-    data_val:Data,
-    theta0:np.ndarray,
-    learning_rates:np.ndarray,
-    lmbdas:np.ndarray,
-    optimizer:GradientDescent,
-    vlims:tuple = (0,3),
-    filename:str = None,
-    verbose:bool = False
+    data_train: Data,
+    data_val: Data,
+    theta0: np.ndarray,
+    learning_rates: np.ndarray,
+    lmbdas: np.ndarray,
+    optimizer: GradientDescent,
+    vlims: tuple = (0,3),
+    filename: str = None,
+    verbose: bool = False
 ) -> None:
     """Plots heatmap of validation MSE scores of minimization of Ridge cost
     function using given GradientDescent instance.
@@ -201,15 +206,17 @@ def tune_lambda_learning_rate(
                 MSE_grid[i,j,k] = np.mean((X_val@theta_opt-y_val)**2)
     # Average MSE across theta0s
     mean_MSE_grid = MSE_grid.mean(axis=0)
+    mean_MSE_grid = np.where(mean_MSE_grid < 3*vlims[1], mean_MSE_grid, np.nan) # Remove exploded gradients
     # Finding optimum
     arg_best_MSE = np.unravel_index(
-        np.argmin(mean_MSE_grid),
+        np.nanargmin(mean_MSE_grid),
         np.shape(mean_MSE_grid)
     )
     if verbose:
-        print(f"Best MSE value is {mean_MSE_grid[arg_best_MSE]} "
-              f"with lmbda {lmbdas[arg_best_MSE[0]]} lrate "
-              f"{learning_rates[arg_best_MSE[1]]} ({time()-start_time:.2f} s)")
+        print(f"Best MSE value is {mean_MSE_grid[arg_best_MSE]:.4} "
+              f"with lmbda {lmbdas[arg_best_MSE[0]]:.1E} "
+              f"lrate {learning_rates[arg_best_MSE[1]:]:.3} "
+              f"({time()-start_time:.2f} s)")
     
     fig, ax = plt.subplots()
     # Plot heatmap first
@@ -219,7 +226,8 @@ def tune_lambda_learning_rate(
         annot=True,
         cmap="viridis",
         ax=ax,
-        cbar_kws={'label':'Validation MSE'})
+        cbar_kws={'label':'Validation MSE'}
+    )
     # Plot a red triangle around best value. This code is messi (not ronaldo)
     ax.add_patch(plt.Rectangle((arg_best_MSE[1],
                                 arg_best_MSE[0]),
@@ -241,7 +249,7 @@ def tune_lambda_learning_rate(
         labels=np.log10(lmbdas)
     )
 
-    if filename:
+    if filename is not None:
         plt.savefig(plot_utils.make_figs_path(filename))
     plt.show()
 
@@ -251,7 +259,7 @@ if __name__=="__main__":
     from sknotlearn.datasets import make_FrankeFunction, load_Terrain
     # D = load_Terrain(n=600, random_state=321)
     D = make_FrankeFunction(n=600, noise_std=0.1, random_state=321)
-    D = D.polynomial(degree=5,with_intercept=False)
+    D = D.polynomial(degree=5, with_intercept=False)
     D_train, D_val = D.train_test_split(ratio=3/4, random_state=42)
     D_train = D_train.scaled(scheme="Standard")
     D_val = D_train.scale(D_val)
@@ -314,7 +322,7 @@ if __name__=="__main__":
             "ylims" : (0,0.8)
         },
         "tunable" : {
-            "learning_rates" : np.linspace(0.0001, 0.6, 101),
+            "learning_rates" : np.linspace(0.001**(1/3), 0.6**(1/3), 101)**(3), # funky learning rate to get more small eta evaluations
             "optimizers" : (aSGD, maSGD, rmSGD, adSGD),
             "optimizer_names" : ("AdaGrad SGD", "AdaGradMom SGD", "RMSprop", "Adam"),
             "ylims" : (0,0.8)
@@ -326,46 +334,63 @@ if __name__=="__main__":
             "ylims" : (0,0.8)
         }
     }
-    # Valid plot names
-    plots1 = [
-        "PGD_MGD_PSGD_MSGD",
-        "SGD_batches_epochs",
-        "adagrad",
-        "momentum",
-        "tunable",
-        "test2"
-    ]
 
-    # Choosing plot to plot
 
     #######################
     # heatmap plot params #
     #######################
     params2 = {
+        "plain_GD" : {
+            "learning_rates" : np.linspace(0.001, 0.08, 11),
+            "lmbdas" : np.logspace(-5,1,13),
+            "optimizer" : GD,
+            "vlims" : (None, 0.4)
+        },
+        "momentum_GD" : {
+            "learning_rates" : np.linspace(0.001, 0.14, 11),
+            "lmbdas" : np.logspace(-5,1,13),
+            "optimizer" : mGD,
+            "vlims" : (None, 0.4)
+        },
         "plain_SGD" : {
             "learning_rates" : np.linspace(0.001, 0.05, 11),
-            "lmbdas" : np.logspace(-9,1,11),
+            "lmbdas" : np.logspace(-5,1,13),
             "optimizer" : SGD,
             "vlims" : (None, 0.4)
         },
+        "momentum_SGD" : {
+            "learning_rates" : np.linspace(0.001, 0.08, 11),
+            "lmbdas" : np.logspace(-5,1,13),
+            "optimizer" : mSGD,
+            "vlims" : (None, 0.4)
+        },
         "adagrad_SGD" : {
-            "learning_rates" : np.linspace(0.01, 0.6, 11),
-            "lmbdas" : np.logspace(-9,1,11),
+            "learning_rates" : np.linspace(0.01, 1, 11),
+            "lmbdas" : np.logspace(-5,1,13),
             "optimizer" : aSGD,
             "vlims" : (None, 0.4)
         },
+        "adagrad_momentum_SGD" : {
+            "learning_rates" : np.linspace(0.01, 0.6, 11),
+            "lmbdas" : np.logspace(-5,1,13),
+            "optimizer" : maSGD,
+            "vlims" : (None, 0.4)
+        },
+        "adam_SGD" : {
+            "learning_rates" : np.linspace(0.0001, 0.1, 11),
+            "lmbdas" : np.logspace(-5,1,13),
+            "optimizer" : adSGD,
+            "vlims" : (None, 0.4)
+        }
     }
-    plots2 = [
-        "plain_SGD",
-        "adagrad_SGD"
-    ]
 
-    # Plotting
-    plot1 = plots1[4]
+    # Choosing plot to plot
+    plot1 = "adagrad"
     # plot1 = None
-    # plot2 = plots2[0]
+    # plot2 = "adam_SGD"
     plot2 = None
-
+    
+    # Plotting
     if plot1:
         tune_learning_rate(
             data_train=D_train,
