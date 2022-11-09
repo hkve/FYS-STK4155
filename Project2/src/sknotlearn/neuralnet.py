@@ -146,9 +146,10 @@ class NeuralNetwork:
 
         # Calculate the gradient of cost function corresponding to this set of y values    
         grad_cost = elementwise_grad(lambda y_pred : self.cost_func(y, y_pred)) 
-
+        
         # Delta in output layer
         delta_ls[-1] = self._grad_activation_output(z_fwp[-1]) * grad_cost(y_pred)
+        
 
         # Iterate backwards over hidden layers to calculate layer errors
         for i in reversed(range(self.n_hidden_layers)):
@@ -265,10 +266,11 @@ class NeuralNetwork:
         assert y.shape == y_pred.shape, f"y and y_pred have different shapes. {y.shape =}, {y_pred.shape =}"
         return np.mean((y - y_pred)**2)
 
+
     def _binary_crossentropy(y, y_pred):
         n = len(y)
         assert y.shape == y_pred.shape, f"y and y_pred have different shapes. {y.shape =}, {y_pred.shape =}"
-        return -np.sum(y*np.log(y_pred)+(1-y)*np.log(1-y_pred))/n
+        return -np.sum(y*np.log(y_pred+opt.EPSILON)+(1-y)*np.log(1-y_pred+opt.EPSILON))/n
 
     #Dicts:        
     activation_functions = {
