@@ -11,14 +11,14 @@
                 Method & MSE & $\eta$ \\ \hline
                 Plain GD & 0.2522 & 0.0719 \\
                 Momentum GD & 0.1738 & 0.132 \\
-                Plain SGD & 0.1787 & 0.0399 \\
-                Momentum SGD & 0.1755 & 0.00394 \\
-                AdaGrad GD & 0.2725 & 0.528 \\
-                AdaGrad Momentum GD & 0.2065 & 0.570 \\
-                AdaGrad SGD & 0.1810 & 0.576 \\
-                AdaGrad Momentum & 0.1784 & 0.175 \\
-                RMSprop SGD & 0.1826 & 0.00677 \\
-                Adam & 0.1790 & 0.0168 \\
+                Plain SGD & 0.1827 & 0.0622 \\
+                Momentum SGD & 0.1719 & 0.0914 \\
+                AdaGrad GD & 0.2725 & 0.525 \\
+                AdaGrad Momentum GD & 0.2065 & 0.567 \\
+                AdaGrad SGD & 0.2017 & 0.546 \\
+                AdaGrad Momentum SGD & 0.1762 & 0.651 \\
+                RMSprop SGD & 0.1778 & 0.277 \\
+                Adam SGD & 0.1736 & 0.287 \\
             \end{tabular}
             \caption{Table of the best validation MSE scores by GD algorithm, together with the learning rate that produced the best result.}
             \label[tab]{res:tab:OLS_MSEs}
@@ -34,7 +34,7 @@
         \begin{subfigure}{.5\textwidth}
             \centering
             \includegraphics[width=\linewidth]{learning_rates_SGD_batches_epochs.pdf}
-            \caption{Best MSEs, learning rates: (0.1787, 0.0402), (0.1746, 0.0152), (0.1703, 0.0343), (0.1697, 0.00394)}
+            \caption{Best MSEs, learning rates: (0.1827, 0.0618), (0.1807, 0.0279), (0.1667, 0.0539), (0.1767, 0.0168)}
             \label[fig]{res:fig:lrate2}
         \end{subfigure}
         \hfill
@@ -51,7 +51,7 @@
             \caption{Best MSEs, learning rates: (0.1810, 0.569), (0.1784, 0.170), (0.1826, 0.00677), (0.1790, 0.0168)}
             \label[fig]{res:fig:lrate4}
         \end{subfigure}
-        \caption{Plots of the validation MSE of the parameters found from optimising the OLS cost function on Franke function data with $n=600$ data points. For the momentum methods we used $\gamma=0.8$. The stochastic methods used 16 batches and 100 epochs, while the standard GD did 100 iterations unless specified otherwise. Overlaid are 95\% confidence intervals based on optimising with five different starting points.
+        \caption{Plots of the validation MSE of the parameters found from optimising the OLS cost function on Franke function data with $n=600$ data points. For the momentum methods we used $\gamma=0.8$. The stochastic methods used a batch size of 64 and 100 epochs, while the standard GD did 100 iterations unless specified otherwise. Overlaid are 95\% confidence intervals based on optimising with five different starting points.
         Analytical OLS MSE: 0.1176.}
         \label[fig]{res:fig:lrates}
     \end{figure*}

@@ -271,8 +271,7 @@ if __name__=="__main__":
 
     max_iter = 100
 
-    n_batches = 16
-    batch_size = len(D_train) // n_batches
+    batch_size = 2**6
 
     # All the gradient descent instances
     GD = GradientDescent("plain", {"eta":0.}, its=max_iter)
@@ -284,8 +283,8 @@ if __name__=="__main__":
     mSGD4 = SGradientDescent("momentum", {"gamma":0.5, "eta":0.}, epochs=max_iter, batch_size=batch_size, random_state=random_state)
     mSGD5 = SGradientDescent("momentum", {"gamma":1, "eta":0.}, epochs=max_iter, batch_size=batch_size, random_state=random_state)
     SGDb = SGradientDescent("plain", {"eta":0.}, epochs=max_iter, batch_size=batch_size//4, random_state=random_state)
-    SGDe = SGradientDescent("plain", {"eta":0.}, epochs=4*max_iter, batch_size=batch_size, random_state=random_state)
-    SGDbe = SGradientDescent("plain", {"eta":0.}, epochs=4*max_iter, batch_size=batch_size//4, random_state=random_state)
+    SGDe = SGradientDescent("plain", {"eta":0.}, epochs=max_iter*4, batch_size=batch_size, random_state=random_state)
+    SGDbe = SGradientDescent("plain", {"eta":0.}, epochs=max_iter*4, batch_size=batch_size//4, random_state=random_state)
     aGD = GradientDescent("adagrad", {"eta":0.}, its=max_iter)
     maGD = GradientDescent("adagrad_momentum", {"gamma":0.8, "eta":0.}, its=max_iter)
     aSGD = SGradientDescent("adagrad", {"eta":0.}, epochs=max_iter, batch_size=batch_size, random_state=random_state)
@@ -304,13 +303,13 @@ if __name__=="__main__":
             "ylims" : (0,0.8)
         },
         "SGD_batches_epochs": {
-            "learning_rates" : np.linspace(0.001, 0.05, 101),
+            "learning_rates" : np.linspace(0.001, 0.08, 101),
             "optimizers" : (SGD,SGDb,SGDe,SGDbe),
             "optimizer_names" : (f"SGD",fr"SGD, $4\times$batches", fr"SGD, $4\times$epochs", fr"SGD, $4\times$batches/epcochs"),
             "ylims" : (0,0.6)
         },
         "adagrad" : {
-            "learning_rates" : np.linspace(0.001, 0.6, 101),
+            "learning_rates" : np.linspace(0.001, 0.7, 101),
             "optimizers" : (aGD,maGD,aSGD,maSGD),
             "optimizer_names" : (f"AdaGrad GD",f"AdaGradMom GD", "AdaGrad SGD", "AdaGradMom SGD"),
             "ylims" : (0,0.8)
@@ -322,7 +321,7 @@ if __name__=="__main__":
             "ylims" : (0,0.8)
         },
         "tunable" : {
-            "learning_rates" : np.linspace(0.001**(1/3), 0.6**(1/3), 101)**(3), # funky learning rate to get more small eta evaluations
+            "learning_rates" : np.linspace(0.001**(1/3), 0.7**(1/3), 101)**(3), # funky learning rate to get more small eta evaluations
             "optimizers" : (aSGD, maSGD, rmSGD, adSGD),
             "optimizer_names" : ("AdaGrad SGD", "AdaGradMom SGD", "RMSprop", "Adam"),
             "ylims" : (0,0.8)
@@ -389,7 +388,7 @@ if __name__=="__main__":
     # plot1 = None
     # plot2 = "adam_SGD"
     plot2 = None
-    
+
     # Plotting
     if plot1:
         tune_learning_rate(
@@ -399,7 +398,7 @@ if __name__=="__main__":
             cost="OLS",
             verbose=True,
             **params1[plot1],
-            # filename="learning_rates_"+plot1
+            filename="learning_rates_"+plot1
         )
 
     if plot2:
