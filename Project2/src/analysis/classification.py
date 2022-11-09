@@ -62,14 +62,10 @@ def varying_activation_functions(D_train, D_test,
             else:
                 acc[j] = np.nan
 
-        if np.min(acc) < 0.6 and not cut:
-            cut = True
-
         label = af.replace("_", " ").capitalize()
         ax.plot(etas, acc, label=label)
 
-    ax.set(xlabel="Learning rate", ylabel="Accuracy")
-    if cut: ax.set(ylim = (0.6, 1))
+    ax.set(xlabel="Learning rate", ylabel="Accuracy", ylim=(0.85,1))
     ax.legend()
     
     if filename:
@@ -219,13 +215,18 @@ if __name__ == "__main__":
         ((15, 15), 1),
         ((10, 10, 10), 1)
     ]
+    
+    eta_ranges = [
+        (0.01, 0.4, 50),
+        (0.001, 0.1, 50)
+        (0.0001, 0.01, 50)
+        (0.0001, 0.01, 50)
+    ]
 
     for i in trange(len(structures)):
         nodes = structures[i]
         filename = f"clasf_activation_functions{i+1}"
-
         if i != 3: continue
-
         varying_activation_functions(D_train, D_test, 
                                 activation_functions=["sigmoid", "tanh", "relu", "leaky_relu", "linear"],
                                 filename=filename,
