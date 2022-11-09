@@ -63,9 +63,19 @@ def varying_activation_functions(D_train, D_test,
                 acc[j] = np.nan
 
         label = af.replace("_", " ").capitalize()
+<<<<<<< HEAD
         ax.plot(etas, acc, label=label)
 
     ax.set(xlabel="Learning rate", ylabel="Accuracy", ylim=(0.85,1))
+=======
+
+        if af == "linear" and NN.n_hidden_layers == 3:
+            ax.scatter(etas, acc, label=label, c=plot_utils.colors[4])
+        else:
+            ax.plot(etas, acc, label=label)
+
+    ax.set(xlabel="Learning rate", ylabel="Accuracy")
+>>>>>>> f9bf63709dd3aec40f470d9b5de171ca13f9f411
     ax.legend()
     
     if filename:
@@ -217,6 +227,7 @@ if __name__ == "__main__":
     ]
     
     eta_ranges = [
+<<<<<<< HEAD
         (0.01, 0.4, 50),
         (0.001, 0.1, 50)
         (0.0001, 0.01, 50)
@@ -231,6 +242,30 @@ if __name__ == "__main__":
                                 activation_functions=["sigmoid", "tanh", "relu", "leaky_relu", "linear"],
                                 filename=filename,
                                 eta_range=(0.01, 0.4, 50),
+=======
+        (0.01, 0.4, 25),
+        (0.001, 0.1, 25),
+        (0.001, 0.1, 25),
+        (0.001, 0.1, 10)
+    ]
+
+    # ylims = [
+    #     (0.93, 1),
+    #     (0.88, 1),
+    #     (0.9, 1),
+    #     (0.85, 1)
+    # ]
+
+    for i in trange(len(structures)):
+        nodes = structures[i]
+        eta_range = eta_ranges[i]
+        filename = f"clasf_activation_functions{i+1}"
+       
+        varying_activation_functions(D_train, D_test, 
+                                activation_functions=["sigmoid", "tanh", "relu", "leaky_relu", "linear"],
+                                filename=filename,
+                                eta_range=eta_range,
+>>>>>>> f9bf63709dd3aec40f470d9b5de171ca13f9f411
                                 nodes=nodes,
                             )
 
