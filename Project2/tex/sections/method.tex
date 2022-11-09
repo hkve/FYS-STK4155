@@ -11,14 +11,23 @@
     \comment{I have imported data and parameters at random by trial. We can discuss the choices later}\\
     Our first analysis will be a comparison of the various GD algorithms, as this will make the basis for our neural network optimisation. We will test it on the Franke function with 600 data points, with a train-test split of $\sfrac{3}{4}$, and a noise term added with std $\sigma=0.1$.
 
-    First we will minimise the OLS cost function
-    \begin{align}
-        \msub{C}{OLS}(\vec{\theta}) = \frac{1}{n}\sum_{i=1}^n \pclosed{X_{i*}\vec{\theta} - y_i}^2,
-    \end{align}
-    with a polynomial expansion of degree $5$ of the Franke function arguments $x,y$. 
+    \subsubsection{OLS Regression}
+        First we will minimise the OLS cost function
+        \begin{align}
+            \msub{C}{OLS}(\vec{\theta}) = \frac{1}{n}\sum_{i=1}^n \pclosed{X_{i*}\vec{\theta} - y_i}^2,
+        \end{align}
+        with a polynomial expansion of degree $5$ of the Franke function arguments $x,y$. We plot the MSE resulting from the predictions of the optimised parameters on the validation data as a function of learning rates. We will look at learning rates from close to zero to where `exploding gradients' occur.\footnote{This happens when the learning rate is large enough to overshoot the minima, and then start oscillating wildly away from the minima; blowing up.}
 
-    \comment{Mention initialising SGDs with same random seed for every learning rate.}
+        Our preliminary analysis will be a comparison of ordinary GD and stochastic GD, with and without momentum. We will use 100 iterations for the ordinary GD, and 100 epochs with 16 batches for the stochastic GD. The momentum methods will use the hyperparameter $\gamma=0.8$. Furthermore, we will investigate the effect of increasing the number of epochs or batches with plain SGD, using 400 epochs and 64 batches.
 
+        We will then look at algorithms that tune the learning rate, implementing ordinary and stochastic AdaGrad, again with and without momentum. We then move on to application of RMSprop and Adam, and see how these do in comparison to AdaGrad.
+
+        GD methods are quite sensitive to the initial parameters from which to descend, so we will make sure to initialise all the methods from the same point when comparing performance. We will always initialise with randomly drawn parameter values from the standard normal distribution with mean zero and std 1. To further combat the sensitivity to initial conditions, we will do all the descents from five different starting points, and compare the average MSE scores we get.
+        \comment{Comment on the randn initialisation and scaling of the data.}\\
+
+    \subsubsection{Ridge Regression}
+
+    
 \subsection{Classification problems}
     Thus far, we have only aimed at solving regression problems. The machinery regarding neural networks we have introduced here, can with some modification be used to approach \textit{classification} problems. Instead of predicting targets in a continuous domain ($y_i \in \mathbb{R}$), we aim to put the target $y_i$ in a specific class ($y_i \in \mathcal{Q}$), where $\mathcal{Q}$ is the set of possible outcomes. For comparison purposes, we will also implement a logistic regression method.
 
