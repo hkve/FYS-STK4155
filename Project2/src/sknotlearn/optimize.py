@@ -59,7 +59,7 @@ class GradientDescent:
             self._it += 1
             g = grad(self.x, *args)
             if any((np.abs(g) > MAX)):
-                self.coverged = False
+                self.converged = False
                 return self.x
             self.x = self._update_rule(self, self.x, g) 
         # print(self.method, self.x)
@@ -173,8 +173,8 @@ class SGradientDescent(GradientDescent):
             self._it += 1
             for batch in batches:
                 g = grad(self.x, *args, batch)
-                if any((np.abs(g) > MAX)):
-                    self.coverged = 0
+                if any((np.abs(g) > MAX)) or any(np.isnan(g)):
+                    self.converged = 0
                     return self.x
                 self.x = self._update_rule(self, self.x, g)
         # print(self.method, self.x)
