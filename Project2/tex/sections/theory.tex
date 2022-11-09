@@ -59,7 +59,7 @@ We will assume that the measurements $y_i$ are generated from an exact function 
             \end{align}
         \end{subequations}
 
-        Another way to adapt the learning rate to the parameter space `terrain' is found in the Root Mean Square Propagation (RMSProp) algorithm. Here we approximate a running average of the second moment of the gradient $\vec{s} = \expval(\vec{g} \circ \vec{g})$, then use this to scale the learning rate appropriately.
+        Another way to adapt the learning rate to the parameter space `terrain' is found in the Root Mean Square Propagation (RMSprop) algorithm. Here we approximate a running average of the second moment of the gradient $\vec{s} = \expval(\vec{g} \circ \vec{g})$, then use this to scale the learning rate appropriately.
         \begin{subequations}
             \begin{align}
                 \vec{g}_k &= \Nablatheta C_k(\vec{\theta}_{k-1}) \\
@@ -69,7 +69,7 @@ We will assume that the measurements $y_i$ are generated from an exact function 
         \end{subequations}
         where again $\epsilon$ is a small number to avoid zero-division, and the arithmetic operations are understood to be element-wise. Here $\beta \in [0,1]$ is a new hyperparameter parametrising the rate at which previous gradients should inform the current average of the second moment.
 
-        Finally, an algorithm which aims to combine RMSProp with momentum is Adam. Here we also keep a running average of $\vec{m} = \expval(\vec{g})$, i.e. the first moment of the gradient. Moreover, bias-corrected values are used in lieu of the `bare' estimates of the first and second moments, here denoted with hats. This ensures that a bias for low values of $\vec{m}_k, \vec{s}_k$ in early iterations with high $\beta$-values is avoided.
+        Finally, an algorithm which aims to combine RMSprop with momentum is Adam. Here we also keep a running average of $\vec{m} = \expval(\vec{g})$, i.e. the first moment of the gradient. Moreover, bias-corrected values are used in lieu of the `bare' estimates of the first and second moments, here denoted with hats. This ensures that a bias for low values of $\vec{m}_k, \vec{s}_k$ in early iterations with high $\beta$-values is avoided.
         \begin{subequations}
             \begin{align}
                 \vec{g}_k &= \Nablatheta C_k(\vec{\theta}_{k-1}) \\
@@ -85,67 +85,67 @@ We will assume that the measurements $y_i$ are generated from an exact function 
         \comment{Discussion notes: Adagrad accumulates G such that the learning rate becomes smaller with iterations --- AKA GD is `turned off'. -\Carl \\
         Not entirely true, rather learning rate stabilizes, I think. -\Carl}
 
-    \subsection{Neural Networks}
-        Artificial neural networks (ANN) are biologically inspired machine learning algoritms which can improve performance as they are exposed to data and without being programmed with any task-specific rules. In this project fully connected feed-forward neural networks (FFNN) will be implemented. 
-        \subsubsection{Structure}
-        First a non-mathematical, intuitive introduction. 
-        % An ANN is built up of components loosely modelled on some of the most important units of a biological neural network: neurons, synapses, and activation biases. 
-        An ANN consists of an input layer and an output layer. Often the network will also have layers betweeen the input and output, called \textit{hidden layers}. In that case the neural network is referred to as deep. Each layer contains \textit{nodes} which are supposed to represent the neurons in a biological neural network, or rather their activation. In a fully connected neural network, all nodes in one layer are connected to all the nodes in the previous as well as the next layer. These connections, which represent the synapses, are referred to as \textit{weights}, and the sizes of the weights are the strenght of the synapses. Each node also have an activation \textit{bias} which says something about how easily activated that specific neuron/node is. See \comment{Figure} for an illustration of a simple artificial neural network. 
-        \begin{figure} [ht]
-            \centering
-            \includegraphics[width=.85\linewidth]{figs/Illustration_NN.png}
-            \caption{Illustration of a simple neural network with an input layer, and an output layer consisting of one node.}
-            \label[fig]{the:fig:Illustration_NN}
-        \end{figure}
-        
-        The nodes, weights and biases are all essentially just numbers, but following an algorithm for combinig these numbers creates an ANN. 
+\subsection{Neural Networks}
+    Artificial neural networks (ANN) are biologically inspired machine learning algorithms which can improve performance as they are exposed to data and without being programmed with any task-specific rules. In this project fully connected feed-forward neural networks (FFNN) will be implemented. 
+    \subsubsection{Structure}
+    First a non-mathematical, intuitive introduction. 
+    % An ANN is built up of components loosely modelled on some of the most important units of a biological neural network: neurons, synapses, and activation biases. 
+    An ANN consists of an input layer and an output layer. Often the network will also have layers between the input and output, called \textit{hidden layers}. In that case the neural network is referred to as deep. Each layer contains \textit{nodes} which are supposed to represent the neurons in a biological neural network, or rather their activation. In a fully connected neural network, all nodes in one layer are connected to all the nodes in the previous as well as the next layer. These connections, which represent the synapses, are referred to as \textit{weights}, and the sizes of the weights are the strenght of the synapses. Each node also have an activation \textit{bias} which says something about how easily activated that specific neuron/node is. See \comment{Figure} for an illustration of a simple artificial neural network. 
+    \begin{figure} [ht]
+        \centering
+        \includegraphics[width=.85\linewidth]{figs/Illustration_NN.png}
+        \caption{Illustration of a simple neural network with an input layer, and an output layer consisting of one node.}
+        \label[fig]{the:fig:Illustration_NN}
+    \end{figure}
+    
+    The nodes, weights and biases are all essentially just numbers, but following an algorithm for combining these numbers creates an ANN. 
 
-        \subsubsection{Feed Forward}
-        The simplest of neural networks is the \textit{Feed Forward Neural Network(FFNN)} which, as its name implies, feeds activation from the input layer and forward through the network, eventually ending up in the output layer. Given a NN with only an input layer, and an output layer consisting of one node (see \comment{Figure}), the output $y$ is then  
-        \begin{equation}
-            y=f\left(\sum_{i=1}^n w_i x_i+b\right)
-        \end{equation} 
-        where $x_i$ constitutes the input, $w_i$ are the weights corresponding to each input variable, and $b$ the bias of the output node. \comment{Is it correct to refer to it as only $b$ and not $b_i$ as in Morten's notes? Also indexes in general (I will explain) -\Anna} $f$ is called the activation function and depends on the analysis being executed; eg. regression, classification, etc.  
-        \begin{figure} [ht]
-            \centering
-            \includegraphics[width=.4\linewidth]{figs/Illustration_simple.png}
-            \caption{Illustration of a simple neural network with an input layer, and an output layer consisting of one node.}
-            \label[fig]{the:fig:simple_NN}
-        \end{figure}
-        If we were to have a more complex neural network, also including hidden layers, $y$ would be a node in the layer after the input. Each such node would have its own activation bias and would be connected with the input through "unique" weights. It is normal that all the nodes in a layer have the same activation function $f$. 
-        
+    \subsubsection{Feed Forward}
+    The simplest of neural networks is the \textit{Feed Forward Neural Network(FFNN)} which, as its name implies, feeds activation from the input layer and forward through the network, eventually ending up in the output layer. Given a NN with only an input layer, and an output layer consisting of one node (see \comment{Figure}), the output $y$ is then  
+    \begin{equation}
+        y=f\left(\sum_{i=1}^n w_i x_i+b\right)
+    \end{equation} 
+    where $x_i$ constitutes the input, $w_i$ are the weights corresponding to each input variable, and $b$ the bias of the output node. \comment{Is it correct to refer to it as only $b$ and not $b_i$ as in Morten's notes? Also indexes in general (I will explain) -\Anna} $f$ is called the activation function and depends on the analysis being executed; e.g. regression, classification, etc.  
+    \begin{figure} [ht]
+        \centering
+        \includegraphics[width=.4\linewidth]{figs/Illustration_simple.png}
+        \caption{Illustration of a simple neural network with an input layer, and an output layer consisting of one node.}
+        \label[fig]{the:fig:simple_NN}
+    \end{figure}
+    If we were to have a more complex neural network, also including hidden layers, $y$ would be a node in the layer after the input. Each such node would have its own activation bias and would be connected with the input through "unique" weights. It is normal that all the nodes in a layer have the same activation function $f$. 
+    
 
-        \subsubsection{Backpropagation}
+    \subsubsection{Backpropagation}
 
-        \subsubsection{Universial approximation theorem}
+    \subsubsection{Universal Approximation Theorem}
 
-    \section{Logistic regression}
-        For comparison with our neural network we introduce maybe the most common classification method there is, \textit{logistic regression}. One might be confused by inclusion of the word \textit{regression} in the name of a classification method. This comes from preforming a fit to the \textit{log-odds} using a function linear in the input variables:
-        \begin{align*}
-            P(\vec{y}|X,\vec{\vec{\theta}}) = \prod_{i = 1}^{n} \sigma(X_{ia} \theta_a)^{y_i}[1-\sigma(X_{ia}\theta_a)]^{1 - y_i}
-        \end{align*}
+\subsection{Logistic regression}
+    For comparison with our neural network we introduce maybe the most common classification method there is, \textit{logistic regression}. One might be confused by inclusion of the word \textit{regression} in the name of a classification method. This comes from preforming a fit to the \textit{log-odds} using a function linear in the input variables:
+    \begin{align*}
+        P(\vec{y}|X,\vec{\vec{\theta}}) = \prod_{i = 1}^{n} \sigma(X_{ia} \theta_a)^{y_i}[1-\sigma(X_{ia}\theta_a)]^{1 - y_i}
+    \end{align*}
 
-        \begin{align*}
-            \log(\frac{p_{y_i}(x_i)}{1-p_{y_i}(x_i)}) = x_i^T \theta
-        \end{align*}
+    \begin{align*}
+        \log(\frac{p_{y_i}(x_i)}{1-p_{y_i}(x_i)}) = x_i^T \theta
+    \end{align*}
 
-        \begin{align*}
-            P(\vec{y}|X,\vec{\vec{\theta}}) = \prod_{i = 1}^{n} \sigma(X_{ia} \theta_a)^{y_i}[1-\sigma(X_{ia}\theta_a)]^{1 - y_i} 
-        \end{align*}
+    \begin{align*}
+        P(\vec{y}|X,\vec{\vec{\theta}}) = \prod_{i = 1}^{n} \sigma(X_{ia} \theta_a)^{y_i}[1-\sigma(X_{ia}\theta_a)]^{1 - y_i} 
+    \end{align*}
 
-        \begin{align*}
-            \msub{C}{BCE}(\vec{\theta}) &= -\log P(\vec{y}|X,\vec{\vec{\theta}}) \\ 
-            &= - \sum_{i = 1}^{n} y_i \sigma(X_{ia} \theta_a) + (1 - y_i)[1-\sigma(X_{ia}\theta_a)]
-        \end{align*}
+    \begin{align*}
+        \msub{C}{BCE}(\vec{\theta}) &= -\log P(\vec{y}|X,\vec{\vec{\theta}}) \\ 
+        &= - \sum_{i = 1}^{n} y_i \sigma(X_{ia} \theta_a) + (1 - y_i)[1-\sigma(X_{ia}\theta_a)]
+    \end{align*}
 
-        \begin{align*}
-            (\grad_{\theta} \msub{C}{BCE})_b &= \sum_{i = 1}^{n} y_i [1 - \sigma(X_{ia} \theta_a) ] X_{ib} + -(1 - y_i)\sigma(X_{ia} \theta_a)X_{ib} \\
-            &= \sum_i^n (y_i - \sigma(X_{ia}\theta_a)) X_{ib}  
-            \pdv{\theta_b} \msub{C}{BCE} \\
-            &= \sum_{i = 1}^{n} \left( (1 - y_i)\sigma(X_{ia} \theta_a) - y_i [1 - \sigma(X_{ia} \theta_a) ] \right) X_{ib} \\
-            &= \sum_i^n (\sigma(X_{ia}\theta_a)- y_i) X_{ib}  
-        \end{align*}
+    \begin{align*}
+        (\grad_{\theta} \msub{C}{BCE})_b &= \sum_{i = 1}^{n} y_i [1 - \sigma(X_{ia} \theta_a) ] X_{ib} + -(1 - y_i)\sigma(X_{ia} \theta_a)X_{ib} \\
+        &= \sum_i^n (y_i - \sigma(X_{ia}\theta_a)) X_{ib}  
+        \pdv{\theta_b} \msub{C}{BCE} \\
+        &= \sum_{i = 1}^{n} \left( (1 - y_i)\sigma(X_{ia} \theta_a) - y_i [1 - \sigma(X_{ia} \theta_a) ] \right) X_{ib} \\
+        &= \sum_i^n (\sigma(X_{ia}\theta_a)- y_i) X_{ib}  
+    \end{align*}
 
-        \begin{align*}
-            \nabla_{\vec{\theta}} \msub{C}{BCE}(\vec{\theta}) = X^T (\hat{\vec{p}} - \vec{y}) 
-        \end{align*}
+    \begin{align*}
+        \nabla_{\vec{\theta}} \msub{C}{BCE}(\vec{\theta}) = X^T (\hat{\vec{p}} - \vec{y}) 
+    \end{align*}
