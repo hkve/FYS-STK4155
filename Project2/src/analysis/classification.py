@@ -12,7 +12,6 @@ from sknotlearn.datasets import load_BreastCancer
 from sknotlearn.optimize import SGradientDescent
 from sknotlearn.neuralnet import NeuralNetwork
 
-np.seterr(divide="ignore", over="ignore", invalid="ignore") # Nothing to see here...
 def network_trainer(**kwargs):
     GB_defaults = {
         "method": "adagrad_momentum",
@@ -41,32 +40,37 @@ def network_trainer(**kwargs):
 
     return NN
 
-def varying_activation_functions(D_train, D_test, activation_functions = ["linear", "sigmoid"], filename=None):
-    etas = np.linspace(0.001, 0.01, 50)
-    num_nodes = [5]
-    num_nodes_ls = ["solid", "dashed", "dotted"]
+def varying_activation_functions(D_train, D_test, 
+                                activation_functions = ["sigmoid", "tanh"],
+                                nodes = ((20,20,),1),
+                                eta_range = (0.01, 0.4, 10), 
+                                filename=None
+                                ):
+    etas = np.linspace(*eta_range)
 
-    acc_all = [[np.zeros_like(etas)]*len(num_nodes)]*len(activation_functions)
-
+    cut = False
     fig, ax = plt.subplots()
-    for i, (acc_af, af) in enumerate(zip(acc_all, activation_functions)):
-        for j in trange(len(num_nodes)):
-            acc_af_nodes = acc_af[j]
-            nodes = ((num_nodes[j], ), 1)
-            for k, eta in enumerate(etas):
-                NN = network_trainer(params={"eta":eta, "gamma":0.8}, activation_hidden=af, nodes=nodes)
-                NN.train(D_train, trainsize=1)
+    for i, af in enumerate(activation_functions):
+        acc = np.zeros_like(etas)
 
-                acc_af_nodes[k] = NN.accuracy(D_test.X, D_test.y)
+        for j, eta in enumerate(etas):
+            NN = network_trainer(params={"eta":eta, "gamma":0.8}, activation_hidden=af, nodes=nodes)
+            NN.train(D_train, trainsize=1)
 
-            label = af.capitalize().replace("_", " ") if j == 0 else None
-            ax.plot(etas, acc_af_nodes, label=label, c=plot_utils.colors[i], ls=num_nodes_ls[j])
+            if NN.optimizer.converged:
+                acc[j] = NN.accuracy(D_test.X, D_test.y)
+            else:
+                acc[j] = np.nan
 
-    ax.set(xlabel="Learning rate", ylabel="Accuracy", ylim=(0.6,1))
+        label = af.replace("_", " ").capitalize()
+        ax.plot(etas, acc, label=label)
+
+    ax.set(xlabel="Learning rate", ylabel="Accuracy", ylim=(0.85,1))
     ax.legend()
+    
     if filename:
         plt.savefig(plot_utils.make_figs_path(filename))
-    plt.show()
+    # plt.show()
 
 def nodes_etas_heatmap(D_train, D_test, etas, nodes, layers=2, epochs=800, batch_size=80, random_state=321, filename=None):
     """Plot the heatmap of MSE-values given various number of nodes and learning rates for a given number of layers . 
@@ -142,8 +146,8 @@ def main():
     D_train, D_test = breast_cancer_data()
 
     SGD = SGradientDescent(
-        method = "plain",
-        params = {"eta":0.005},
+        method = "adagrad_momentum",
+        params = {"gamma":0.8, "eta":0.008},
         epochs=100,
         batch_size=20,
         random_state=321
@@ -155,16 +159,17 @@ def main():
         nodes=nodes, 
         random_state=321,
         cost_func="BCE",
-        activation_hidden="sigmoid",
+        activation_hidden="linear",
         activation_output="sigmoid",
     )
 
-
     NN.train(D_train, trainsize=1)
+    print(SGD.converged, NN.optimizer.converged)
     print(NN.accuracy(D_test.X, D_test.y))
 
     y_pred, proba =  NN.classify(D_test.X, return_prob=True)
 
+    print(f"w, b: {NN.weights[0]}, {NN.biases[0]}")
     for a, b, c in zip(y_pred, D_test.y, proba):
         print(a, b, c)
 
@@ -203,11 +208,32 @@ if __name__ == "__main__":
 
     D_train, D_test = breast_cancer_data()
 
-    # etas = np.linspace(0.01, 0.4, 50)
-    varying_activation_functions(D_train, D_test, 
-                                activation_functions=["sigmoid", "tanh", "relu", "leaky_relu"],
-                                filename= "clasf_good_activation_functions_10"
+
+    structures = [
+        ((1, ), 1),
+        ((30, ), 1),
+        ((15, 15), 1),
+        ((10, 10, 10), 1)
+    ]
+    
+    eta_ranges = [
+        (0.01, 0.4, 50),
+        (0.001, 0.1, 50)
+        (0.0001, 0.01, 50)
+        (0.0001, 0.01, 50)
+    ]
+
+    for i in trange(len(structures)):
+        nodes = structures[i]
+        filename = f"clasf_activation_functions{i+1}"
+        if i != 3: continue
+        varying_activation_functions(D_train, D_test, 
+                                activation_functions=["sigmoid", "tanh", "relu", "leaky_relu", "linear"],
+                                filename=filename,
+                                eta_range=(0.01, 0.4, 50),
+                                nodes=nodes,
                             )
+
 
     # etas = [0.001, 0.005, 0.01, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7]
     # nodes = [1,5,10,15,20,30,40,50]

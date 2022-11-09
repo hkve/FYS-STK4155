@@ -118,3 +118,20 @@ We will assume that the measurements $y_i$ are generated from an exact function 
         \subsubsection{Backpropagation}
 
         \subsubsection{Universial approximation theorem}
+
+    \section{Logistic regression}
+    
+
+    \begin{align*}
+        P(\vec{y}|X,\vec{\vec{\theta}}) = \prod_{i = 1}^{n} \sigma(X_{ia} \theta_a)^{y_i}[1-\sigma(X_{ia}\theta_a)]^{1 - y_i}
+    \end{align*}
+
+    \begin{align*}
+        \msub{C}{BCE}(\vec{\theta}) &= -\log P(\vec{y}|X,\vec{\vec{\theta}}) \\ 
+        &= - \sum_{i = 1}^{n} y_i \sigma(X_{ia} \theta_a) + (1 - y_i)[1-\sigma(X_{ia}\theta_a)]
+    \end{align*}
+
+    \begin{align*}
+        (\grad_{\theta} \msub{C}{BCE})_b &= \sum_{i = 1}^{n} y_i [1 - \sigma(X_{ia} \theta_a) ] X_{ib} + -(1 - y_i)\sigma(X_{ia} \theta_a)X_{ib} \\
+        &= \sum_i^n (y_i - \sigma(X_{ia}\theta_a)) X_{ib}  
+    \end{align*}
