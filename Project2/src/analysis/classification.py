@@ -63,20 +63,6 @@ def varying_activation_functions(D_train, D_test,
                 acc[j] = np.nan
 
         label = af.replace("_", " ").capitalize()
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-        ax.plot(etas, acc, label=label)
-
-    ax.set(xlabel="Learning rate", ylabel="Accuracy", ylim=(0.85,1))
-=======
-=======
->>>>>>> f9bf63709dd3aec40f470d9b5de171ca13f9f411
-=======
->>>>>>> f9bf63709dd3aec40f470d9b5de171ca13f9f411
-=======
->>>>>>> f9bf63709dd3aec40f470d9b5de171ca13f9f411
 
         if af == "linear" and NN.n_hidden_layers == 3:
             ax.scatter(etas, acc, label=label, c=plot_utils.colors[4])
@@ -84,21 +70,11 @@ def varying_activation_functions(D_train, D_test,
             ax.plot(etas, acc, label=label)
 
     ax.set(xlabel="Learning rate", ylabel="Accuracy")
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> f9bf63709dd3aec40f470d9b5de171ca13f9f411
-=======
->>>>>>> f9bf63709dd3aec40f470d9b5de171ca13f9f411
-=======
->>>>>>> f9bf63709dd3aec40f470d9b5de171ca13f9f411
-=======
->>>>>>> f9bf63709dd3aec40f470d9b5de171ca13f9f411
     ax.legend()
     
     if filename:
         plt.savefig(plot_utils.make_figs_path(filename))
-    # plt.show()
+    plt.show()
 
 def nodes_etas_heatmap(D_train, D_test, etas, nodes, layers=2, epochs=800, batch_size=80, random_state=321, filename=None):
     """Plot the heatmap of MSE-values given various number of nodes and learning rates for a given number of layers . 
@@ -245,31 +221,6 @@ if __name__ == "__main__":
     ]
     
     eta_ranges = [
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-        (0.01, 0.4, 50),
-        (0.001, 0.1, 50)
-        (0.0001, 0.01, 50)
-        (0.0001, 0.01, 50)
-    ]
-
-    for i in trange(len(structures)):
-        nodes = structures[i]
-        filename = f"clasf_activation_functions{i+1}"
-        if i != 3: continue
-        varying_activation_functions(D_train, D_test, 
-                                activation_functions=["sigmoid", "tanh", "relu", "leaky_relu", "linear"],
-                                filename=filename,
-                                eta_range=(0.01, 0.4, 50),
-=======
-=======
->>>>>>> f9bf63709dd3aec40f470d9b5de171ca13f9f411
-=======
->>>>>>> f9bf63709dd3aec40f470d9b5de171ca13f9f411
-=======
->>>>>>> f9bf63709dd3aec40f470d9b5de171ca13f9f411
         (0.01, 0.4, 25),
         (0.001, 0.1, 25),
         (0.001, 0.1, 25),
@@ -292,16 +243,6 @@ if __name__ == "__main__":
                                 activation_functions=["sigmoid", "tanh", "relu", "leaky_relu", "linear"],
                                 filename=filename,
                                 eta_range=eta_range,
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> f9bf63709dd3aec40f470d9b5de171ca13f9f411
-=======
->>>>>>> f9bf63709dd3aec40f470d9b5de171ca13f9f411
-=======
->>>>>>> f9bf63709dd3aec40f470d9b5de171ca13f9f411
-=======
->>>>>>> f9bf63709dd3aec40f470d9b5de171ca13f9f411
                                 nodes=nodes,
                             )
 
