@@ -3,7 +3,7 @@
     \comment{Here we write about the datasets we use, as before. Maybe reference project 1 about Franke function?}\\
     \comment{Mention data scaling.}\\
 
-    \subsubsection*{Wisconsin Breast Cancer data set}\label{sec:breast_cancer}
+    \subsubsection*{Wisconsin Breast Cancer data set}\label[sec]{breast_cancer_dataset}
     For regression problems, the Wisconsin Breast Cancer data set \cite{Dua:2019} will be used. Tumor features are computed from digitized images, describing characteristics of the cell nuclei present in the image. In total there are $n = 569$ unique instances, where each instance has the respective tumor marked as either malignant (M) or benign (B). We will aim to classify the tumor as M or B based on 10 different attributes ranging from tumor radius to texture. Each of these 10 attributes is again split up into three different measurements, named mean, standard error and worst. The latter describes the mean of the three largest measurements. This data set serves a good real-world benchmarking set, containing not too many instances and no missing fields.  
 
 \subsection{Assessing Gradient Descent}
@@ -31,7 +31,7 @@
 \subsection{Classification problems}
     Thus far, we have only aimed at solving regression problems. The machinery regarding neural networks we have introduced here, can with some modification be used to approach \textit{classification} problems. Instead of predicting targets in a continuous domain ($y_i \in \mathbb{R}$), we aim to put the target $y_i$ in a specific class ($y_i \in \mathcal{Q}$), where $\mathcal{Q}$ is the set of possible outcomes. For comparison purposes, we will also implement a logistic regression method.
 
-    For our case using the Wisconsin Breast data set presented in \cref{sec:breast_cancer}, we aim to classify either M or B. These categories are mutually exclusive, thus determining M or not M is sufficient (i.e. $\mathcal{Q} = \{ M, \neg M \}$). This leaves us with a binary problem, represented with $y_i \in \{ 1, 0 \}$ where $y_i = 1$ implies M and $y_i = 0$ not M.
+    For our case using the Wisconsin Breast data set presented in \cref{breast_cancer_dataset}, we aim to classify either M or B. These categories are mutually exclusive, thus determining M or not M is sufficient (i.e. $\mathcal{Q} = \{ M, \neg M \}$). This leaves us with a binary problem, represented with $y_i \in \{ 1, 0 \}$ where $y_i = 1$ implies M and $y_i = 0$ not M.
 
     To measure the goodness of fit in for our classification problems, we use the \textit{accuracy} score. This metric simply counts the number correctly classified cases, divided by the total number of cases:
 

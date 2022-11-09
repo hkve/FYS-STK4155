@@ -3,8 +3,8 @@ from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
 import seaborn as sns
 import plot_utils
-from utils import make_figs_path
 import time
+from tqdm import trange
 
 import context
 from sknotlearn.data import Data
@@ -12,6 +12,61 @@ from sknotlearn.datasets import load_BreastCancer
 from sknotlearn.optimize import SGradientDescent
 from sknotlearn.neuralnet import NeuralNetwork
 
+np.seterr(divide="ignore", over="ignore", invalid="ignore") # Nothing to see here...
+def network_trainer(**kwargs):
+    GB_defaults = {
+        "method": "adagrad_momentum",
+        "params": {"gamma":0.8, "eta":0.1}, 
+        "epochs": 100,
+        "batch_size": 20,
+        "random_state": 321,
+    }
+    NN_defaults = {
+        "nodes": ((4, ), 1), 
+        "cost_func": "BCE",
+        "lmbda": None,
+        "activation_hidden": "sigmoid",
+        "activation_output": "sigmoid"
+    }
+
+    for k, v in kwargs.items():
+        if k in GB_defaults.keys():
+            GB_defaults[k] = v
+        if k in NN_defaults.keys():
+            NN_defaults[k] = v 
+
+    SGD = SGradientDescent(**GB_defaults)
+            
+    NN = NeuralNetwork(optimizer=SGD, **NN_defaults)
+
+    return NN
+
+def varying_activation_functions(D_train, D_test, activation_functions = ["linear", "sigmoid"], filename=None):
+    etas = np.linspace(0.001, 0.01, 50)
+    num_nodes = [5]
+    num_nodes_ls = ["solid", "dashed", "dotted"]
+
+    acc_all = [[np.zeros_like(etas)]*len(num_nodes)]*len(activation_functions)
+
+    fig, ax = plt.subplots()
+    for i, (acc_af, af) in enumerate(zip(acc_all, activation_functions)):
+        for j in trange(len(num_nodes)):
+            acc_af_nodes = acc_af[j]
+            nodes = ((num_nodes[j], ), 1)
+            for k, eta in enumerate(etas):
+                NN = network_trainer(params={"eta":eta, "gamma":0.8}, activation_hidden=af, nodes=nodes)
+                NN.train(D_train, trainsize=1)
+
+                acc_af_nodes[k] = NN.accuracy(D_test.X, D_test.y)
+
+            label = af.capitalize().replace("_", " ") if j == 0 else None
+            ax.plot(etas, acc_af_nodes, label=label, c=plot_utils.colors[i], ls=num_nodes_ls[j])
+
+    ax.set(xlabel="Learning rate", ylabel="Accuracy", ylim=(0.6,1))
+    ax.legend()
+    if filename:
+        plt.savefig(plot_utils.make_figs_path(filename))
+    plt.show()
 
 def nodes_etas_heatmap(D_train, D_test, etas, nodes, layers=2, epochs=800, batch_size=80, random_state=321, filename=None):
     """Plot the heatmap of MSE-values given various number of nodes and learning rates for a given number of layers . 
@@ -50,7 +105,7 @@ def nodes_etas_heatmap(D_train, D_test, etas, nodes, layers=2, epochs=800, batch
                 cost_func="MSE",
                 # lmbda=0.001,
                 activation_hidden="sigmoid",
-                activation_output="linear"
+                activation_output="sigmoid"
             )
 
             NN.train(D_train, trainsize=1)
@@ -80,21 +135,21 @@ def nodes_etas_heatmap(D_train, D_test, etas, nodes, layers=2, epochs=800, batch
         labels=etas
     )
     if filename:
-        plt.savefig(make_figs_path(filename), dpi=300)
+        plt.savefig(plot_utils.make_figs_path(filename), dpi=300)
     plt.show()
 
 def main():
-    D = load_BreastCancer()
+    D_train, D_test = breast_cancer_data()
 
     SGD = SGradientDescent(
-        method = "adam",
-        params = {"eta":0.05, "beta1": 0.9, "beta2": 0.99},
+        method = "plain",
+        params = {"eta":0.005},
         epochs=100,
         batch_size=20,
         random_state=321
     )
 
-    nodes = ((20, 20, ), 1)
+    nodes = ((5, ), 1)
     NN = NeuralNetwork(
         SGD, 
         nodes=nodes, 
@@ -102,25 +157,15 @@ def main():
         cost_func="BCE",
         activation_hidden="sigmoid",
         activation_output="sigmoid",
-        lmbda=0.000001
     )
 
-    D_train, D_test = D.train_test_split(ratio=3/4, random_state=321)
-    y_train, X_train = D_train.unpacked()
-    y_test, X_test = D_test.unpacked()
 
-    scaler = StandardScaler().fit(X_train)
-    X_train, X_test = scaler.transform(X_train), scaler.transform(X_test)
-
-
-    D_train.X = X_train
     NN.train(D_train, trainsize=1)
-    print(NN.accuracy(X_test, y_test))
+    print(NN.accuracy(D_test.X, D_test.y))
 
-    y_pred, proba =  NN.classify(X_test, return_prob=True)
-    print(len(y_pred))
+    y_pred, proba =  NN.classify(D_test.X, return_prob=True)
 
-    for a, b, c in zip(y_pred, y_test, proba):
+    for a, b, c in zip(y_pred, D_test.y, proba):
         print(a, b, c)
 
 def test_logreg():
@@ -137,23 +182,34 @@ def test_logreg():
     print(acc)
 
 
+def breast_cancer_data(random_state=321):
+    D = load_BreastCancer()
+    D_train, D_test = D.train_test_split(ratio=3/4, random_state=321)
+    _, X_train = D_train.unpacked()
+    _, X_test = D_test.unpacked()
+
+    scaler = StandardScaler().fit(X_train)
+    X_train, X_test = scaler.transform(X_train), scaler.transform(X_test)
+    
+    D_train.X = X_train
+    D_test.X = X_test
+
+    return D_train, D_test
+
+
 if __name__ == "__main__":
     # test_logreg()
-    main()
+    # main()
 
-    # D = load_BreastCancer()
-    # D_train, D_test = D.train_test_split(ratio=3/4, random_state=321)
-    # _, X_train = D_train.unpacked()
-    # _, X_test = D_test.unpacked()
+    D_train, D_test = breast_cancer_data()
 
-    # scaler = StandardScaler().fit(X_train)
-    # X_train, X_test = scaler.transform(X_train), scaler.transform(X_test)
-    
-    # D_train.X = X_train
-    # D_test.X = X_test
+    # etas = np.linspace(0.01, 0.4, 50)
+    varying_activation_functions(D_train, D_test, 
+                                activation_functions=["sigmoid", "tanh", "relu", "leaky_relu"],
+                                filename= "clasf_good_activation_functions_10"
+                            )
 
-
-    # etas = [0.001, 0.005, 0.01, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+    # etas = [0.001, 0.005, 0.01, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7]
     # nodes = [1,5,10,15,20,30,40,50]
 
     # nodes_etas_heatmap(D_train, D_test, etas, nodes, layers=2, epochs=100, batch_size=20)
