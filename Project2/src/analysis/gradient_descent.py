@@ -72,9 +72,9 @@ def tune_learning_rate(
                                    lmbda*np.eye(X_train.shape[1])) @ X_train.T @ y_train
 
     # Iterate through optimizers and compute/plot scores
-    for num, (optimizer, name, color) in enumerate(zip(optimizers,
-                                                       optimizer_names,
-                                                       plot_utils.colors[:len(optimizers)])):
+    for optimizer, name, color in zip(optimizers,
+                                      optimizer_names,
+                                      plot_utils.colors[:len(optimizers)]):
         start_time = time()     # For timing algorithms
         MSE_array = np.zeros((len(theta0), len(learning_rates)))
         for i, x0 in enumerate(theta0):
@@ -120,6 +120,7 @@ def tune_learning_rate(
                      arrowprops=dict(facecolor=color))
         if verbose:
             print(f"{name} MSE score: {MSE_means[argbest]:.4} "
+                  f"+- {MSE_stds[argbest]:.3} "
                   f"(Learning rate {learning_rates[argbest]:.3}) "
                   f"({time()-start_time:.2f} s)")
 
@@ -276,7 +277,7 @@ if __name__ == "__main__":
     D_val = D_train.scale(D_val)
 
     # Setting some general params
-    random_state = 321
+    random_state = 123
     np.random.seed(random_state)
     theta0 = [np.random.randn(D_val.n_features) for _ in range(5)]
 
@@ -423,7 +424,7 @@ if __name__ == "__main__":
             cost="OLS",
             verbose=True,
             **params1[plot1],
-            filename="learning_rates_"+plot1
+            # filename="learning_rates_"+plot1
         )
 
     if plot2:
