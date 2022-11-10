@@ -72,9 +72,9 @@ def tune_learning_rate(
                                    lmbda*np.eye(X_train.shape[1])) @ X_train.T @ y_train
 
     # Iterate through optimizers and compute/plot scores
-    for optimizer, name, color in zip(optimizers,
-                                      optimizer_names,
-                                      plot_utils.colors[:len(optimizers)]):
+    for num, (optimizer, name, color) in enumerate(zip(optimizers,
+                                                       optimizer_names,
+                                                       plot_utils.colors[:len(optimizers)])):
         start_time = time()     # For timing algorithms
         MSE_array = np.zeros((len(theta0), len(learning_rates)))
         for i, x0 in enumerate(theta0):
@@ -111,10 +111,16 @@ def tune_learning_rate(
                              MSE_means-2*MSE_stds, MSE_means+2*MSE_stds,
                              alpha=0.3, color=color)
 
+        argbest = np.nanargmin(MSE_means)
+        plt.annotate("",
+                     xy=(learning_rates[argbest], MSE_means[argbest]),
+                     xytext=(learning_rates[argbest],
+                             MSE_means[argbest] - ylims[1]/6),
+                     ha="center",
+                     arrowprops=dict(facecolor=color))
         if verbose:
-            print(f"{name} MSE score: {np.nanmin(MSE_means):.4} "
-                  f"(Learning rate "
-                  f"{learning_rates[np.nanargmin(MSE_means)]:.3}) "
+            print(f"{name} MSE score: {MSE_means[argbest]:.4} "
+                  f"(Learning rate {learning_rates[argbest]:.3}) "
                   f"({time()-start_time:.2f} s)")
 
     # Calculating analytical solution from matrix inversion
@@ -324,7 +330,7 @@ if __name__ == "__main__":
         "SGD_batches_epochs": {
             "learning_rates": np.linspace(0.001, 0.08, 101),
             "optimizers": (SGD, SGDb, SGDe, SGDbe),
-            "optimizer_names": (f"SGD", fr"SGD, $4\times$batches", fr"SGD, $4\times$epochs", fr"SGD, $4\times$batches/epcochs"),
+            "optimizer_names": (f"SGD", fr"SGD, $4\times$batches", fr"SGD, $4\times$epochs", fr"SGD, $4\times$batches/epochs"),
             "ylims": (0, 0.6)
         },
         "adagrad": {
@@ -403,7 +409,7 @@ if __name__ == "__main__":
     }
 
     # Choosing plot to plot
-    plot1 = "PGD_MGD_PSGD_MSGD"
+    plot1 = "tunable"
     # plot1 = None
     # plot2 = "adam_SGD"
     plot2 = None
@@ -417,7 +423,7 @@ if __name__ == "__main__":
             cost="OLS",
             verbose=True,
             **params1[plot1],
-            # filename="learning_rates_"+plot1
+            filename="learning_rates_"+plot1
         )
 
     if plot2:
