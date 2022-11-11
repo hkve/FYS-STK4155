@@ -1,54 +1,62 @@
-\comment{Suggestion: future tense}\\
+\comment{Suggestion: past tense NB! THIS IS A CHANGE}\\
 \subsection{Datasets}
     \comment{Here we write about the datasets we use, as before. Maybe reference project 1 about Franke function?}\\
     \comment{Mention data scaling.}\\
 
-    \subsubsection*{Wisconsin Breast Cancer data set}\label{sec:breast_cancer}
-    For regression problems, the Wisconsin Breast Cancer data set \cite{Dua:2019} will be used. Tumor features are computed from digitized images, describing characteristics of the cell nuclei present in the image. In total there are $n = 569$ unique instances, where each instance has the respective tumor marked as either malignant (M) or benign (B). We will aim to classify the tumor as M or B based on 10 different attributes ranging from tumor radius to texture. Each of these 10 attributes is again split up into three different measurements, named mean, standard error and worst. The latter describes the mean of the three largest measurements. This data set serves a good real-world benchmarking set, containing not too many instances and no missing fields.  
+    \subsubsection*{Wisconsin Breast Cancer data set}\label[sec]{breast_cancer_dataset}
+        For regression problems, the Wisconsin Breast Cancer data set \cite{Dua:2019} was used. Tumour features are computed from digitized images, describing characteristics of the cell nuclei present in the image. In total there are $n = 569$ unique instances, where each instance has the respective tumour marked as either malignant (M) or benign (B). We aimed to classify the tumour as M or B based on 10 different attributes ranging from tumour radius to texture. Each of these 10 attributes were again split up into three different measurements, named mean, standard error and worst. The latter describes the mean of the three largest measurements. This data set serves a good real-world benchmarking set, containing not too many instances and no missing fields.  
 
 \subsection{Assessing Gradient Descent}
     \comment{Trying out the gradient descent methods and comparing them.}\\
     \comment{I have imported data and parameters at random by trial. We can discuss the choices later}\\
-    Our first analysis will be a comparison of the various GD algorithms, as this will make the basis for our neural network optimisation. We will test it on the Franke function with 600 data points, with a train-test split of $\sfrac{3}{4}$, and a noise term added with std $\sigma=0.1$.
+    Our first analysis was a comparison of the various GD algorithms, as these make the basis for our neural network optimisation. We used the GD algorithms to optimise OLS and Ridge cost functions~\cite{Project1}, training them on the Franke function with 600 data points, with a train-test split of $\sfrac{3}{4}$, and a noise term added with std $\sigma=0.1$.
 
-    First we will minimise the OLS cost function
-    \begin{align}
-        \msub{C}{OLS}(\vec{\theta}) = \frac{1}{n}\sum_{i=1}^n \pclosed{X_{i*}\vec{\theta} - y_i}^2,
-    \end{align}
-    with a polynomial expansion of degree $5$ of the Franke function arguments $x,y$. 
+    \subsubsection{OLS Regression}
+        First we focused on the OLS cost function
+        \begin{align}
+            \msub{C}{OLS}(\vec{\theta}) = \frac{1}{n}\sum_{i=1}^n \pclosed{X_{i*}\vec{\theta} - y_i}^2,
+        \end{align}
+        with a polynomial expansion of degree $5$ of the Franke function arguments $x,y$. We plot the MSE resulting from the predictions of the optimised parameters on the validation data as a function of learning rates. We looked at learning rates from close to zero to where `exploding gradients' occurred, which was different between the different algorithms.\footnote{This happens when the learning rate is large enough to overshoot the minima, and then start oscillating wildly away from the minima; blowing up.}
 
-    \comment{Mention initialising SGDs with same random seed for every learning rate.}
+        Our preliminary analysis was a comparison of ordinary GD and stochastic GD, with and without momentum. We used 100 iterations for the ordinary GD, and 100 epochs with 16 batches for the stochastic GD. For the momentum methods we used a hyperparameter value $\gamma=0.8$. Furthermore, we investigated the effect of increasing the number of epochs or batches with plain SGD, using 400 epochs and 64 batches.
 
-\subsection{Creating a Neural Network and regression problems}
-    In this part of our analysis we will create an FFNN with a flexible number of hidden layers and nodes. Subsequently we will train and test this network on the Nicaraguan terrain data from Project 1 and compare its performance with the results from the linear regression methods (OLS and Ridge) employed in that project. 
+        We then looked at algorithms that tune the learning rate, implementing ordinary and stochastic AdaGrad, again with and without momentum. Then we moved on to application of stochastic RMSprop and Adam, and compared how these do in comparison to AdaGrad with SGD.
 
-    \comment{Discuss the choice of cost function in the NN}
 
-    We start by implementing the sigmoid activation function in the hidden layers. As 
+    \subsection{Ridge Regression}
+        Adding an $L_2$-penalisation term to the OLS cost function gives us the Ridge cost function. \comment{c'mon Carl, pick up the energy! -\Carl }
 
+    \subsubsection{Initialisation}
+        GD methods are quite sensitive to the initial parameters from which to descend, so made sure to initialise all the methods from the same point when comparing performance. We always initialised with randomly drawn parameter values from the standard normal distribution with mean zero and std one. To further combat the sensitivity to initial conditions, we did all the descents from five different starting points, and computed the average MSE scores we got.
+        \comment{Comment on the randn initialisation and scaling of the data.}\\
+
+    \subsubsection{Ridge Regression}
+        
+
+    
 \subsection{Classification problems}
-    Thus far, we have only aimed at solving regression problems. The machinery regarding neural networks we have introduced here, can with some modification be used to approach \textit{classification} problems. Instead of predicting targets in a continuous domain ($y_i \in \mathbb{R}$), we aim to put the target $y_i$ in a specific class ($y_i \in \mathcal{Q}$), where $\mathcal{Q}$ is the set of possible outcomes. For comparison purposes, we will also implement a logistic regression method.
+    Thus far, we had only aimed at solving regression problems. The machinery regarding neural networks we have introduced here, can with some modification be used to approach \textit{classification} problems. Instead of predicting targets in a continuous domain ($y_i \in \mathbb{R}$), we aimed to put the target $y_i$ in a specific class ($y_i \in \mathcal{Q}$), where $\mathcal{Q}$ is the set of possible outcomes. For comparison purposes, we also implemented a simple logistic regression method.
 
-    For our case using the Wisconsin Breast data set presented in \cref{sec:breast_cancer}, we aim to classify either M or B. These categories are mutually exclusive, thus determining M or not M is sufficient (i.e. $\mathcal{Q} = \{ M, \neg M \}$). This leaves us with a binary problem, represented with $y_i \in \{ 1, 0 \}$ where $y_i = 1$ implies M and $y_i = 0$ not M.
+    For our case using the Wisconsin Breast data set presented in \cref{breast_cancer_dataset}, we aimed to classify either $M$ or $B$. These categories are mutually exclusive, thus determining $M$ or not $M$ is sufficient (i.e. $\mathcal{Q} = \{ M, \neg M \}$). This gave us a binary problem, represented with $y_i \in \{ 1, 0 \}$ where $y_i = 1$ implies $M$ and $y_i = 0$ not $M$.
 
-    To measure the goodness of fit in for our classification problems, we use the \textit{accuracy} score. This metric simply counts the number correctly classified cases, divided by the total number of cases:
+    To measure the goodness of fit in for our classification problems, we used the \textit{accuracy} score. This metric simply counts the number correctly classified cases, divided by the total number of cases:
 
     \begin{align}
         A(y_i, \hat{y}_i) = \frac{1}{n}\sum_{i=1}^{n} I(\hat{y}_i = y_i), \\
         I(\hat{y}_i = y) = \begin{cases}
             1\hspace{10px}&\text{if }\hat{y}_i = y \\
             0\hspace{10px}&\text{else}
-        \end{cases} \nonumber
+        \end{cases} \nonumber,
     \end{align}
-    Where $I$ is the indicator function. We note that if all cases are classified correctly, the sum will evaluate to $n$ and if all are classified wrongly, it will evaluate to 0. Thus, the accuracy is bounded by $0 \leq A(y_i, \hat{y}_i) \leq 1$.
+    where $I$ is the indicator function. We note that if all cases are classified correctly, the sum will evaluate to $n$ and if all are classified wrongly, it will evaluate to 0. Thus, the accuracy is bounded by $0 \leq A(y_i, \hat{y}_i) \leq 1$.
 
     \subsubsection*{Logistic Regression}
     To be continued ...
 
     \subsubsection*{Neural Network approach}
-    As a loss function suitable for classification problems, the Binary Cross Entropy (BCE) \cite{BCE} will be used:
+    As a loss function suitable for classification problems, the Binary Cross Entropy (BCE) \cite{BCE} was used:
     \begin{align}
-        \msub{C}{BCE} = -\frac{1}{n}\sum_{i=1}^{n} y_i \log{\hat{p}_i} + (1-y_i) \log{(1-\hat{p}_i)}
+        \msub{C}{BCE} = -\frac{1}{n}\sum_{i=1}^{n} y_i \log{\hat{p}_i} + (1-y_i) \log{(1-\hat{p}_i)},
         \label{eq:BCE_loss_function}
     \end{align} 
-    Where $\hat{p}_i$ is the predicted probability of $y_i = 1$ given $x_i$.  
+    where $\hat{p}_i$ is the predicted probability of $y_i = 1$ given $x_i$.  

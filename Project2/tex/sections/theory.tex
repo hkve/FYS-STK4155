@@ -59,7 +59,7 @@ We will assume that the measurements $y_i$ are generated from an exact function 
             \end{align}
         \end{subequations}
 
-        Another way to adapt the learning rate to the parameter space `terrain' is found in the Root Mean Square Propagation (RMSProp) algorithm. Here we approximate a running average of the second moment of the gradient $\vec{s} = \expval(\vec{g} \circ \vec{g})$, then use this to scale the learning rate appropriately.
+        Another way to adapt the learning rate to the parameter space `terrain' is found in the Root Mean Square Propagation (RMSprop) algorithm. Here we approximate a running average of the second moment of the gradient $\vec{s} = \expval(\vec{g} \circ \vec{g})$, then use this to scale the learning rate appropriately.
         \begin{subequations}
             \begin{align}
                 \vec{g}_k &= \Nablatheta C_k(\vec{\theta}_{k-1}) \\
@@ -69,7 +69,7 @@ We will assume that the measurements $y_i$ are generated from an exact function 
         \end{subequations}
         where again $\epsilon$ is a small number to avoid zero-division, and the arithmetic operations are understood to be element-wise. Here $\beta \in [0,1]$ is a new hyperparameter parametrising the rate at which previous gradients should inform the current average of the second moment.
 
-        Finally, an algorithm which aims to combine RMSProp with momentum is Adam. Here we also keep a running average of $\vec{m} = \expval(\vec{g})$, i.e. the first moment of the gradient. Moreover, bias-corrected values are used in lieu of the `bare' estimates of the first and second moments, here denoted with hats. This ensures that a bias for low values of $\vec{m}_k, \vec{s}_k$ in early iterations with high $\beta$-values is avoided.
+        Finally, an algorithm which aims to combine RMSprop with momentum is Adam. Here we also keep a running average of $\vec{m} = \expval(\vec{g})$, i.e. the first moment of the gradient. Moreover, bias-corrected values are used in lieu of the `bare' estimates of the first and second moments, here denoted with hats. This ensures that a bias for low values of $\vec{m}_k, \vec{s}_k$ in early iterations with high $\beta$-values is avoided.
         \begin{subequations}
             \begin{align}
                 \vec{g}_k &= \Nablatheta C_k(\vec{\theta}_{k-1}) \\
@@ -129,4 +129,35 @@ We will assume that the measurements $y_i$ are generated from an exact function 
 
         \subsubsection{Backpropagation}
 
-        \subsubsection{Universial approximation theorem}
+    \subsubsection{Universal Approximation Theorem}
+
+\subsection{Logistic regression}
+    For comparison with our neural network we introduce maybe the most common classification method there is, \textit{logistic regression}. One might be confused by inclusion of the word \textit{regression} in the name of a classification method. This comes from preforming a fit to the \textit{log-odds} using a function linear in the input variables:
+    \begin{align*}
+        P(\vec{y}|X,\vec{\vec{\theta}}) = \prod_{i = 1}^{n} \sigma(X_{ia} \theta_a)^{y_i}[1-\sigma(X_{ia}\theta_a)]^{1 - y_i}
+    \end{align*}
+
+    \begin{align*}
+        \log(\frac{p_{y_i}(x_i)}{1-p_{y_i}(x_i)}) = x_i^T \theta
+    \end{align*}
+
+    \begin{align*}
+        P(\vec{y}|X,\vec{\vec{\theta}}) = \prod_{i = 1}^{n} \sigma(X_{ia} \theta_a)^{y_i}[1-\sigma(X_{ia}\theta_a)]^{1 - y_i} 
+    \end{align*}
+
+    \begin{align*}
+        \msub{C}{BCE}(\vec{\theta}) &= -\log P(\vec{y}|X,\vec{\vec{\theta}}) \\ 
+        &= - \sum_{i = 1}^{n} y_i \sigma(X_{ia} \theta_a) + (1 - y_i)[1-\sigma(X_{ia}\theta_a)]
+    \end{align*}
+
+    \begin{align*}
+        (\grad_{\theta} \msub{C}{BCE})_b &= \sum_{i = 1}^{n} y_i [1 - \sigma(X_{ia} \theta_a) ] X_{ib} + -(1 - y_i)\sigma(X_{ia} \theta_a)X_{ib} \\
+        &= \sum_i^n (y_i - \sigma(X_{ia}\theta_a)) X_{ib}  
+        \pdv{\theta_b} \msub{C}{BCE} \\
+        &= \sum_{i = 1}^{n} \left( (1 - y_i)\sigma(X_{ia} \theta_a) - y_i [1 - \sigma(X_{ia} \theta_a) ] \right) X_{ib} \\
+        &= \sum_i^n (\sigma(X_{ia}\theta_a)- y_i) X_{ib}  
+    \end{align*}
+
+    \begin{align*}
+        \nabla_{\vec{\theta}} \msub{C}{BCE}(\vec{\theta}) = X^T (\hat{\vec{p}} - \vec{y}) 
+    \end{align*}
