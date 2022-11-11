@@ -2,3 +2,26 @@
 And finally appendices here
 
     \subsection{Activation functions}
+    \renewcommand{\arraystretch}{2}
+        \begin{table*}[]
+            \centering
+            \begin{tabular}{|l|l|l|l|}
+            \hline
+            \textbf{Name}     & \textbf{Function} & \textbf{Derivative} \\ \hline
+            Identity & $f(x) = x$ & $f'(x) = 1$  \\ \hline
+            Sigmoid  & $\sigma(x) = \frac{1}{1 + e^{-x}}$          &  $\sigma ' (x) = \sigma(x)(1-\sigma(x))$          \\ \hline
+            \begin{tabular}[c]{@{}l@{}}Hyperbolic \\ tangent\end{tabular}        &  $\tanh (x) = \frac{e^x-e^{-x}}{e^x+e^{-x}}$         &  $\tanh ' (x) = 1 - (\tanh (x))^2$          \\ \hline
+            ReLU        & 
+                $
+                f(x) = \begin{cases}0 & \text { if } x \leq 0 \\
+                x & \text { if } x>0\end{cases}
+                $   
+                & $f'(x) = \begin{cases}0 & \text { if } x<0 \\ 1 & \text { if } x>0 \\ \text { undefined } & \text { if } x=0\end{cases} $ \\ \hline
+            Leaky ReLU& $
+            f(x) = \begin{cases}0.01 & \text { if } x \leq 0 \\
+            x & \text { if } x>0\end{cases}
+            $ & $f'(x) = \begin{cases}0 & \text { if } x<0 \\ 1 & \text { if } x>0 \\ \text { undefined } & \text { if } x=0\end{cases} $\\ \hline
+            \end{tabular}
+            \caption{Table over the various activation functions implemented in this project and their derivatives.}
+        \end{table*}
+    \renewcommand{\arraystretch}{1}

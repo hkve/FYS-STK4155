@@ -36,6 +36,19 @@ colors = [
 cmap = matplotlib.colors.LinearSegmentedColormap.from_list(
     "", colors[:2] + [colors[3]])
 
+cmap_terrain = matplotlib.colors.LinearSegmentedColormap.from_list(
+    "", [
+    "darkslategrey",
+    sns.color_palette('dark')[-1],
+    sns.color_palette('husl')[-3],
+    # sns.color_palette('deep')[-1],
+    "darkturquoise",
+    sns.color_palette('husl')[-2],
+    # 'mediumorchid',
+    sns.color_palette('husl')[-1],
+] )
+# cmap_inverse = "terrain"
+
 sns.set_style("darkgrid")
 # Set all fonts to be equal to tex
 # https://stackoverflow.com/questions/11367736/matplotlib-consistent-font-using-latex

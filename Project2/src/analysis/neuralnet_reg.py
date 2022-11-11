@@ -229,23 +229,23 @@ if __name__ == "__main__":
     #         filename=filename
     #     )
 
-    # nodes = ((50,)*3, 1)
-    # eta = 0.001
-    # plot_NN_vs_test(
-    #     D_train=D_train, 
-    #     D_test=D_test, 
-    #     eta=eta, nodes=nodes, 
-    #     epochs=epochs, 
-    #     batch_size=batch_size,
-    #     # filename_test="terrain_test.pdf", 
-    #     # filename_pred="terrain_predicted.pdf"
-    # )
+    nodes = ((50,)*3, 1)
+    eta = 0.001
+    plot_NN_vs_test(
+        D_train=D_train, 
+        D_test=D_test, 
+        eta=eta, nodes=nodes, 
+        epochs=epochs, 
+        batch_size=batch_size,
+        # filename_test="terrain_test.pdf", 
+        # filename_pred="terrain_predicted.pdf"
+    )
 
     # Check activation function:
     #Plot in same plot, include MSE 
     # activation_func_2d()
 
-    introducing_act()
+    # introducing_act()
     
 
 

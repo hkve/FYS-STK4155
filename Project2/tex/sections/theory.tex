@@ -111,7 +111,7 @@ We will assume that the measurements $y_i$ are generated from an exact function 
                 y=f\left(\sum_{i=1}^n w_i x_i+b\right)
             \label[eq]{the:eq:output}
             \end{equation} 
-            where $x_i$ constitutes the input, $w_i$ are the weights corresponding to each input variable, and $b$ the bias of the output node. $f$ is called the \textit{activation function} and depends on the analysis being executed; e.g. regression, classification, etc. Each node has a corresponding activation function which defines the possible outputs of that node. The activation function closest to replicating the behaviour of a biological neuron is the heaviside function which yields either $0$ or $1$; firing or not firing. However, there are in some cases advantages of abandoning this biological model. Some other, and currently more used activation functions are: linear, sigmoid, relu, tanh, and leaky relu some of which are plotted in \cref{the:fig:introducing_acts}. \comment{See more on activation functions in appendix ref} 
+            where $x_i$ constitutes the input, $w_i$ are the weights corresponding to each input variable, and $b$ the bias of the output node. $f$ is called the \textit{activation function} and depends on the analysis being executed; e.g. regression, classification, etc. Each node has a corresponding activation function which defines the possible outputs of that node. The activation function closest to replicating the behaviour of a biological neuron is the heaviside function which yields either $0$ or $1$; firing or not firing. However, there are in some cases advantages of abandoning this biological model. Some other, and currently more used activation functions are: identity, sigmoid, relu, tanh, and leaky relu some of which are plotted in \cref{the:fig:introducing_acts}. \comment{See more on activation functions in appendix ref} 
             \begin{figure} [ht]
                 \centering
                 \includegraphics[width=\linewidth]{figs/introducing_acts.pdf}
@@ -119,7 +119,7 @@ We will assume that the measurements $y_i$ are generated from an exact function 
                 \label[fig]{the:fig:introducing_acts}
             \end{figure}
             
-            In the output layer the activation function constitutes what analysis the network does. E.g. a form of binary classification can be done by implementing the sigmoid activation function in the output layer, and for regression problems the linear function, $f(x)=x$, is implemented.
+            In the output layer the activation function constitutes what analysis the network does. E.g. a form of binary classification can be done by implementing the sigmoid activation function in the output layer, and for regression problems the identity function, $f(x)=x$, is implemented.
             It is normal that all the nodes in a layer have the same activation function $f$.    
 
             If we were to have a more complex neural network than the one from \cref{the:fig:simple_NN}, now also including hidden layers, $y$ (ref \cref{the:eq:output}) would be a node in the layer after the input. Each such node would have its own activation bias and would be connected with the input, or activation from the previous layer, through "unique" weights.  

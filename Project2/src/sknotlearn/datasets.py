@@ -4,6 +4,7 @@ from imageio import imread
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from data import Data 
 
+import analysis.plot_utils as plot_utils
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import cm
@@ -51,9 +52,9 @@ def plot_surf(D):
 
 	X = D.X
 	if D.X.shape[1] == 2:
-		surf = ax.plot_trisurf(*X.T, D.y, cmap=cm.viridis, linewidth=0, antialiased=False)
+		surf = ax.plot_trisurf(*X.T, D.y, cmap=plot_utils.cmap_terrain, linewidth=0, antialiased=False)
 	else:
-		surf = ax.plot_trisurf(X[:,1], X[:,2], D.y, cmap=cm.viridis, linewidth=0, antialiased=False)
+		surf = ax.plot_trisurf(X[:,1], X[:,2], D.y, cmap=plot_utils.cmap_terrain, linewidth=0, antialiased=False)
 	
 	ax.set_xlabel("x", fontsize=14)
 	ax.set_ylabel("y", fontsize=14)
