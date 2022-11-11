@@ -14,8 +14,80 @@ from sknotlearn.data import Data
 from sknotlearn.neuralnet import NeuralNetwork
 from sknotlearn.datasets import make_debugdata, make_FrankeFunction, plot_FrankeFunction, load_Terrain, plot_Terrain
 
-def plot_NN_vs_test(D_train, D_test, eta, nodes, epochs=800, batch_size=80, random_state=321, filename_test=None, filename_pred=None):
+def introducing_act():
+    """Introducing the activation functions through plots.
+    """
+    x = np.linspace(-10,10,1000)
+    sigmoid = 1/(1+np.exp(-x))
+    relu = np.maximum(np.zeros_like(x),x)
+    leaky = np.maximum(0.1*x, x)
+    tanh = np.tanh(x)
 
+    act_funcs = ["sigmoid", "relu", "leaky_relu", "tanh"]
+
+    fig, axes = plt.subplots(2,2)
+    axes[0,0].plot(x, sigmoid)
+    axes[0,0].set_title("sigmoid")
+    axes[0,0].tick_params(labelsize=14)
+    axes[1,0].plot(x, tanh, color=plot_utils.colors[1])
+    axes[1,0].set_title("tanh")
+    axes[1,0].tick_params(labelsize=14)
+    axes[0,1].plot(x, relu, color=plot_utils.colors[2])
+    axes[0,1].set_title("relu")
+    axes[0,1].tick_params(labelsize=14)
+    axes[1,1].plot(x, leaky, color=plot_utils.colors[3])
+    axes[1,1].set_title("leaky relu")
+    axes[1,1].tick_params(labelsize=14)
+    plt.savefig(make_figs_path("introducing_acts.pdf"))
+    plt.show()
+
+def activation_func_2d():
+    """ Creating networks with different activation functions, wanting to see the various approximations. Training on data of x**2 with noise.   
+    For discussion: relu has a point of non-linearity which can be shuffeled around by the bias. Having more nodes creates more points of non-linearities. Linear is only linear. 
+    """
+    x, y, X = make_debugdata(n = 600, random_state=321)
+    D = Data(y,x.reshape(-1,1))
+    D_train, D_test = D.train_test_split(ratio=3/4, random_state=42)
+
+    nodes = ((100,), 1)
+    eta = 0.001
+    epochs = 200
+    batch_size = 2**6
+
+    SGD = opt.SGradientDescent(
+        method = "adam",
+        params = {"eta":eta, "beta1":0.9, "beta2":0.99},
+        epochs=epochs,
+        batch_size=batch_size,
+        random_state=321
+    )
+
+    plt.scatter(D_test.X[:,0][::5], D_test.y[::5], color=plot_utils.colors[-1], label='Datapoints', s=10)
+    act_funcs = ["sigmoid", "relu", "leaky_relu", "tanh", "linear"]
+    for i, act in enumerate(act_funcs):
+        NN = NeuralNetwork(
+            SGD, 
+            nodes, 
+            random_state=321,
+            cost_func="MSE",
+            # lmbda=0.001,
+            activation_hidden=act,
+            activation_output="linear"
+            )    
+    
+        NN.train(D_train, trainsize=1)
+        y_pred = NN.predict(D_test.X)
+
+        mse = MSE(D_test.y, y_pred)
+        print(f"{act} gives {mse = :.6f}")
+
+        sorted_idcs = D_test.X[:,0].argsort()
+        plt.plot(D_test.X[sorted_idcs,0], y_pred[sorted_idcs], color=plot_utils.colors[i], label=act)
+    plt.legend()    
+    plt.show()
+
+
+def plot_NN_vs_test(D_train, D_test, eta, nodes, epochs=800, batch_size=80, random_state=321, filename_test=None, filename_pred=None):
     SGD = opt.SGradientDescent(
         method = "adam",
         params = {"eta":eta, "beta1":0.9, "beta2":0.99},
@@ -169,51 +241,13 @@ if __name__ == "__main__":
     #     # filename_pred="terrain_predicted.pdf"
     # )
 
-    #One dimensional :
-    # import matplotlib.pyplot as plt
-    # sorted_idcs = D_test.X[:,0].argsort()
-    # plt.scatter(D_test.X[:,0], D_test.y, c="r")
-    # plt.plot(D_test.X[sorted_idcs,0], y_pred[sorted_idcs])
-    # plt.show()
-
     # Check activation function:
     #Plot in same plot, include MSE 
+    # activation_func_2d()
+
+    introducing_act()
     
-    x, y, X = make_debugdata(n = 100, random_state=321)
-    D = Data(y,x.reshape(-1,1))
-    D_train, D_test = D.train_test_split(ratio=3/4, random_state=42)
 
-    nodes = ((100,), 1)
-    eta = 0.001
-    epochs = 500
-    batch_size = 15
-
-    SGD = opt.SGradientDescent(
-        method = "adam",
-        params = {"eta":eta, "beta1":0.9, "beta2":0.99},
-        epochs=epochs,
-        batch_size=batch_size,
-        random_state=321
-    )
-
-    NN = NeuralNetwork(
-        SGD, 
-        nodes, 
-        random_state=321,
-        cost_func="MSE",
-        # lmbda=0.001,
-        activation_hidden="tanh",
-        activation_output="linear"
-        )    
-    
-    NN.train(D_train, trainsize=1)
-    y_pred = NN.predict(D_test.X)
-
-    sorted_idcs = D_test.X[:,0].argsort()
-    print(D_test.X, sorted_idcs.shape)
-    plt.scatter(D_test.X[:,0], D_test.y)
-    plt.plot(D_test.X[sorted_idcs,0], y_pred[sorted_idcs], color=plot_utils.colors[1])
-    plt.show()
 
 
     "SGD"
