@@ -1,7 +1,9 @@
-import pathlib as pl 
+import pathlib as pl
+import matplotlib
 import matplotlib.pyplot as plt
 from cycler import cycler
 import seaborn as sns
+
 
 def make_figs_path(filename):
     cur_path = pl.Path(__file__)
@@ -21,6 +23,7 @@ def make_figs_path(filename):
 
     return str(figs_path)
 
+
 colors = [
     sns.color_palette('husl')[-3],
     sns.color_palette('husl')[-2],
@@ -29,6 +32,9 @@ colors = [
     'royalblue',
     'seagreen'
 ]
+
+cmap = matplotlib.colors.LinearSegmentedColormap.from_list(
+    "", colors[:2] + [colors[3]])
 
 sns.set_style("darkgrid")
 # Set all fonts to be equal to tex
