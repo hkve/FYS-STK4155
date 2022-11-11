@@ -86,45 +86,43 @@ We will assume that the measurements $y_i$ are generated from an exact function 
         Not entirely true, rather learning rate stabilizes, I think. -\Carl}
 
     \subsection{Neural Networks}
-        Artificial neural networks (ANN) are biologically inspired machine learning algoritms which can improve performance as they are exposed to data and without being programmed with any task-specific rules. In this project fully connected feed-forward neural networks (FFNN) will be implemented. 
+        Artificial neural networks (ANN) are biologically inspired machine learning algoritms which can improve performance as they are exposed to data and without being programmed with any task-specific rules. In this project fully connected \textit{feed-forward neural networks (FFNN)} will be implemented. 
         \subsubsection{Structure}
         First a non-mathematical, intuitive introduction. 
-        An ANN consists of an input layer and an output layer. Often the network will also have layers betweeen the input and output, called \textit{hidden layers}. In that case the neural network is referred to as deep. Each layer contains \textit{nodes} which are supposed to represent the neurons in a biological neural network, or rather their activation. In a fully connected neural network, all nodes in one layer are connected to all the nodes in the previous as well as the next layer. These connections, which represent the synapses, are referred to as \textit{weights}, and the sizes of the weights are the strenght of the synapses. Each node also have an activation \textit{bias} which says something about how easily activated that specific neuron/node is. See \cref{the:fig:Illustration_NN} for an illustration of a simple artificial neural network. 
+        An ANN consists of an input layer and an output layer. Often the network will also have layers betweeen the input and output, called \textit{hidden layers}. In that case the neural network is referred to as deep. Each layer contains \textit{nodes} which are supposed to represent the neurons in a biological neural network, or rather their activation. In a fully connected neural network, all nodes in one layer are connected to all the nodes in the previous as well as the next layer. These connections, which represent the synapses, are referred to as \textit{weights}, and the sizes of the weights are the synaptic strength. Each node also have an activation \textit{bias} which says something about how easily activated that specific neuron/node is. See \cref{the:fig:Illustration_NN} for an illustration of a simple, deep artificial neural network. 
         \begin{figure} [ht]
             \centering
             \includegraphics[width=.85\linewidth]{figs/Illustration_NN.png}
-            \caption{Illustration of a simple neural network with an input layer, and an output layer consisting of one node.}
+            \caption{Illustration of a simple deep neural network with an input layer, two hidden layer, and an output layer. The circles are the nodes and the lines between are the weights.}
             \label[fig]{the:fig:Illustration_NN}
         \end{figure}
         
         The nodes, weights and biases are all essentially just numbers, but following an algorithm for combinig these numbers creates an ANN. 
 
         \subsubsection{Feed Forward}
-        \begin{figure} [ht]
-            \centering
-            \includegraphics[width=.4\linewidth]{figs/Illustration_simple.png}
-            \caption{Illustration of a simple neural network with an input layer, and an output layer consisting of one node.}
-            \label[fig]{the:fig:simple_NN}
-        \end{figure}
-        The simplest of neural networks is the \textit{Feed Forward Neural Network(FFNN)} which, as its name implies, feeds activation from the input layer and forward through the network, eventually ending up in the output layer. Given a NN with only an input layer, and an output layer consisting of one node (see \cref{the:fig:simple_NN}), the output $y$ is then  
-        \begin{equation}
-            y=f\left(\sum_{i=1}^n w_i x_i+b\right)
-        \end{equation} 
-        where $x_i$ constitutes the input, $w_i$ are the weights corresponding to each input variable, and $b$ the bias of the output node. $f$ is called the \textit{activation function} and depends on the analysis being executed; eg. regression, classification, etc. Each node has a corresponding activation function which defines the possible outputs of that node. The activation function closest to replicating the behaviour of a biological neuron is the heaviside function which yields either $0$ or $1$; firing or not firing. However, there are in some cases advantages of abandoning this biological model. Some other, and currently more used activation functions are: linear, sigmoid, relu, tanh, and leaky relu which are plotted in \cref{the:fig:introducing_acts}. 
-        \begin{figure} [ht]
-            \centering
-            \includegraphics[width=\linewidth]{figs/introducing_acts.pdf}
-            \caption{Plots of some commonly used activation functions.}
-            \label[fig]{the:fig:introducing_acts}
-        \end{figure}
-        In the output layer the activation function constitutes what analysis the network does. A logistic regression or other form of binary classification is done by implementing the sigmoid activation function in the output layer, and 
-        It is normal that all the nodes in a layer have the same activation function $f$.    
+            \begin{figure} [ht]
+                \centering
+                \includegraphics[width=.4\linewidth]{figs/Illustration_simple.png}
+                \caption{Illustration of a simple neural network with an input layer, and an output layer consisting of one node.}
+                \label[fig]{the:fig:simple_NN}
+            \end{figure}
+            The simplest of neural networks is the \textit{Feed Forward Neural Network(FFNN)} which, as its name implies, feeds activation from the input layer and forward through the network, eventually ending up in the output layer. Given a NN with only an input layer, and an output layer consisting of one node (see \cref{the:fig:simple_NN}), the output $y$ is then  
+            \begin{equation}
+                y=f\left(\sum_{i=1}^n w_i x_i+b\right)
+            \label[eq]{the:eq:output}
+            \end{equation} 
+            where $x_i$ constitutes the input, $w_i$ are the weights corresponding to each input variable, and $b$ the bias of the output node. $f$ is called the \textit{activation function} and depends on the analysis being executed; e.g. regression, classification, etc. Each node has a corresponding activation function which defines the possible outputs of that node. The activation function closest to replicating the behaviour of a biological neuron is the heaviside function which yields either $0$ or $1$; firing or not firing. However, there are in some cases advantages of abandoning this biological model. Some other, and currently more used activation functions are: linear, sigmoid, relu, tanh, and leaky relu some of which are plotted in \cref{the:fig:introducing_acts}. \comment{See more on activation functions in appendix ref} 
+            \begin{figure} [ht]
+                \centering
+                \includegraphics[width=\linewidth]{figs/introducing_acts.pdf}
+                \caption{Plots of some commonly used activation functions.}
+                \label[fig]{the:fig:introducing_acts}
+            \end{figure}
+            
+            In the output layer the activation function constitutes what analysis the network does. E.g. a form of binary classification can be done by implementing the sigmoid activation function in the output layer, and for regression problems the linear function, $f(x)=x$, is implemented.
+            It is normal that all the nodes in a layer have the same activation function $f$.    
 
-        
-
-        If we were to have a more complex neural network, also including hidden layers, $y$ would be a node in the layer after the input. Each such node would have its own activation bias and would be connected with the input through "unique" weights.  
-        
-
+            If we were to have a more complex neural network than the one from \cref{the:fig:simple_NN}, now also including hidden layers, $y$ (ref \cref{the:eq:output}) would be a node in the layer after the input. Each such node would have its own activation bias and would be connected with the input, or activation from the previous layer, through "unique" weights.  
         
 
         \subsubsection{Backpropagation}
