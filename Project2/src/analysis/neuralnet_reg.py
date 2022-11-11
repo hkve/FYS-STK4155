@@ -15,7 +15,7 @@ from sknotlearn.neuralnet import NeuralNetwork
 from sknotlearn.datasets import make_debugdata, make_FrankeFunction, plot_FrankeFunction, load_Terrain, plot_Terrain
 
 def introducing_act():
-    """Introducing the activation functions through plots
+    """Introducing the activation functions through plots.
     """
     x = np.linspace(-10,10,1000)
     sigmoid = 1/(1+np.exp(-x))
@@ -38,6 +38,7 @@ def introducing_act():
     axes[1,1].plot(x, leaky, color=plot_utils.colors[3])
     axes[1,1].set_title("leaky relu")
     axes[1,1].tick_params(labelsize=14)
+    plt.savefig(make_figs_path("introducing_acts.pdf"))
     plt.show()
 
 def activation_func_2d():

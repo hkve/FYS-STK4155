@@ -19,6 +19,13 @@
 
     \comment{Mention initialising SGDs with same random seed for every learning rate.}
 
+\subsection{Creating a Neural Network and regression problems}
+    In this part of our analysis we will create an FFNN with a flexible number of hidden layers and nodes. Subsequently we will train and test this network on the Nicaraguan terrain data from Project 1 and compare its performance with the results from the linear regression methods (OLS and Ridge) employed in that project. 
+
+    \comment{Discuss the choice of cost function in the NN}
+
+    We start by implementing the sigmoid activation function in the hidden layers. As 
+
 \subsection{Classification problems}
     Thus far, we have only aimed at solving regression problems. The machinery regarding neural networks we have introduced here, can with some modification be used to approach \textit{classification} problems. Instead of predicting targets in a continuous domain ($y_i \in \mathbb{R}$), we aim to put the target $y_i$ in a specific class ($y_i \in \mathcal{Q}$), where $\mathcal{Q}$ is the set of possible outcomes. For comparison purposes, we will also implement a logistic regression method.
 
