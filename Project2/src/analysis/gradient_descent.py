@@ -23,7 +23,7 @@ def tune_learning_rate(
     optimizers: tuple,
     optimizer_names: tuple,
     lmbda: float = None,
-    ylims: tuple = (0, 3),
+    ylims: tuple = (None, None),
     filename: str = None,
     verbose: bool = False
 ) -> None:
@@ -94,14 +94,21 @@ def tune_learning_rate(
                         x0=x0,
                         args=(np.arange(len(data_train)),)
                     )
-                if optimizer.converged:
-                    MSE_array[i, j] = np.mean((X_val@theta_opt - y_val)**2)
+                # Calculate MSE
+                MSE = np.mean((X_val@theta_opt - y_val)**2)
+                # Check if gradient exploded
+                if ylims[1] is not None:
+                    limtest = MSE < 10*ylims[1]
+                else:
+                    limtest = True
+                if optimizer.converged and limtest:
+                    MSE_array[i, j] = MSE
                 else:
                     MSE_array[i, j] = np.nan
         # Average MSE across theta0s
         MSE_means = MSE_array.mean(axis=0)
         plt.plot(learning_rates, MSE_means, label=name, c=color)
-        if len(theta0) > 1:     # Adding 95% confidence interval
+        if len(theta0) > 1:  # Adding 95% confidence interval
             MSE_stds = MSE_array.std(axis=0) / np.sqrt(len(theta0)-1)
             plt.fill_between(learning_rates,
                              MSE_means-2*MSE_stds, MSE_means+2*MSE_stds,
@@ -343,14 +350,14 @@ if __name__ == "__main__":
     #####################
     params1 = {
         "PGD_MGD_PSGD_MSGD": dict(
-            learning_rates=np.linspace(0., 0.14, 101)[1:],
+            learning_rates=np.linspace(0.001, 0.14, 101),
             optimizers=(GD, mGD, SGD, mSGD),
             optimizer_names=(f"Plain GD", f"Momentum GD",
                              "Plain SGD", "Momentum SGD"),
             ylims=(0, 0.8)
         ),
         "SGD_batches_epochs": dict(
-            learning_rates=np.linspace(0., 0.08, 101)[1:],
+            learning_rates=np.linspace(0.001, 0.08, 101),
             optimizers=(SGD, SGDb, SGDe, SGDbe),
             optimizer_names=(f"SGD", fr"SGD, $4\times$batches",
                              fr"SGD, $4\times$epochs",
@@ -358,14 +365,14 @@ if __name__ == "__main__":
             ylims=(0, 0.6)
         ),
         "adagrad": dict(
-            learning_rates=np.linspace(0., 0.7, 101)[1:],
+            learning_rates=np.linspace(0.001, 0.7, 101),
             optimizers=(aGD, maGD, aSGD, maSGD),
             optimizer_names=(f"AdaGrad GD", f"AdaGradMom GD",
                              "AdaGrad SGD", "AdaGradMom SGD"),
             ylims=(0, 0.8)
         ),
         "momentum": dict(
-            learning_rates=np.linspace(0., 0.08, 101)[1:],
+            learning_rates=np.linspace(0.001, 0.08, 101),
             optimizers=(mSGD2, mSGD3, mSGD4, mSGD, mSGD5),
             optimizer_names=(r"mSGD $\gamma=0.01$", r"mSGD $\gamma=0.1$",
                              r"mSGD $\gamma=0.5$", r"mSGD $\gamma=0.8$",
@@ -374,7 +381,7 @@ if __name__ == "__main__":
         ),
         "tunable": dict(
             # funky learning rate to get more small eta evaluations
-            learning_rates=np.linspace(0.001**(1/3), 0.7**(1/3), 101)**(3),
+            learning_rates=np.linspace(0.001, 0.7, 101),
             optimizers=(rmSGD, adSGD, aSGD, maSGD),
             optimizer_names=("RMSprop SGD", "Adam SGD",
                              "AdaGrad SGD", "AdaGradMom SGD"),
@@ -402,7 +409,6 @@ if __name__ == "__main__":
             lmbdas=np.logspace(-5, 1, 13),
             optimizer=mGD,
             vlims=(None, 0.6),
-            # title="GD with momentum"
         ),
         "plain_SGD": dict(
             learning_rates=np.linspace(0., 0.05, 11)[1:],
@@ -415,7 +421,6 @@ if __name__ == "__main__":
             lmbdas=np.logspace(-5, 1, 13),
             optimizer=mSGD,
             vlims=(None, 0.6),
-            # title="SGD with momentum"
         ),
         "adagrad_SGD": dict(
             learning_rates=np.linspace(0., 1., 11)[1:],
@@ -428,22 +433,18 @@ if __name__ == "__main__":
             lmbdas=np.logspace(-5, 1, 13),
             optimizer=maSGD,
             vlims=(None, None),
-            # title="SGD AdaGrad with momentum"
         ),
         "adam_SGD": dict(
             learning_rates=np.linspace(0., 0.1, 11)[1:],
             lmbdas=np.logspace(-5, 1, 13),
             optimizer=adSGD,
             vlims=(None, 0.7),
-            # title="SGD Adam with momentum"
         )
     }
 
     # Choosing plot to plot
-    plot1 = "adagrad"
-    # plot1 = None
-    # plot2 = "adagrad_momentum_SGD"
-    plot2 = None
+    plot1 = ""
+    plot2 = ""
 
     # Plotting
     if plot1:

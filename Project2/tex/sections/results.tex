@@ -22,10 +22,10 @@
                 Momentum SGD & $0.1754 \pm 0.0023$ & 0.040 \\
                 AdaGrad GD & $0.369 \pm 0.074$ & 0.43 \\
                 AdaGrad Momentum GD & $0.234 \pm 0.019$ & 0.49 \\
-                AdaGrad SGD & $0.1762 \pm 0.0092$ & 0.70 \\
+                AdaGrad SGD & $0.2031 \pm 0.0092$ & 0.70 \\
                 AdaGrad Momentum SGD & $0.1762 \pm 0.0028$ & 0.30 \\
-                RMSprop SGD & $0.1931 \pm 0.0060$ & 0.038 \\
-                Adam SGD & $0.1736 \pm 0.0016$& 0.089 \\
+                RMSprop SGD & $0.1933 \pm 0.0060$ & 0.036 \\
+                Adam SGD & $0.1733 \pm 0.0016$& 0.092 \\
             \end{tabular}
             \caption{Table of the best validation MSE scores by GD algorithm, together with the learning rate that produced the best result.}
             \label[tab]{res:tab:OLS_MSEs}
@@ -55,7 +55,7 @@
             \begin{subfigure}{.49\textwidth}
                 \centering
                 \includegraphics[width=\linewidth]{learning_rates_tunable}
-                \caption{The minimal MSEs by algorithm: RMSprop SGD 0.1931 ($\eta=0.038$), Adam SGD 0.1736 ($\eta=0.0016$), AdaGrad SGD 0.2031 ($\eta=0.70$), AdaGrad SGD w/ momentum 0.1762 ($\eta=0.31$)}
+                \caption{The minimal MSEs by algorithm: RMSprop SGD 0.1933 ($\eta=0.036$), Adam SGD 0.1733 ($\eta=0.092$), AdaGrad SGD 0.2031 ($\eta=0.70$), AdaGrad SGD w/ momentum 0.1762 ($\eta=0.30$)}
                 \label[fig]{res:fig:lrate4}
             \end{subfigure}
             \caption{Plots of the validation MSE of the parameters found from optimising the OLS cost function on Franke function data with $n=600$ data points. For the momentum methods we used $\gamma=0.8$, for RMSprop we used $\beta=0.9$ and for Adam we used $\beta_1=0.9, \beta_2=0.99$. The stochastic methods used a batch size of 64 and 100 epochs, while the standard GD did 100 iterations unless specified otherwise. Overlaid are 95\% confidence intervals based on optimising with five different starting points.
