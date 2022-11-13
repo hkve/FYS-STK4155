@@ -23,7 +23,7 @@ def tune_learning_rate(
     optimizers: tuple,
     optimizer_names: tuple,
     lmbda: float = None,
-    ylims: tuple = (0, 3),
+    ylims: tuple = (None, None),
     filename: str = None,
     verbose: bool = False
 ) -> None:
@@ -94,15 +94,21 @@ def tune_learning_rate(
                         x0=x0,
                         args=(np.arange(len(data_train)),)
                     )
-                if not optimizer.converged:
-                    MSE_array[i, j] = np.nan
+                # Calculate MSE
+                MSE = np.mean((X_val@theta_opt - y_val)**2)
+                # Check if gradient exploded
+                if ylims[1] is not None:
+                    limtest = MSE < 10*ylims[1]
                 else:
-                    MSE_array[i, j] = np.mean((X_val@theta_opt - y_val)**2)
+                    limtest = True
+                if optimizer.converged and limtest:
+                    MSE_array[i, j] = MSE
+                else:
+                    MSE_array[i, j] = np.nan
         # Average MSE across theta0s
-        MSE_array = np.where(MSE_array < 3*ylims[1], MSE_array, np.nan)
         MSE_means = MSE_array.mean(axis=0)
         plt.plot(learning_rates, MSE_means, label=name, c=color)
-        if len(theta0) > 1:     # Adding 95% confidence interval
+        if len(theta0) > 1:  # Adding 95% confidence interval
             MSE_stds = MSE_array.std(axis=0) / np.sqrt(len(theta0)-1)
             plt.fill_between(learning_rates,
                              MSE_means-2*MSE_stds, MSE_means+2*MSE_stds,
@@ -118,7 +124,7 @@ def tune_learning_rate(
         if verbose:
             print(f"{name} MSE score: {MSE_means[argbest]:.4} "
                   f"+- {MSE_stds[argbest]:.3} "
-                  f"(Learning rate {learning_rates[argbest]:.3}) "
+                  f"(Learning rate {learning_rates[argbest]:.2}) "
                   f"({time()-start_time:.2f} s)")
 
     # Calculating analytical solution from matrix inversion
@@ -160,6 +166,7 @@ def tune_lambda_learning_rate(
     lmbdas: np.ndarray,
     optimizer: GradientDescent,
     vlims: tuple = (0, 3),
+    title: str = None,
     filename: str = None,
     verbose: bool = False
 ) -> None:
@@ -183,7 +190,6 @@ def tune_lambda_learning_rate(
         theta0 = (theta0,)
 
     # Unpacking data
-    y_train, X_train = data_train.unpacked()
     y_val, X_val = data_val.unpacked()
 
     # Iterate through every combination of lambda and learning rate.
@@ -215,20 +221,22 @@ def tune_lambda_learning_rate(
                         x0=x0,
                         args=(np.arange(len(data_train)),)
                     )
-                MSE_grid[i, j, k] = np.mean((X_val@theta_opt-y_val)**2)
+                if optimizer.converged:
+                    MSE_grid[i, j, k] = np.mean((X_val@theta_opt-y_val)**2)
+                else:
+                    MSE_grid[i, j, k] = np.nan
     # Average MSE across theta0s
     mean_MSE_grid = MSE_grid.mean(axis=0)
-    # Remove exploded gradients
-    mean_MSE_grid = np.where(mean_MSE_grid < 3*vlims[1], mean_MSE_grid, np.nan)
     # Finding optimum
     arg_best_MSE = np.unravel_index(
         np.nanargmin(mean_MSE_grid),
         np.shape(mean_MSE_grid)
     )
     if verbose:
-        print(f"Best MSE value is {mean_MSE_grid[arg_best_MSE]:.4} "
+        print(f"Best MSE value of {optimizer.method}: "
+              f"{mean_MSE_grid[arg_best_MSE]:.4} "
               f"with lmbda {lmbdas[arg_best_MSE[0]]:.1E} "
-              f"lrate {learning_rates[arg_best_MSE[1]:]:.3} "
+              f"lrate {learning_rates[arg_best_MSE[1]]:.2} "
               f"({time()-start_time:.2f} s)")
 
     fig, ax = plt.subplots()
@@ -237,7 +245,7 @@ def tune_lambda_learning_rate(
         mean_MSE_grid,
         vmin=vlims[0], vmax=vlims[1],
         annot=True,
-        cmap="viridis",
+        cmap=plot_utils.cmap,
         ax=ax,
         cbar_kws={'label': 'Validation MSE'}
     )
@@ -258,9 +266,11 @@ def tune_lambda_learning_rate(
     )
     ax.set_ylabel(r"$\log_{10}(\lambda)$")
     ax.set_yticks(
-        np.arange(len(lmbdas)),
-        labels=np.log10(lmbdas)
+        np.arange(len(lmbdas))[::2],
+        labels=np.log10(lmbdas)[::2]
     )
+    if title is not None:
+        ax.set_title(title)
 
     if filename is not None:
         plt.savefig(plot_utils.make_figs_path(filename))
@@ -287,51 +297,51 @@ if __name__ == "__main__":
     batch_size = 2**6
 
     # All the gradient descent instances
-    GD = GradientDescent("plain", {"eta": 0.},
+    GD = GradientDescent("plain", dict(eta=0.),
                          its=max_iter)
-    mGD = GradientDescent("momentum", {"gamma": 0.8, "eta": 0.},
+    mGD = GradientDescent("momentum", dict(gamma=0.8, eta=0.),
                           its=max_iter)
-    SGD = SGradientDescent("plain", {"eta": 0.},
+    SGD = SGradientDescent("plain", dict(eta=0.),
                            epochs=max_iter, batch_size=batch_size,
                            random_state=random_state)
-    mSGD = SGradientDescent("momentum", {"gamma": 0.8, "eta": 0.},
+    mSGD = SGradientDescent("momentum", dict(gamma=0.8, eta=0.),
                             epochs=max_iter, batch_size=batch_size,
                             random_state=random_state)
-    mSGD2 = SGradientDescent("momentum", {"gamma": 0.01, "eta": 0.},
+    mSGD2 = SGradientDescent("momentum", dict(gamma=0.01, eta=0.),
                              epochs=max_iter, batch_size=batch_size,
                              random_state=random_state)
-    mSGD3 = SGradientDescent("momentum", {"gamma": 0.1, "eta": 0.},
+    mSGD3 = SGradientDescent("momentum", dict(gamma=0.1, eta=0.),
                              epochs=max_iter, batch_size=batch_size,
                              random_state=random_state)
-    mSGD4 = SGradientDescent("momentum", {"gamma": 0.5, "eta": 0.},
+    mSGD4 = SGradientDescent("momentum", dict(gamma=0.5, eta=0.),
                              epochs=max_iter, batch_size=batch_size,
                              random_state=random_state)
-    mSGD5 = SGradientDescent("momentum", {"gamma": 1, "eta": 0.},
+    mSGD5 = SGradientDescent("momentum", dict(gamma=1., eta=0.),
                              epochs=max_iter, batch_size=batch_size,
                              random_state=random_state)
-    SGDb = SGradientDescent("plain", {"eta": 0.},
+    SGDb = SGradientDescent("plain", dict(eta=0.),
                             epochs=max_iter, batch_size=batch_size//4,
                             random_state=random_state)
-    SGDe = SGradientDescent("plain", {"eta": 0.},
+    SGDe = SGradientDescent("plain", dict(eta=0.),
                             epochs=max_iter*4, batch_size=batch_size,
                             random_state=random_state)
-    SGDbe = SGradientDescent("plain", {"eta": 0.},
+    SGDbe = SGradientDescent("plain", dict(eta=0.),
                              epochs=max_iter*4, batch_size=batch_size//4,
                              random_state=random_state)
-    aGD = GradientDescent("adagrad", {"eta": 0.},
+    aGD = GradientDescent("adagrad", dict(eta=0.),
                           its=max_iter)
-    maGD = GradientDescent("adagrad_momentum", {"gamma": 0.8, "eta": 0.},
+    maGD = GradientDescent("adagrad_momentum", dict(gamma=0.8, eta=0.),
                            its=max_iter)
-    aSGD = SGradientDescent("adagrad", {"eta": 0.},
+    aSGD = SGradientDescent("adagrad", dict(eta=0.),
                             epochs=max_iter, batch_size=batch_size,
                             random_state=random_state)
-    maSGD = SGradientDescent("adagrad_momentum", {"gamma": 0.8, "eta": 0.},
+    maSGD = SGradientDescent("adagrad_momentum", dict(gamma=0.8, eta=0.),
                              epochs=max_iter, batch_size=batch_size,
                              random_state=random_state)
-    rmSGD = SGradientDescent("rmsprop", {"eta": 0., "beta": 0.9},
+    rmSGD = SGradientDescent("rmsprop", dict(eta=0., beta=0.9),
                              epochs=max_iter, batch_size=batch_size,
                              random_state=random_state)
-    adSGD = SGradientDescent("adam", {"eta": 0., "beta1": 0.9, "beta2": 0.99},
+    adSGD = SGradientDescent("adam", dict(eta=0., beta1=0.9, beta2=0.99),
                              epochs=max_iter, batch_size=batch_size,
                              random_state=random_state)
 
@@ -371,9 +381,9 @@ if __name__ == "__main__":
         ),
         "tunable": dict(
             # funky learning rate to get more small eta evaluations
-            learning_rates=np.linspace(0.001**(1/3), 0.7**(1/3), 101)**(3),
+            learning_rates=np.linspace(0.001, 0.7, 101),
             optimizers=(rmSGD, adSGD, aSGD, maSGD),
-            optimizer_names=("RMSprop", "Adam",
+            optimizer_names=("RMSprop SGD", "Adam SGD",
                              "AdaGrad SGD", "AdaGradMom SGD"),
             ylims=(0, 0.8)
         ),
@@ -384,60 +394,57 @@ if __name__ == "__main__":
             ylims=(0, 0.8)
         )
     }
-
     #######################
     # heatmap plot params #
     #######################
     params2 = {
         "plain_GD": dict(
-            learning_rates=np.linspace(0.001, 0.08, 11),
+            learning_rates=np.linspace(0., 0.08, 11)[1:],
             lmbdas=np.logspace(-5, 1, 13),
             optimizer=GD,
-            vlims=(None, 0.4)
+            vlims=(None, 0.4),
         ),
         "momentum_GD": dict(
-            learning_rates=np.linspace(0.001, 0.14, 11),
+            learning_rates=np.linspace(0., 0.14, 11)[1:],
             lmbdas=np.logspace(-5, 1, 13),
             optimizer=mGD,
-            vlims=(None, 0.4)
+            vlims=(None, 0.6),
         ),
         "plain_SGD": dict(
-            learning_rates=np.linspace(0.001, 0.05, 11),
+            learning_rates=np.linspace(0., 0.05, 11)[1:],
             lmbdas=np.logspace(-5, 1, 13),
             optimizer=SGD,
             vlims=(None, 0.4)
         ),
         "momentum_SGD": dict(
-            learning_rates=np.linspace(0.001, 0.08, 11),
+            learning_rates=np.linspace(0., 0.11, 11)[1:],
             lmbdas=np.logspace(-5, 1, 13),
             optimizer=mSGD,
-            vlims=(None, 0.4)
+            vlims=(None, 0.6),
         ),
         "adagrad_SGD": dict(
-            learning_rates=np.linspace(0.01, 1, 11),
+            learning_rates=np.linspace(0., 1., 11)[1:],
             lmbdas=np.logspace(-5, 1, 13),
             optimizer=aSGD,
             vlims=(None, 0.4)
         ),
         "adagrad_momentum_SGD": dict(
-            learning_rates=np.linspace(0.01, 0.6, 11),
+            learning_rates=np.linspace(0., 0.6, 11)[1:],
             lmbdas=np.logspace(-5, 1, 13),
             optimizer=maSGD,
-            vlims=(None, 0.4)
+            vlims=(None, None),
         ),
         "adam_SGD": dict(
-            learning_rates=np.linspace(0.0001, 0.1, 11),
+            learning_rates=np.linspace(0., 0.1, 11)[1:],
             lmbdas=np.logspace(-5, 1, 13),
             optimizer=adSGD,
-            vlims=(None, 0.4)
+            vlims=(None, 0.7),
         )
     }
 
     # Choosing plot to plot
-    plot1 = "tunable"
-    # plot1 = None
-    # plot2 = "adam_SGD"
-    plot2 = None
+    plot1 = ""
+    plot2 = ""
 
     # Plotting
     if plot1:

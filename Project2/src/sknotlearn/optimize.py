@@ -5,6 +5,10 @@ EPSILON = float_info.epsilon**0.5
 MAX = 1 / float_info.epsilon
 
 
+def isfinite(x: np.ndarray, threshold: float = MAX):
+    return any(np.abs(x) > threshold) or any(np.isnan(x))
+
+
 class GradientDescent:
     """Implements Gradient Descent minimization of a problem defined by the gradient g of scalar function wrt. argument(s) x. Implemented update rules are:
     "plain" (eta): Ordinary GD with a learning rate eta.
@@ -14,15 +18,17 @@ class GradientDescent:
     "adam" (eta, beta1, beta2): Adam algorithm with learning rate eta, running average of gradient weighted with beta1 and running average of second moment of gradient weighted with beta1. Bias correction of estimates are included.
     """
 
-    def __init__(self, method: str, params: dict, its: int) -> None:
+    def __init__(self, method: str, params: dict, its: int, threshold: float = MAX) -> None:
         """Set the type of gradient descent
 
         Args:
             method (str): Type of gradient descent
             params (dict): The hyperparameters for the GD (eta, gamma, betas, etc.)
             its (int): Number of iterations
+            threshold (float): Maximum float value for gradients. Defaults to MAX.
         """
         self.method, self.params, self.its = method, params, its
+        self.threshold = threshold
         if method in self.methods.keys():
             if not callable(params["eta"]):  # wrap learning rate if constant
                 eta = params["eta"]
@@ -64,7 +70,7 @@ class GradientDescent:
         for it in range(self.its):
             self._it += 1
             g = grad(self.x, *args)
-            if any((np.abs(g) > MAX)) or any(np.isnan(g)):
+            if isfinite(np.abs(g), threshold=self.threshold):
                 self.converged = False
                 return self.x
             self.x = self._update_rule(self, self.x, g)
@@ -139,7 +145,7 @@ class SGradientDescent(GradientDescent):
     """Implements Gradient Descent minimization of a problem defined by the gradient g of scalar function wrt. argument(s) x. Assumes stochastic form of gradient g(x, idcs) = sum(gi[idcs]) + g0.
     """
 
-    def __init__(self, method: str, params: dict, epochs: int, batch_size: int, random_state=None) -> None:
+    def __init__(self, method: str, params: dict, epochs: int, batch_size: int, random_state=None, threshold: float = MAX) -> None:
         """Set the type of gradient descent
 
         Args:
@@ -149,7 +155,7 @@ class SGradientDescent(GradientDescent):
             batch_size (int): Size of each batch
             random_state (int): random seed to use with numpy.random module
         """
-        super().__init__(method, params, epochs)
+        super().__init__(method, params, epochs, threshold)
         self.batch_size = batch_size
         self.epochs = epochs
         self.random_state = random_state
@@ -179,7 +185,7 @@ class SGradientDescent(GradientDescent):
             self._it += 1
             for batch in batches:
                 g = grad(self.x, *args, batch)
-                if any((np.abs(g) > MAX)) or any(np.isnan(g)):
+                if isfinite(np.abs(g), threshold=self.threshold):
                     self.converged = 0
                     return self.x
                 self.x = self._update_rule(self, self.x, g)
