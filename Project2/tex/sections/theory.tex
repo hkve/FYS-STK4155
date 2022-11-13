@@ -88,16 +88,16 @@ We will assume that the measurements $y_i$ are generated from an exact function 
     \subsection{Neural Networks}
         Artificial neural networks (ANN) are biologically inspired machine learning algoritms which can improve performance as they are exposed to data and without being programmed with any task-specific rules. In this project fully connected \textit{feed-forward neural networks (FFNN)} will be implemented. 
         \subsubsection{Structure}
-        First a non-mathematical, intuitive introduction. 
-        An ANN consists of an input layer and an output layer. Often the network will also have layers betweeen the input and output, called \textit{hidden layers}. In that case the neural network is referred to as deep. Each layer contains \textit{nodes} which are supposed to represent the neurons in a biological neural network, or rather their activation. In a fully connected neural network, all nodes in one layer are connected to all the nodes in the previous as well as the next layer. These connections, which represent the synapses, are referred to as \textit{weights}, and the sizes of the weights are the synaptic strength. Each node also have an activation \textit{bias} which says something about how easily activated that specific neuron/node is. See \cref{the:fig:Illustration_NN} for an illustration of a simple, deep artificial neural network. 
-        \begin{figure} [ht]
-            \centering
-            \includegraphics[width=.85\linewidth]{figs/Illustration_NN.png}
-            \caption{Illustration of a simple deep neural network with an input layer, two hidden layer, and an output layer. The circles are the nodes and the lines between are the weights.}
-            \label[fig]{the:fig:Illustration_NN}
-        \end{figure}
-        
-        The nodes, weights and biases are all essentially just numbers, but following an algorithm for combinig these numbers creates an ANN. 
+            First a non-mathematical, intuitive introduction. 
+            An ANN consists of an input layer and an output layer. Often the network will also have layers betweeen the input and output, called \textit{hidden layers}. In that case the neural network is referred to as deep. Each layer contains \textit{nodes} which are supposed to represent the neurons in a biological neural network, or rather their activation. In a fully connected neural network, all nodes in one layer are connected to all the nodes in the previous as well as the next layer. These connections, which represent the synapses, are referred to as \textit{weights}, and the sizes of the weights are the synaptic strength. Each node also have an activation \textit{bias} which says something about how easily activated that specific neuron/node is. See \cref{the:fig:Illustration_NN} for an illustration of a simple, deep artificial neural network. 
+            \begin{figure} [ht]
+                \centering
+                \includegraphics[width=.85\linewidth]{figs/Illustration_NN.png}
+                \caption{Illustration of a simple deep neural network with an input layer, two hidden layer, and an output layer. The circles are the nodes and the lines between are the weights.}
+                \label[fig]{the:fig:Illustration_NN}
+            \end{figure}
+            
+            The nodes, weights and biases are all essentially just numbers, but following an algorithm for combinig these numbers creates an ANN. 
 
         \subsubsection{Feed Forward}
             \begin{figure} [ht]
@@ -122,10 +122,17 @@ We will assume that the measurements $y_i$ are generated from an exact function 
             In the output layer the activation function constitutes what analysis the network does. E.g. a form of binary classification can be done by implementing the sigmoid activation function in the output layer, and for regression problems the identity function, $f(x)=x$, is implemented.
             It is normal that all the nodes in a layer have the same activation function $f$.    
 
-            If we were to have a more complex neural network than the one from \cref{the:fig:simple_NN}, now also including hidden layers, $y$ (ref \cref{the:eq:output}) would be a node in the layer after the input. Each such node would have its own activation bias and would be connected with the input, or activation from the previous layer, through "unique" weights.  
-        
+            If we were to have a more complex neural network than the one from \cref{the:fig:simple_NN}, now also including hidden layers, $y$ (ref \cref{the:eq:output}) would be a node in the layer after the input. Each such node would have its own activation bias and would be connected with the input, or activation from the previous layer, through "unique" weights.
+            \begin{equation}
+                a^l_i = f^l \pclosed{\sum_{j=1}^{N_{l-1}} w_{ij}^l a_j^{l-1} + b^l}
+            \end{equation}  
 
+
+        
         \subsubsection{Backpropagation}
+            Backpropagation 
+            
+
 
     \subsubsection{Universal Approximation Theorem}
 

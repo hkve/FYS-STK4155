@@ -47,7 +47,6 @@ cmap_terrain = matplotlib.colors.LinearSegmentedColormap.from_list(
     # 'mediumorchid',
     sns.color_palette('husl')[-1],
 ] )
-# cmap_inverse = "terrain"
 
 sns.set_style("darkgrid")
 # Set all fonts to be equal to tex
