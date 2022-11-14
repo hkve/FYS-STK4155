@@ -51,7 +51,7 @@ def activation_func_2d():
 
     nodes = ((100,), 1)
     eta = 0.001
-    epochs = 200
+    epochs = 500
     batch_size = 2**6
 
     SGD = opt.SGradientDescent(
@@ -84,10 +84,24 @@ def activation_func_2d():
         sorted_idcs = D_test.X[:,0].argsort()
         plt.plot(D_test.X[sorted_idcs,0], y_pred[sorted_idcs], color=plot_utils.colors[i], label=act)
     plt.legend()    
+    # plt.savefig(make_figs_path("c_activations_2d_data.pdf"))
     plt.show()
 
 
-def plot_NN_vs_test(D_train, D_test, eta, nodes, epochs=800, batch_size=80, random_state=321, filename_test=None, filename_pred=None):
+def plot_NN_vs_test(D_train, D_test, eta, nodes, epochs=500, batch_size=80, random_state=321, filename_test=None, filename_pred=None):
+    """Function for training an NN and plotting the true terrain data and the NN predicted terrain data for qualitative comparison. Will also print the MSE. The optimal parameters are likely already found in another process. 
+
+    Args:
+        D_train (Data): Training data
+        D_test (Data): Testing data
+        eta (float): Learning rate 
+        nodes (tuple): The nodes and layers of the network. E.g. ((10,10,10),1)
+        epochs (int): Number of epochs for which the gradient is calculated. Defaults to 800.
+        batch_size (int): The size of each bach in the SGD. Defaults to 80.
+        random_state (int): Defaults to 321.
+        filename_test (_type_, str): Filename of true data plot. Needs to be implemented to save plot. Defaults to None.
+        filename_pred (_type_, str): Filename of NN predicted plot. Needs to be implemented to save plot. Defaults to None.
+    """
     SGD = opt.SGradientDescent(
         method = "adam",
         params = {"eta":eta, "beta1":0.9, "beta2":0.99},
@@ -109,7 +123,7 @@ def plot_NN_vs_test(D_train, D_test, eta, nodes, epochs=800, batch_size=80, rand
     NN.train(D_train, trainsize=1)
     y_pred = NN.predict(D_test.X)
 
-    print(MSE(D_test.y, y_pred))
+    print(f"MSE = {MSE(D_test.y, y_pred) :.5f}")
 
     #Plot: 
     D_pred = Data(y_pred, D_test.X)
@@ -117,11 +131,11 @@ def plot_NN_vs_test(D_train, D_test, eta, nodes, epochs=800, batch_size=80, rand
 
     D_test = D_train.unscale(D_test)
 
-    plot_Terrain(D_test, angle=(16,-165), filename=filename_test)
-    plot_Terrain(D_pred, angle=(16,-165), filename=filename_pred)
+    # plot_Terrain(D_test, angle=(16,-165), filename=filename_test)
+    # plot_Terrain(D_pred, angle=(16,-165), filename=filename_pred)
 
 
-def nodes_etas_heatmap(D_train, D_test, etas, nodes, layers=2, epochs=800, batch_size=80, random_state=321, filename=None):
+def nodes_etas_heatmap(D_train, D_test, etas, nodes, layers=2, epochs=500, batch_size=80, random_state=321, filename=None):
     """Plot the heatmap of MSE-values given various number of nodes and learning rates for a given number of layers . 
 
     Args:
@@ -170,10 +184,12 @@ def nodes_etas_heatmap(D_train, D_test, etas, nodes, layers=2, epochs=800, batch
     run_time = time.time() - start_time 
     print(f"{epochs = } and {batch_size = } gives {run_time = :.3f} s")
 
+    v_min = np.min(MSE_grid)
+    v_max = np.min(MSE_grid) * 4
     
     # Ploting the heatmap
     fig, ax = plt.subplots()
-    sns.heatmap(MSE_grid, annot=True, cmap="viridis", ax=ax, cbar_kws={'label':'MSE'})
+    sns.heatmap(MSE_grid, annot=True, cmap=plot_utils.cmap, ax=ax, cbar_kws={'label':'MSE'}, vmin=v_min, vmax=v_max)
     # Plot a red triangle around best value. I think this code is Messi<3
     arg_best_MSE = np.unravel_index(np.nanargmin(MSE_grid), np.shape(MSE_grid))
     ax.add_patch(plt.Rectangle((arg_best_MSE[1], arg_best_MSE[0]), 1, 1, fc='none', ec='red', lw=5, clip_on=False))
@@ -194,6 +210,72 @@ def nodes_etas_heatmap(D_train, D_test, etas, nodes, layers=2, epochs=800, batch
     # plt.show()
 
 
+def implement_scikit(D_train, D_test, nodes, layers, etas, epochs=500, early_stopping=False, random_state=321, filename=None):
+    """
+
+    Args:
+        D_train (_type_): _description_
+        D_test (_type_): _description_
+        nodes (list): List of all of the various nodes in each layer 
+        layers (_type_): _description_
+        etas (_type_): _description_
+    """
+    np.random.seed(random_state)
+
+    from sklearn.neural_network import MLPRegressor
+
+    MSE_grid = list()
+    for eta in etas: 
+        MSE_list = list()
+        for n in nodes:
+            nodes_ = ((n,)*layers)
+            dnn = MLPRegressor(
+                hidden_layer_sizes=nodes_,
+                # activation="logistic",
+                solver="adam",
+                learning_rate_init=eta,
+                max_iter=epochs,
+                early_stopping=early_stopping,
+            )
+
+            dnn.fit(D_train.X, D_train.y)
+
+            y_pred = dnn.predict(D_test.X)
+
+            # print(np.c_[D_test.y, y_pred])
+            # print(MSE(D_test.y, y_pred))
+            # print(dnn.score(D_test.X, D_test.y))
+
+            MSE_list.append(MSE(D_test.y, y_pred))
+        MSE_grid.append(MSE_list)
+
+    v_min = np.min(MSE_grid)
+    v_max = np.min(MSE_grid) * 4
+
+    
+    # Ploting the heatmap
+    fig, ax = plt.subplots()
+    sns.heatmap(MSE_grid, annot=True, cmap=plot_utils.cmap, ax=ax, cbar_kws={'label':'MSE'}, vmin=v_min, vmax=v_max)
+    # Plot a red triangle around best value. I think this code is Messi<3
+    arg_best_MSE = np.unravel_index(np.nanargmin(MSE_grid), np.shape(MSE_grid))
+    ax.add_patch(plt.Rectangle((arg_best_MSE[1], arg_best_MSE[0]), 1, 1, fc='none', ec='red', lw=5, clip_on=False))
+
+    # Set xylabels and ticks. This code is ronaldo, but it works.
+    ax.set_xlabel("Nodes in each layer")
+    ax.set_xticks(
+        np.arange(len(nodes))+.5,
+        labels=nodes
+    )
+    ax.set_ylabel("Learning rate")
+    ax.set_yticks(
+        np.arange(len(etas))+.5,
+        labels=etas
+    )
+    if filename:
+        plt.savefig(make_figs_path(filename), dpi=300)
+    plt.show()
+
+
 def MSE(y_test, y_pred):
     assert y_test.shape == y_pred.shape, f"y and y_pred have different shapes. {y_test.shape =}, {y_pred.shape =}"
     return np.mean((y_test - y_pred)**2)
@@ -202,16 +284,17 @@ def MSE(y_test, y_pred):
 
 if __name__ == "__main__":
     epochs = 500
-    batch_size = 15
+    batch_size = 2**4
 
     D = load_Terrain(random_state=123, n=600)
     D_train, D_test = D.train_test_split(ratio=3/4, random_state=42)
     D_train = D_train.scaled(scheme="Standard")    
     D_test = D_train.scale(D_test)
-    y_test = D_test.y   
+    y_test = D_test.y  
 
-    # nodes = [10,20,50]
-    # etas = [0.001, 0.01, 0.08]
+    #Heatmap:
+    # nodes = [100]
+    # etas = [0.001]
     # layers = [1]
     # nodes = [2, 10, 20, 50, 100, 200]
     # etas = [0.0005, 0.001, 0.01, 0.06, 0.08, 0.1, 0.8]
@@ -229,20 +312,49 @@ if __name__ == "__main__":
     #         filename=filename
     #     )
 
-    nodes = ((50,)*3, 1)
-    eta = 0.001
+    #Plot terrain data:
+    # NB: Seems like 500 is just a 'lucky' number of epochs; should maybe have more epochs to get a more stable MSE?.
+    # epochs_ = np.arange(100, 1000, 100)
+    # for e in epochs_:
+    #     print(f"epochs = {e}")
+    #     nodes = ((50,)*3, 1)
+    #     eta = 0.001
+    #     plot_NN_vs_test(
+    #         D_train=D_train, 
+    #         D_test=D_test, 
+    #         eta=eta, nodes=nodes, 
+    #         epochs=e, 
+    #         batch_size=batch_size,
+    #         # filename_test="terrain_test.pdf", 
+    #         # filename_pred="terrain_predicted.pdf"
+    #     )
+    nodes = ((100,)*3, 1)
+    eta = 0.01
     plot_NN_vs_test(
         D_train=D_train, 
         D_test=D_test, 
-        eta=eta, nodes=nodes, 
+        eta=eta, 
+        nodes=nodes, 
         epochs=epochs, 
         batch_size=batch_size,
         # filename_test="terrain_test.pdf", 
-        # filename_pred="terrain_predicted.pdf"
+        filename_pred="terrain_predicted_sk.pdf"
     )
 
-    # Check activation function:
-    #Plot in same plot, include MSE 
+    #Scikit-learn
+    # nodes = [100]
+    # etas = [0.001]
+    # layers = [1]
+    # nodes = [2, 10, 20, 50, 100, 200]
+    # etas = [0.0005, 0.001, 0.01, 0.06, 0.08, 0.1, 0.8]
+    # layers = [1,3,5]
+    # for l in layers:
+    #     filename = f"nodes_etas_heatmap_sk_{l}.pdf"
+    #     implement_scikit(D_train, D_test, nodes=nodes, layers=l, etas=etas, filename=filename)
+
+        #Believe there are too few datapoints to implement early stopping (not enough validation data to decide when to actually stop)
+
+    # Check activation functions:
     # activation_func_2d()
 
     # introducing_act()
