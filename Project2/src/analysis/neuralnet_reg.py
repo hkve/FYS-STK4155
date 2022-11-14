@@ -51,7 +51,7 @@ def activation_func_2d():
 
     nodes = ((100,), 1)
     eta = 0.001
-    epochs = 200
+    epochs = 500
     batch_size = 2**6
 
     SGD = opt.SGradientDescent(
@@ -88,7 +88,7 @@ def activation_func_2d():
     plt.show()
 
 
-def plot_NN_vs_test(D_train, D_test, eta, nodes, epochs=800, batch_size=80, random_state=321, filename_test=None, filename_pred=None):
+def plot_NN_vs_test(D_train, D_test, eta, nodes, epochs=500, batch_size=80, random_state=321, filename_test=None, filename_pred=None):
     """Function for training an NN and plotting the true terrain data and the NN predicted terrain data for qualitative comparison. Will also print the MSE. The optimal parameters are likely already found in another process. 
 
     Args:
@@ -135,7 +135,7 @@ def plot_NN_vs_test(D_train, D_test, eta, nodes, epochs=800, batch_size=80, rand
     # plot_Terrain(D_pred, angle=(16,-165), filename=filename_pred)
 
 
-def nodes_etas_heatmap(D_train, D_test, etas, nodes, layers=2, epochs=800, batch_size=80, random_state=321, filename=None):
+def nodes_etas_heatmap(D_train, D_test, etas, nodes, layers=2, epochs=500, batch_size=80, random_state=321, filename=None):
     """Plot the heatmap of MSE-values given various number of nodes and learning rates for a given number of layers . 
 
     Args:
@@ -210,7 +210,7 @@ def nodes_etas_heatmap(D_train, D_test, etas, nodes, layers=2, epochs=800, batch
     # plt.show()
 
 
-def implement_scikit(D_train, D_test, nodes, layers, etas, epochs=200, early_stopping=False, random_state=321, filename=None):
+def implement_scikit(D_train, D_test, nodes, layers, etas, epochs=500, early_stopping=False, random_state=321, filename=None):
     """
 
     Args:
@@ -328,18 +328,18 @@ if __name__ == "__main__":
     #         # filename_test="terrain_test.pdf", 
     #         # filename_pred="terrain_predicted.pdf"
     #     )
-    # nodes = ((100,)*3, 1)
-    # eta = 0.01
-    # plot_NN_vs_test(
-    #     D_train=D_train, 
-    #     D_test=D_test, 
-    #     eta=eta, 
-    #     nodes=nodes, 
-    #     epochs=epochs, 
-    #     batch_size=batch_size,
-    #     # filename_test="terrain_test.pdf", 
-    #     filename_pred="terrain_predicted_sk.pdf"
-    # )
+    nodes = ((100,)*3, 1)
+    eta = 0.01
+    plot_NN_vs_test(
+        D_train=D_train, 
+        D_test=D_test, 
+        eta=eta, 
+        nodes=nodes, 
+        epochs=epochs, 
+        batch_size=batch_size,
+        # filename_test="terrain_test.pdf", 
+        filename_pred="terrain_predicted_sk.pdf"
+    )
 
     #Scikit-learn
     # nodes = [100]
