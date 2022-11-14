@@ -108,10 +108,10 @@ We will assume that the measurements $y_i$ are generated from an exact function 
             \end{figure}
             The simplest of neural networks is the \textit{Feed Forward Neural Network(FFNN)} which, as its name implies, feeds activation from the input layer and forward through the network, eventually ending up in the output layer. Given a NN with only an input layer, and an output layer consisting of one node (see \cref{the:fig:simple_NN}), the output $y$ is then  
             \begin{equation}
-                y=f\left(\sum_{i=1}^n w_i x_i+b\right)
+                y=f\left(\sum_{i=1}^n w_i x_i+b\right)= f(z)
             \label[eq]{the:eq:output}
             \end{equation} 
-            where $x_i$ constitutes the input, $w_i$ are the weights corresponding to each input variable, and $b$ the bias of the output node. $f$ is called the \textit{activation function} and depends on the analysis being executed; e.g. regression, classification, etc. Each node has a corresponding activation function which defines the possible outputs of that node. The activation function closest to replicating the behaviour of a biological neuron is the heaviside function which yields either $0$ or $1$; firing or not firing. However, there are in some cases advantages of abandoning this biological model. Some other, and currently more used activation functions are: identity, sigmoid, relu, tanh, and leaky relu some of which are plotted in \cref{the:fig:introducing_acts}. \comment{See more on activation functions in appendix ref} 
+            where $x_i$ constitutes the input, $w_i$ are the weights corresponding to each input variable, and $b$ the bias of the output node. We define $z$ as the sum over all the weighted inputs with bias added; $z=\pclosed{\Sigma_{i=1}^n w_ix_i + b}$. $f$ is called the \textit{activation function} and depends on the analysis being executed; e.g. regression, classification, etc. Each node has a corresponding activation function which defines the possible outputs of that node. The activation function closest to replicating the behaviour of a biological neuron is the heaviside function which yields either $0$ or $1$; firing or not firing. However, there are in some cases advantages of abandoning this biological model. Some other, and currently more used activation functions are: identity, sigmoid, relu, tanh, and leaky relu some of which are plotted in \cref{the:fig:introducing_acts}. 
             \begin{figure} [ht]
                 \centering
                 \includegraphics[width=\linewidth]{figs/introducing_acts.pdf}
@@ -119,19 +119,38 @@ We will assume that the measurements $y_i$ are generated from an exact function 
                 \label[fig]{the:fig:introducing_acts}
             \end{figure}
             
-            In the output layer the activation function constitutes what analysis the network does. E.g. a form of binary classification can be done by implementing the sigmoid activation function in the output layer, and for regression problems the identity function, $f(x)=x$, is implemented.
+            In the output layer the activation function constitutes what analysis the network does. E.g. a form of binary classification can be done by implementing the sigmoidactivation function in the output layer, and for regression problems the identity function, $f(x)=x$, is implemented.
             It is normal that all the nodes in a layer have the same activation function $f$.    
+            \comment{See more on activation functions in appendix ref} 
 
-            If we were to have a more complex neural network than the one from \cref{the:fig:simple_NN}, now also including hidden layers, $y$ (ref \cref{the:eq:output}) would be a node in the layer after the input. Each such node would have its own activation bias and would be connected with the input, or activation from the previous layer, through "unique" weights.
+            If we were to have a more complex neural network than the one from \cref{the:fig:simple_NN}, now also including hidden layers, $y$ (ref \cref{the:eq:output}) would be a node in the hidden layer after the input. Each node in the network would have its own activation bias and would be connected with the input, or activation from the previous layer, through "unique" weights. In \cref{the:eq:node_activation}, $l$ refers to the layer we are calculating the activation in, and $i$ to a specific node in that layer.  
             \begin{equation}
-                a^l_i = f^l \pclosed{\sum_{j=1}^{N_{l-1}} w_{ij}^l a_j^{l-1} + b^l}
+                a^l_i = f^l \pclosed{\sum_{j=1}^{N_{l-1}} w_{ij}^l a_j^{l-1} + b^l} = f^l(z^l_i)
+            \label[eq]{the:eq:node_activation}
             \end{equation}  
+            \begin{equation}
+                z^l_i = \sum_{j=1}^{N_{l-1}} w_{ij}^l a_j^{l-1} + b^l
+            \end{equation}
+            We can write this in a more compact form:
+            \begin{equation}
+                \hat{z}^l = \pclosed{\hat{W}^l}^T\hat{a}^{l-1} + \hat{b}^l
+            \end{equation}
 
 
-        
+
         \subsubsection{Backpropagation}
-            Backpropagation 
-            
+            The essence of neural networks as machine learning is \textit{training}. This means getting the network to adjust its parameters to better fit the data. A common algorithm used to do this is the \textit{Backpropagation algorithm}. A feed forward calculation of the network yields an output which can be compared with the true data output through a cost function. The goal is to minimise the cost. The only changes the network can do to get a different output, is to adjust its weights and biases. Backpropagation therefore uses the gradients of the cost function with respect to these parameters and applies a gradient descent method for finding the parameters yielding the lowest cost. The gradients are calculated through the chain rule and for one layer at the time, starting at the last layer and propagating backwards through the network, hence the name Backpropagation. 
+
+            Starting with the last layer $L$ the output error is 
+            \begin{equation}
+                \delta_i^L = \pdv{C}{z_i^L} = \pdv{C}{a_i^L} \pdv{a_i^L}{z_i^L} =  f'(z_i^L) \pdv{C}{a_i^L}
+            \end{equation}
+
+
+            \begin{equation}
+                \pdv{z^l_i}{w_{ij}^l} = a_i^{l-1}
+            \end{equation}
+
 
 
     \subsubsection{Universal Approximation Theorem}
@@ -146,7 +165,7 @@ We will assume that the measurements $y_i$ are generated from an exact function 
         \begin{align*}
             \log(\frac{p(x_i)}{1-p(x_i)}) = x_i^T \vec{\theta}
         \end{align*}
-        Where we have defined $p(x_i) \equiv p(\hat{y}_i = 1 | x_i, \vec{\theta})$, the probability that we guess $\hat{y}_i = 1$ given a data point $x_i$ and parameters $\vec{\theta}$. Solving the above expression for $p(x_i)$ yields the Sigmoid function from \cref{app:activation_functions} evaluated in $x_i^T \vec{\theta}$.
+        Where we have defined $p(x_i) \equiv p(y_i = 1 | x_i, \vec{\theta})$, the probability that we guess $\hat{y}_i = 1$ given a data point $x_i$ and parameters $\vec{\theta}$. Solving the above expression for $p(x_i)$ yields the Sigmoid function from \cref{app:activation_functions} evaluated in $x_i^T \vec{\theta}$.
         
         \begin{align*}
             p(x_i) = \sigma(x_i^T \vec{\theta}) = \frac{1}{1+\exp{-x_i^T\vec{\theta}}}
@@ -158,20 +177,23 @@ We will assume that the measurements $y_i$ are generated from an exact function 
         \end{align*}
         The cost function then follows from taking logarithm of the likelihood, presented with an overall negative sign giving a minimisation problem of the parameters $\vec{\theta}$. This is in the literature often called the \textit{Binary Cross Entropy} (BCE) cost function \cite{BCE}.  
 
-        \begin{align*}
-            \msub{C}{BCE}(\vec{\theta}) &= -\log P(\vec{y}|X,\vec{\vec{\theta}}) \\ 
+        \begin{align}
+            &\msub{C}{BCE}(\vec{\theta}) = -\log P(\vec{y}|X,\vec{\vec{\theta}}) \nonumber\\ 
             &= - \sum_{i = 1}^{n} y_i \log[\sigma(X_{ia} \theta_a)] + (1 - y_i)\log[1-\sigma(X_{ia}\theta_a)]
-        \end{align*}
+            \label[eq]{the:logreg_cost_function}
+        \end{align}
         Taking the derivative wrt. to a parameter $\theta_b$ recalling the derivative of the Sigmoid function from \cref{app:activation_functions} we find:
 
         \begin{align*}
             \pdv{\theta_b} \msub{C}{BCE} &= - \sum_{i = 1}^{n} y_i (1-\sigma(X_{ia} \theta_a))X_{ib} - (1-y_i)\sigma(X_{ia} \theta_a)X_{ib} \\
             &= \sum_{i=1}^n (\sigma(X_{ia}\theta_a) - y_i)X_{ib}
         \end{align*}
-        Finally, with $\vec{p}_i = \sigma(X_{ia}\theta_a)$
-
-        \begin{align*}
+        Finally, with $\vec{p}_i = \sigma(X_{ia}\theta_a)$, we can express the gradient of the BCE cost function in vector notation.
+        \begin{align}
             \nabla_{\vec{\theta}} \msub{C}{BCE}(\vec{\theta}) = X^T (\vec{p} - \vec{y}) 
-        \end{align*}
+            \label[eq]{the:logreg_gradient}
+        \end{align}
+
 
     \subsubsection{Neural network approach}
+        Something Something since we want to interpret output as probability we must choose Sigmoid. Hidden activation functions can be whatever. 
