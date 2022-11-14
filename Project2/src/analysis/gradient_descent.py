@@ -221,8 +221,15 @@ def tune_lambda_learning_rate(
                         x0=x0,
                         args=(np.arange(len(data_train)),)
                     )
-                if optimizer.converged:
-                    MSE_grid[i, j, k] = np.mean((X_val@theta_opt-y_val)**2)
+                # Calculate MSE
+                MSE = np.mean((X_val@theta_opt - y_val)**2)
+                # Check if gradient exploded
+                if vlims[1] is not None:
+                    limtest = MSE < 10*vlims[1]
+                else:
+                    limtest = True
+                if optimizer.converged and limtest:
+                    MSE_grid[i, j, k] = MSE
                 else:
                     MSE_grid[i, j, k] = np.nan
     # Average MSE across theta0s
@@ -233,8 +240,13 @@ def tune_lambda_learning_rate(
         np.shape(mean_MSE_grid)
     )
     if verbose:
+        if len(theta0) > 1:  # Adding 95% confidence interval
+            std_MSE_grid = MSE_grid.std(axis=0) / np.sqrt(len(theta0)-1)
+        else:
+            MSE_stds = np.zeros_like(mean_MSE_grid)
         print(f"Best MSE value of {optimizer.method}: "
               f"{mean_MSE_grid[arg_best_MSE]:.4} "
+              f"+- {std_MSE_grid[arg_best_MSE]:.2} "
               f"with lmbda {lmbdas[arg_best_MSE[0]]:.1E} "
               f"lrate {learning_rates[arg_best_MSE[1]]:.2} "
               f"({time()-start_time:.2f} s)")

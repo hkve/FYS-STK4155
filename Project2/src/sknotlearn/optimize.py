@@ -202,6 +202,8 @@ class SGradientDescent(GradientDescent):
         np.random.shuffle(idcs)  # shuffle indices
         n = len(idcs)
         n_batches = n // self.batch_size
+        if n_batches == 0:  # If batch size is larger than n, we use 1 batch
+            n_batches = 1
         return [idcs[i:i+n//n_batches] for i in range(n_batches)]
 
 

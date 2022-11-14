@@ -66,6 +66,17 @@
     \subsubsection{Ridge Optimisation}
         The results from the ridge analysis are found in \cref{res:fig:GDridge}. 
 
+        \begin{table}
+            \centering
+            \begin{tabular}{r|c|l|l}
+                Method & MSE & $\eta$ & $\lambda$ \\ \hline
+                Momentum GD & $0.1843 \pm 0.0045$ & 0.13 & 0.0032 \\
+                Momentum SGD & $0.1734 \pm 0.0015$ & 0.033 & 0.0032 \\
+                AdaGrad Momentum SGD & $0.1745 \pm 0.0023$ & 0.30 & 0.0032 \\
+                Adam SGD & $0.1724 \pm 0.0013$ & 0.090 & 0.001
+            \end{tabular}
+        \end{table}
+
         \begin{figure*}
             \begin{subfigure}{.49\textwidth}
                 \includegraphics[width=\linewidth]{lmbda_learning_rates_momentum_GD.pdf}
