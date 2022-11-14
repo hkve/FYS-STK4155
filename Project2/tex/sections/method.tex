@@ -65,8 +65,6 @@
 
     
 \subsection{Classification problems}
-    Thus far, we had only aimed at solving regression problems. The machinery regarding neural networks we have introduced here, can with some modification be used to approach \textit{classification} problems. Instead of predicting targets in a continuous domain ($y_i \in \mathbb{R}$), we aimed to put the target $y_i$ in a specific class ($y_i \in \mathcal{Q}$), where $\mathcal{Q}$ is the set of possible outcomes. For comparison purposes, we also implemented a simple logistic regression method.
-
     For our case using the Wisconsin Breast data set presented in \cref{breast_cancer_dataset}, we aimed to classify either $M$ or $B$. These categories are mutually exclusive, thus determining $M$ or not $M$ is sufficient (i.e. $\mathcal{Q} = \{ M, \neg M \}$). This gave us a binary problem, represented with $y_i \in \{ 1, 0 \}$ where $y_i = 1$ implies $M$ and $y_i = 0$ not $M$.
 
     To measure the goodness of fit in for our classification problems, we used the \textit{accuracy} score. This metric simply counts the number correctly classified cases, divided by the total number of cases:
