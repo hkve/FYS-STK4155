@@ -14,6 +14,8 @@ from sknotlearn.data import Data
 from sknotlearn.neuralnet import NeuralNetwork
 from sknotlearn.datasets import make_debugdata, make_FrankeFunction, plot_FrankeFunction, load_Terrain, plot_Terrain
 
+from sklearn.neural_network import MLPRegressor
+
 def introducing_act():
     """Introducing the activation functions through plots.
     """
@@ -87,8 +89,7 @@ def activation_func_2d():
     # plt.savefig(make_figs_path("c_activations_2d_data.pdf"))
     plt.show()
 
-
-def plot_NN_vs_test(D_train, D_test, eta, nodes, epochs=500, batch_size=80, random_state=321, filename_test=None, filename_pred=None):
+def plot_NN_vs_test(D_train, D_test, eta, nodes, batch_size, epochs=500, random_state=321, filename_test=None, filename_pred=None):
     """Function for training an NN and plotting the true terrain data and the NN predicted terrain data for qualitative comparison. Will also print the MSE. The optimal parameters are likely already found in another process. 
 
     Args:
@@ -131,11 +132,10 @@ def plot_NN_vs_test(D_train, D_test, eta, nodes, epochs=500, batch_size=80, rand
 
     D_test = D_train.unscale(D_test)
 
-    # plot_Terrain(D_test, angle=(16,-165), filename=filename_test)
-    # plot_Terrain(D_pred, angle=(16,-165), filename=filename_pred)
+    plot_Terrain(D_test, angle=(16,-165), filename=filename_test)
+    plot_Terrain(D_pred, angle=(16,-165), filename=filename_pred)
 
-
-def nodes_etas_heatmap(D_train, D_test, etas, nodes, layers=2, epochs=500, batch_size=80, random_state=321, filename=None):
+def nodes_etas_heatmap(D_train, D_test, etas, nodes, layers, batch_size, activation_hidden="sigmoid", epochs=500, random_state=321, filename=None):
     """Plot the heatmap of MSE-values given various number of nodes and learning rates for a given number of layers . 
 
     Args:
@@ -171,7 +171,7 @@ def nodes_etas_heatmap(D_train, D_test, etas, nodes, layers=2, epochs=500, batch
                 random_state=random_state,
                 cost_func="MSE",
                 # lmbda=0.001,
-                activation_hidden="sigmoid",
+                activation_hidden=activation_hidden,
                 activation_output="linear"
             )
 
@@ -207,44 +207,45 @@ def nodes_etas_heatmap(D_train, D_test, etas, nodes, layers=2, epochs=500, batch
     )
     if filename:
         plt.savefig(make_figs_path(filename), dpi=300)
-    # plt.show()
+    else:
+        plt.show()
 
-
-def implement_scikit(D_train, D_test, nodes, layers, etas, epochs=500, early_stopping=False, random_state=321, filename=None):
-    """
+def implement_scikit(D_train, D_test, nodes, layers, etas, epochs=500, batch_size="auto", early_stopping=False, activation="logistic", random_state=321, filename=None):
+    """Creating a neural network using scikit-learn and plotting the heatmap of MSE-values given various number of nodes and learning rates for a given number of layers. 
 
     Args:
-        D_train (_type_): _description_
-        D_test (_type_): _description_
-        nodes (list): List of all of the various nodes in each layer 
-        layers (_type_): _description_
-        etas (_type_): _description_
+        D_train (Data): Training data.
+        D_test (Data): Testing data
+        etas (ndarray, list): A list (or array) of the various learning rates. 
+        nodes (ndarray, list): A list (or array) of the various number of nodes in each layer. (NB: All layers have the same number of nodes) 
+        layers (int): Number of layers. 
+        epochs (int): Number of epochs for which each gradient is calculated. Defaults to 500.
+        batch_size (int): The size of each bach in the SGD. Defaults to 80.
+        early_stopping (bool, optional): Terminate training when validation score is not improving. Defaults to False.
+        random_state (int): Defaults to 321.
+        filename (_type_, str): Filename of plot. Needs to be implemented to save plot. Defaults to None.
     """
-    np.random.seed(random_state)
 
-    from sklearn.neural_network import MLPRegressor
 
     MSE_grid = list()
     for eta in etas: 
         MSE_list = list()
         for n in nodes:
+            np.random.seed(random_state)
             nodes_ = ((n,)*layers)
             dnn = MLPRegressor(
                 hidden_layer_sizes=nodes_,
-                # activation="logistic",
+                activation=activation,
                 solver="adam",
                 learning_rate_init=eta,
                 max_iter=epochs,
+                batch_size=batch_size,
                 early_stopping=early_stopping,
+                alpha=0,
             )
 
             dnn.fit(D_train.X, D_train.y)
-
             y_pred = dnn.predict(D_test.X)
-
-            # print(np.c_[D_test.y, y_pred])
-            # print(MSE(D_test.y, y_pred))
-            # print(dnn.score(D_test.X, D_test.y))
 
             MSE_list.append(MSE(D_test.y, y_pred))
         MSE_grid.append(MSE_list)
@@ -273,7 +274,47 @@ def implement_scikit(D_train, D_test, nodes, layers, etas, epochs=500, early_sto
     )
     if filename:
         plt.savefig(make_figs_path(filename), dpi=300)
-    plt.show()
+    else:
+        plt.show()
+
+def regularization(D_train, D_test, nodes, layers, eta, lmbdas, batch_size, epochs=500, random_state=321, filename=None):
+    """Plot the MSE as a function of regularization parameter
+    """
+    nodes_ = ((nodes,)*layers, 1)
+
+    SGD = opt.SGradientDescent(
+        method = "adam",
+        params = {"eta":eta, "beta1":0.9, "beta2":0.99},
+        epochs=epochs,
+        batch_size=batch_size,
+        random_state=random_state
+    )
+
+    MSE_list = []
+    for lmbda in lmbdas:
+        NN = NeuralNetwork(
+            SGD, 
+            nodes_, 
+            random_state=random_state,
+            cost_func="MSE",
+            lmbda=lmbda,
+            activation_hidden="sigmoid",
+            activation_output="linear"
+            )
+        NN.train(D_train, trainsize=1)
+        y_pred = NN.predict(D_test.X)
+
+        MSE_list.append(MSE(D_test.y, y_pred))
+    
+    fig, ax = plt.subplots()
+    ax.plot(np.log10(lmbdas), MSE_list)
+    if filename: 
+        plt.savefig(make_figs_path(filename))
+    else:
+        plt.show()
+    
+    #Add labels and legend plis
+    
 
 
 def MSE(y_test, y_pred):
@@ -284,7 +325,7 @@ def MSE(y_test, y_pred):
 
 if __name__ == "__main__":
     epochs = 500
-    batch_size = 2**4
+    batch_size = 200
 
     D = load_Terrain(random_state=123, n=600)
     D_train, D_test = D.train_test_split(ratio=3/4, random_state=42)
@@ -295,12 +336,12 @@ if __name__ == "__main__":
     #Heatmap:
     # nodes = [100]
     # etas = [0.001]
-    # layers = [1]
+    # layers = [3]
     # nodes = [2, 10, 20, 50, 100, 200]
     # etas = [0.0005, 0.001, 0.01, 0.06, 0.08, 0.1, 0.8]
-    # layers = [1,3,5]
+    # # layers = [1,3,5]
     # for l in layers:
-    #     filename = f"nodes_etas_heatmap_{l}.pdf"
+    #     filename = f"nodes_etas_heatmap_{l}_lrelu.pdf"
     #     nodes_etas_heatmap(
     #         D_train=D_train, 
     #         D_test=D_test, 
@@ -309,12 +350,14 @@ if __name__ == "__main__":
     #         layers=l, 
     #         epochs=epochs, 
     #         batch_size=batch_size, 
+    #         activation_hidden="leaky_relu", 
     #         filename=filename
     #     )
 
     #Plot terrain data:
     # NB: Seems like 500 is just a 'lucky' number of epochs; should maybe have more epochs to get a more stable MSE?.
     # epochs_ = np.arange(100, 1000, 100)
+    # epochs_ = [500]
     # for e in epochs_:
     #     print(f"epochs = {e}")
     #     nodes = ((50,)*3, 1)
@@ -328,43 +371,50 @@ if __name__ == "__main__":
     #         # filename_test="terrain_test.pdf", 
     #         # filename_pred="terrain_predicted.pdf"
     #     )
-    nodes = ((100,)*3, 1)
-    eta = 0.01
-    plot_NN_vs_test(
-        D_train=D_train, 
-        D_test=D_test, 
-        eta=eta, 
-        nodes=nodes, 
-        epochs=epochs, 
-        batch_size=batch_size,
-        # filename_test="terrain_test.pdf", 
-        filename_pred="terrain_predicted_sk.pdf"
-    )
+
 
     #Scikit-learn
     # nodes = [100]
     # etas = [0.001]
-    # layers = [1]
+    # layers = [3]
     # nodes = [2, 10, 20, 50, 100, 200]
     # etas = [0.0005, 0.001, 0.01, 0.06, 0.08, 0.1, 0.8]
     # layers = [1,3,5]
     # for l in layers:
     #     filename = f"nodes_etas_heatmap_sk_{l}.pdf"
-    #     implement_scikit(D_train, D_test, nodes=nodes, layers=l, etas=etas, filename=filename)
+    #     implement_scikit(
+    #         D_train, 
+    #         D_test, 
+    #         nodes=nodes, 
+    #         layers=l, 
+    #         etas=etas, 
+    #         batch_size=batch_size,
+    #         activation="logistic",
+    #         filename=filename,  
+    #     )
+ 
 
-        #Believe there are too few datapoints to implement early stopping (not enough validation data to decide when to actually stop)
+    #Believe there are too few datapoints to implement early stopping (not enough validation data to decide when to actually stop)
+
+    #Regularization 
+    lmbdas = np.logspace(-9, -1, 50)
+    nodes = 200
+    eta = 0.001
+    layers = 5
+    regularization(
+        D_train, 
+        D_test, 
+        nodes, 
+        layers, 
+        eta, 
+        lmbdas, 
+        batch_size, 
+        epochs=500, 
+        random_state=321, 
+        filename="lmbdas_NN_reg.pdf"
+    )
+
 
     # Check activation functions:
     # activation_func_2d()
-
     # introducing_act()
-    
-
-
-
-    "SGD"
-    #Interesting parameters:
-    eta_plain = [0.001, 0.01, 0.1, 0.9] #The best is eta=0.1
-    gamma_momentum = 0.8 #The best when eta=0.1
-
-    "Layers and nodes"
