@@ -257,6 +257,7 @@ def tune_lambda_learning_rate(
         mean_MSE_grid,
         vmin=vlims[0], vmax=vlims[1],
         annot=True,
+        fmt=".3",
         cmap=plot_utils.cmap,
         ax=ax,
         cbar_kws={'label': 'Validation MSE'}
@@ -289,6 +290,40 @@ def tune_lambda_learning_rate(
     plt.show()
 
 
+def analytical_lmbda_plot(data_train: Data, data_val: Data, lmbdas: np.ndarray,
+                          verbose: bool = False, filename=None) -> None:
+    y_train, X_train = data_train.unpacked()
+    y_val, X_val = data_val.unpacked()
+
+    MSE_array = np.zeros(len(lmbdas))
+    for i, lmbda in enumerate(lmbdas):
+        theta_ana = np.linalg.pinv(X_train.T@X_train
+                    + lmbda * np.eye(data_train.n_features)) @ X_train.T @ y_train
+        MSE_array[i] = np.mean((X_val@theta_ana - y_val)**2)
+
+    if verbose:
+        arg_best_MSE = MSE_array.argmin()
+        print(f"Best MSE: {MSE_array[arg_best_MSE]:.4} "
+              f"with lmbda {lmbdas[arg_best_MSE]:.1E}")
+
+    plt.plot(np.log10(lmbdas), MSE_array)
+    theta_OLS = np.linalg.pinv(X_train.T@X_train) @ X_train.T @ y_train
+    MSE_OLS = np.mean((X_val@theta_OLS - y_val)**2)
+    plt.hlines(MSE_OLS,
+               xmin=np.log10(lmbdas).min(),
+               xmax=np.log10(lmbdas).max(),
+               label="Analytical OLS solution",
+               ls="--",
+               colors="grey"
+               )
+    plt.legend(loc="upper left")
+    plt.xlabel(r"$\log_{10}(\lambda)$")
+    plt.ylabel("Validation MSE")
+    if filename is not None:
+        plt.savefig(filename)
+    plt.show()
+
+
 if __name__ == "__main__":
     # Import data
     from sknotlearn.datasets import make_FrankeFunction, load_Terrain
@@ -304,9 +339,9 @@ if __name__ == "__main__":
     np.random.seed(random_state)
     theta0 = [np.random.randn(D_val.n_features) for _ in range(5)]
 
-    max_iter = 100
+    max_iter = 500
 
-    batch_size = 2**6
+    batch_size = 200
 
     # All the gradient descent instances
     GD = GradientDescent("plain", dict(eta=0.),
@@ -393,7 +428,7 @@ if __name__ == "__main__":
         ),
         "tunable": dict(
             # funky learning rate to get more small eta evaluations
-            learning_rates=np.linspace(0.001, 0.7, 101),
+            learning_rates=(np.linspace(0., 0.7**(1/2), 101)**2)[1:],
             optimizers=(rmSGD, adSGD, aSGD, maSGD),
             optimizer_names=("RMSprop SGD", "Adam SGD",
                              "AdaGrad SGD", "AdaGradMom SGD"),
@@ -412,51 +447,52 @@ if __name__ == "__main__":
     params2 = {
         "plain_GD": dict(
             learning_rates=np.linspace(0., 0.08, 11)[1:],
-            lmbdas=np.logspace(-5, 1, 13),
+            lmbdas=np.logspace(-8, 1, 10),
             optimizer=GD,
             vlims=(None, 0.4),
         ),
         "momentum_GD": dict(
             learning_rates=np.linspace(0., 0.14, 11)[1:],
-            lmbdas=np.logspace(-5, 1, 13),
+            lmbdas=np.logspace(-8, 1, 10),
             optimizer=mGD,
             vlims=(None, 0.6),
         ),
         "plain_SGD": dict(
             learning_rates=np.linspace(0., 0.05, 11)[1:],
-            lmbdas=np.logspace(-5, 1, 13),
+            lmbdas=np.logspace(-8, 1, 10),
             optimizer=SGD,
             vlims=(None, 0.4)
         ),
         "momentum_SGD": dict(
-            learning_rates=np.linspace(0., 0.11, 11)[1:],
-            lmbdas=np.logspace(-5, 1, 13),
+            learning_rates=np.linspace(0., 0.13, 11)[1:],
+            lmbdas=np.logspace(-8, 1, 10),
             optimizer=mSGD,
             vlims=(None, 0.6),
         ),
         "adagrad_SGD": dict(
             learning_rates=np.linspace(0., 1., 11)[1:],
-            lmbdas=np.logspace(-5, 1, 13),
+            lmbdas=np.logspace(-8, 1, 10),
             optimizer=aSGD,
             vlims=(None, 0.4)
         ),
         "adagrad_momentum_SGD": dict(
             learning_rates=np.linspace(0., 0.6, 11)[1:],
-            lmbdas=np.logspace(-5, 1, 13),
+            lmbdas=np.logspace(-8, 1, 10),
             optimizer=maSGD,
             vlims=(None, None),
         ),
         "adam_SGD": dict(
-            learning_rates=np.linspace(0., 0.1, 11)[1:],
-            lmbdas=np.logspace(-5, 1, 13),
+            learning_rates=np.linspace(0., 0.55, 11)[1:],
+            lmbdas=np.logspace(-8, 1, 10),
             optimizer=adSGD,
             vlims=(None, 0.7),
         )
     }
 
     # Choosing plot to plot
-    plot1 = ""
-    plot2 = ""
+    plot1 = ""  # dict key for params1 or empty string
+    plot2 = ""  # dict key for params2 or empty string
+    plot3 = 0  # True or False
 
     # Plotting
     if plot1:
@@ -466,7 +502,7 @@ if __name__ == "__main__":
             theta0=theta0,
             verbose=True,
             **params1[plot1],
-            # filename="learning_rates_"+plot1
+            filename="learning_rates_"+plot1
         )
 
     if plot2:
@@ -476,5 +512,13 @@ if __name__ == "__main__":
             theta0=theta0,
             verbose=True,
             **params2[plot2],
-            # filename="lmbda_learning_rates_"+plot2
+            filename="lmbda_learning_rates_"+plot2
+        )
+
+    if plot3:
+        analytical_lmbda_plot(
+            D_train, D_val,
+            lmbdas=np.logspace(-9, -3, 121),
+            verbose=True,
+            # filename="lmbda_plot_ana"
         )
