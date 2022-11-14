@@ -291,24 +291,42 @@ def tune_lambda_learning_rate(
 
 
 def analytical_lmbda_plot(data_train: Data, data_val: Data, lmbdas: np.ndarray,
-                          verbose: bool = False, filename=None) -> None:
+                          verbose: bool = False, filename: str = None) -> None:
+    """Plot the validation MSE of analytical linear regression parameters of
+    the ridge cost function as function of lmbdas.
+
+    Args:
+        data_train (Data): Data to optimize the parameters on.
+        data_val (Data): Data to evaluate the MSE of the optimal parameters on.
+        lmbdas (np.ndarray): Array of the lmbda-values to use
+        verbose (bool, optional): Whether to print the best result.
+                                  Defaults to False.
+        filename (str, optional): Where to save the figure.
+                                     Defaults to None.
+    """
+    # Unpack data
     y_train, X_train = data_train.unpacked()
     y_val, X_val = data_val.unpacked()
 
     MSE_array = np.zeros(len(lmbdas))
     for i, lmbda in enumerate(lmbdas):
+        # Cumbersome analytic expression using pseudo-inverse for safety
         theta_ana = np.linalg.pinv(X_train.T@X_train
                     + lmbda * np.eye(data_train.n_features)) @ X_train.T @ y_train
         MSE_array[i] = np.mean((X_val@theta_ana - y_val)**2)
 
     if verbose:
         arg_best_MSE = MSE_array.argmin()
-        print(f"Best MSE: {MSE_array[arg_best_MSE]:.4} "
+        print(f"Best ridge MSE: {MSE_array[arg_best_MSE]:.4} "
               f"with lmbda {lmbdas[arg_best_MSE]:.1E}")
-
-    plt.plot(np.log10(lmbdas), MSE_array)
+    # Plotting
+    plt.plot(np.log10(lmbdas), MSE_array, label="Analytical ridge solution")
+    # The analytic OLS solution
     theta_OLS = np.linalg.pinv(X_train.T@X_train) @ X_train.T @ y_train
     MSE_OLS = np.mean((X_val@theta_OLS - y_val)**2)
+    if verbose:
+        print(f"Best OLS MSE: {MSE_OLS:.4}")
+    # Plotting this as a horizontal, grey line
     plt.hlines(MSE_OLS,
                xmin=np.log10(lmbdas).min(),
                xmax=np.log10(lmbdas).max(),
@@ -328,14 +346,14 @@ if __name__ == "__main__":
     # Import data
     from sknotlearn.datasets import make_FrankeFunction, load_Terrain
     # D = load_Terrain(n=600, random_state=321)
-    D = make_FrankeFunction(n=600, noise_std=0.1, random_state=321)
+    random_state = 321
+    D = make_FrankeFunction(n=600, noise_std=0.1, random_state=random_state)
     D = D.polynomial(degree=5, with_intercept=False)
-    D_train, D_val = D.train_test_split(ratio=3/4, random_state=42)
+    D_train, D_val = D.train_test_split(ratio=3/4, random_state=random_state)
     D_train = D_train.scaled(scheme="Standard")
     D_val = D_train.scale(D_val)
 
     # Setting some general params
-    random_state = 123
     np.random.seed(random_state)
     theta0 = [np.random.randn(D_val.n_features) for _ in range(5)]
 
@@ -482,7 +500,7 @@ if __name__ == "__main__":
             vlims=(None, None),
         ),
         "adam_SGD": dict(
-            learning_rates=np.linspace(0., 0.55, 11)[1:],
+            learning_rates=np.linspace(0., 0.45, 11)[1:],
             lmbdas=np.logspace(-8, 1, 10),
             optimizer=adSGD,
             vlims=(None, 0.7),
@@ -512,13 +530,13 @@ if __name__ == "__main__":
             theta0=theta0,
             verbose=True,
             **params2[plot2],
-            filename="lmbda_learning_rates_"+plot2
+            # filename="lmbda_learning_rates_"+plot2
         )
 
     if plot3:
         analytical_lmbda_plot(
             D_train, D_val,
-            lmbdas=np.logspace(-9, -3, 121),
+            lmbdas=np.logspace(-8, 0, 81),
             verbose=True,
             # filename="lmbda_plot_ana"
         )
