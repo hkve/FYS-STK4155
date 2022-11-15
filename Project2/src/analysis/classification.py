@@ -5,6 +5,7 @@ import numpy as np
 import context
 from sknotlearn.datasets import load_BreastCancer
 from sknotlearn.data import Data
+from sknotlearn.optimize import GradientDescent, SGradientDescent
 
 def breast_cancer_data(random_state=321):
     D = load_BreastCancer()
@@ -60,16 +61,6 @@ def acc_eta_activation_functions(D_train, D_test):
                             )
 
 
-def test_logreg(D_train, D_test):
-    clf = LogisticRegression(max_iter=10000).fit(D_train.X, D_train.y)
-
-    y_pred = clf.predict(D_test.X)
-    
-
-    acc = np.sum(y_pred == D_test.y)/len(y_pred)
-    print(acc)
-
-
 
 def lmbda_eta_heatmaps(D_train, D_test):
     eta_range = (0.001, 0.1, 5)
@@ -91,10 +82,26 @@ def lmbda_eta_heatmaps(D_train, D_test):
             filename = f"lmbda_lr_struct{i}_{af}"
             cu.lmbda_eta_heatmap(D_train, D_test, eta_range, lmbda_range, nodes=nodes, activation_hidden=af, filename=filename)
 
+def logreg_different_activations(D_train, D_test):
+    max_iter = 100
+    batch_size = 200
+    eta_range = (1e-3, 2, 20)
+
+    GD = GradientDescent("plain", dict(eta=0.), its=max_iter)
+    mGD = GradientDescent("momentum", dict(gamma=0.8, eta=0.), its=max_iter)
+    SGD = SGradientDescent("plain", dict(eta=0.), epochs=max_iter, batch_size=batch_size)
+    adSGD = SGradientDescent("adam", dict(eta=0., beta1=0.9, beta2=0.99), epochs=max_iter, batch_size=batch_size)
+    
+    labels = ["a", "b", "c", "d"]
+    opts = [GD, mGD, SGD, adSGD]
+
+    cu.logreg_different_activations(D_train, D_test, eta_range, opts, labels)
+
 if __name__ == "__main__":
     D_train, D_test = breast_cancer_data()
 
     # acc_eta_activation_functions(D_train, D_test)
     # lmbda_eta_heatmaps(D_train, D_test)
 
-    cu.logreg_with_sklearn(D_train, D_test)
+    # cu.logreg_with_sklearn(D_train, D_test)
+    logreg_different_activations(D_train, D_test)

@@ -26,6 +26,7 @@ class LogisticRegression:
             opt_args["all_idcs"] = np.arange(data.n_points)
 
         self.coef = self.optimizer.call(**opt_args)
+        self.converged = self.optimizer.converged
 
         return self
 

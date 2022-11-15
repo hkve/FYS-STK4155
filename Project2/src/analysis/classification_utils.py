@@ -141,26 +141,29 @@ def lmbda_eta_heatmap(D_train, D_test, etas, lmbdas, nodes=((1,), 1), activation
     plt.show()
 
 
-def logreg_different_activations(D_train, D_test, opts, eta_range):
-    ACCs = [None]*len(opts)
-
+def logreg_different_activations(D_train, D_test, eta_range, opts, labels, filename=None):
     etas = np.linspace(*eta_range)
 
+    fig, ax = plt.subplots()
     for i, opt in enumerate(opts):
-        ACC = np.zeros_like(eta_range)
+        ACC = np.zeros_like(etas)
         for j, eta in enumerate(etas):
-            opt.params["eta"] = eta
-            
+            opt.params["eta"] = lambda it: eta
+            clf = LogReg().fit(D_train, opt)
+            ACC[j] = clf.accuracy(D_test.X, D_test.y)
+            print(clf.converged)
+        ax.plot(etas, ACC, label=labels[i])
 
-        ACCs[i] = ACC
+    ax.set(xlabel="Learning rate", ylabel="Accuracy")
+    ax.legend()
+    if filename: plt.savefig(plot_utils.make_figs_path(filename))
+    plt.show()
+
+
 def logreg_with_sklearn(D_train, D_test):
     from sklearn.linear_model import LogisticRegression
 
-    GD = GradientDescent(
-        method= "plain",
-        params= {"eta":0.1}, 
-        its=1000
-    )
+    GD = GradientDescent(method= "plain", params= {"eta":0.1},  its=1000)
 
     clf1 = LogReg().fit(D_train, optimizer=GD)
     clf2 = LogisticRegression(max_iter=10000).fit(D_train.X, D_train.y)
