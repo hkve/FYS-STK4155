@@ -1,9 +1,10 @@
 \comment{Suggestion: past tense}\\
 
 \subsection{Gradient Descent Analysis}
+    First we looked at our library of gradient descent methods to figure out what and how they worked. This with the goal of finding a descent recipe for optimising our neural networks down the line.
     
     \subsubsection{OLS Optimisation}
-        All plots regarding the optimisation of the OLS cost function are found in \cref{res:fig:lrates}. The best MSE scores and learning rates are tabulated in \cref{res:tab:OLS_MSEs}. We found that the none of the algorithms come really close to the analytical OLS solution, found by matrix inversion, with a validation MSE of $0.1176$. The best performing algorithms were SGD with Adam (MSE $0.1661 \pm 0.0021$), SGD with momentum (MSE $0.1729 \pm 0.0022$) and GD with momentum (MSE $0.1775 \pm 0.0026$).
+        All plots regarding the optimisation of the OLS cost function are found in \cref{res:fig:lrates}. The best MSE scores and learning rates are tabulated in \cref{res:tab:OLS_MSEs}. We found that the none of the algorithms come really close to the analytical OLS solution, found by matrix inversion, with a validation MSE of $0.1176$. The best performing algorithms were SGD with Adam (MSE $0.1660 \pm 0.0018$), SGD with momentum (MSE $0.1729 \pm 0.0022$) and GD with momentum (MSE $0.1775 \pm 0.0026$).
 
         In \cref{res:fig:lrate1} we see that both the non-stochastic and stochastic algorithms performed better when momentum was added, which helped avoid local minima to converge faster and prevent exploding gradients. Generally, the stochastic algorithms had tighter confidence intervals, signalling that they are not as sensitive to the initial conditions as the plain algorithms.
 
@@ -11,7 +12,7 @@
 
         Adding the tuning of the learning rate with AdaGrad, we see in \cref{res:fig:lrate3} a marked increase in stability. However, the algorithms struggled to converge, with the momentum based algorithms doing best, SGD slightly bettering the GD results. However, even AdaGrad SGD with momentum could not beat the ordinary momentum based GD and SGD algorithms.
 
-        Introducing RMSprop and Adam to tune the learning rate provided algorithms with a tunable learning rate that converged faster than AdaGrad, seen in \cref{res:fig:lrate4}. Instead of exploding, the MSE of RMSprop gradually increased from around $\eta=0.1$. Ultimately, it performed similarly to the AdaGrad algorithms, with an optimal MSE of 0.1863. The momentum based Adam algorithm performed the best, with an optimal MSE of $0.1661$; but performing well from very low $\eta$-values up to around $\eta=0.35$. After this point Adam was markedly less stable than the AdaGrad algorithms. Aside from converging faster, it was also notable that both RMSprop and Adam were much less sensitive to initial conditions, with generally much tighter confidence intervals.
+        Introducing RMSprop and Adam to tune the learning rate provided algorithms with a tunable learning rate that converged faster than AdaGrad, seen in \cref{res:fig:lrate4}. Instead of exploding, the MSE of RMSprop gradually increased from around $\eta=0.1$. Ultimately, it performed similarly to the AdaGrad algorithms, with an optimal MSE of 0.1863. The momentum based Adam algorithm performed the best, with an optimal MSE of $0.1660$; but performing well from very low $\eta$-values up to around $\eta=0.35$. After this point Adam was markedly less stable than the AdaGrad algorithms. Aside from converging faster, it was also notable that both RMSprop and Adam were much less sensitive to initial conditions, with generally much tighter confidence intervals.
 
         \begin{table}[!ht]
             \centering
@@ -23,11 +24,11 @@
                 Plain SGD & $0.1862 \pm 0.0028$ & 0.069 \\
                 Momentum SGD & $0.1729 \pm 0.0022$ & 0.12 \\
                 AdaGrad GD & $0.2135 \pm 0.012$ & 0.50 \\
-                AdaGrad Momentum GD & $0.1836 \pm 0.0024$ & 0.53 \\
+                AdaGrad Momentum GD & $0.1836 \pm 0.0024$ & 0.52 \\
                 AdaGrad SGD & $0.1906 \pm 0.0038$ & 0.50 \\
-                AdaGrad Momentum SGD & $0.1823 \pm 0.0020$ & 0.47 \\
-                RMSprop SGD & $0.1863 \pm 0.0027$ & 0.028 \\
-                Adam SGD & $0.1661 \pm 0.0021$& 0.30 \\
+                AdaGrad Momentum SGD & $0.1822 \pm 0.0020$ & 0.47 \\
+                RMSprop SGD & $0.1859 \pm 0.0027$ & 0.019 \\
+                Adam SGD & $0.1660 \pm 0.0018$& 0.32 \\
             \end{tabular}
             \caption{Table of the best validation MSE scores by GD algorithm, together with the learning rate that produced the best result.}
             \label[tab]{res:tab:OLS_MSEs}
@@ -50,14 +51,14 @@
             \begin{subfigure}{.49\textwidth}
                 \centering
                 \includegraphics[width=\linewidth]{learning_rates_adagrad}
-                \caption{The minimal MSEs by algorithm: AdaGrad GD 0.2135 ($\eta=0.50$), AdaGrad GD w/momentum 0.1836 ($\eta=0.53$), AdaGrad SGD 0.1906 ($\eta=0.50$), AdaGrad SGD w/momentum 0.1823 ($\eta=0.47$)}
+                \caption{The minimal MSEs by algorithm: AdaGrad GD 0.2135 ($\eta=0.50$), AdaGrad GD w/momentum 0.1836 ($\eta=0.52$), AdaGrad SGD 0.1906 ($\eta=0.50$), AdaGrad SGD w/momentum 0.1822 ($\eta=0.47$)}
                 \label[fig]{res:fig:lrate3}
             \end{subfigure}
             \hfill
             \begin{subfigure}{.49\textwidth}
                 \centering
                 \includegraphics[width=\linewidth]{learning_rates_tunable}
-                \caption{The minimal MSEs by algorithm: RMSprop SGD 0.1863 ($\eta=0.0027$), Adam SGD 0.1661 ($\eta=0.0021$), AdaGrad SGD 0.1906 ($\eta=0.49$), AdaGrad SGD w/momentum 0.1823 ($\eta=0.47$)}
+                \caption{The minimal MSEs by algorithm: RMSprop SGD 0.1859 ($\eta=0.019$), Adam SGD 0.1660 ($\eta=0.32$), AdaGrad SGD 0.1906 ($\eta=0.50$), AdaGrad SGD w/momentum 0.1823 ($\eta=0.46$)}
                 \label[fig]{res:fig:lrate4}
             \end{subfigure}
             \caption{Plots of the validation MSE of the parameters found from optimising the OLS cost function on Franke function data with $n=600$ data points. For the momentum methods we used $\gamma=0.8$, for RMSprop we used $\beta=0.9$ and for Adam we used $\beta_1=0.9, \beta_2=0.99$. The stochastic methods used a batch size of 200 and 500 epochs, while the standard GD did 500 iterations unless specified otherwise. Overlaid are 95\% confidence intervals based on optimising with five different starting points. Exploded gradients are clipped out of the plot. The analytical OLS solution achieved an MSE of 0.1377.}
@@ -71,9 +72,12 @@
 
         The best performing algorithm was again SGD with Adam to tune the learning rate (MSE of $0.1673 \pm 0.0020$), as before with the OLS cost function.
 
+        To see whether ridge actually had the potential to do a difference, we plotted the validation MSE of the analytical ridge solution as a function $\lambda$ against the analytical OLS solution in \cref{res:fig:ridge_ana}.
+
         \begin{table}[ht!]
             \centering
             \begin{tabular}{r|c|l|l}
+                Analytic & 0.1338 & - & 0.002 \\
                 Method & MSE & $\eta$ & $\lambda$ \\ \hline
                 Momentum GD & $0.1777 \pm 0.0025$ & 0.13 & $10^{-4}$ \\
                 Momentum SGD & $0.1747 \pm 0.0020$ & 0.12 & $10^{-8}$ \\
@@ -114,6 +118,13 @@
             \caption{}
             \label[fig]{res:fig:GDridge}
         \end{figure*}
+
+        \begin{figure}[ht!]
+            \centering
+            \includegraphics[width=\linewidth]{lmbda_plot_ana}
+            \caption{Plot of the validation MSE found from optimising our linear regression parameters to the ridge cost function as a function of the penalisation parameter $\lambda$.}
+            \label[fig]{res:fig:ridge_ana}
+        \end{figure}
 
 
 \subsection{Wisconsin Breast Cancer}
