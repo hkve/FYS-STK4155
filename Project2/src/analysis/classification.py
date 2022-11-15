@@ -23,9 +23,9 @@ def breast_cancer_data(random_state=321):
 def acc_eta_activation_functions(D_train, D_test):
     structures = [
         ((5, ), 1),
-        ((30, ), 1),
-        ((15, 15), 1),
-        ((10, 10, 10), 1)
+        ((10, ), 1), # 10
+        ((5, 5), 1),
+        ((5, 5, 5), 1)
     ]
     
     eta_ranges = [
@@ -47,7 +47,10 @@ def acc_eta_activation_functions(D_train, D_test):
         eta_range = eta_ranges[i]
         ylim = ylims[i]
         filename = f"clasf_activation_functions{i+1}"
-       
+        # filename = None
+
+        if not i in (1,3): continue
+        
         cu.varying_activation_functions(D_train, D_test, 
                                 activation_functions=["sigmoid", "tanh", "relu", "leaky_relu"],
                                 filename=filename,
@@ -95,5 +98,5 @@ def lmbda_eta_heatmaps(D_train, D_test):
 if __name__ == "__main__":
     D_train, D_test = breast_cancer_data()
 
-    # acc_eta_activation_functions(D_train, D_test)
-    lmbda_eta_heatmaps(D_train, D_test)
+    acc_eta_activation_functions(D_train, D_test)
+    # lmbda_eta_heatmaps(D_train, D_test)
