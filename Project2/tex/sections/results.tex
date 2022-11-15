@@ -61,7 +61,7 @@
                 \caption{The minimal MSEs by algorithm: RMSprop SGD 0.1859 ($\eta=0.019$), Adam SGD 0.1660 ($\eta=0.32$), AdaGrad SGD 0.1906 ($\eta=0.50$), AdaGrad SGD w/momentum 0.1823 ($\eta=0.46$)}
                 \label[fig]{res:fig:lrate4}
             \end{subfigure}
-            \caption{Plots of the validation MSE of the parameters found from optimising the OLS cost function on Franke function data with $n=600$ data points. For the momentum methods we used $\gamma=0.8$, for RMSprop we used $\beta=0.9$ and for Adam we used $\beta_1=0.9, \beta_2=0.99$. The stochastic methods used a batch size of 200 and 500 epochs, while the standard GD did 500 iterations unless specified otherwise. Overlaid are 95\% confidence intervals based on optimising with five different starting points. Exploded gradients are clipped out of the plot. The analytical OLS solution achieved an MSE of 0.1377.}
+            \caption{Plots of the validation MSE of the parameters found from optimising the OLS cost function on Franke function data with $n=600$ data points with a train test split of $\sfrac{3}{4}$. For the momentum methods we used $\gamma=0.8$, for RMSprop we used $\beta=0.9$ and for Adam we used $\beta_1=0.9, \beta_2=0.99$. The stochastic methods used a batch size of 200 and 500 epochs, while the standard GD did 500 iterations unless specified otherwise. Overlaid are 95\% confidence intervals based on optimising with five different starting points. Exploded gradients are clipped out of the plot. The analytical OLS solution achieved an MSE of 0.1377.}
             \label[fig]{res:fig:lrates}
         \end{figure*}
 
@@ -72,13 +72,13 @@
 
         The best performing algorithm was again SGD with Adam to tune the learning rate (MSE of $0.1673 \pm 0.0020$), as before with the OLS cost function.
 
-        To see whether ridge actually had the potential to do a difference, we plotted the validation MSE of the analytical ridge solution as a function $\lambda$ against the analytical OLS solution in \cref{res:fig:ridge_ana}.
+        To see whether ridge actually had the potential to do a difference, we plotted the validation MSE of the analytical ridge solution as a function $\lambda$ against the analytical OLS solution in \cref{res:fig:ridge_ana}. We see that the ridge solution does actually perform better than OLS between $\lambda \in [0.0001, 0.01]$, meaning that there is potential for improvement with the ridge penalisation.
 
         \begin{table}[ht!]
             \centering
             \begin{tabular}{r|c|l|l}
-                Analytic & 0.1338 & - & 0.002 \\
                 Method & MSE & $\eta$ & $\lambda$ \\ \hline
+                Analytic & 0.1338 & - & 0.002 \\
                 Momentum GD & $0.1777 \pm 0.0025$ & 0.13 & $10^{-4}$ \\
                 Momentum SGD & $0.1747 \pm 0.0020$ & 0.12 & $10^{-8}$ \\
                 AdaGrad Momentum SGD & $0.1822 \pm 0.0013$ & 0.48 & $10^{-3}$ \\
@@ -115,14 +115,14 @@
                 \caption{\textbf{SGD Adam}. Best MSE value was 0.1673 with $\lambda=10^{-5}, \eta=0.32$.}
                 \label[fig]{res:fig:adSGDridge}
             \end{subfigure}
-            \caption{}
+            \caption{Plots of the validation MSE of the parameters found from optimising the ridge cost function on Franke function data with $n=600$ data points with a train test split of $\sfrac{3}{4}$. For the momentum methods we used $\gamma=0.8$ and for Adam we used $\beta_1=0.9, \beta_2=0.99$. The stochastic methods used a batch size of 200 and 500 epochs, while the standard GD did 500 iterations unless specified otherwise. Overlaid are 95\% confidence intervals based on optimising with five different starting points. Exploded gradients are clipped out of the plot.}
             \label[fig]{res:fig:GDridge}
         \end{figure*}
 
         \begin{figure}[ht!]
             \centering
             \includegraphics[width=\linewidth]{lmbda_plot_ana}
-            \caption{Plot of the validation MSE found from optimising our linear regression parameters to the ridge cost function as a function of the penalisation parameter $\lambda$.}
+            \caption{Plot of the validation MSE found from optimising our linear regression parameters to the ridge cost function as a function of the penalisation parameter $\lambda$. The optimal MSE is 0.1338 with $\lambda = 0.002$.}
             \label[fig]{res:fig:ridge_ana}
         \end{figure}
 
