@@ -25,7 +25,8 @@
     \subsubsection{Wisconsin Breast Cancer data set}\label[sec]{breast_cancer_dataset}
         For regression problems, the Wisconsin Breast Cancer data set \cite{Dua:2019} was used. Tumour features are computed from digitized images, describing characteristics of the cell nuclei present in the image. In total there are $n = 569$ unique instances, where each instance has the respective tumour marked as either malignant ($M$) or benign ($B$). We aimed to classify the tumour as $M$ or $B$ based on 10 different attributes ranging from tumour radius to texture. Each of these 10 attributes were again split up into three different measurements, named mean, standard error and worst. The latter describes the mean of the three largest measurements. This data set serves a good real-world benchmarking set, containing not too many instances and no missing fields.  
 
-    \subsubsection{Data Scaling}
+    \subsubsection{Data Preparation}
+        All the data we handle, we will scale before using it for training and testing our algorithms. We will use the Standard scaling detailed in~\cite{Project1}. This ensures that features are all of the same order of magnitude, making the mean zero and std 1 for all of them individually. In the regression problems, we will also scale the observation data $\vec{y}$ too, whereas this is not done in the binary classification case.
 
 \subsection{Assessing Gradient Descent}
     \comment{Trying out the gradient descent methods and comparing them.}\\
@@ -37,11 +38,11 @@
         \begin{align}
             \msub{C}{OLS}(\vec{\theta}) = \frac{1}{n}\sum_{i=1}^n \pclosed{X_{i*}\vec{\theta} - y_i}^2,
         \end{align}
-        with a polynomial expansion of degree $5$ of the Franke function arguments $x,y$. We plot the MSE resulting from the predictions of the optimised parameters on the validation data as a function of learning rates. We looked at learning rates from close to zero to where `exploding gradients' occurred, which was different between the different algorithms.\footnote{This happens when the learning rate is large enough to overshoot the minima, and then start oscillating wildly away from the minima; blowing up.}
+        with a polynomial expansion of degree $5$ of the Franke function arguments $x,y$. We plot the MSE resulting from the predictions of the optimised parameters on the validation data as a function of learning rates. We looked at learning rates from close to zero to where `exploding gradients' occurred, which was different between the different algorithms.\footnote{Exploding gradients happen when the learning rate is large enough to overshoot the minima, and then start oscillating wildly away from the minima; blowing up.}
 
         Our preliminary analysis was a comparison of ordinary GD and stochastic GD, with and without momentum. We used 500 iterations for the ordinary GD, and 500 epochs with a batch size of 200 for the stochastic GD. For the momentum methods we used a hyperparameter value $\gamma=0.8$. Furthermore, we investigated the effect of increasing the number of epochs or batches with plain SGD, using 2000 epochs and a batch size of 50.
 
-        We then looked at algorithms that tune the learning rate, implementing ordinary and stochastic AdaGrad, again with and without momentum. Then we moved on to application of stochastic RMSprop and Adam, and compared how these do in comparison to AdaGrad with SGD.
+        Then we looked at algorithms that tune the learning rate, implementing ordinary and stochastic AdaGrad, again with and without momentum. Then we moved on to application of stochastic RMSprop and Adam, and compared how these do in comparison to AdaGrad with SGD.
 
 
     \subsubsection{Ridge Regression}
@@ -50,13 +51,13 @@
             \msub{C}{ridge}(\vec{\theta}) = \frac{1}{n}\sum_{i=1}^n \pclosed{X_{i*}\vec{\theta} - y_i}^2 + \lambda\norm[2]{\vec{\theta}}^2.
         \end{align}
 
-        We selected four momentum based algorithms from the OLS analysis to see how they responded to changing of learning rate and $\lambda$-parameter in fitting to the validation data. Again we used 100 iterations for the GD method, and 100 epochs with batch size 64 with the SGD methods. Varying $\lambda \in [10^{-8}, 10^1]$, we compared first with a fixed learning rate between GD and SGD with momentum ($\gamma=0.8$). Then we used a tunable learning rate and SGD with AdaGrad with momentum ($\gamma=0.8$) and finally Adam $(\beta_1=0.9, \beta_2=0.99)$.
+        We selected the four momentum based algorithms from the OLS analysis to see how they responded to changing of learning rate and $\lambda$-parameter in predicting the validation data. Again we used 500 iterations for the GD method, and 500 epochs with batch size 200 with the SGD methods. Varying $\lambda \in [10^{-8}, 10^1]$, we compared first with a fixed learning rate between GD and SGD with momentum ($\gamma=0.8$). Then we used a tunable learning rate and SGD with AdaGrad with momentum ($\gamma=0.8$) and finally Adam $(\beta_1=0.9, \beta_2=0.99)$.
 
     \subsubsection{Initialisation}
         GD methods are quite sensitive to the initial parameters from which to descend, so made sure to initialise all the methods from the same point when comparing performance. We always initialised with randomly drawn parameter values from the standard normal distribution with mean zero and std one. To further combat the sensitivity to initial conditions, we did all the descents from five different starting points, and computed the average MSE scores we got.
         \comment{Comment on the randn initialisation and scaling of the data.}\\
 
-\subsection{Creating a Neural Network and regression problems}
+\subsection{Creating a Neural Network and Regression Problems}
     In this part of our analysis we will create an FFNN with a flexible number of hidden layers and nodes. Subsequently we will train and test this network on the Nicaraguan terrain data from Project 1 and compare its performance with the results from the linear regression methods (OLS and Ridge) employed in that project. 
 
     \comment{Discuss the choice of cost function in the NN}
@@ -64,7 +65,7 @@
     We start by implementing the sigmoid activation function in the hidden layers. As 
 
     
-\subsection{Classification problems}
+\subsection{Classification Problems}
     For our case using the Wisconsin Breast data set presented in \cref{breast_cancer_dataset}, we aimed to classify either $M$ or $B$. These categories are mutually exclusive, thus determining $M$ or not $M$ is sufficient (i.e. $\mathcal{Q} = \{ M, \neg M \}$). This gave us a binary problem, represented with $y_i \in \{ 1, 0 \}$ where $y_i = 1$ implies $M$ and $y_i = 0$ not $M$.
 
     To measure the goodness of fit in for our classification problems, we used the \textit{accuracy} score. This metric simply counts the number correctly classified cases, divided by the total number of cases:
@@ -81,7 +82,7 @@
     \subsubsection*{Logistic Regression}
     To be continued ...
 
-    \subsubsection*{Neural Network approach}
+    \subsubsection*{Neural Network Approach}
     As a loss function suitable for classification problems, the Binary Cross Entropy (BCE) \cite{BCE} was used:
     \begin{align}
         \msub{C}{BCE} = -\frac{1}{n}\sum_{i=1}^{n} y_i \log{\hat{p}_i} + (1-y_i) \log{(1-\hat{p}_i)},
