@@ -156,16 +156,16 @@ We will assume that the measurements $y_i$ are generated from an exact function 
     \subsubsection{Universal Approximation Theorem}
 
 \subsection{Classification}
-    Instead of predicting targets in a continuous domain ($y_i \in \mathbb{R}$), we aimed to put the target $y_i$ in a specific class ($y_i \in \mathcal{Q}$), where $\mathcal{Q}$ is the set of possible outcomes. This is named \textit{regression}, where in the following we will only consider binary cases. This means we will try to classify mutually exclusive properties, that is either we have the outcome $O$ or not the outcome $O$ ($\mathcal{Q} \in \{O, \neg O\}$). We will label these as $O = 1$ and $\neg O = 0$.
+    Instead of predicting targets in a continuous domain ($y_i \in \mathbb{R}$), we aimed to put the target $y_i$ in a specific class ($y_i \in \mathcal{Q}$), where $\mathcal{Q}$ is the set of possible outcomes. This is named \textit{regression} \comment{Is this perhaps a bit confusing nomenclature? -\Carl}, where in the following we will only consider binary cases. This means we will try to classify mutually exclusive properties, that is either we have the outcome $O$ or not the outcome $O$ ($\mathcal{Q} = \{O, \neg O\}$). We will label these as $O = 1$ and $\neg O = 0$.
 
-    Two different methods for classification will be introduced here. Firstly we introduce \textit{logistic regression}, maybe the most common method in the domain of classification. In addition, under some restrictions, our neural network can be used for classification problems. Both of these models have an output on the domain $p(x_i) \in [0,1]$ which we will interpret as the probability of the outcome $y_i = 1$. We will classify the data point $x_i$ as $\hat{y}_i = 1$ if $p(x_i) > \tau$ and $\hat{y}_i = 0$ if $p(x_i) < \tau$, where $\tau$ is the \textit{threshold}, a priori set to $\tau = 0.5$. 
+    Two different methods for classification will be introduced here. Firstly we will look at \textit{logistic regression}, maybe the most common method in the domain of classification. In addition, under some restrictions, our neural network can be used for classification problems. Both of these models have an output $p(x_i)$ on the domain $[0,1]$, which we will interpret as the probability of the outcome $y_i = 1$. We will classify the data point $x_i$ as $\hat{y}_i = 1$ if $p(x_i) > \tau$ and $\hat{y}_i = 0$ if $p(x_i) < \tau$, where $\tau$ is the \textit{threshold}, a priori set to $\tau = 0.5$. 
 
     \subsubsection{Logistic regression}
         For comparison with our neural network we introduce maybe the most common classification method there is, \textit{logistic regression}. One might be confused by inclusion of the word \textit{regression} in the name of a classification method. This comes from performing a fit to the \textit{log-odds} using a function linear in the input variables:
         \begin{align*}
-            \log(\frac{p(x_i)}{1-p(x_i)}) = x_i^T \vec{\theta}
+            \log(\frac{p(x_i)}{1-p(x_i)}) = x_i^T \vec{\theta},
         \end{align*}
-        Where we have defined $p(x_i) \equiv p(y_i = 1 | x_i, \vec{\theta})$, the probability that we guess $\hat{y}_i = 1$ given a data point $x_i$ and parameters $\vec{\theta}$. Solving the above expression for $p(x_i)$ yields the Sigmoid function from \cref{app:activation_functions} evaluated in $x_i^T \vec{\theta}$.
+        where we have defined $p(x_i) \equiv p(y_i = 1 | x_i, \vec{\theta})$, the probability that we guess $\hat{y}_i = 1$ given a data point $x_i$ and parameters $\vec{\theta}$. Solving the above expression for $p(x_i)$ yields the Sigmoid function from \cref{app:activation_functions} evaluated in $x_i^T \vec{\theta}$. \comment{I might be tripping, but I can't see where the sign in the exponent comes from. -\Carl}
         
         \begin{align*}
             p(x_i) = \sigma(x_i^T \vec{\theta}) = \frac{1}{1+\exp{-x_i^T\vec{\theta}}}
@@ -173,9 +173,9 @@ We will assume that the measurements $y_i$ are generated from an exact function 
         Following the approach from \cite{Project1}, we have the likelihood for a Binomial distribution:      
 
         \begin{align*}
-            P(\vec{y}|X,\vec{\vec{\theta}}) = \prod_{i = 1}^{n} \sigma(X_{ia} \theta_a)^{y_i}[1-\sigma(X_{ia}\theta_a)]^{1 - y_i}
+            P(\vec{y}|X,\vec{\vec{\theta}}) = \prod_{i = 1}^{n} \sigma(X_{ia} \theta_a)^{y_i}[1-\sigma(X_{ia}\theta_a)]^{1 - y_i},
         \end{align*}
-        The cost function then follows from taking logarithm of the likelihood, presented with an overall negative sign giving a minimisation problem of the parameters $\vec{\theta}$. This is in the literature often called the \textit{Binary Cross Entropy} (BCE) cost function \cite{BCE}.  
+        where a sum over $a$ is implied. The cost function then follows from taking logarithm of the likelihood, presented with an overall negative sign giving a minimisation problem of the parameters $\vec{\theta}$. In the literature this is often called the \textit{Binary Cross Entropy} (BCE) cost function \cite{BCE}.  
 
         \begin{align}
             &\msub{C}{BCE}(\vec{\theta}) = -\log P(\vec{y}|X,\vec{\vec{\theta}}) \nonumber\\ 
@@ -188,7 +188,7 @@ We will assume that the measurements $y_i$ are generated from an exact function 
             \pdv{\theta_b} \msub{C}{BCE} &= - \sum_{i = 1}^{n} y_i (1-\sigma(X_{ia} \theta_a))X_{ib} - (1-y_i)\sigma(X_{ia} \theta_a)X_{ib} \\
             &= \sum_{i=1}^n (\sigma(X_{ia}\theta_a) - y_i)X_{ib}
         \end{align*}
-        Finally, with $\vec{p}_i = \sigma(X_{ia}\theta_a)$, we can express the gradient of the BCE cost function in vector notation.
+        Finally, with $p_i = \sigma(X_{ia}\theta_a)$, we can express the gradient of the BCE cost function in vector notation.
         \begin{align}
             \nabla_{\vec{\theta}} \msub{C}{BCE}(\vec{\theta}) = X^T (\vec{p} - \vec{y}) 
             \label[eq]{the:logreg_gradient}
