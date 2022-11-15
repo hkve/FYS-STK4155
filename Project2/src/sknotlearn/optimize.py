@@ -59,6 +59,7 @@ class GradientDescent:
             args (tuple, optional): arguments to be passed to grad-function. Defaults to ().
         """
         # assert that grad works as intended
+        print(self.params["eta"](0))
         grad0 = grad(x0, *args)
         assert grad0.shape == x0.shape, f"grad-function returns array of shape {grad0.shape} instead of shape {x0.shape}."
         del grad0
@@ -71,11 +72,11 @@ class GradientDescent:
             self._it += 1
             g = grad(self.x, *args)
             if isfinite(np.abs(g), threshold=self.threshold):
-                self.converged = False
+                self.converged = 0
                 return self.x
             self.x = self._update_rule(self, self.x, g)
         # print(self.method, self.x)
-        self.converged = True
+        self.converged = 1
         return self.x
 
     def _plain_init(self, x0: np.ndarray) -> None:
