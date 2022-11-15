@@ -98,5 +98,16 @@ def lmbda_eta_heatmaps(D_train, D_test):
 if __name__ == "__main__":
     D_train, D_test = breast_cancer_data()
 
-    acc_eta_activation_functions(D_train, D_test)
+    # acc_eta_activation_functions(D_train, D_test)
     # lmbda_eta_heatmaps(D_train, D_test)
+
+    from sknotlearn.logreg import LogisticRegression
+    from sknotlearn.optimize import GradientDescent
+
+    GD = GradientDescent("momentum", {"eta": 0.08, "gamma": 0.8}, its=100)
+    reg = LogisticRegression().fit(D_train, optimizer=GD)
+
+    pred, prob = reg.classify(D_test.X, return_prob=True)
+
+    for a,b, c, in zip(pred, D_test.y, prob):
+        print(a, b, c)

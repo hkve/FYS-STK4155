@@ -14,22 +14,22 @@ class LogisticRegression:
         self.optimizer = optimizer
         
         if not x0:
-            x0 = np.random.normal(0,1, Data.n_features)
+            x0 = np.random.normal(0,1, data.n_features)
         
         self.coef = self.optimizer.call(
             grad = self.grad,
-            x0=x0
-            args=(data, lmbda)
-            all_idcs=np.arange(D.n_points)
+            x0=x0,
+            args=(data, self.lmbda),
+            #all_idcs=np.arange(data.n_points)
         )
 
         return self
 
     def predict(self, X:np.ndarray, coef=None) -> np.ndarray:
-        if not coef:
+        if coef is None:
             coef = self.coef
 
-        return 1/(1+np.exp( X @ coef ))
+        return 1/(1+np.exp( - X @ coef ))
 
     def classify(self, X:np.ndarray, return_prob:bool=False):
         proba = self.predict(X)
@@ -42,7 +42,7 @@ class LogisticRegression:
         else:
             return y_pred
 
-    def accuracy(self, X:np.ndarrau, y:np.ndarray):
+    def accuracy(self, X:np.ndarray, y:np.ndarray):
         n = len(y)
         y_pred = self.classify(X)
         return np.sum(y_pred == y)/n
