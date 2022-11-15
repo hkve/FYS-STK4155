@@ -95,5 +95,5 @@ def lmbda_eta_heatmaps(D_train, D_test):
 if __name__ == "__main__":
     D_train, D_test = breast_cancer_data()
 
-    acc_eta_activation_functions(D_train, D_test)
-    # lmbda_eta_heatmaps(D_train, D_test)
+    # acc_eta_activation_functions(D_train, D_test)
+    lmbda_eta_heatmaps(D_train, D_test)

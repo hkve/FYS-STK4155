@@ -112,13 +112,19 @@ def lmbda_eta_heatmap(D_train, D_test, etas, lmbdas, nodes=((1,), 1), activation
 
         ACC_grid.append(ACC_list)
         
+    ACC_grid = np.array(ACC_grid)
+
     fig, ax = plt.subplots()
     sns.heatmap(ACC_grid, annot=True, cmap=plot_utils.cmap, ax=ax, cbar_kws={'label':'Accuracy'}, fmt=".3")
     
     arg_best_ACC = np.unravel_index(np.nanargmax(ACC_grid), np.shape(ACC_grid))
-    n,m = arg_best_ACC
-    print(f"Best ACC = {ACC_grid[n][m]}, lmbda = {lmbdas[n]}, eta = {etas[m]}")
-    ax.add_patch(plt.Rectangle((arg_best_ACC[1], arg_best_ACC[0]), 1, 1, fc='none', ec='red', lw=5, clip_on=False))
+    ib, jb = arg_best_ACC
+    ij_bests = np.argwhere(ACC_grid==ACC_grid[ib,jb])
+
+    for ij in ij_bests:
+        i, j = ij
+        print(f"Best ACC = {ACC_grid[i][j]}, lmbda = {lmbdas[i]:.4e}, eta = {etas[j]:.4e}")
+        ax.add_patch(plt.Rectangle((j, i), 1, 1, fc='none', ec='red', lw=5, clip_on=False))
 
     # Set xylabels and ticks. This code is ronaldo, but it works.
     ax.set_xlabel("Learning rate")

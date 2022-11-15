@@ -131,14 +131,14 @@
     \begin{figure*}
         \begin{subfigure}{.49\textwidth}
             \includegraphics[width=\linewidth]{clasf_activation_functions1.pdf}
-            \caption{$\eta \in [ 0.01, 0.4 ]$ with $n = 50$ points. One hidden layer with a single node}
+            \caption{$\eta \in [ 0.01, 0.4 ]$ with $n = 50$ points. One hidden layer with five nodes}
             \label[fig]{res:fig:a}
         \end{subfigure}
         \hfill 
         \begin{subfigure}{.49\textwidth}
             \centering
             \includegraphics[width=\linewidth]{clasf_activation_functions2.pdf}
-            \caption{$\eta \in [ 0.001, 0.01 ]$ with $n = 50$ points. One hidden layer 30 nodes}
+            \caption{$\eta \in [ 0.001, 0.01 ]$ with $n = 50$ points. One hidden layer with 30 nodes}
             \label[fig]{res:fig:b}
         \end{subfigure}
         \hfill 
@@ -155,4 +155,35 @@
             \caption{$\eta \in [ 0.001, 0.01 ]$ with $n = 50$ points. Three hidden layers with ten nodes each}
             \label[fig]{res:fig:d}
         \end{subfigure}
+    \end{figure*}
+
+    \begin{figure*}
+        \begin{subfigure}{.49\textwidth}
+            \includegraphics[width=\linewidth]{lmbda_lr_struct0_sigmoid.pdf}
+            \caption{$\lambda\eta$, one layer five nodes, sigmoid}
+            \label[fig]{res:fig:e}
+        \end{subfigure}
+        \hfill
+        \begin{subfigure}{.49\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{lmbda_lr_struct0_tanh.pdf}
+            \caption{$\lambda\eta$, one layer five nodes, tanh}
+            \label[fig]{res:fig:f}
+        \end{subfigure}
+        \hfill
+        \begin{subfigure}{.49\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{lmbda_lr_struct1_sigmoid.pdf}
+            \caption{$\lambda\eta$, two layers five nodes each, sigmoid}
+            \label[fig]{res:fig:g}
+        \end{subfigure}
+        \hfill
+        \begin{subfigure}{.49\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{lmbda_lr_struct1_tanh.pdf}
+            \caption{$\lambda\eta$, two layers five nodes each, tanh}
+            \label[fig]{res:fig:h}
+        \end{subfigure}
+        \caption{}
+        \label[fig]{res:fig:efgh}
     \end{figure*}
