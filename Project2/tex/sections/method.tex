@@ -1,7 +1,6 @@
 \comment{Suggestion: past tense NB! THIS IS A CHANGE}\\
 \subsection{Datasets}
     \comment{Here we write about the datasets we use, as before. Maybe reference project 1 about Franke function?}\\
-    \comment{Mention data scaling.}\\
     We will use some of the same datasets as in Project 1~\cite{Project1}, namely the Franke function data and the Nicaraguan terrain data.
     \subsubsection{Franke Function}
         The Franke function $F: \mathbb{R}^2 \to \mathbb{R}$ is a two-dimensional scalar function made up of four Gaussian functions.
@@ -29,8 +28,6 @@
         All the data we handle, we will scale before using it for training and testing our algorithms. We will use the Standard scaling detailed in~\cite{Project1}. This ensures that features are all of the same order of magnitude, making the mean zero and std 1 for all of them individually. In the regression problems, we will also scale the observation data $\vec{y}$ too, whereas this is not done in the binary classification case.
 
 \subsection{Assessing Gradient Descent}
-    \comment{Trying out the gradient descent methods and comparing them.}\\
-    \comment{I have imported data and parameters at random by trial. We can discuss the choices later}\\
     Our first analysis was a comparison of the various GD algorithms, as these make the basis for our neural network optimisation. We used the GD algorithms to optimise OLS and Ridge cost functions~\cite{Project1}, training them on the Franke function with 600 data points, with a train-test split of $\sfrac{3}{4}$, and a noise term added with std $\sigma=0.1$. This was done in anticipation of applying our Neural Network on terrain data, which the Franke function imitates.
 
     \subsubsection{OLS Regression}
@@ -54,8 +51,7 @@
         We selected the four momentum based algorithms from the OLS analysis to see how they responded to changing of learning rate and $\lambda$-parameter in predicting the validation data. Again we used 500 iterations for the GD method, and 500 epochs with batch size 200 with the SGD methods. Varying $\lambda \in [10^{-8}, 10^1]$, we compared first with a fixed learning rate between GD and SGD with momentum ($\gamma=0.8$). Then we used a tunable learning rate and SGD with AdaGrad with momentum ($\gamma=0.8$) and finally Adam $(\beta_1=0.9, \beta_2=0.99)$.
 
     \subsubsection{Initialisation}
-        GD methods are quite sensitive to the initial parameters from which to descend, so made sure to initialise all the methods from the same point when comparing performance. We always initialised with randomly drawn parameter values from the standard normal distribution with mean zero and std one. To further combat the sensitivity to initial conditions, we did all the descents from five different starting points, and computed the average MSE scores we got.
-        \comment{Comment on the randn initialisation and scaling of the data.}\\
+        GD methods are quite sensitive to the initial parameters from which to descend, so made sure to initialise all the methods from the same point when comparing performance. We always initialised with randomly drawn parameter values from the standard normal distribution with mean zero and std one. Since we always deal with scaled features, we can safely initialise the parameters with a standard normal distribution without fear of the dimension of the parameters being terribly out of sorts. To further combat the sensitivity to initial conditions, we did all the descents from five different starting points, and computed the average MSE scores we got.
 
 \subsection{Creating a Neural Network and Regression Problems}
     In this part of our analysis we will create an FFNN with a flexible number of hidden layers and nodes. Subsequently we will train and test this network on the Nicaraguan terrain data from Project 1 and compare its performance with the results from the linear regression methods (OLS and Ridge) employed in that project. 
@@ -79,10 +75,10 @@
     \end{align}
     where $I$ is the indicator function. We note that if all cases are classified correctly, the sum will evaluate to $n$ and if all are classified wrongly, it will evaluate to 0. Thus, the accuracy is bounded by $0 \leq A(y_i, \hat{y}_i) \leq 1$.
 
-    \subsubsection*{Logistic Regression}
+    \subsubsection{Logistic Regression}
     To be continued ...
 
-    \subsubsection*{Neural Network Approach}
+    \subsubsection{Neural Network Approach}
     As a loss function suitable for classification problems, the Binary Cross Entropy (BCE) \cite{BCE} was used:
     \begin{align}
         \msub{C}{BCE} = -\frac{1}{n}\sum_{i=1}^{n} y_i \log{\hat{p}_i} + (1-y_i) \log{(1-\hat{p}_i)},
