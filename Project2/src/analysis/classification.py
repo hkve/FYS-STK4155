@@ -5,6 +5,7 @@ import numpy as np
 import context
 from sknotlearn.datasets import load_BreastCancer
 from sknotlearn.data import Data
+from sknotlearn.optimize import GradientDescent, SGradientDescent
 
 def breast_cancer_data(random_state=321):
     D = load_BreastCancer()
@@ -48,8 +49,6 @@ def acc_eta_activation_functions(D_train, D_test):
         ylim = ylims[i]
         filename = f"clasf_activation_functions{i+1}"
         # filename = None
-
-        if not i in (1,3): continue
         
         cu.varying_activation_functions(D_train, D_test, 
                                 activation_functions=["sigmoid", "tanh", "relu", "leaky_relu"],
@@ -58,20 +57,6 @@ def acc_eta_activation_functions(D_train, D_test):
                                 nodes=nodes,
                                 ylim=ylim
                             )
-
-
-def test_logreg():
-    from sklearn.linear_model import LogisticRegression
-    D = load_BreastCancer()
-
-    D_train, D_test = D.train_test_split(ratio=3/4, random_state=321)
-    clf = LogisticRegression(max_iter=10000).fit(D_train.X, D_train.y)
-
-    y_pred = clf.predict(D_test.X)
-    
-
-    acc = np.sum(y_pred == D_test.y)/len(y_pred)
-    print(acc)
 
 
 
@@ -95,19 +80,27 @@ def lmbda_eta_heatmaps(D_train, D_test):
             filename = f"lmbda_lr_struct{i}_{af}"
             cu.lmbda_eta_heatmap(D_train, D_test, eta_range, lmbda_range, nodes=nodes, activation_hidden=af, filename=filename)
 
+def logreg_different_activations(D_train, D_test):
+    max_iter = 100
+    batch_size = 200
+    eta_range = (.1,1, 20)
+
+    GD = GradientDescent("plain", dict(eta=0.), its=max_iter)
+    mGD = GradientDescent("momentum", dict(gamma=0.8, eta=0.), its=max_iter)
+    SGD = SGradientDescent("plain", dict(eta=0.), epochs=max_iter, batch_size=batch_size)
+    adSGD = SGradientDescent("adam", dict(eta=0., beta1=0.9, beta2=0.99), epochs=max_iter, batch_size=batch_size)
+    
+    labels = ["GD", "MGD", "SGD", "AdaSGB"]
+    opts = [GD, mGD, SGD, adSGD]
+
+    cu.logreg_different_activations(D_train, D_test, eta_range, opts, labels)
+
 if __name__ == "__main__":
     D_train, D_test = breast_cancer_data()
-
     # acc_eta_activation_functions(D_train, D_test)
     # lmbda_eta_heatmaps(D_train, D_test)
 
-    from sknotlearn.logreg import LogisticRegression
-    from sknotlearn.optimize import GradientDescent
-
-    GD = GradientDescent("momentum", {"eta": 0.08, "gamma": 0.8}, its=100)
-    reg = LogisticRegression().fit(D_train, optimizer=GD)
-
-    pred, prob = reg.classify(D_test.X, return_prob=True)
-
-    for a,b, c, in zip(pred, D_test.y, prob):
-        print(a, b, c)
+    # cu.lmbda_eta_heatmap_sklearn(D_train, D_test)
+    # cu.logreg_with_sklearn(D_train, D_test)
+    # logreg_different_activations(D_train, D_test)
+    cu.lmbda_eta_heatmap_sklearn(D_train, D_test, (0.001, 0.5, 5), lmbdas=(-6,0,5), filename="lmbda_lr_struct1_sigmoid_sklearn")

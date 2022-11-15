@@ -89,7 +89,7 @@ def activation_func_2d():
     # plt.savefig(make_figs_path("c_activations_2d_data.pdf"))
     plt.show()
 
-def plot_NN_vs_test(D_train, D_test, eta, nodes, batch_size, epochs=500, random_state=321, filename_test=None, filename_pred=None):
+def plot_NN_vs_test(D_train, D_test, eta, nodes, batch_size, epochs=500, lmbda=None, random_state=321, filename_test=None, filename_pred=None):
     """Function for training an NN and plotting the true terrain data and the NN predicted terrain data for qualitative comparison. Will also print the MSE. The optimal parameters are likely already found in another process. 
 
     Args:
@@ -116,7 +116,7 @@ def plot_NN_vs_test(D_train, D_test, eta, nodes, batch_size, epochs=500, random_
         nodes, 
         random_state=random_state,
         cost_func="MSE",
-        # lmbda=0.001,
+        lmbda=lmbda,
         activation_hidden="sigmoid",
         activation_output="linear"
         )
@@ -290,8 +290,14 @@ def regularization(D_train, D_test, nodes, layers, eta, lmbdas, batch_size, epoc
         random_state=random_state
     )
 
+    if not 0 in lmbdas:
+        lmbdas_ = np.append(None, lmbdas)
+    
     MSE_list = []
-    for lmbda in lmbdas:
+    for i, lmbda in enumerate(lmbdas_):
+        #To keep track in the terminal: 
+        print(fr"lambda nr. {i+1}/{len(lmbdas_)}")
+
         NN = NeuralNetwork(
             SGD, 
             nodes_, 
@@ -304,23 +310,33 @@ def regularization(D_train, D_test, nodes, layers, eta, lmbdas, batch_size, epoc
         NN.train(D_train, trainsize=1)
         y_pred = NN.predict(D_test.X)
 
-        MSE_list.append(MSE(D_test.y, y_pred))
+        if lmbda is None:
+            OLS = MSE(D_test.y, y_pred)  
+        else: 
+            MSE_list.append(MSE(D_test.y, y_pred))
+
+    #Remember to print best MSE and its lambda 
+    print(fr"Best MSE: {np.nanmin(MSE_list)}" + "\n" + fr"corresponding lambda: {lmbdas[np.nanargmin(MSE_list)]}")
+    
+    OLS = OLS * np.ones_like(MSE_list)
     
     fig, ax = plt.subplots()
-    ax.plot(np.log10(lmbdas), MSE_list)
+    ax.plot(np.log10(lmbdas), OLS, "--", color="grey", label="OLS solution")
+    ax.plot(np.log10(lmbdas), MSE_list, label="ridge solution")
+    ax.set_xlabel(r"$\log_{10} \lambda $")
+    ax.set_ylabel(r"Validation MSE")
+    ax.set_ylim(0)
+    ax.legend()
     if filename: 
         plt.savefig(make_figs_path(filename))
     else:
         plt.show()
-    
-    #Add labels and legend plis
-    
-
 
 def MSE(y_test, y_pred):
     assert y_test.shape == y_pred.shape, f"y and y_pred have different shapes. {y_test.shape =}, {y_pred.shape =}"
     return np.mean((y_test - y_pred)**2)
 
+def R2(y_test, y_pred)
 
 
 if __name__ == "__main__":
@@ -331,12 +347,10 @@ if __name__ == "__main__":
     D_train, D_test = D.train_test_split(ratio=3/4, random_state=42)
     D_train = D_train.scaled(scheme="Standard")    
     D_test = D_train.scale(D_test)
-    y_test = D_test.y  
+    y_test = D_test.y 
+
 
     #Heatmap:
-    # nodes = [100]
-    # etas = [0.001]
-    # layers = [3]
     # nodes = [2, 10, 20, 50, 100, 200]
     # etas = [0.0005, 0.001, 0.01, 0.06, 0.08, 0.1, 0.8]
     # # layers = [1,3,5]
@@ -354,29 +368,7 @@ if __name__ == "__main__":
     #         filename=filename
     #     )
 
-    #Plot terrain data:
-    # NB: Seems like 500 is just a 'lucky' number of epochs; should maybe have more epochs to get a more stable MSE?.
-    # epochs_ = np.arange(100, 1000, 100)
-    # epochs_ = [500]
-    # for e in epochs_:
-    #     print(f"epochs = {e}")
-    #     nodes = ((50,)*3, 1)
-    #     eta = 0.001
-    #     plot_NN_vs_test(
-    #         D_train=D_train, 
-    #         D_test=D_test, 
-    #         eta=eta, nodes=nodes, 
-    #         epochs=e, 
-    #         batch_size=batch_size,
-    #         # filename_test="terrain_test.pdf", 
-    #         # filename_pred="terrain_predicted.pdf"
-    #     )
-
-
     #Scikit-learn
-    # nodes = [100]
-    # etas = [0.001]
-    # layers = [3]
     # nodes = [2, 10, 20, 50, 100, 200]
     # etas = [0.0005, 0.001, 0.01, 0.06, 0.08, 0.1, 0.8]
     # layers = [1,3,5]
@@ -392,27 +384,43 @@ if __name__ == "__main__":
     #         activation="logistic",
     #         filename=filename,  
     #     )
- 
-
     #Believe there are too few datapoints to implement early stopping (not enough validation data to decide when to actually stop)
 
     #Regularization 
-    lmbdas = np.logspace(-9, -1, 50)
-    nodes = 200
-    eta = 0.001
-    layers = 5
-    regularization(
-        D_train, 
-        D_test, 
-        nodes, 
-        layers, 
-        eta, 
-        lmbdas, 
-        batch_size, 
-        epochs=500, 
-        random_state=321, 
-        filename="lmbdas_NN_reg.pdf"
-    )
+    # lmbdas = np.logspace(-9, -1, 50)
+    # nodes = 200
+    # eta = 0.001
+    # layers = 5
+    # regularization(
+    #     D_train, 
+    #     D_test, 
+    #     nodes, 
+    #     layers, 
+    #     eta, 
+    #     lmbdas, 
+    #     batch_size, 
+    #     epochs=500, 
+    #     random_state=321, 
+    #     filename="lmbdas_NN_reg.pdf"
+    # ) 
+
+
+    #Plot terrain data:
+    # nodes = ((200,)*5, 1)
+    # lmbda = 7.906043210907685e-05
+    # eta = 0.001
+    # plot_NN_vs_test(
+    #     D_train=D_train, 
+    #     D_test=D_test, 
+    #     eta=eta, 
+    #     lmbda=lmbda,
+    #     nodes=nodes, 
+    #     epochs=epochs, 
+    #     batch_size=batch_size,
+    #     filename_test="terrain_test.pdf", 
+    #     filename_pred="terrain_predicted.pdf"
+    # )
+
 
 
     # Check activation functions:
