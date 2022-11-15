@@ -1,2 +1,16 @@
 \comment{Suggestion: present/past tense}\\
-Discussion goes here
+
+\subsection{Gradient Descent Methods}
+    \comment{Something general}\\
+    \comment{C'mon Carl, pick up the energy, -\Carl}\\
+
+    \subsubsection{Ordinary Gradient Descent}
+
+    \subsubsection{Stochastic Gradient Descent}
+
+    \subsubsection{AdaGrad methods}
+        With the AdaGrad algorithms, the diagonal of $G$ accumulates every iteration, adding $g_i^2$, meaning that the learning rates $\eta \propto G^{-\sfrac{1}{2}}$ will only decrease. This results in AdaGrad `turning off' the descent, effectively implementing a cap to the distance it will travel in parameter space. This in turn makes it very safe, combating exploding gradients very effectively, as evidenced in \cref{res:fig:lrate3}. However, it also makes it more sensitive to the initialisation of the parameters: If it starts far from a `good' minimum in parameter space, it will struggle to reach it before turning off.
+
+    \subsubsection{RMSprop and Adam}
+
+    \subsubsection{Ridge Penalisation on Linear Regression}
