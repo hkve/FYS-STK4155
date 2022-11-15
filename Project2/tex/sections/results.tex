@@ -232,60 +232,61 @@
     \begin{figure*}
         \begin{subfigure}{.49\textwidth}
             \includegraphics[width=\linewidth]{clasf_activation_functions1.pdf}
-            \caption{$\eta \in [ 0.01, 0.4 ]$ with $n = 50$ points. One hidden layer with five nodes}
-            \label[fig]{res:fig:a}
+            \caption{Network \network{1}{5}, plotted for $\eta \in [ 0.01, 0.4 ]$ using 8 linearly spaced points}
+            \label[fig]{res:fig:clf_af_N_1_5}
         \end{subfigure}
         \hfill 
         \begin{subfigure}{.49\textwidth}
             \centering
             \includegraphics[width=\linewidth]{clasf_activation_functions2.pdf}
-            \caption{$\eta \in [ 0.001, 0.01 ]$ with $n = 50$ points. One hidden layer with ten nodes}
-            \label[fig]{res:fig:b}
+            \caption{Network \network{1}{10}, plotted for $\eta \in [ 0.001, 0.01 ]$ using 8 linearly spaced points}
+            \label[fig]{res:fig:clf_af_N_1_10}
         \end{subfigure}
         \hfill 
         \begin{subfigure}{.49\textwidth}
             \centering
             \includegraphics[width=\linewidth]{clasf_activation_functions3.pdf}
-            \caption{$\eta \in [ 0.001, 0.01 ]$ with $n = 50$ points. Two hidden layers with five nodes each}
-            \label[fig]{res:fig:c}
+            \caption{Network \network{2}{5}, plotted for $\eta \in [ 0.001, 0.01 ]$ using 8 linearly spaced points}
+            \label[fig]{res:fig:clf_af_N_2_5}
         \end{subfigure}
         \hfill 
         \begin{subfigure}{.49\textwidth}
             \centering
             \includegraphics[width=\linewidth]{clasf_activation_functions4.pdf}
-            \caption{$\eta \in [ 0.001, 0.01 ]$ with $n = 50$ points. Three hidden layers with five nodes each}
-            \label[fig]{res:fig:d}
+            \caption{Network \network{3}{5}, plotted for $\eta \in [ 0.001, 0.01 ]$ using 8 linearly spaced points}
+            \label[fig]{res:fig:clf_af_N_3_5}
         \end{subfigure}
-        \caption{Plots of the accuracy score against learning rate for different activation functions for used for the hidden layer(s). Different network models have been used for the four plots. The AdaGrad algorithm with momentum $\gamma = 0.8$ has been used for optimisation.}
+        \caption{Plots of the accuracy score against learning rate for different activation functions for used for the hidden layer(s). Different network models have been used for the four plots. The AdaGrad algorithm with momentum $\gamma = 0.8$ has been used for optimisation, running 100 epochs with a batch size of 200.}
+        \label[fig]{res:fig:clf_afs}
     \end{figure*}
 
     \begin{figure*}
         \begin{subfigure}{.49\textwidth}
             \includegraphics[width=\linewidth]{lmbda_lr_struct0_sigmoid.pdf}
-            \caption{$\lambda\eta$, one layer five nodes, sigmoid}
-            \label[fig]{res:fig:e}
+            \caption{Network \network{1}{5} with a Sigmoid activation function for the hidden layer. A single maximum was found with an accuracy $A = 0.993$, using $\eta = 0.1$ and $\lambda = 10^{-3.5}$}
+            \label[fig]{res:fig:clf_heatmap_N_1_5_sig}
         \end{subfigure}
         \hfill
         \begin{subfigure}{.49\textwidth}
             \centering
             \includegraphics[width=\linewidth]{lmbda_lr_struct0_tanh.pdf}
-            \caption{$\lambda\eta$, one layer five nodes, tanh}
-            \label[fig]{res:fig:f}
+            \caption{Network \network{1}{5} with a Hyperbolic tangent activation function for the hidden layer. A single maximum was found with an accuracy $A = 0.986$, using $\eta = 0.03$ and $\lambda = 10^{-1.25}$}
+            \label[fig]{res:fig:clf_heatmap_N_1_5_tanh}
         \end{subfigure}
         \hfill
         \begin{subfigure}{.49\textwidth}
             \centering
             \includegraphics[width=\linewidth]{lmbda_lr_struct1_sigmoid.pdf}
-            \caption{$\lambda\eta$, two layers five nodes each, sigmoid}
-            \label[fig]{res:fig:g}
+            \caption{Network \network{2}{5} with a Sigmoid activation function for the hidden layers. Multiple maxima was found with an accuracy $A = 0.986$.}
+            \label[fig]{res:fig:res:fig:clf_heatmap_N_2_5_sig}
         \end{subfigure}
         \hfill
         \begin{subfigure}{.49\textwidth}
             \centering
             \includegraphics[width=\linewidth]{lmbda_lr_struct1_tanh.pdf}
-            \caption{$\lambda\eta$, two layers five nodes each, tanh}
-            \label[fig]{res:fig:h}
+            \caption{Network \network{2}{5} with a Hyperbolic activation function for the hidden layers. Multiple maxima was found with an accuracy $A = 0.986$.}
+            \label[fig]{res:fig:clf_heatmap_N_2_5_tanh}
         \end{subfigure}
-        \caption{}
-        \label[fig]{res:fig:efgh}
+        \caption{Plots of validation accuracy score varied against learning rate and penalisation term $\lambda$. Red squares mark the best accuracy scores. The first row contains the network structures \network{1}{5} with Sigmoid (a) and Hyperbolic tangent (b) activation functions for the output layer, while the second row contains \network{2}{5} with Sigmoid (a) and Hyperbolic tangent (b). The AdaGrad algorithm with momentum $\gamma = 0.8$ has been used for optimisation, running 100 epochs with a batch size of 200.}
+        \label[fig]{res:fig:clf_heatmaps}
     \end{figure*}
