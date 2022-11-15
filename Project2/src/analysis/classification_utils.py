@@ -141,6 +141,57 @@ def lmbda_eta_heatmap(D_train, D_test, etas, lmbdas, nodes=((1,), 1), activation
     plt.show()
 
 
+def lmbda_eta_heatmap_sklearn(D_train, D_test, etas, lmbdas, nodes=(5,5), filename=None):
+    from sklearn.neural_network import MLPClassifier
+    etas = np.linspace(*etas)
+    lmbdas = np.logspace(*lmbdas)
+
+    ACC_grid = list()
+    for lmbda in lmbdas: 
+        ACC_list = list()
+        for eta in etas:
+            clf = MLPClassifier(random_state=321,
+                                max_iter=600,
+                                learning_rate="constant",
+                                learning_rate_init=eta,
+                                hidden_layer_sizes=(5,5),
+                                activation="logistic",
+                                early_stopping=False,
+                                alpha=lmbda
+                                ).fit(D_train.X, D_train.y)
+
+            ACC = clf.score(D_test.X, D_test.y)
+            ACC_list.append(ACC)
+
+        ACC_grid.append(ACC_list)
+        
+    ACC_grid = np.array(ACC_grid)
+
+    fig, ax = plt.subplots()
+    sns.heatmap(ACC_grid, annot=True, cmap=plot_utils.cmap, ax=ax, cbar_kws={'label':'Accuracy'}, fmt=".3")
+    
+    arg_best_ACC = np.unravel_index(np.nanargmax(ACC_grid), np.shape(ACC_grid))
+    ib, jb = arg_best_ACC
+    ij_bests = np.argwhere(ACC_grid==ACC_grid[ib,jb])
+
+    for ij in ij_bests:
+        i, j = ij
+        print(f"Best ACC = {ACC_grid[i][j]}, lmbda = {lmbdas[i]:.4e}, eta = {etas[j]:.4e}")
+        ax.add_patch(plt.Rectangle((j, i), 1, 1, fc='none', ec='red', lw=5, clip_on=False))
+
+    # Set xylabels and ticks. This code is ronaldo, but it works.
+    ax.set_xlabel("Learning rate")
+    xticks, xlabels = shoter_labels(round_nearest(etas, decimals=1, sig=True))
+    ax.set_xticks(xticks, labels=xlabels)
+
+
+    ax.set_ylabel(r"log$_{10}(\alpha)$")
+    yticks, ylabels = shoter_labels(np.log10(lmbdas))
+    ax.set_yticks(yticks, labels=ylabels)
+    
+    if filename: plt.savefig(plot_utils.make_figs_path(filename))
+    plt.show()
+
 def logreg_different_activations(D_train, D_test, eta_range, opts, labels, filename=None):
     etas = np.linspace(*eta_range)
 
@@ -163,7 +214,7 @@ def logreg_different_activations(D_train, D_test, eta_range, opts, labels, filen
 def logreg_with_sklearn(D_train, D_test):
     from sklearn.linear_model import LogisticRegression
 
-    GD = GradientDescent(method= "plain", params= {"eta":0.1},  its=1000)
+    GD = GradientDescent(method= "plain", params= {"eta":1000},  its=1000)
 
     clf1 = LogReg().fit(D_train, optimizer=GD)
     clf2 = LogisticRegression(max_iter=10000).fit(D_train.X, D_train.y)

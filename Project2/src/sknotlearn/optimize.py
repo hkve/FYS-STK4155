@@ -59,6 +59,7 @@ class GradientDescent:
             args (tuple, optional): arguments to be passed to grad-function. Defaults to ().
         """
         # assert that grad works as intended
+        print(self.params["eta"](0))
         grad0 = grad(x0, *args)
         assert grad0.shape == x0.shape, f"grad-function returns array of shape {grad0.shape} instead of shape {x0.shape}."
         del grad0

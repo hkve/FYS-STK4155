@@ -49,8 +49,6 @@ def acc_eta_activation_functions(D_train, D_test):
         ylim = ylims[i]
         filename = f"clasf_activation_functions{i+1}"
         # filename = None
-
-        if not i in (1,3): continue
         
         cu.varying_activation_functions(D_train, D_test, 
                                 activation_functions=["sigmoid", "tanh", "relu", "leaky_relu"],
@@ -85,23 +83,24 @@ def lmbda_eta_heatmaps(D_train, D_test):
 def logreg_different_activations(D_train, D_test):
     max_iter = 100
     batch_size = 200
-    eta_range = (1e-3, 2, 20)
+    eta_range = (.1,1, 20)
 
     GD = GradientDescent("plain", dict(eta=0.), its=max_iter)
     mGD = GradientDescent("momentum", dict(gamma=0.8, eta=0.), its=max_iter)
     SGD = SGradientDescent("plain", dict(eta=0.), epochs=max_iter, batch_size=batch_size)
     adSGD = SGradientDescent("adam", dict(eta=0., beta1=0.9, beta2=0.99), epochs=max_iter, batch_size=batch_size)
     
-    labels = ["a", "b", "c", "d"]
+    labels = ["GD", "MGD", "SGD", "AdaSGB"]
     opts = [GD, mGD, SGD, adSGD]
 
     cu.logreg_different_activations(D_train, D_test, eta_range, opts, labels)
 
 if __name__ == "__main__":
     D_train, D_test = breast_cancer_data()
-
     # acc_eta_activation_functions(D_train, D_test)
     # lmbda_eta_heatmaps(D_train, D_test)
 
+    # cu.lmbda_eta_heatmap_sklearn(D_train, D_test)
     # cu.logreg_with_sklearn(D_train, D_test)
-    logreg_different_activations(D_train, D_test)
+    # logreg_different_activations(D_train, D_test)
+    cu.lmbda_eta_heatmap_sklearn(D_train, D_test, (0.001, 0.5, 5), lmbdas=(-6,0,5))
