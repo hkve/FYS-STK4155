@@ -82,22 +82,19 @@ We will assume that the measurements $y_i$ are generated from an exact function 
         \end{subequations}
 
 
-        \comment{Discussion notes: Adagrad accumulates G such that the learning rate becomes smaller with iterations --- AKA GD is `turned off'. -\Carl \\
-        Not entirely true, rather learning rate stabilizes, I think. -\Carl}
-
     \subsection{Neural Networks}
-        Artificial neural networks (ANN) are biologically inspired machine learning algoritms which can improve performance as they are exposed to data and without being programmed with any task-specific rules. In this project fully connected \textit{feed-forward neural networks (FFNN)} will be implemented. 
+        Artificial neural networks (ANN) are biologically inspired machine learning algorithms which can improve performance as they are exposed to data and without being programmed with any task-specific rules. In this project fully connected \textit{feed-forward neural networks (FFNN)} will be implemented. 
         \subsubsection{Structure}
             First a non-mathematical, intuitive introduction. 
-            An ANN consists of an input layer and an output layer. Often the network will also have layers betweeen the input and output, called \textit{hidden layers}. In that case the neural network is referred to as deep. Each layer contains \textit{nodes} which are supposed to represent the neurons in a biological neural network, or rather their activation. In a fully connected neural network, all nodes in one layer are connected to all the nodes in the previous as well as the next layer. These connections, which represent the synapses, are referred to as \textit{weights}, and the sizes of the weights are the synaptic strength. Each node also have an activation \textit{bias} which says something about how easily activated that specific neuron/node is. See \cref{the:fig:Illustration_NN} for an illustration of a simple, deep artificial neural network. 
+            An ANN consists of an input layer and an output layer. Often the network will also have layers between the input and output, called \textit{hidden layers}. In that case the neural network is referred to as deep. Each layer contains \textit{nodes} which are supposed to represent the neurons in a biological neural network, or rather their activation. In a fully connected neural network, all nodes in one layer are connected to all the nodes in the previous as well as the next layer. These connections, which represent the synapses, are referred to as \textit{weights}, and the sizes of the weights are the synaptic strength. Each node also have an activation \textit{bias} which says something about how easily activated that specific neuron/node is. See \cref{the:fig:Illustration_NN} for an illustration of a simple, deep artificial neural network. 
             \begin{figure} [ht]
                 \centering
                 \includegraphics[width=.85\linewidth]{figs/Illustration_NN.png}
-                \caption{Illustration of a simple deep neural network with an input layer, two hidden layer, and an output layer. The circles are the nodes and the lines between are the weights.}
+                \caption{Illustration of a simple deep neural network with an input layer, two hidden layers, and an output layer. The circles are the nodes and the lines between are the weights.}
                 \label[fig]{the:fig:Illustration_NN}
             \end{figure}
             
-            The nodes, weights and biases are all essentially just numbers, but following an algorithm for combinig these numbers creates an ANN. 
+            The nodes, weights and biases are all essentially just numbers, but following an algorithm for combining these numbers creates an ANN. 
 
         \subsubsection{Feed Forward}
             \begin{figure} [ht]
@@ -111,7 +108,7 @@ We will assume that the measurements $y_i$ are generated from an exact function 
                 y=f\left(\sum_{i=1}^n w_i x_i+b\right)= f(z)
             \label[eq]{the:eq:output}
             \end{equation} 
-            where $x_i$ constitutes the input, $w_i$ are the weights corresponding to each input variable, and $b$ the bias of the output node. We define $z$ as the sum over all the weighted inputs with bias added; $z=\pclosed{\Sigma_{i=1}^n w_ix_i + b}$. $f$ is called the \textit{activation function} and depends on the analysis being executed; e.g. regression, classification, etc. Each node has a corresponding activation function which defines the possible outputs of that node. The activation function closest to replicating the behaviour of a biological neuron is the heaviside function which yields either $0$ or $1$; firing or not firing. However, there are in some cases advantages of abandoning this biological model. Some other, and currently more used activation functions are: identity, sigmoid, relu, tanh, and leaky relu some of which are plotted in \cref{the:fig:introducing_acts}. 
+            where $x_i$ constitutes the input, $w_i$ are the weights corresponding to each input variable, and $b$ the bias of the output node. We define $z$ as the sum over all the weighted inputs with bias added; $z=\pclosed{\Sigma_{i=1}^n w_ix_i + b}$. $f$ is called the \textit{activation function} and depends on the analysis being executed; e.g. regression, classification, etc. Each node has a corresponding activation function which defines the possible outputs of that node. The activation function closest to replicating the behaviour of a biological neuron is the Heaviside function which yields either $0$ or $1$; firing or not firing. However, there are in some cases advantages of abandoning this biological model. Some other, and currently more used activation functions are: identity, sigmoid, ReLu, tanh, and leaky ReLu some of which are plotted in \cref{the:fig:introducing_acts}. 
             \begin{figure} [ht]
                 \centering
                 \includegraphics[width=\linewidth]{figs/introducing_acts.pdf}
@@ -119,7 +116,7 @@ We will assume that the measurements $y_i$ are generated from an exact function 
                 \label[fig]{the:fig:introducing_acts}
             \end{figure}
             
-            In the output layer the activation function constitutes what analysis the network does. E.g. a form of binary classification can be done by implementing the sigmoidactivation function in the output layer, and for regression problems the identity function, $f(x)=x$, is implemented.
+            In the output layer the activation function constitutes what analysis the network does. E.g. a form of binary classification can be done by implementing the sigmoid activation function in the output layer, and for regression problems the identity function, $f(x)=x$, is implemented.
             It is normal that all the nodes in a layer have the same activation function $f$.    
             \comment{See more on activation functions in appendix ref} 
 
