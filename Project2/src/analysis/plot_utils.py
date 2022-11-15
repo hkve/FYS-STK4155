@@ -33,6 +33,8 @@ colors = [
     sns.color_palette('dark')[-1]
 ]
 
+markers = ["s", "o", "X","*", "^"]
+
 cmap = matplotlib.colors.LinearSegmentedColormap.from_list(
     "", colors[:2] + [colors[3]])
 
