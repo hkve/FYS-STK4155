@@ -76,14 +76,16 @@
 
         \begin{table}[ht!]
             \centering
-            \begin{tabular}{r|c|l|l}
-                Method & MSE & $\eta$ & $\lambda$ \\ \hline
-                Analytic & 0.1338 & - & 0.002 \\
-                Momentum GD & $0.1777 \pm 0.0025$ & 0.13 & $10^{-4}$ \\
-                Momentum SGD & $0.1747 \pm 0.0020$ & 0.12 & $10^{-8}$ \\
-                AdaGrad Momentum SGD & $0.1822 \pm 0.0013$ & 0.48 & $10^{-3}$ \\
-                Adam SGD & $0.1673 \pm 0.0020$ & 0.32 & $10^{-5}$
-            \end{tabular}
+            \scalebox{0.85}{
+                \begin{tabular}{r|c|l|l}
+                    Method & MSE & $\eta$ & $\lambda$ \\ \hline
+                    Analytic & 0.1338 & - & 0.002 \\
+                    Momentum GD & $0.1777 \pm 0.0025$ & 0.13 & $10^{-4}$ \\
+                    Momentum SGD & $0.1747 \pm 0.0020$ & 0.12 & $10^{-8}$ \\
+                    AdaGrad Momentum SGD & $0.1822 \pm 0.0013$ & 0.48 & $10^{-3}$ \\
+                    Adam SGD & $0.1673 \pm 0.0020$ & 0.32 & $10^{-5}$
+                \end{tabular}
+            }
             \caption{Summary of the best validation MSEs resulting from the optimisation of the ridge cost function using various GD algorithms. The data is taken from the plots in \cref{res:fig:GDridge}.}
             \label[tab]{res:tab:ridge_MSEs}
         \end{table}
