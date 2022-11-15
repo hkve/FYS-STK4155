@@ -1,8 +1,7 @@
 \comment{Suggestion: present/past tense}\\
 
 \subsection{Gradient Descent Methods}
-    \comment{Something general}\\
-    \comment{C'mon Carl, pick up the energy, -\Carl}\\
+    The GD methods we employed were not especially impressive in optimising our linear regression parameters when compared to the analytical solution obtained from matrix inversion. However, we used a pretty limited dataset, and did not use that many features (20 in total). Matrix inversion will quickly become computationally expensive, and can also become unstable when there is correlation between the features. Some notes on the different algorithms employed follow.
 
     \subsubsection{Ordinary Gradient Descent}
         The non-stochastic GD was characterised by being sensitive to initialisation, but performed well on our simple optimisation problems when momentum was added, both on the OLS and ridge cost functions. These algorithms were faster than their stochastic counterpart, largely due to the fact that they update the parameters less often. It is clear that ordinary GD can be powerful when the parameter terrain is sufficiently non-complex, or if you have the computational resources to initialise multiple times. 
