@@ -157,7 +157,7 @@ We will assume that the measurements $y_i$ are generated from an exact function 
 
     Two different methods for classification will be introduced here. Firstly we will look at \textit{logistic regression}, maybe the most common method in the domain of classification. In addition, under some restrictions, our neural network can be used for classification problems. Both of these models have an output $p(x_i)$ on the domain $[0,1]$, which we will interpret as the probability of the outcome $y_i = 1$. We will classify the data point $x_i$ as $\hat{y}_i = 1$ if $p(x_i) > \tau$ and $\hat{y}_i = 0$ if $p(x_i) < \tau$, where $\tau$ is the \textit{threshold}, a priori set to $\tau = 0.5$. 
 
-    \subsubsection{Logistic regression}
+    \subsubsection{Logistic Regression}
         For comparison with our neural network we introduce maybe the most common classification method there is, \textit{logistic regression}. One might be confused by inclusion of the word \textit{regression} in the name of a classification method. This comes from performing a fit to the \textit{log-odds} using a function linear in the input variables:
         \begin{align*}
             \log(\frac{p(x_i)}{1-p(x_i)}) = x_i^T \vec{\theta},
@@ -194,5 +194,5 @@ We will assume that the measurements $y_i$ are generated from an exact function 
         \end{align}
 
 
-    \subsubsection{Neural network approach}
+    \subsubsection{Neural Network Approach}
         Something Something since we want to interpret output as probability we must choose Sigmoid. Hidden activation functions can be whatever. 
