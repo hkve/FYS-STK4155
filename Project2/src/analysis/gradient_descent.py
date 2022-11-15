@@ -291,7 +291,9 @@ def tune_lambda_learning_rate(
 
 
 def analytical_lmbda_plot(data_train: Data, data_val: Data, lmbdas: np.ndarray,
-                          verbose: bool = False, filename: str = None) -> None:
+                          ylims: tuple = (0, None),
+                          verbose: bool = False,
+                          filename: str = None) -> None:
     """Plot the validation MSE of analytical linear regression parameters of
     the ridge cost function as function of lmbdas.
 
@@ -334,11 +336,12 @@ def analytical_lmbda_plot(data_train: Data, data_val: Data, lmbdas: np.ndarray,
                ls="--",
                colors="grey"
                )
+    plt.ylim(ylims)
     plt.legend(loc="upper left")
     plt.xlabel(r"$\log_{10}(\lambda)$")
     plt.ylabel("Validation MSE")
     if filename is not None:
-        plt.savefig(filename)
+        plt.savefig(plot_utils.make_figs_path(filename))
     plt.show()
 
 
@@ -430,7 +433,7 @@ if __name__ == "__main__":
             ylims=(0, 0.6)
         ),
         "adagrad": dict(
-            learning_rates=np.linspace(0.001, 0.7, 101),
+            learning_rates=np.linspace(0.001, 0.6, 101),
             optimizers=(aGD, maGD, aSGD, maSGD),
             optimizer_names=(f"AdaGrad GD", f"AdaGradMom GD",
                              "AdaGrad SGD", "AdaGradMom SGD"),
@@ -446,11 +449,11 @@ if __name__ == "__main__":
         ),
         "tunable": dict(
             # funky learning rate to get more small eta evaluations
-            learning_rates=(np.linspace(0., 0.7**(1/2), 101)**2)[1:],
+            learning_rates=(np.linspace(0., 0.1**(1/2), 101)**2)[1:],
             optimizers=(rmSGD, adSGD, aSGD, maSGD),
             optimizer_names=("RMSprop SGD", "Adam SGD",
                              "AdaGrad SGD", "AdaGradMom SGD"),
-            ylims=(0, 0.8)
+            ylims=(0, 0.6)
         ),
         "test2": dict(
             learning_rates=np.linspace(0.0001, 0.1, 101),
@@ -530,7 +533,7 @@ if __name__ == "__main__":
             theta0=theta0,
             verbose=True,
             **params2[plot2],
-            # filename="lmbda_learning_rates_"+plot2
+            filename="lmbda_learning_rates_"+plot2
         )
 
     if plot3:
@@ -538,5 +541,5 @@ if __name__ == "__main__":
             D_train, D_val,
             lmbdas=np.logspace(-8, 0, 81),
             verbose=True,
-            # filename="lmbda_plot_ana"
+            filename="lmbda_plot_ana"
         )

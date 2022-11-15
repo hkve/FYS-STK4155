@@ -5,12 +5,16 @@
     \comment{C'mon Carl, pick up the energy, -\Carl}\\
 
     \subsubsection{Ordinary Gradient Descent}
+        The non-stochastic GD was characterised by being sensitive to initialisation, but performed well on our simple optimisation problems when momentum was added, both on the OLS and ridge cost functions. These algorithms were faster than their stochastic counterpart, largely due to the fact that they update the parameters less often. It is clear that ordinary GD can be powerful when the parameter terrain is sufficiently non-complex, or if you have the computational resources to initialise multiple times. 
 
     \subsubsection{Stochastic Gradient Descent}
+        Adding stochasticity to the GD methods seemed to make them converge faster, at the expense of less stability. This is likely due to not being caught up in local minima, something both stochasticity and momentum can help with. Thus, it makes sense that the gap in performance between plain SGD and SGD with momentum was smaller (MSEs of 0.1862 and 0.1729 respectively) compared to the `bare' GD (MSEs of 0.1982 and 0.1775 respectively). However, one of the significant improvements was the improvement in sensitivity to initialisation, which makes sense seeing as the stochastic algorithms can escape the pull of the local parameter space terrain more easily to venture towards greater minima.
 
     \subsubsection{AdaGrad methods}
         With the AdaGrad algorithms, the diagonal of $G$ accumulates every iteration, adding $g_i^2$, meaning that the learning rates $\eta \propto G^{-\sfrac{1}{2}}$ will only decrease. This results in AdaGrad `turning off' the descent, effectively implementing a cap to the distance it will travel in parameter space. This in turn makes it very safe, combating exploding gradients very effectively, as evidenced in \cref{res:fig:lrate3}. However, it also makes it more sensitive to the initialisation of the parameters: If it starts far from a `good' minimum in parameter space, it will struggle to reach it before turning off.
 
     \subsubsection{RMSprop and Adam}
+        Both RMSprop and Adam married some of the stability of the tunable AdaGrad across learning rates, but managed to do so without turning off the learning rate, but rather using running averages $\vec{s}_k$ that do not monotonically increase. This meant that they were significantly less sensitive to the initialisation, as they managed to converge regardless. Again, adding momentum as with Adam increased stability and convergence. 
 
     \subsubsection{Ridge Penalisation on Linear Regression}
+        Adding a ridge penalisation on the parameters of our linear regression optimisation seemed to have little to no effect. We might attribute this to the fact that our linear model was not complex, and the data was `nice' enough, as to not be prone to overfitting. Essentially, the degrees of freedom in our fit seemed appropriate, and did not need penalisation. It was interesting to note that it did decrease the sensitivity to the initialisation of the GD methods, however.
