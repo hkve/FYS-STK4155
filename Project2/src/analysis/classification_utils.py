@@ -4,8 +4,9 @@ import seaborn as sns
 import plot_utils
 
 import context
-from sknotlearn.optimize import SGradientDescent
+from sknotlearn.optimize import SGradientDescent, GradientDescent
 from sknotlearn.neuralnet import NeuralNetwork
+from sknotlearn.logreg import LogisticRegression as LogReg
 
 def round_nearest(arg, decimals=2, sig=False):
     labels = [""]*len(arg)
@@ -140,33 +141,31 @@ def lmbda_eta_heatmap(D_train, D_test, etas, lmbdas, nodes=((1,), 1), activation
     plt.show()
 
 
-def main():
-    D_train, D_test = breast_cancer_data()
+def logreg_different_activations(D_train, D_test, opts, eta_range):
+    ACCs = [None]*len(opts)
 
-    SGD = SGradientDescent(
-        method = "adagrad_momentum",
-        params = {"gamma":0.8, "eta":0.008},
-        epochs=100,
-        batch_size=20,
-        random_state=321
+    etas = np.linspace(*eta_range)
+
+    for i, opt in enumerate(opts):
+        ACC = np.zeros_like(eta_range)
+        for j, eta in enumerate(etas):
+            opt.params["eta"] = eta
+            
+
+        ACCs[i] = ACC
+def logreg_with_sklearn(D_train, D_test):
+    from sklearn.linear_model import LogisticRegression
+
+    GD = GradientDescent(
+        method= "plain",
+        params= {"eta":0.1}, 
+        its=1000
     )
 
-    nodes = ((5, ), 1)
-    NN = NeuralNetwork(
-        SGD, 
-        nodes=nodes, 
-        random_state=321,
-        cost_func="BCE",
-        activation_hidden="linear",
-        activation_output="sigmoid",
-    )
+    clf1 = LogReg().fit(D_train, optimizer=GD)
+    clf2 = LogisticRegression(max_iter=10000).fit(D_train.X, D_train.y)
 
-    NN.train(D_train, trainsize=1)
-    print(SGD.converged, NN.optimizer.converged)
-    print(NN.accuracy(D_test.X, D_test.y))
+    acc1 = clf1.accuracy(D_test.X, D_test.y)
+    acc2 = np.sum(clf2.predict(D_test.X) == D_test.y)/D_test.n_points
 
-    y_pred, proba =  NN.classify(D_test.X, return_prob=True)
-
-    print(f"w, b: {NN.weights[0]}, {NN.biases[0]}")
-    for a, b, c in zip(y_pred, D_test.y, proba):
-        print(a, b, c)
+    print(f"sknotlearn {acc1 = }, sklearn {acc2 = }")

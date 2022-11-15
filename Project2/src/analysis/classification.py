@@ -60,11 +60,7 @@ def acc_eta_activation_functions(D_train, D_test):
                             )
 
 
-def test_logreg():
-    from sklearn.linear_model import LogisticRegression
-    D = load_BreastCancer()
-
-    D_train, D_test = D.train_test_split(ratio=3/4, random_state=321)
+def test_logreg(D_train, D_test):
     clf = LogisticRegression(max_iter=10000).fit(D_train.X, D_train.y)
 
     y_pred = clf.predict(D_test.X)
@@ -101,13 +97,4 @@ if __name__ == "__main__":
     # acc_eta_activation_functions(D_train, D_test)
     # lmbda_eta_heatmaps(D_train, D_test)
 
-    from sknotlearn.logreg import LogisticRegression
-    from sknotlearn.optimize import GradientDescent
-
-    GD = GradientDescent("momentum", {"eta": 0.08, "gamma": 0.8}, its=100)
-    reg = LogisticRegression().fit(D_train, optimizer=GD)
-
-    pred, prob = reg.classify(D_test.X, return_prob=True)
-
-    for a,b, c, in zip(pred, D_test.y, prob):
-        print(a, b, c)
+    cu.logreg_with_sklearn(D_train, D_test)

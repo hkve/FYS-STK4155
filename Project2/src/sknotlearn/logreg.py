@@ -4,24 +4,28 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import numpy as np
 
 from data import Data
-import optimize
+from optimize import GradientDescent, SGradientDescent
 
 class LogisticRegression:
-    def __init__(self, lmbda=None):
+    def __init__(self, lmbda=0):
         self.lmbda = lmbda
 
-    def fit(self, data:Data, optimizer:optimize.GradientDescent, x0:np.ndarray=None):
+    def fit(self, data:Data, optimizer, x0:np.ndarray=None):
         self.optimizer = optimizer
         
         if not x0:
             x0 = np.random.normal(0,1, data.n_features)
         
-        self.coef = self.optimizer.call(
-            grad = self.grad,
-            x0=x0,
-            args=(data, self.lmbda),
-            #all_idcs=np.arange(data.n_points)
-        )
+        opt_args = {
+            "grad": self.grad,
+            "x0": x0,
+            "args":(data, self.lmbda)
+        }
+
+        if "epochs" in optimizer.__dict__.keys():
+            opt_args["all_idcs"] = np.arange(data.n_points)
+
+        self.coef = self.optimizer.call(**opt_args)
 
         return self
 
@@ -54,4 +58,4 @@ class LogisticRegression:
         y, X = data[idcs].unpacked()
         n = len(y)
 
-        return (1./n) * X.T @ ( self.predict(X, coef) - y)
+        return (1./n) * X.T @ ( self.predict(X, coef) - y) + lmbda*coef
