@@ -216,6 +216,22 @@ def logreg_different_opts(D_train, D_test, eta_range, opts, labels, filename=Non
     plt.show()
 
 
+def logreg_different_opts_during_opts(D_train, D_test, its, opts, labels, filename=None):
+    fig, ax = plt.subplots()
+    for i, opt in enumerate(opts):
+        clf = LogReg().fit_save_accuracy(D_train, D_test, opt)
+        
+        ACC = clf.saved_accuracy_opt[1:]
+        if "epochs" in opt.__dict__:
+            ACC = ACC[::D_train.n_points//opt.batch_size]
+         
+        ax.plot(its, ACC, label=labels[i])
+
+    ax.set(xlabel="Iterations/Epochs", ylabel="Accuracy")
+    ax.legend()
+    if filename: plt.savefig(plot_utils.make_figs_path(filename))
+    plt.show()
+
 def logreg_with_sklearn(D_train, D_test):
     from sklearn.linear_model import LogisticRegression
 
