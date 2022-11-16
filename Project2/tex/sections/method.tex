@@ -56,14 +56,27 @@
         GD methods are quite sensitive to the initial parameters from which to descend, so made sure to initialise all the methods from the same point when comparing performance. We always initialised with randomly drawn parameter values from the standard normal distribution with mean zero and std one. Since we always deal with scaled features, we can safely initialise the parameters with a standard normal distribution without fear of the dimension of the parameters being terribly out of sorts. To further combat the sensitivity to initial conditions, we did all the descents from five different starting points, and computed the average MSE scores we got.
 
 \subsection{Creating a Neural Network and Regression Problems}
-    In this part of our analysis we will create an FFNN with a flexible number of hidden layers and nodes. Subsequently we will train and test this network on the Nicaraguan terrain data from Project 1 and compare its performance with the results from the linear regression methods (OLS and Ridge) employed in that project. 
+    We started by creating an FFNN with a flexible number of hidden layers and nodes as well as variable learning rate, multiple possible activation functions, and with an optional regularisation parameter. Subsequently we varied these variables, then trained the various networks and tested them on the Nicaraguan terrain data from Project 1. We compared the best network's performance with the results from the linear regression methods (OLS and Ridge) employed in that project. 
+    
+    \subsubsection{Initialisation of the Network}
+        As in the previous section, we set the number of epochs to 500 and batch size to 200. Since we discovered that SGD exceeded GD and that Adam performed best of the GD methods, these algorithms were the ones we employed in our network.    
+        \comment{CARL, look over HERE! GD/SGD, GD method}
 
-    \comment{Discuss the choice of cost function in the NN}
+        In the neural network we chose to implement MSE as the cost function, $C$, for the output. We started by setting the activation of the hidden layers to sigmoid, and since we wanted to perform regression, we selected the identity function for the final output layer. Initially we set the regularisation parameter to zero. 
 
-    We start by implementing the sigmoid activation function in the hidden layers. As 
+        When setting up the neural network, the weights and biases need initial values. Choosing these values can affect how the network trains and evetually performes. From \cref{the:eq:bp_w_b_delta} we see that setting all the parameters to $0$ means the network will not backpropogate initially and all the nodes will yield the same output. \comment{is this too theory to be in method?}. In this project we have initialised the weights with a distribution of mean zero and std $1$. We set the initial biases to $0.01$. Since the mean of the initialised weights is 0, setting the initial biases to a small value like this ensures every $z_i^L$ has a value to backpropogate in the first iteration.  
+    
+    \subsubsection{Varying Layers, Nodes, and Learning Rate}
+        \comment{Introduce the N-notation} 
+        \network{layers}{nodes}
+        We wanted to explore how our neural networks vary depending on their structure. We therefore varied the number of layers, number of nodes in each layer, and the learning rate while computing the measures for goodness of fit.
+        A neural network's structure consits mainly of its number of layers and number of nodes in each layer. We chose to only evaluate somewhat symmetrical networks, meaning we did not vary the the number of nodes does not vary between the hidden layers. 
 
-    \subsubsection{Initialisation of parameters}
-        When setting up the neural network, the weights and biases need to be set to initial values. Choosing these values can affect how the network trains and evetually performes. E.g. setting all the parameters to $0$ means the all the network does is map every input to $0$. Skalering (diskusjon)
+    \subsubsection{Exploring Activation Functions in Hidden Layers}
+
+    \subsubsection{Implementing Regularisation}
+
+    \subsubsection{Terrain Data an Comparison with OLS}
 
     
 \subsection{Classification Problems}
