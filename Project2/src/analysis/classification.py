@@ -48,7 +48,7 @@ def acc_eta_activation_functions(D_train, D_test):
         eta_range = eta_ranges[i]
         ylim = ylims[i]
         filename = f"clasf_activation_functions{i+1}"
-        # filename = None
+        filename = None
         
         cu.varying_activation_functions(D_train, D_test, 
                                 activation_functions=["sigmoid", "tanh", "relu", "leaky_relu"],

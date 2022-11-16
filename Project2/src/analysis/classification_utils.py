@@ -72,7 +72,9 @@ def varying_activation_functions(D_train, D_test,
                                 ):
     etas = np.linspace(*eta_range)
 
-    cut = False
+    print("--------")
+    print(nodes)
+    print("--------")
     fig, ax = plt.subplots()
     for i, af in enumerate(activation_functions):
         acc = np.zeros_like(etas)
@@ -87,7 +89,8 @@ def varying_activation_functions(D_train, D_test,
                 acc[j] = np.nan
 
         label = af.replace("_", " ").capitalize()
-
+        max_i = np.nanargmax(acc)
+        print(f"{af =}, acc = {acc[max_i]}, eta = {etas[max_i]}")
         ax.plot(etas, acc, label=label, marker=plot_utils.markers[i], linestyle="-", markersize=10, alpha=0.8)
 
     ax.set(xlabel="Learning rate", ylabel="Accuracy")
