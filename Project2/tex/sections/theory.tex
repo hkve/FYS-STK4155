@@ -1,6 +1,6 @@
 \comment{Suggestion: present tense, makes sense but might mess up some times H}\\
 
-When referring to the data we will be dealing without throughout this project, it is useful to define quantities clearly to limit the confusion. This was done in \cite{Project1}, but we will summarise it here.
+When referring to the data we will be dealing without throughout this project, it is useful to define quantities clearly to limit the confusion. This was done in~\citep{Project1}, but we will summarise it here.
 
 Letting $\vec{y} \in \mathbb{R}^n$ be a vector containing a series of $n$ measurements with a corresponding to an input matrix $X \in \mathbb{R}^{n\times p}$. The rows $x_i \in \mathbb{R}^p$ of $X$ are the $p$ inputs, or \textit{features}, producing the measurement $y_i$. The feature columns of $X$ are referred to as $\vec{x}_a \in \mathbb{R}^n$. Together these form a dataset $\mathcal{D} = \cclosed{(y_i, x_i)}$. Furthermore, we refer to the parameters of our models collectively by $\vec{\theta}$.
 
@@ -196,12 +196,12 @@ In fitting our models to the data, we want to produce predictions $\hat{y} = \ha
         \begin{align*}
             p(x_i) = \sigma(x_i^T \vec{\theta}) = \frac{1}{1+\exp{-x_i^T\vec{\theta}}}
         \end{align*}
-        Following the approach from \cite{Project1}, we have the likelihood for a Binomial distribution:      
+        Following the approach from \citep{Project1}, we have the likelihood for a Binomial distribution:      
 
         \begin{align*}
             P(\vec{y}|X,\vec{\vec{\theta}}) = \prod_{i = 1}^{n} \sigma(X_{i*}\vec{\theta})^{y_i}[1-\sigma(X_{i*}\vec{\theta})]^{1 - y_i},
         \end{align*}
-        where a sum over $a$ is implied. The cost function then follows from taking logarithm of the likelihood, presented with an overall negative sign giving a minimisation problem of the parameters $\vec{\theta}$. In the literature this is often called the \textit{Binary Cross Entropy} (BCE) cost function \cite{BCE}.  
+        where a sum over $a$ is implied. The cost function then follows from taking logarithm of the likelihood, presented with an overall negative sign giving a minimisation problem of the parameters $\vec{\theta}$. In the literature this is often called the \textit{Binary Cross Entropy} (BCE) cost function \citep{BCE}.  
 
         \begin{align}
             \msub{C}{BCE}(\vec{\theta}) =& - \frac{1}{n} \log P(\vec{y}|X,\vec{\vec{\theta}}) \nonumber \\ \nonumber

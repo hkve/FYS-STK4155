@@ -26,8 +26,12 @@
             With our scaling of the data, every feature with mean at zero and standard deviation equals $1$, the initialisation of the weights with the same distribution intuitively makes sense. \comment{please rewrite in a more academic fashion}
             We could have explored other ways of initialising the parameters of the network. 
     
+
         \subsubsection{The choice of epochs}
             Could hypotesise that increasing the number of epochs would increase the network's performance. However, there is a trade-off between performance and the some times expensive process of training. 
 
         \subsubsection{Choice of cost function}
             We chose MSE as the cost function for the NN. We could have tested various cost functions, e.g. by implementing a penilisation. 
+
+\subsection{Model Selection}
+    Model selection is prevalent in all parts of this project, and in many cases, the difference between models has been marginal. To get a more thorough examination of which GD methods, regressors and classifiers work best, it would have been helpful to employ resampling techniques like bootstrap or cross-validation as in~\citep{Project1} to get better estimates for the scores we have employed throughout, e.g. MSE, R2 and accuracy.

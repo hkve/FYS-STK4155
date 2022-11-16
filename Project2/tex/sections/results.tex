@@ -232,21 +232,45 @@
 
 \subsection{Wisconsin Breast Cancer}
     \subsubsection{Logistic regression}
+    The different optimisation algorithms from our library of gradient decent methods were applied to optimise the BCE cost function without penalisation \cref{the:eq:logreg_cost_function} using Logistic regression. This is presented in \cref{res:fig:logreg_GD_opt} for GD methods with and without momentum, while SGD based methods is presented in \cref{res:fig:logreg_SGD_opt}.    
 
     \begin{figure}
         \begin{subfigure}{.49\textwidth}
             \centering
             \includegraphics[width=\linewidth]{logreg_GD.pdf}
-            \caption{Showing accuracy as a function of learning rate, optimised using GD with and without momentum for 5 and 50 iterations.}
+            \caption{Showing accuracy as a function of learning rate, optimised using GD with ($\gamma = 0.8$) and without momentum for 5 and 50 iterations.}
             \label[fig]{res:fig:logreg_GD_opt}
         \end{subfigure}
         \begin{subfigure}{.49\textwidth}
             \centering
             \includegraphics[width=\linewidth]{logreg_SGD.pdf}
-            \caption{Showing accuracy as a function of learning rate, optimised plain, Adam and AdaGrad SGD while varying the number of epochs. For all optimisations, a batch size of 200 was used.}
-            \label[fig]{res:logreg_SGD_opt}
+            \caption{Showing accuracy as a function of learning rate, optimised plain, Adam ($\beta_1 = 0.9, \beta_2 = 0.99$) and AdaGrad SGD while varying the number of epochs. For all optimisations, a batch size of 200 was used.}
+            \label[fig]{res:fig:logreg_SGD_opt}
+        \end{subfigure}
+        \begin{subfigure}{.49\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{logreg_acc_during_optimazation.pdf}
+            \caption{Showing accuracy as a function of iterations/epochs. All methods used $\eta = 0.05$, with Adam having $\beta_1 = 0.9, \beta_2 = 0.99$ and momentum GD $\gamma = 0.8$.}
+            \label[fig]{res:fig:logreg_SGD_opt}
         \end{subfigure}
     \end{figure}
+
+    \begin{figure*}
+        \begin{subfigure}{.49\textwidth}
+            \includegraphics[width=\linewidth]{logreg_penalisation.pdf}
+            \caption{Validation accuracy for logistic regression as a function of learning rate and penalisation parameter $\lambda$. Largest accuracy of $A = 0.986$ found at $\eta = 0.1, \lambda = 10^{-6}$.}
+            \label[fig]{res:fig:logreg_penalisation_ours}
+        \end{subfigure}
+        \hfill 
+        \begin{subfigure}{.49\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{logreg_penalisation_sklearn.pdf}
+            \caption{Validation accuracy for \textbf{scikit-learn}'s implementation of logistic regression as a function penalisation parameter $C$. }
+            \label[fig]{res:fig:logreg_penalisation_sklearn}
+        \end{subfigure}
+        \caption{\comment{These plots are stupid, but I am tired and can not bother tweaking to make them look any better.}}
+        \label[fig]{res:fig:logreg_penalisation}
+    \end{figure*}
 
     \subsubsection{Classification Neural Network}
     \begin{table}
@@ -324,6 +348,8 @@
         \label[fig]{res:fig:clf_heatmaps}
     \end{figure*}
 
+
+    \subsubsection{SKLERN STUFF}
     \begin{figure}
         \centering
         \includegraphics[width=\linewidth]{alpha_lr_struct1_sigmoid_sklearn.pdf}

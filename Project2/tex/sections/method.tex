@@ -1,7 +1,7 @@
 \comment{Suggestion: past tense NB! THIS IS A CHANGE}\\
 \subsection{Datasets}
     \comment{Here we write about the datasets we use, as before. Maybe reference project 1 about Franke function?}\\
-    We will use some of the same datasets as in Project 1~\cite{Project1}, namely the Franke function data and the Nicaraguan terrain data.
+    We will use some of the same datasets as in Project 1~\citep{Project1}, namely the Franke function data and the Nicaraguan terrain data.
     \subsubsection{Franke Function}
         The Franke function $F: \mathbb{R}^2 \to \mathbb{R}$ is a two-dimensional scalar function made up of four Gaussian functions.
         \begin{align}
@@ -22,13 +22,13 @@
         We have taken terrain data from the Nicaraguan mountains, sampling height data within the square defined by longitudinal coordinates $[86^\circ\,33'\,20''\,\text{W}, 86^\circ\,28'\,20''\,\text{W}]$ and latitudes $[13^\circ\,26'\,40''\,\text{N}, 13^\circ\,31'\,40''\,\text{N}]$. The data has one arcsecond resolution.
 
     \subsubsection{Wisconsin Breast Cancer data set}\label[sec]{breast_cancer_dataset}
-        For regression problems, the Wisconsin Breast Cancer data set \cite{Dua:2019} was used. Tumour features are computed from digitized images, describing characteristics of the cell nuclei present in the image. In total there are $n = 569$ unique instances, where each instance has the respective tumour marked as either malignant ($M$) or benign ($B$). We aimed to classify the tumour as $M$ or $B$ based on 10 different attributes ranging from tumour radius to texture. Each of these 10 attributes were again split up into three different measurements, named mean, standard error and worst. The latter describes the mean of the three largest measurements. This data set serves a good real-world benchmarking set, containing not too many instances and no missing fields.  
+        For regression problems, the Wisconsin Breast Cancer data set \citep{Dua:2019} was used. Tumour features are computed from digitized images, describing characteristics of the cell nuclei present in the image. In total there are $n = 569$ unique instances, where each instance has the respective tumour marked as either malignant ($M$) or benign ($B$). We aimed to classify the tumour as $M$ or $B$ based on 10 different attributes ranging from tumour radius to texture. Each of these 10 attributes were again split up into three different measurements, named mean, standard error and worst. The latter describes the mean of the three largest measurements. This data set serves a good real-world benchmarking set, containing not too many instances and no missing fields.  
 
     \subsubsection{Data Preparation}
-        All the data we handle, we will scale before using it for training and testing our algorithms. We will use the Standard scaling detailed in~\cite{Project1}. This ensures that features are all of the same order of magnitude, making the mean zero and std 1 for all of them individually. In the regression problems, we will also scale the observation data $\vec{y}$ too, whereas this is not done in the binary classification case.
+        All the data we handle, we will scale before using it for training and testing our algorithms. We will use the Standard scaling detailed in~\citep{Project1}. This ensures that features are all of the same order of magnitude, making the mean zero and std 1 for all of them individually. In the regression problems, we will also scale the observation data $\vec{y}$ too, whereas this is not done in the binary classification case.
 
 \subsection{Assessing Gradient Descent}
-    Our first analysis was a comparison of the various GD algorithms, as these make the basis for our neural network optimisation. We used the GD algorithms to optimise OLS and Ridge cost functions~\cite{Project1}, training them on the Franke function with 600 data points, with a train-test split of $\sfrac{3}{4}$, and a noise term added with std $\sigma=0.1$. This was done in anticipation of applying our Neural Network on terrain data, which the Franke function imitates.
+    Our first analysis was a comparison of the various GD algorithms, as these make the basis for our neural network optimisation. We used the GD algorithms to optimise OLS and Ridge cost functions~\citep{Project1}, training them on the Franke function with 600 data points, with a train-test split of $\sfrac{3}{4}$, and a noise term added with std $\sigma=0.1$. This was done in anticipation of applying our Neural Network on terrain data, which the Franke function imitates.
 
     \subsubsection{OLS Regression}
         First we focused on the OLS cost function
@@ -107,8 +107,8 @@
     
     Despite these restrictions, there are a plethora of components to tweak. Initially, we will begin by investigating how different hidden activation functions perform as a function of learning rate. Specifically, we will try Sigmoid, Hyperbolic tangent, ReLU and Leaky ReLU from \cref{app:activation_functions}. This analysis will be repeated for four different network structures, \network{1}{5}, \network{1}{10}, \network{2}{5} and \network{3}{5}  (GRADIENT DECENT METHOD??).
 
-    Taking complexity and performance into account, we will choose two of these structures with two different activation functions and perform an analysis using the $L_2$ penalisation. By varying both $\lambda$ and $\eta$ as hyperparameters, we see how different network structures behave with constraints on weight sizes. Lastly, choosing a specific structure we will compare our results with \textbf{scikit-learn} \cite{scikit-learn}
-    % As a loss function suitable for classification problems, the Binary Cross Entropy (BCE) \cite{BCE} was used:
+    Taking complexity and performance into account, we will choose two of these structures with two different activation functions and perform an analysis using the $L_2$ penalisation. By varying both $\lambda$ and $\eta$ as hyperparameters, we see how different network structures behave with constraints on weight sizes. Lastly, choosing a specific structure we will compare our results with \textbf{scikit-learn} \citep{scikit-learn}
+    % As a loss function suitable for classification problems, the Binary Cross Entropy (BCE) \citep{BCE} was used:
     % \begin{align}
     %     \msub{C}{BCE} = -\frac{1}{n}\sum_{i=1}^{n} y_i \log{\hat{p}_i} + (1-y_i) \log{(1-\hat{p}_i)},
     %     \label{eq:BCE_loss_function}
