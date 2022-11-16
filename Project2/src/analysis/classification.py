@@ -103,6 +103,23 @@ def logreg_different_opts(D_train, D_test):
 
     cu.logreg_different_opts(D_train, D_test, eta_range, opts, labels, filename="logreg_SGD")
 
+def logreg_different_opts_during_training(D_train, D_test):
+    max_its = 200
+    eta = 0.05
+    its = np.arange(1, max_its+1)
+    GD1 = GradientDescent("plain", dict(eta=eta), its=max_its)
+    mGD1 = GradientDescent("momentum", dict(gamma=0.8, eta=eta), its=max_its)
+    SGD = SGradientDescent("plain", dict(eta=eta), epochs=max_its, batch_size=200)
+    AdamSGD = SGradientDescent("adam", dict(eta=eta, beta1=0.9, beta2=0.99), epochs=max_its, batch_size=200)
+    adSGD = SGradientDescent("adagrad", dict(eta=eta), epochs=max_its, batch_size=200)
+
+
+    opts = [GD1, mGD1, SGD, AdamSGD, adSGD]
+    labels = ["GD", "mGD", "SGD", "Adam SGB", "AdaGrad SGD"]
+
+    cu.logreg_different_opts_during_opts(D_train, D_test, its, opts, labels, filename="logreg_acc_during_optimazation")
+
+
 if __name__ == "__main__":
     D_train, D_test = breast_cancer_data()
     # acc_eta_activation_functions(D_train, D_test)
@@ -110,5 +127,6 @@ if __name__ == "__main__":
 
     # cu.lmbda_eta_heatmap_sklearn(D_train, D_test)
     # cu.logreg_with_sklearn(D_train, D_test)
-    logreg_different_opts(D_train, D_test)
+    # logreg_different_opts(D_train, D_test)
+    logreg_different_opts_during_training(D_train, D_test)
     # cu.lmbda_eta_heatmap_sklearn(D_train, D_test, (0.001, 0.5, 5), lmbdas=(-6,0,5), filename="lmbda_lr_struct1_sigmoid_sklearn")
