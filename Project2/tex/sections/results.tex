@@ -230,19 +230,20 @@
 
 \subsection{Wisconsin Breast Cancer}
     \subsubsection{Logistic regression}
+    The different optimisation algorithms from our library of gradient decent methods were applied to optimise the BCE cost function without penalisation \cref[eq]{the:eq:logreg_cost_function} using Logistic regression. This is presented in \cref[fig]{res:fig:logreg_GD_opt} for GD methods with out without momentum, while SGD based methods is presented in \cref[fig]{res:fig:logreg_SGD_opt}   
 
     \begin{figure}
         \begin{subfigure}{.49\textwidth}
             \centering
             \includegraphics[width=\linewidth]{logreg_GD.pdf}
-            \caption{Showing accuracy as a function of learning rate, optimised using GD with and without momentum for 5 and 50 iterations.}
+            \caption{Showing accuracy as a function of learning rate, optimised using GD with ($\gamma = 0.8$) and without momentum for 5 and 50 iterations.}
             \label[fig]{res:fig:logreg_GD_opt}
         \end{subfigure}
         \begin{subfigure}{.49\textwidth}
             \centering
             \includegraphics[width=\linewidth]{logreg_SGD.pdf}
-            \caption{Showing accuracy as a function of learning rate, optimised plain, Adam and AdaGrad SGD while varying the number of epochs. For all optimisations, a batch size of 200 was used.}
-            \label[fig]{res:logreg_SGD_opt}
+            \caption{Showing accuracy as a function of learning rate, optimised plain, Adam ($\beta_1 = 0.9, \beta_2 = 0.99$) and AdaGrad SGD while varying the number of epochs. For all optimisations, a batch size of 200 was used.}
+            \label[fig]{res:fig:logreg_SGD_opt}
         \end{subfigure}
     \end{figure}
 
