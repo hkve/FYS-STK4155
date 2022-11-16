@@ -59,7 +59,6 @@ class GradientDescent:
             args (tuple, optional): arguments to be passed to grad-function. Defaults to ().
         """
         # assert that grad works as intended
-        print(self.params["eta"](0))
         grad0 = grad(x0, *args)
         assert grad0.shape == x0.shape, f"grad-function returns array of shape {grad0.shape} instead of shape {x0.shape}."
         del grad0
@@ -214,21 +213,34 @@ if __name__ == "__main__":
     random_state = 321
     np.random.seed(random_state)
     D = make_FrankeFunction(n=600, noise_std=0.1, random_state=random_state)
-    D = D.polynomial(degree=5).scaled(scheme="Standard")
-
+    D = D.polynomial(degree=5)
     D_train, D_test = D.train_test_split(ratio=3/4, random_state=random_state)
+    D_train = D_train.scaled("Standard")
+    D_test = D_train.scale(D_test)
 
-    max_iter = 100000
+    max_iter = 10000
+    theta0 = np.random.randn(D.n_features)
 
-    GD = GradientDescent("momentum", {"eta": 0.08, "gamma": 0.8}, its=max_iter)
-    theta_opt = GD.call(
+    GD = GradientDescent("momentum", {"eta": 0.10, "gamma": 0.8},
+                         its=max_iter)
+    SGD = SGradientDescent("momentum", {"eta": 0.10, "gamma": 0.8},
+                           epochs=max_iter, batch_size=128)
+    theta_GD = GD.call(
         grad=OLS_gradient,
-        x0=np.random.randn(D.n_features),
+        x0=theta0,
         args=(D_train,)
     )
+    theta_SGD = SGD.call(
+        grad=OLS_gradient,
+        x0=theta0,
+        all_idcs=np.arange(len(D_train)),
+        args=(D_train,)
+    )
+
     theta_ana = np.linalg.pinv(D_train.X.T@D_train.X) @ D_train.X.T @ D_train.y
 
-    MSE_GD = np.mean((D_test.X@theta_opt - D_test.y)**2)
+    MSE_GD = np.mean((D_test.X@theta_GD - D_test.y)**2)
+    MSE_SGD = np.mean((D_test.X@theta_SGD - D_test.y)**2)
     MSE_ana = np.mean((D_test.X@theta_ana - D_test.y)**2)
 
-    print(MSE_GD, MSE_ana)
+    print(MSE_GD, MSE_SGD, MSE_ana)
