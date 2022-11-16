@@ -1,10 +1,13 @@
 \comment{Suggestion: present tense, makes sense but might mess up some times H}\\
 
-Before we delve into to details of the theory section, it is useful to take a moment to define the quantities we will be dealing with. Let $\vec{y}$ denote a vector of a series of measured values $y_i$, $i\in 1, 2,\ldots, n$ at points $X$, where $X$ is a matrix where the rows $x_i$ correspond to the input values that produced the measurement $y_i$. For completeness, we refer to the columns of $X$ as $\vec{x}_a$, $a=1, 2,\ldots, p$.\footnote{Throughout this project, $a, b$ will always index the $p$ features for a model, and $i, j$ the $n$ data points.} Together, these form the dataset $\mathcal{D} = \cclosed{(y_i, x_i)}$. Another important set of values is $\vec{\theta}$ which contains the parameters that will define the model we will use to predict the data.
+When referring to the data we will be dealing without throughout this project, it is useful to define quantities clearly to limit the confusion. This was done in \cite{Project1}, but we will summarise it here.
 
-We will assume that the measurements $y_i$ are generated from an exact function $f(x)$ with stochastic noise $\epsilon$ added, such that $y_i = f(x_i) + \epsilon$. Throughout this project, we will assume that the noise to be distributed normally with zero mean and some standard deviation (std) $\sigma$; $\epsilon \distas \normal{0}{\sigma^2}$. Furthermore, we will assume that the noise between different measurements is independent and identically distributed (i.i.d.). Our job then is to model an $\hat{f}(x)$ that we want to be close to $f(x)$.
-\comment{Copied this section from previous project, as it will be useful here too. Needs rewriting, -\Carl}
-\comment{Also add somewhere: } \cite{Project1}.
+Letting $\vec{y} \in \mathbb{R}^n$ be a vector containing a series of $n$ measurements with a corresponding to an input matrix $X \in \mathbb{R}^{n\times p}$. The rows $x_i \in \mathbb{R}^p$ of $X$ are the $p$ inputs, or \textit{features}, producing the measurement $y_i$. The feature columns of $X$ are referred to as $\vec{x}_a \in \mathbb{R}^n$. Together these form a dataset $\mathcal{D} = \cclosed{(y_i, x_i)}$. Furthermore, we refer to the parameters of our models collectively by $\vec{\theta}$.
+
+The underlying assumption of our regression is that the measurements $y_i$ are produced from some \textit{exact} function $f(x_i): \mathbb{R}^p \to \mathbb{R}$, with an added stochastic noise $\epsilon$ which follows some unknown distribution. We will further assume that this noise is generated from some normal distribution $\epsilon \distas \normal{0}{\sigma^2}$ with some standard deviation (std) $\sigma$.
+
+In fitting our models to the data, we want to produce predictions $\hat{y} = \hat{f}(x)$ that approximates new measurements $y \sim f(x)$.
+
 \subsection{Gradient Descent Methods}\label[sec]{the:sec:gradient_decent_methods}
     \comment{This section might well be moved to method, it is not too theoretical. -\Carl}\\
     Optimisation of the parameters of the models we will be employing in this project is formulated as minimisation problems, with an associated cost function $C(\vec{\theta})$ to be minimised to find the optimal parameters.
@@ -80,10 +83,10 @@ We will assume that the measurements $y_i$ are generated from an exact function 
 
 
     \subsection{Neural Networks}
-        Artificial neural networks (ANN) are biologically inspired machine learning algorithms which can improve performance as they are exposed to data and without being programmed with any task-specific rules. In this project fully connected \textit{feed-forward neural networks (FFNN)} will be implemented. 
+        Artificial neural networks (ANN) are biologically inspired machine learning algorithms which can improve performance as they are exposed to data and without being programmed with any task-specific rules. In this project fully connected Feed-Forward Neural Networks (FFNN) will be implemented. 
         \subsubsection{Structure}
             First a non-mathematical, intuitive introduction. 
-            An ANN consists of an input layer and an output layer. Often the network will also have layers between the input and output, called \textit{hidden layers}. In that case the neural network is referred to as deep. Each layer contains \textit{nodes} which are supposed to represent the neurons in a biological neural network, or rather their activation. In a fully connected neural network, all nodes in one layer are connected to all the nodes in the previous as well as the next layer. These connections, which represent the synapses, are referred to as \textit{weights}, and the sizes of the weights are the synaptic strength. Each node also have an activation \textit{bias} which says something about how easily activated that specific neuron/node is. See \cref{the:fig:Illustration_NN} for an illustration of a simple, deep artificial neural network. 
+            An ANN consists of an input layer and an output layer. Often the network will also have layers between the input and output, called \textit{hidden layers}. In that case the neural network is often referred to as deep. Each layer contains \textit{nodes} which are supposed to represent the neurons in a biological neural network, or rather their activation. In a fully connected neural network, all nodes in one layer are connected to all the nodes in the previous as well as the next layer. These connections, which represent the synapses, are referred to as \textit{weights}, and the sizes of the weights are the synaptic strength. Each node also have an activation \textit{bias} which says something about how easily activated that specific neuron/node is. See \cref{the:fig:Illustration_NN} for an illustration of a simple artificial neural network. 
             \begin{figure} [ht]
                 \centering
                 \includegraphics[width=.85\linewidth]{figs/Illustration_NN.png}
@@ -100,12 +103,12 @@ We will assume that the measurements $y_i$ are generated from an exact function 
                 \caption{Illustration of a simple neural network with an input layer, and an output layer consisting of one node.}
                 \label[fig]{the:fig:simple_NN}
             \end{figure}
-            The simplest of neural networks is the \textit{Feed Forward Neural Network(FFNN)} which, as its name implies, feeds activation from the input layer and forward through the network, eventually ending up in the output layer. Given a NN with only an input layer, and an output layer consisting of one node (see \cref{the:fig:simple_NN}), the output $y$ is then  
+            The simplest of neural networks is the \textit{Feed Forward Neural Network(FFNN)} which, as its name implies, feeds activation from the input layer and forward through the network, eventually ending up in the output layer. Given a NN with only an input layer, and an output layer consisting of one node (see \cref{the:fig:simple_NN}), the output $\hat{y}$ is then  
             \begin{equation}
-                y=f\left(\sum_{i=1}^n w_i x_i+b\right)= f(z)
+                \hat{y}=f\left(\sum_{i=1}^n w_i x_i+b\right)= f(z)
             \label[eq]{the:eq:output}
             \end{equation} 
-            where $x_i$ constitutes the input, $w_i$ are the weights corresponding to each input variable, and $b$ the bias of the output node. We define $z$ as the sum over all the weighted inputs with bias added; $z=\pclosed{\Sigma_{i=1}^n w_ix_i + b}$. $f$ is called the \textit{activation function} and depends on the analysis being executed; e.g. regression, classification, etc. Each node has a corresponding activation function which defines the possible outputs of that node. The activation function closest to replicating the behaviour of a biological neuron is the Heaviside function which yields either $0$ or $1$; firing or not firing. However, there are in some cases advantages of abandoning this biological model. Some other, and currently more used activation functions are: identity, sigmoid, ReLu, tanh, and leaky ReLu some of which are plotted in \cref{the:fig:introducing_acts}. 
+            where $x_i$ constitutes the input, $w_i$ are the weights corresponding to each input variable, and $b$ the bias of the output node. We define $z$ as the sum over all the weighted inputs with bias added; $z=\pclosed{\Sigma_{i=1}^n w_ix_i + b}$. $f$ is called the \textit{activation function} and depends on the analysis being executed; e.g. regression, classification, etc. Each node in a network has a corresponding activation function which defines the possible outputs of that node. The activation function closest to replicating the behaviour of a biological neuron is the Heaviside function which yields either $0$ or $1$; firing or not firing. However, there are in some cases advantages of abandoning this biological model. Some other, and currently more used activation functions are: identity, sigmoid, ReLU, tanh, and leaky ReLU some of which are plotted in \cref{the:fig:introducing_acts}. 
             \begin{figure} [ht]
                 \centering
                 \includegraphics[width=\linewidth]{figs/introducing_acts.pdf}
@@ -117,37 +120,66 @@ We will assume that the measurements $y_i$ are generated from an exact function 
             It is normal that all the nodes in a layer have the same activation function $f$.    
             \comment{See more on activation functions in appendix ref} 
 
-            If we were to have a more complex neural network than the one from \cref{the:fig:simple_NN}, now also including hidden layers, $y$ (ref \cref{the:eq:output}) would be a node in the hidden layer after the input. Each node in the network would have its own activation bias and would be connected with the input, or activation from the previous layer, through "unique" weights. In \cref{the:eq:node_activation}, $l$ refers to the layer we are calculating the activation in, and $i$ to a specific node in that layer.  
+            If we were to have a more complex neural network than the one from \cref{the:fig:simple_NN}, now also including hidden layers, $\hat{y}$ (ref \cref{the:eq:output}) would be a node in the hidden layer after the input. Each node in the network would have its own activation bias and would be connected with the input, or activation from the previous layer, through independent weights. \cref{the:eq:node_activation} shows the calculated activation of a specific node $i$ in layer $l$ of the network.
             \begin{equation}
                 a^l_i = f^l \pclosed{\sum_{j=1}^{N_{l-1}} w_{ij}^l a_j^{l-1} + b^l} = f^l(z^l_i)
             \label[eq]{the:eq:node_activation}
             \end{equation}  
             \begin{equation}
-                z^l_i = \sum_{j=1}^{N_{l-1}} w_{ij}^l a_j^{l-1} + b^l
+                z^l_i = \sum_{j=1}^{N_{l-1}} w_{ij}^l a_j^{l-1} + b_i^l
             \end{equation}
-            We can write this in a more compact form:
+            This can be written in a more compact form like in \cref{the:eq:node_activation_compact}.
             \begin{equation}
                 \vec{z}^l = \pclosed{W^l}^T\vec{a}^{l-1} + \vec{b}^l
+                \label[eq]{the:eq:node_activation_compact}
             \end{equation}
+            The activations of the first layer go into calculating the activations of the next layer, which again go into the next, and then the next, until the activations of the output layer, $\vec{a}^L \equiv \hat{y}$, are found. 
 
 
 
         \subsubsection{Backpropagation}
-            The essence of neural networks as machine learning is \textit{training}. This means getting the network to adjust its parameters to better fit the data. A common algorithm used to do this is the \textit{Backpropagation algorithm}. A feed forward calculation of the network yields an output which can be compared with the true data output through a cost function. The goal is to minimise the cost. The only changes the network can do to get a different output, is to adjust its weights and biases. Backpropagation therefore uses the gradients of the cost function with respect to these parameters and applies a gradient descent method for finding the parameters yielding the lowest cost. The gradients are calculated through the chain rule and for one layer at the time, starting at the last layer and propagating backwards through the network, hence the name Backpropagation. 
-
-            Starting with the last layer $L$ the output error is 
-            \begin{equation}
-                \delta_i^L = \pdv{C}{z_i^L} = \pdv{C}{a_i^L} \pdv{a_i^L}{z_i^L} =  f'(z_i^L) \pdv{C}{a_i^L}
-            \end{equation}
-
-
-            \begin{equation}
-                \pdv{z^l_i}{w_{ij}^l} = a_i^{l-1}
-            \end{equation}
-
-
+            The essence of neural networks as machine learning is \textit{training}. This means getting the network to adjust its parameters to better fit the data. A common algorithm used to do this is the \textit{Backpropagation algorithm}. A feed forward calculation of the network yields an output which can be compared with the true data output through a cost function. The goal is to minimise the cost. The only changes the network can do to get a different output, is to adjust its weights and biases. Backpropagation is a method of finding the gradients of the cost function with respect to these parameters. The gradients are calculated through the chain rule and for one layer at the time, starting at the last layer and propagating backwards through the network, hence the name Backpropagation. When these are found one can apply a gradient descent method for finding the parameters yielding the lowest cost and implementing them in the network. After a feed forward pass with the new parameters, the process of backpropagation, gradient descent, and updating can be repeated. This is a way of training the network.     
+            
+            Mathematically, finding the gradients of the individual weights, $w_{ij}$, and biases, $b_i$, for the last layer $L$ can be done as in \cref{the:eq:bp_w_b_delta}.
+            \begin{subequations}
+                \label[eq]{the:eq:bp_w_b_delta}
+                \begin{align}
+                    \pdv{C}{b_i^L} &= \pdv{C}{z_i^L} \pdv{z_i^L}{b_i^L} = \pdv{C}{z_i^L} \equiv \delta_i^L 
+                \label[eq]{the:eq:bp_w}
+                \end{align}                
+                \begin{align}
+                    \pdv{C}{w_{ij}^L} = \pdv{C}{z_i^L}\pdv{z_i^L}{w_{ij}^L} = \delta_i^L a_j^{L-1}
+                \label[eq]{the:eq:bp_b}
+                \end{align}
+                \begin{align}
+                    \delta_i^L = \pdv{C}{z_i^L} = \pdv{C}{a_i^L}\pdv{a_i^L}{z_i^L} = \pdv{C}{a_i^L} f'(z_i^L)
+                \label[eq]{the:eq:bp_delta} 
+                \end{align}
+            \end{subequations}
+            All of these equations are independent of the cost function implemented and enables the use of automatic differentiation through tools like e.g. \verb|Autograd|. It is also possible to calculate all of these sizes analytically, but that yields less flexibility in the neural network. By the same approach, the gradients for the layers $l = L-1, L-2,...,1$ can be found: 
+            \begin{subequations}
+                \begin{align}
+                    \delta_i^l = \pdv{C}{z_i^l} = \sum_k \pdv{C}{z_k^{l+1}} \pdv{z_k^{l+1}}{z_i^l} 
+                    = \sum_k \delta_k^{l+1} \pdv{z_k^{l+1}}{z_i^l}
+                \end{align}
+                \begin{align}
+                    z_k^{l+1} = \sum_{j=1}^{N_l} w_{ki}^{l+1} a_i^l + b_k^{l+1}
+                \end{align}
+                \begin{align}
+                    \delta_i^l = \sum_k \delta_k^{l+1} w_{ki}^{l+1} f'(z_i^l)
+                \end{align}
+                \begin{align}
+                    \pdv{C}{b_i^L} = \delta_i^l \quad \wedge \quad 
+                    \pdv{C}{w_{ij}^L} = \delta_i^l a_j^{l-1}
+                \end{align}
+            \end{subequations}
+            \comment{Maybe remove the last two eqs?}
+            Having found the gradients of the parameters for all the layers, gradient descent can be implemented. 
 
     \subsubsection{Universal Approximation Theorem}
+            
+
+    \subsubsection{Regularisation}
 
 \subsection{Classification}
     Instead of predicting targets in a continuous domain ($y_i \in \mathbb{R}$), we aimed to put the target $y_i$ in a specific class ($y_i \in \mathcal{Q}$), where $\mathcal{Q}$ is the set of possible outcomes. This is named \textit{classification} \comment{Is this perhaps a bit confusing nomenclature? -\Carl}, where in the following we will only consider binary cases. This means we will try to classify mutually exclusive properties, that is either we have the outcome $O$ or not the outcome $O$ ($\mathcal{Q} = \{O, \neg O\}$). We will label these as $O = 1$ and $\neg O = 0$.

@@ -332,11 +332,14 @@ def regularization(D_train, D_test, nodes, layers, eta, lmbdas, batch_size, epoc
     else:
         plt.show()
 
+#Make a heatplot of eta vs lambda with R2
+
 def MSE(y_test, y_pred):
     assert y_test.shape == y_pred.shape, f"y and y_pred have different shapes. {y_test.shape =}, {y_pred.shape =}"
     return np.mean((y_test - y_pred)**2)
 
-def R2(y_test, y_pred)
+def R2(y_test, y_pred):
+    pass
 
 
 if __name__ == "__main__":

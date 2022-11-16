@@ -62,6 +62,9 @@
 
     We start by implementing the sigmoid activation function in the hidden layers. As 
 
+    \subsubsection{Initialisation of parameters}
+        When setting up the neural network, the weights and biases need to be set to initial values. Choosing these values can affect how the network trains and evetually performes. E.g. setting all the parameters to $0$ means the all the network does is map every input to $0$. Skalering (diskusjon)
+
     
 \subsection{Classification Problems}
     For our case using the Wisconsin Breast data set presented in \cref{breast_cancer_dataset}, we aimed to classify either $M$ or $B$. These categories are mutually exclusive, thus determining $M$ or not $M$ is sufficient (i.e. $\mathcal{Q} = \{ M, \neg M \}$). This gave us a binary problem, represented with $y_i \in \{ 1, 0 \}$ where $y_i = 1$ implies $M$ and $y_i = 0$ not $M$.
