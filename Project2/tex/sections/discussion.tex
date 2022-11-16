@@ -19,3 +19,7 @@
 
     \subsubsection{Ridge Penalisation on Linear Regression}
         Adding a ridge penalisation on the parameters of our linear regression optimisation seemed to have little to no effect. We might attribute this to the fact that our linear model was not complex, and the data was `nice' enough, as to not be prone to overfitting. Essentially, the degrees of freedom in our fit seemed appropriate, and did not need penalisation. It was interesting to note that it did decrease the sensitivity to the initialisation of the GD methods, however.
+
+
+\subsection{Model Selection}
+    Model selection is prevalent in all parts of this project, and in many cases, the difference between models has been marginal. To get a more thorough examination of which GD methods, regressors and classifiers work best, it would have been helpful to employ resampling techniques like bootstrap or cross-validation as in~\citep{Project1} to get better estimates for the scores we have employed throughout, e.g. MSE, R2 and accuracy.
