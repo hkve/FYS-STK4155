@@ -1,10 +1,13 @@
 \comment{Suggestion: present tense, makes sense but might mess up some times H}\\
 
-Before we delve into to details of the theory section, it is useful to take a moment to define the quantities we will be dealing with. Let $\vec{y}$ denote a vector of a series of measured values $y_i$, $i\in 1, 2,\ldots, n$ at points $X$, where $X$ is a matrix where the rows $x_i$ correspond to the input values that produced the measurement $y_i$. For completeness, we refer to the columns of $X$ as $\vec{x}_a$, $a=1, 2,\ldots, p$.\footnote{Throughout this project, $a, b$ will always index the $p$ features for a model, and $i, j$ the $n$ data points.} Together, these form the dataset $\mathcal{D} = \cclosed{(y_i, x_i)}$. Another important set of values is $\vec{\theta}$ which contains the parameters that will define the model we will use to predict the data.
+When referring to the data we will be dealing without throughout this project, it is useful to define quantities clearly to limit the confusion. This was done in \cite{Project1}, but we will summarise it here.
 
-We will assume that the measurements $y_i$ are generated from an exact function $f(x)$ with stochastic noise $\epsilon$ added, such that $y_i = f(x_i) + \epsilon$. Throughout this project, we will assume that the noise to be distributed normally with zero mean and some standard deviation (std) $\sigma$; $\epsilon \distas \normal{0}{\sigma^2}$. Furthermore, we will assume that the noise between different measurements is independent and identically distributed (i.i.d.). Our job then is to model an $\hat{f}(x)$ that we want to be close to $f(x)$.
-\comment{Copied this section from previous project, as it will be useful here too. Needs rewriting, -\Carl}
-\comment{Also add somewhere: } \cite{Project1}.
+Letting $\vec{y} \in \mathbb{R}^n$ be a vector containing a series of $n$ measurements with a corresponding to an input matrix $X \in \mathbb{R}^{n\times p}$. The rows $x_i \in \mathbb{R}^p$ of $X$ are the $p$ inputs, or \textit{features}, producing the measurement $y_i$. The feature columns of $X$ are referred to as $\vec{x}_a \in \mathbb{R}^n$. Together these form a dataset $\mathcal{D} = \cclosed{(y_i, x_i)}$. Furthermore, we refer to the parameters of our models collectively by $\vec{\theta}$.
+
+The underlying assumption of our regression is that the measurements $y_i$ are produced from some \textit{exact} function $f(x_i): \mathbb{R}^p \to \mathbb{R}$, with an added stochastic noise $\epsilon$ which follows some unknown distribution. We will further assume that this noise is generated from some normal distribution $\epsilon \distas \normal{0}{\sigma^2}$ with some standard deviation (std) $\sigma$.
+
+In fitting our models to the data, we want to produce predictions $\hat{y} = \hat{f}(x)$ that approximates new measurements $y \sim f(x)$.
+
 \subsection{Gradient Descent Methods}\label[sec]{the:sec:gradient_decent_methods}
     \comment{This section might well be moved to method, it is not too theoretical. -\Carl}\\
     Optimisation of the parameters of the models we will be employing in this project is formulated as minimisation problems, with an associated cost function $C(\vec{\theta})$ to be minimised to find the optimal parameters.
