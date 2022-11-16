@@ -89,8 +89,11 @@ def varying_activation_functions(D_train, D_test,
                 acc[j] = np.nan
 
         label = af.replace("_", " ").capitalize()
-        max_i = np.nanargmax(acc)
-        print(f"{af =}, acc = {acc[max_i]}, eta = {etas[max_i]}")
+        max_acc = np.nanmax(acc)
+        max_is = np.argwhere(acc==max_acc)
+
+        for max_i in max_is:
+            print(f"{af =}, acc = {acc[max_i][0]:.3f}, eta = {etas[max_i][0]:.3f}")
         ax.plot(etas, acc, label=label, marker=plot_utils.markers[i], linestyle="-", markersize=10, alpha=0.8)
 
     ax.set(xlabel="Learning rate", ylabel="Accuracy")
@@ -195,7 +198,7 @@ def lmbda_eta_heatmap_sklearn(D_train, D_test, etas, lmbdas, nodes=(5,5), filena
     if filename: plt.savefig(plot_utils.make_figs_path(filename))
     plt.show()
 
-def logreg_different_activations(D_train, D_test, eta_range, opts, labels, filename=None):
+def logreg_different_opts(D_train, D_test, eta_range, opts, labels, filename=None):
     etas = np.linspace(*eta_range)
 
     fig, ax = plt.subplots()
@@ -205,7 +208,6 @@ def logreg_different_activations(D_train, D_test, eta_range, opts, labels, filen
             opt.params["eta"] = lambda it: eta
             clf = LogReg().fit(D_train, opt)
             ACC[j] = clf.accuracy(D_test.X, D_test.y)
-            print(clf.converged)
         ax.plot(etas, ACC, label=labels[i])
 
     ax.set(xlabel="Learning rate", ylabel="Accuracy")

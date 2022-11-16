@@ -7,12 +7,57 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sys import exit
 from time import time
+from collections.abc import Callable
 import plot_utils
 
 import context
 from sknotlearn.data import Data
 from sknotlearn.linear_model import OLS_gradient, ridge_gradient
 from sknotlearn.optimize import GradientDescent, SGradientDescent
+
+
+def MSE(y_pred: np.ndarray, y_target: np.ndarray) -> float:
+    return np.mean((y_pred - y_target)**2)
+
+
+def OLS_solution(X: np.ndarray, y: np.ndarray) -> np.ndarray:
+    return np.linalg.pinv(X.T @ X) @ X.T @ y
+
+
+def ridge_solution(X: np.ndarray, y: np.ndarray, lmbda: float) -> np.ndarray:
+    Id = np.eye(X.shape(1))
+    return np.linalg.pinv(X.T @ X + lmbda*Id) @ X.T @ y
+
+
+def clip_exploded_gradients(val: float, lim: float, convergence: int) -> float:
+    if lim is not None:
+        limtest = val < lim
+    else:
+        limtest = True
+    if convergence and limtest:
+        return val
+    else:
+        return np.nan
+
+
+def call_optimizer(optimizer: GradientDescent,
+                   grad: Callable, x0: np.ndarray,
+                   idcs: np.ndarray) -> np.ndarray:
+    """Handles the different call signatures of GradientDescent and SGradientDescent"""
+    if isinstance(optimizer, SGradientDescent):
+        theta_opt = optimizer.call(
+            grad=grad,
+            x0=x0,
+            all_idcs=idcs
+        )
+    else:
+        theta_opt = optimizer.call(
+            grad=grad,
+            x0=x0,
+            args=(idcs,)
+        )
+    return theta_opt
+
 
 
 def tune_learning_rate(
@@ -59,14 +104,13 @@ def tune_learning_rate(
         def grad(theta, idcs): return OLS_gradient(theta,
                                                    data_train,
                                                    idcs)
-        theta_ana = np.linalg.pinv(X_train.T@X_train) @ X_train.T @ y_train
+        theta_ana = OLS_solution(X_train, y_train)
     else:
-        def grad(theta, idcs): ridge_gradient(theta,
-                                              data_train,
-                                              lmbda,
-                                              idcs)
-        theta_ana = np.linalg.pinv(X_train.T@X_train +
-                                   lmbda*np.eye(X_train.shape[1])) @ X_train.T @ y_train
+        def grad(theta, idcs): return ridge_gradient(theta,
+                                                     data_train,
+                                                     lmbda,
+                                                     idcs)
+        theta_ana = ridge_solution(X_train, y_train, lmbda)
 
     # Iterate through optimizers and compute/plot scores
     for optimizer, name, color in zip(optimizers,
@@ -81,39 +125,26 @@ def tune_learning_rate(
                 params["eta"] = learning_rate
                 optimizer.set_params(params)
 
-                # The call-signature of GD and SGD is slightly different
-                if isinstance(optimizer, SGradientDescent):
-                    theta_opt = optimizer.call(
-                        grad=grad,
-                        x0=x0,
-                        all_idcs=np.arange(len(data_train))
-                    )
-                else:
-                    theta_opt = optimizer.call(
-                        grad=grad,
-                        x0=x0,
-                        args=(np.arange(len(data_train)),)
-                    )
-                # Calculate MSE
-                MSE = np.mean((X_val@theta_opt - y_val)**2)
+                theta_opt = call_optimizer(optimizer,
+                                           grad, x0,
+                                           np.arange(len(data_train)))
                 # Check if gradient exploded
-                if ylims[1] is not None:
-                    limtest = MSE < 10*ylims[1]
-                else:
-                    limtest = True
-                if optimizer.converged and limtest:
-                    MSE_array[i, j] = MSE
-                else:
-                    MSE_array[i, j] = np.nan
+                MSE_array[i, j] = clip_exploded_gradients(
+                    val=MSE(X_val@theta_opt, y_val),
+                    lim=10*ylims[1] if ylims is not None else None,
+                    convergence=optimizer.converged
+                )
         # Average MSE across theta0s
         MSE_means = MSE_array.mean(axis=0)
         plt.plot(learning_rates, MSE_means, label=name, c=color)
+
         if len(theta0) > 1:  # Adding 95% confidence interval
             MSE_stds = MSE_array.std(axis=0) / np.sqrt(len(theta0)-1)
             plt.fill_between(learning_rates,
                              MSE_means-2*MSE_stds, MSE_means+2*MSE_stds,
                              alpha=0.3, color=color)
 
+        # Annotating the best MSE value
         argbest = np.nanargmin(MSE_means)
         plt.annotate("",
                      xy=(learning_rates[argbest], MSE_means[argbest]),
@@ -128,7 +159,7 @@ def tune_learning_rate(
                   f"({time()-start_time:.2f} s)")
 
     # Calculating analytical solution from matrix inversion
-    MSE_ana = np.mean((X_val@theta_ana - y_val)**2)
+    MSE_ana = MSE(X_val@theta_ana, y_val)
     if verbose:
         print(f"Analytical MSE score: {MSE_ana:.4}")
 
@@ -208,30 +239,14 @@ def tune_lambda_learning_rate(
                 params["eta"] = learning_rate
                 optimizer.set_params(params)
 
-                # Call signature is slightly different between GD and SGD.
-                if isinstance(optimizer, SGradientDescent):
-                    theta_opt = optimizer.call(
-                        grad=grad,
-                        x0=x0,
-                        all_idcs=np.arange(len(data_train))
-                    )
-                else:
-                    theta_opt = optimizer.call(
-                        grad=grad,
-                        x0=x0,
-                        args=(np.arange(len(data_train)),)
-                    )
-                # Calculate MSE
-                MSE = np.mean((X_val@theta_opt - y_val)**2)
-                # Check if gradient exploded
-                if vlims[1] is not None:
-                    limtest = MSE < 10*vlims[1]
-                else:
-                    limtest = True
-                if optimizer.converged and limtest:
-                    MSE_grid[i, j, k] = MSE
-                else:
-                    MSE_grid[i, j, k] = np.nan
+                theta_opt = call_optimizer(optimizer,
+                                           grad, x0,
+                                           np.arange(len(data_train)))
+                MSE_grid[i, j, k] = clip_exploded_gradients(
+                    val=MSE(X_val@theta_opt, y_val),
+                    lim=10*vlims[1] if vlims[1] is not None else None,
+                    convergence=optimizer.converged
+                )
     # Average MSE across theta0s
     mean_MSE_grid = MSE_grid.mean(axis=0)
     # Finding optimum
@@ -240,7 +255,7 @@ def tune_lambda_learning_rate(
         np.shape(mean_MSE_grid)
     )
     if verbose:
-        if len(theta0) > 1:  # Adding 95% confidence interval
+        if len(theta0) > 1:  # Finding std of mean
             std_MSE_grid = MSE_grid.std(axis=0) / np.sqrt(len(theta0)-1)
         else:
             MSE_stds = np.zeros_like(mean_MSE_grid)
@@ -313,9 +328,8 @@ def analytical_lmbda_plot(data_train: Data, data_val: Data, lmbdas: np.ndarray,
     MSE_array = np.zeros(len(lmbdas))
     for i, lmbda in enumerate(lmbdas):
         # Cumbersome analytic expression using pseudo-inverse for safety
-        theta_ana = np.linalg.pinv(X_train.T@X_train
-                    + lmbda * np.eye(data_train.n_features)) @ X_train.T @ y_train
-        MSE_array[i] = np.mean((X_val@theta_ana - y_val)**2)
+        theta_ana = ridge_solution(X_train, y_train, lmbda)
+        MSE_array[i] = MSE(X_val@theta_ana, y_val)
 
     if verbose:
         arg_best_MSE = MSE_array.argmin()
@@ -324,8 +338,8 @@ def analytical_lmbda_plot(data_train: Data, data_val: Data, lmbdas: np.ndarray,
     # Plotting
     plt.plot(np.log10(lmbdas), MSE_array, label="Analytical ridge solution")
     # The analytic OLS solution
-    theta_OLS = np.linalg.pinv(X_train.T@X_train) @ X_train.T @ y_train
-    MSE_OLS = np.mean((X_val@theta_OLS - y_val)**2)
+    theta_OLS = OLS_solution(X_train, y_train)
+    MSE_OLS = MSE(X_val@theta_OLS, y_val)
     if verbose:
         print(f"Best OLS MSE: {MSE_OLS:.4}")
     # Plotting this as a horizontal, grey line

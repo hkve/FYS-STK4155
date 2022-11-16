@@ -5,7 +5,7 @@
 
 \usepackage{overhead} % I put the overhead in a separate file
 
-\title{Project 2}
+\title{Optimising Simple Neural Networks as a Regressor and Classifier}
 \author{Anna Hjertvik Aasen, Carl Martin Fevang, Håkon Kvernmoen}
 \date{\today}
 
@@ -15,12 +15,12 @@
     \begin{@twocolumnfalse}
         \maketitle
         \begin{abstract}
-            This is the abstract.
+            At first we implemented ten GD and SGD algorithms and optimised OLS and ridge linear regression cost functions. Expanding a polynomial design matrix to degree 5 and fitting to the Franke function, we found SGD with Adam to perform the best, with a validation MSE of $0.1660 \pm 0.0018$, compared to the analytical OLS solution with a validation MSE of $0.1377$. Ridge penalisation did not improve the GD methods, but improved the analytical solution to $0.1338$ with $\lambda=0.002$. \comment{Write on about more results\ldots}
         \end{abstract}
     \end{@twocolumnfalse}
 ]
 
-% \tableofcontents
+\tableofcontents
 
 \section{Introduction}
 \input{sections/introduction}
@@ -40,14 +40,16 @@
 \section{Concluding remarks}
 \input{sections/conclusion}
 
+\printbibliography
+
 % for numbering appendix equations more appropriately
 \numberwithin{equation}{section}
 \renewcommand{\theequation}{\thesection.\arabic{equation}}
+\newpage
 \begin{appendices}
     \input{sections/appendix} 
 \end{appendices}
 
-\printbibliography
 
 \end{document}
 

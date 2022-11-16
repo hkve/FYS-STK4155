@@ -1,13 +1,14 @@
 \comment{Suggestion: present tense, makes sense but might mess up some times H}\\
-In this project, I thought we could use \verb|cleveref| to reference things like \cref{int:fig:example}.
 
+When referring to the data we will be dealing without throughout this project, it is useful to define quantities clearly to limit the confusion. This was done in \cite{Project1}, but we will summarise it here.
 
-Before we delve into to details of the theory section, it is useful to take a moment to define the quantities we will be dealing with. Let $\vec{y}$ denote a vector of a series of measured values $y_i$, $i\in 1, 2,\ldots, n$ at points $X$, where $X$ is a matrix where the rows $x_i$ correspond to the input values that produced the measurement $y_i$. For completeness, we refer to the columns of $X$ as $\vec{x}_a$, $a=1, 2,\ldots, p$.\footnote{Throughout this project, $a, b$ will always index the $p$ features for a model, and $i, j$ the $n$ data points.} Together, these form the dataset $\mathcal{D} = \cclosed{(y_i, x_i)}$. Another important set of values is $\vec{\theta}$ which contains the parameters that will define the model we will use to predict the data.
+Letting $\vec{y} \in \mathbb{R}^n$ be a vector containing a series of $n$ measurements with a corresponding to an input matrix $X \in \mathbb{R}^{n\times p}$. The rows $x_i \in \mathbb{R}^p$ of $X$ are the $p$ inputs, or \textit{features}, producing the measurement $y_i$. The feature columns of $X$ are referred to as $\vec{x}_a \in \mathbb{R}^n$. Together these form a dataset $\mathcal{D} = \cclosed{(y_i, x_i)}$. Furthermore, we refer to the parameters of our models collectively by $\vec{\theta}$.
 
-We will assume that the measurements $y_i$ are generated from an exact function $f(x)$ with stochastic noise $\epsilon$ added, such that $y_i = f(x_i) + \epsilon$. Throughout this project, we will assume that the noise to be distributed normally with zero mean and some standard deviation (std) $\sigma$; $\epsilon \distas \normal{0}{\sigma^2}$. Furthermore, we will assume that the noise between different measurements is independent and identically distributed (i.i.d.). Our job then is to model an $\hat{f}(x)$ that we want to be close to $f(x)$.
-\comment{Copied this section from previous project, as it will be useful here too. Needs rewriting, -\Carl}
-\comment{Also add somewhere: } \cite{Project1}.
-\subsection{Gradient Descent Methods}
+The underlying assumption of our regression is that the measurements $y_i$ are produced from some \textit{exact} function $f(x_i): \mathbb{R}^p \to \mathbb{R}$, with an added stochastic noise $\epsilon$ which follows some unknown distribution. We will further assume that this noise is generated from some normal distribution $\epsilon \distas \normal{0}{\sigma^2}$ with some standard deviation (std) $\sigma$.
+
+In fitting our models to the data, we want to produce predictions $\hat{y} = \hat{f}(x)$ that approximates new measurements $y \sim f(x)$.
+
+\subsection{Gradient Descent Methods}\label[sec]{the:sec:gradient_decent_methods}
     \comment{This section might well be moved to method, it is not too theoretical. -\Carl}\\
     Optimisation of the parameters of the models we will be employing in this project is formulated as minimisation problems, with an associated cost function $C(\vec{\theta})$ to be minimised to find the optimal parameters.
     \subsubsection{Plain Gradient Descent}
@@ -181,7 +182,7 @@ We will assume that the measurements $y_i$ are generated from an exact function 
     \subsubsection{Regularisation}
 
 \subsection{Classification}
-    Instead of predicting targets in a continuous domain ($y_i \in \mathbb{R}$), we aimed to put the target $y_i$ in a specific class ($y_i \in \mathcal{Q}$), where $\mathcal{Q}$ is the set of possible outcomes. This is named \textit{regression} \comment{Is this perhaps a bit confusing nomenclature? -\Carl}, where in the following we will only consider binary cases. This means we will try to classify mutually exclusive properties, that is either we have the outcome $O$ or not the outcome $O$ ($\mathcal{Q} = \{O, \neg O\}$). We will label these as $O = 1$ and $\neg O = 0$.
+    Instead of predicting targets in a continuous domain ($y_i \in \mathbb{R}$), we aimed to put the target $y_i$ in a specific class ($y_i \in \mathcal{Q}$), where $\mathcal{Q}$ is the set of possible outcomes. This is named \textit{classification} \comment{Is this perhaps a bit confusing nomenclature? -\Carl}, where in the following we will only consider binary cases. This means we will try to classify mutually exclusive properties, that is either we have the outcome $O$ or not the outcome $O$ ($\mathcal{Q} = \{O, \neg O\}$). We will label these as $O = 1$ and $\neg O = 0$.
 
     Two different methods for classification will be introduced here. Firstly we will look at \textit{logistic regression}, maybe the most common method in the domain of classification. In addition, under some restrictions, our neural network can be used for classification problems. Both of these models have an output $p(x_i)$ on the domain $[0,1]$, which we will interpret as the probability of the outcome $y_i = 1$. We will classify the data point $x_i$ as $\hat{y}_i = 1$ if $p(x_i) > \tau$ and $\hat{y}_i = 0$ if $p(x_i) < \tau$, where $\tau$ is the \textit{threshold}, a priori set to $\tau = 0.5$. 
 
@@ -198,27 +199,27 @@ We will assume that the measurements $y_i$ are generated from an exact function 
         Following the approach from \cite{Project1}, we have the likelihood for a Binomial distribution:      
 
         \begin{align*}
-            P(\vec{y}|X,\vec{\vec{\theta}}) = \prod_{i = 1}^{n} \sigma(X_{ia} \theta_a)^{y_i}[1-\sigma(X_{ia}\theta_a)]^{1 - y_i},
+            P(\vec{y}|X,\vec{\vec{\theta}}) = \prod_{i = 1}^{n} \sigma(X_{i*}\vec{\theta})^{y_i}[1-\sigma(X_{i*}\vec{\theta})]^{1 - y_i},
         \end{align*}
         where a sum over $a$ is implied. The cost function then follows from taking logarithm of the likelihood, presented with an overall negative sign giving a minimisation problem of the parameters $\vec{\theta}$. In the literature this is often called the \textit{Binary Cross Entropy} (BCE) cost function \cite{BCE}.  
 
         \begin{align}
             \msub{C}{BCE}(\vec{\theta}) =& - \frac{1}{n} \log P(\vec{y}|X,\vec{\vec{\theta}}) \nonumber \\ \nonumber
-            =& - \frac{1}{n} \sum_{i = 1}^{n} \Big\{ y_i \log[\sigma(X_{ia} \theta_a)] \\
-            &+ (1 - y_i)\log[1-\sigma(X_{ia}\theta_a)] \Big\}
-            \label[eq]{the:logreg_cost_function}
+            =& - \frac{1}{n} \sum_{i = 1}^{n} \Big\{ y_i \log[\sigma(X_{i*}\vec{\theta})] \\
+            &+ (1 - y_i)\log[1-\sigma(X_{i*}\vec{\theta})] \Big\}
+            \label[eq]{the:eq:logreg_cost_function}
         \end{align}
         Taking the derivative wrt. to a parameter $\theta_b$ recalling the derivative of the Sigmoid function from \cref{app:activation_functions} we find:
 
         \begin{align} \nonumber
-            \pdv{\theta_b} \msub{C}{BCE} =& - \frac{1}{n} \sum_{i = 1}^{n} \Big\{ y_i \bclosed{1-\sigma(X_{ia} \theta_a)}X_{ib} \\ \nonumber
-            &- (1-y_i)\sigma(X_{ia} \theta_a)X_{ib}  \Big\} \\
-            =& \sum_{i=1}^n \bclosed{\sigma(X_{ia}\theta_a) - y_i}X_{ib}
+            \pdv{\theta_b} \msub{C}{BCE} =& - \frac{1}{n} \sum_{i = 1}^{n} \Big\{ y_i \bclosed{1-\sigma(X_{i*}\vec{\theta})}X_{ib} \\ \nonumber
+            &- (1-y_i)\sigma(X_{i*}\vec{\theta})X_{ib}  \Big\} \\
+            =& \frac{1}{n}\sum_{i=1}^n \bclosed{\sigma(X_{i*}\vec{\theta}) - y_i}X_{ib}
         \end{align}
-        Finally, with $p_i = \sigma(X_{ia}\theta_a)$, we can express the gradient of the BCE cost function in vector notation.
+        Finally, with $p(x_i) = \sigma(X_{i*}\vec{\theta})$, we can express the gradient of the BCE cost function in vector notation.
         \begin{align}
-            \nabla_{\vec{\theta}} \msub{C}{BCE}(\vec{\theta}) = X^T (\vec{p} - \vec{y}) 
-            \label[eq]{the:logreg_gradient}
+            \nabla_{\vec{\theta}} \msub{C}{BCE}(\vec{\theta}) = \frac{1}{n}X^T (\vec{p} - \vec{y}) 
+            \label[eq]{the:eq:logreg_gradient}
         \end{align}
 
 
