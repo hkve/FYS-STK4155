@@ -1,2 +1,5 @@
 \comment{Suggestion: past tense}\\
 
+We have introduced and implemented a wide range of GD and SGD algorithms, and found that they perform satisfactorily when minimising OLS and ridge cost functions of linear regression problems. This was done on the Franke function with stochastic noise, using a polynomial expansion of degree 5 of the two arguments. Fitting to 600 points split into train- and test portions with a $\sfrac{3}{4}$ split, we found that adding momentum increased convergence rate and stability, adding stochasticity improved convergence rate and using tunable learning rates as with the AdaGrad, RMSprop and Adam algorithms increased stability. Overall, SGD with Adam performed the best with a validation MSE of $0.1660 \pm 0.0018$ using the OLS cost function with 500 epochs and a batch size of 200.
+
+Having applied linear regression to the Franke function, we moved on to actual terrain data, using our NN as a regressor. To be continued
