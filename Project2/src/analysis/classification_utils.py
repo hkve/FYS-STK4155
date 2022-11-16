@@ -1,9 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-import plot_utils
+from sklearn.linear_model import LogisticRegression
 
 import context
+import plot_utils
 from sknotlearn.optimize import SGradientDescent, GradientDescent
 from sknotlearn.neuralnet import NeuralNetwork
 from sknotlearn.logreg import LogisticRegression as LogReg
@@ -27,8 +28,9 @@ def shoter_labels(arg, n=5):
     if len(arg) > n:
         skip = int(len(arg)/n) 
         labels = arg[::skip]
-        ticks = np.arange(len(labels)+2*skip, step=skip)+.75
+        ticks = np.arange(len(labels), step=skip)+.75
 
+    print(len(ticks), len(labels))
     return ticks, labels
 
 def network_trainer(**kwargs):
@@ -232,15 +234,62 @@ def logreg_different_opts_during_opts(D_train, D_test, its, opts, labels, filena
     if filename: plt.savefig(plot_utils.make_figs_path(filename))
     plt.show()
 
-def logreg_with_sklearn(D_train, D_test):
-    from sklearn.linear_model import LogisticRegression
 
-    GD = GradientDescent(method= "plain", params= {"eta":1000},  its=1000)
+def logreg_heatmap(D_train, D_test, etas, lmbdas, filename=None):
+    etas = np.linspace(*etas)
+    lmbdas = np.logspace(*lmbdas)
+    ACC_grid = list()
+    for lmbda in lmbdas: 
+        ACC_list = list()
+        for eta in etas:
+            opt = SGradientDescent("adagrad_momentum", params={"gamma":0.8, "eta":eta}, epochs=100, batch_size=200)
+            clf = LogReg(lmbda=lmbda).fit(D_train, optimizer=opt)
 
-    clf1 = LogReg().fit(D_train, optimizer=GD)
-    clf2 = LogisticRegression(max_iter=10000).fit(D_train.X, D_train.y)
+            ACC = clf.accuracy(D_test.X, D_test.y) if clf.optimizer.converged else np.nan
+            ACC_list.append(ACC)
 
-    acc1 = clf1.accuracy(D_test.X, D_test.y)
-    acc2 = np.sum(clf2.predict(D_test.X) == D_test.y)/D_test.n_points
+        ACC_grid.append(ACC_list)
+        
+    ACC_grid = np.array(ACC_grid)
 
-    print(f"sknotlearn {acc1 = }, sklearn {acc2 = }")
+    fig, ax = plt.subplots()
+    sns.heatmap(ACC_grid, annot=True, cmap=plot_utils.cmap, ax=ax, cbar_kws={'label':'Accuracy'}, fmt=".3")
+    
+    arg_best_ACC = np.unravel_index(np.nanargmax(ACC_grid), np.shape(ACC_grid))
+    ib, jb = arg_best_ACC
+    ij_bests = np.argwhere(ACC_grid==ACC_grid[ib,jb])
+
+    for ij in ij_bests:
+        i, j = ij
+        print(f"Best ACC = {ACC_grid[i][j]}, lmbda = {lmbdas[i]:.4e}, eta = {etas[j]:.4e}")
+        ax.add_patch(plt.Rectangle((j, i), 1, 1, fc='none', ec='red', lw=5, clip_on=False))
+
+    ax.set_xlabel("Learning rate")
+    xticks, xlabels = shoter_labels(round_nearest(etas, decimals=1, sig=True))
+    ax.set_xticks(xticks, labels=xlabels)
+
+
+    ax.set_ylabel(r"log$_{10}(\lambda)$")
+    yticks, ylabels = shoter_labels(np.log10(lmbdas))
+    ax.set_yticks(yticks, labels=ylabels)
+    
+    if filename: plt.savefig(plot_utils.make_figs_path(filename))
+    plt.show()
+
+
+def logreg_with_sklearn(D_train, D_test, Cs, filename=None):
+    Cs = np.linspace(*Cs)
+    acc = np.zeros_like(Cs)
+
+    for i, C in enumerate(Cs):
+        clf = LogisticRegression(max_iter=10000, penalty="l2", C=C).fit(D_train.X, D_train.y)
+        acc[i] = clf.score(D_test.X, D_test.y)
+        print(f"{C = }, {acc[i] = }")
+
+    fig, ax = plt.subplots()
+
+    ax.plot(Cs, acc)
+    ax.set(xlabel=r"Penalisation $\alpha$", ylabel="Accuracy")
+    if filename: plt.savefig(plot_utils.make_figs_path(filename))
+    plt.show()
+    
