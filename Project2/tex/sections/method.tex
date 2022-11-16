@@ -73,10 +73,10 @@
             0\hspace{10px}&\text{else}
         \end{cases} \nonumber,
     \end{align}
-    where $I$ is the indicator function. We note that if all cases are classified correctly, the sum will evaluate to $n$ and if all are classified wrongly, it will evaluate to 0. Thus, the accuracy is bounded by $0 \leq A(y_i, \hat{y}_i) \leq 1$.
+    where $I$ is the indicator function, and $\hat{y}_i \in \{ 1, 0\}$ is our models classification based on the probability $p(x_i)$ and the threshold $\tau$. We note that if all cases are classified correctly, the sum will evaluate to $n$ and if all are classified wrongly, it will evaluate to 0. Thus, the accuracy is bounded by $0 \leq A(y_i, \hat{y}_i) \leq 1$. This will be calculated using the test set from a $\sfrac{3}{4}$ train-test split for both the neural network and logistic regression.
 
     \subsubsection{Logistic Regression}
-    To be continued ...
+    The optimal parameters for our BCE cost function \cref{the:eq:logreg_cost_function} can be found by the variouse optimisation schemes introduces presented in \ref{the:sec:gradient_decent_methods}   
 
     \subsubsection{Neural Network Approach}
     As a loss function suitable for classification problems, the Binary Cross Entropy (BCE) \cite{BCE} was used:
