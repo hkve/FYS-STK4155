@@ -7,7 +7,7 @@ Before we delve into to details of the theory section, it is useful to take a mo
 We will assume that the measurements $y_i$ are generated from an exact function $f(x)$ with stochastic noise $\epsilon$ added, such that $y_i = f(x_i) + \epsilon$. Throughout this project, we will assume that the noise to be distributed normally with zero mean and some standard deviation (std) $\sigma$; $\epsilon \distas \normal{0}{\sigma^2}$. Furthermore, we will assume that the noise between different measurements is independent and identically distributed (i.i.d.). Our job then is to model an $\hat{f}(x)$ that we want to be close to $f(x)$.
 \comment{Copied this section from previous project, as it will be useful here too. Needs rewriting, -\Carl}
 \comment{Also add somewhere: } \cite{Project1}.
-\subsection{Gradient Descent Methods}
+\subsection{Gradient Descent Methods}\label[sec]{the:sec:gradient_decent_methods}
     \comment{This section might well be moved to method, it is not too theoretical. -\Carl}\\
     Optimisation of the parameters of the models we will be employing in this project is formulated as minimisation problems, with an associated cost function $C(\vec{\theta})$ to be minimised to find the optimal parameters.
     \subsubsection{Plain Gradient Descent}
@@ -177,7 +177,7 @@ We will assume that the measurements $y_i$ are generated from an exact function 
             \msub{C}{BCE}(\vec{\theta}) =& - \frac{1}{n} \log P(\vec{y}|X,\vec{\vec{\theta}}) \nonumber \\ \nonumber
             =& - \frac{1}{n} \sum_{i = 1}^{n} \Big\{ y_i \log[\sigma(X_{ia} \theta_a)] \\
             &+ (1 - y_i)\log[1-\sigma(X_{ia}\theta_a)] \Big\}
-            \label[eq]{the:logreg_cost_function}
+            \label[eq]{the:eq:logreg_cost_function}
         \end{align}
         Taking the derivative wrt. to a parameter $\theta_b$ recalling the derivative of the Sigmoid function from \cref{app:activation_functions} we find:
 
@@ -186,10 +186,10 @@ We will assume that the measurements $y_i$ are generated from an exact function 
             &- (1-y_i)\sigma(X_{ia} \theta_a)X_{ib}  \Big\} \\
             =& \sum_{i=1}^n \bclosed{\sigma(X_{ia}\theta_a) - y_i}X_{ib}
         \end{align}
-        Finally, with $p_i = \sigma(X_{ia}\theta_a)$, we can express the gradient of the BCE cost function in vector notation.
+        Finally, with $p(x_i) = \sigma(X_{ia}\theta_a)$, we can express the gradient of the BCE cost function in vector notation.
         \begin{align}
             \nabla_{\vec{\theta}} \msub{C}{BCE}(\vec{\theta}) = X^T (\vec{p} - \vec{y}) 
-            \label[eq]{the:logreg_gradient}
+            \label[eq]{the:eq:logreg_gradient}
         \end{align}
 
 
