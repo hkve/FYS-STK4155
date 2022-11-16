@@ -18,6 +18,7 @@ sandkasse.py
 *.run.xml
 *.gz
 *.bcf
+*.toc
 
 
 *.npz
