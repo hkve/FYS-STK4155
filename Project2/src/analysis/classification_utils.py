@@ -289,7 +289,7 @@ def logreg_with_sklearn(D_train, D_test, Cs, filename=None):
     fig, ax = plt.subplots()
 
     ax.plot(Cs, acc)
-    ax.set(xlabel=r"Penalisation $\alpha$", ylabel="Accuracy")
+    ax.set(xlabel=r"Penalisation $C$", ylabel="Accuracy")
     if filename: plt.savefig(plot_utils.make_figs_path(filename))
     plt.show()
     
