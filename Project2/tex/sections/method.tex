@@ -84,14 +84,14 @@
         \msub{C}{CLF}(\vec{\theta}) = \msub{C}{BCE}(\vec{\theta}) +  \lambda\norm[2]{\vec{\theta}}^2
         \label[eq]{met:eq:classification_cost_function}.
     \end{align}
-    Initially, we will investigate how different methods from the GD and SGD family perform for a range of different learning rates. This will be done without any penalisation, that is $\lambda = 0$ in \cref{met:eq:classification_cost_function}. FILL IN SPECIFICS OF WHAT METHODS AND PARAMTERS.
+    Initially, we will investigate how different methods from the GD and SGD family perform for a range of different learning rates. This will be done without any penalisation, that is $\lambda = 0$ in \cref{met:eq:classification_cost_function}. FILL IN SPECIFICS OF WHAT METHODS AND PARAMTERS. blablabla what we will do.
 
     \subsubsection{Neural Network Approach}
     To use our neural network for classification problems, we must apply some restrictions to our neural network. As discussed, since we classify two mutually exclusive outcomes, a single output neuron will be sufficient. Since we wish to interpret this output as the probability for $M$, the output activation function must be bounded by $f(x) \in [0,1]$. Look at our activation function repertoire from \cref{app:activation_functions}, the only applicable functions (without any modifications) is the Sigmoid function. Assuming that the targets we wish to predict are drawn from a normal distribution does not resonate with what we know about classification problems. Therefor, using the OLS/Ridge cost function is not feasible. For this binary problem, a cost function derived form a Bernoulli distribution would be more feasible. The BCE cost function \cref{met:eq:classification_cost_function} is a better choice in this case.     
     
     Despite these restrictions, there are a plethora of components to tweak. Initially, we will begin by investigating how different hidden activation functions perform as a function of learning rate. Specifically, we will try Sigmoid, Hyperbolic tangent, ReLU and Leaky ReLU from \cref{app:activation_functions}. This analysis will be repeated for four different network structures, \network{1}{5}, \network{1}{10}, \network{2}{5} and \network{3}{5}  (GRADIENT DECENT METHOD??).
 
-    Taking complexity and performance into account, we will choose two of these structures with two different activation functions and perform an analysis using the $L_2$ penalisation. By varying both $\lambda$ and $\eta$ as hyperparameters, we see how different network structures behave with constraints on weight sizes.  
+    Taking complexity and performance into account, we will choose two of these structures with two different activation functions and perform an analysis using the $L_2$ penalisation. By varying both $\lambda$ and $\eta$ as hyperparameters, we see how different network structures behave with constraints on weight sizes. Lastly, choosing a specific structure we will compare our results with \textbf{scikit-learn} \cite{scikit-learn}
     % As a loss function suitable for classification problems, the Binary Cross Entropy (BCE) \cite{BCE} was used:
     % \begin{align}
     %     \msub{C}{BCE} = -\frac{1}{n}\sum_{i=1}^{n} y_i \log{\hat{p}_i} + (1-y_i) \log{(1-\hat{p}_i)},

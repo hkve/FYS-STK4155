@@ -81,19 +81,27 @@ def lmbda_eta_heatmaps(D_train, D_test):
             cu.lmbda_eta_heatmap(D_train, D_test, eta_range, lmbda_range, nodes=nodes, activation_hidden=af, filename=filename)
 
 def logreg_different_opts(D_train, D_test):
-    max_iter = 100
-    batch_size = 200
     eta_range = (.1,1, 20)
 
-    GD = GradientDescent("plain", dict(eta=0.), its=max_iter)
-    mGD = GradientDescent("momentum", dict(gamma=0.8, eta=0.), its=max_iter)
-    SGD = SGradientDescent("plain", dict(eta=0.), epochs=max_iter, batch_size=batch_size)
-    adSGD = SGradientDescent("adam", dict(eta=0., beta1=0.9, beta2=0.99), epochs=max_iter, batch_size=batch_size)
-    
-    labels = ["GD", "MGD", "SGD", "AdaSGB"]
-    opts = [GD, mGD, SGD, adSGD]
+    GD_few = GradientDescent("plain", dict(eta=0.), its=5)
+    GD_many = GradientDescent("plain", dict(eta=0.), its=50)
+    mGD_few = GradientDescent("momentum", dict(gamma=0.8, eta=0.), its=5)
+    mGD_many = GradientDescent("momentum", dict(gamma=0.8, eta=0.), its=50)
 
-    cu.logreg_different_opts(D_train, D_test, eta_range, opts, labels)
+    labels = ["GD, 5 iters", "GD, 50 iters", "mGD, 5 iters", "mGD, 50 iters"]
+    opts = [GD_few, GD_many, mGD_few, mGD_many]    
+    cu.logreg_different_opts(D_train, D_test, eta_range, opts, labels, filename="logreg_GD")
+
+
+    SGD_few = SGradientDescent("plain", dict(eta=0.), epochs=5, batch_size=200)
+    SGD_many = SGradientDescent("plain", dict(eta=0.), epochs=50, batch_size=200)
+    AdamSGD = SGradientDescent("adam", dict(eta=0., beta1=0.9, beta2=0.99), epochs=5, batch_size=200)
+    adSGD = SGradientDescent("adagrad", dict(eta=0.), epochs=5, batch_size=200)
+
+    labels = ["SGD, 5 epochs", "SGD2, 50 epochs", "Adam SGD, 5 epochs", "AdaGrad SGD, 5 epochs"]
+    opts = [SGD_few, SGD_many, AdamSGD, adSGD] # , mGD, SGD, adSGD
+
+    cu.logreg_different_opts(D_train, D_test, eta_range, opts, labels, filename="logreg_SGD")
 
 if __name__ == "__main__":
     D_train, D_test = breast_cancer_data()
@@ -102,5 +110,5 @@ if __name__ == "__main__":
 
     # cu.lmbda_eta_heatmap_sklearn(D_train, D_test)
     # cu.logreg_with_sklearn(D_train, D_test)
-    # logreg_different_opts(D_train, D_test)
+    logreg_different_opts(D_train, D_test)
     # cu.lmbda_eta_heatmap_sklearn(D_train, D_test, (0.001, 0.5, 5), lmbdas=(-6,0,5), filename="lmbda_lr_struct1_sigmoid_sklearn")

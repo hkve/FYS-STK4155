@@ -89,8 +89,11 @@ def varying_activation_functions(D_train, D_test,
                 acc[j] = np.nan
 
         label = af.replace("_", " ").capitalize()
-        max_i = np.nanargmax(acc)
-        print(f"{af =}, acc = {acc[max_i]}, eta = {etas[max_i]}")
+        max_acc = np.nanmax(acc)
+        max_is = np.argwhere(acc==max_acc)
+
+        for max_i in max_is:
+            print(f"{af =}, acc = {acc[max_i][0]:.3f}, eta = {etas[max_i][0]:.3f}")
         ax.plot(etas, acc, label=label, marker=plot_utils.markers[i], linestyle="-", markersize=10, alpha=0.8)
 
     ax.set(xlabel="Learning rate", ylabel="Accuracy")
@@ -205,7 +208,6 @@ def logreg_different_opts(D_train, D_test, eta_range, opts, labels, filename=Non
             opt.params["eta"] = lambda it: eta
             clf = LogReg().fit(D_train, opt)
             ACC[j] = clf.accuracy(D_test.X, D_test.y)
-            print(clf.converged)
         ax.plot(etas, ACC, label=labels[i])
 
     ax.set(xlabel="Learning rate", ylabel="Accuracy")
