@@ -34,6 +34,7 @@
         First we focused on the OLS cost function
         \begin{align}
             \msub{C}{OLS}(\vec{\theta}) = \frac{1}{n}\sum_{i=1}^n \pclosed{X_{i*}\vec{\theta} - y_i}^2,
+            \label[eq]{met:eq:ols_cost_function}
         \end{align}
         with a polynomial expansion of degree $5$ of the Franke function arguments $x,y$. We plot the MSE resulting from the predictions of the optimised parameters on the validation data as a function of learning rates. We looked at learning rates from close to zero to where `exploding gradients' occurred, which was different between the different algorithms.\footnote{Exploding gradients happen when the learning rate is large enough to overshoot the minima, and then start oscillating wildly away from the minima; blowing up.}
 
@@ -45,7 +46,8 @@
     \subsubsection{Ridge Regression}
         Adding an $L_2$-penalisation term to the OLS cost function gives us the Ridge cost function
         \begin{align}
-            \msub{C}{ridge}(\vec{\theta}) = \frac{1}{n}\sum_{i=1}^n \pclosed{X_{i*}\vec{\theta} - y_i}^2 + \lambda\norm[2]{\vec{\theta}}^2.
+            \msub{C}{ridge}(\vec{\theta}) = \frac{1}{n}\sum_{i=1}^n \pclosed{X_{i*}\vec{\theta} - y_i}^2 + \lambda\norm[2]{\vec{\theta}}^2. 
+            \label[eq]{met:eq:ridge_cost_function}
         \end{align}
 
         We selected the four momentum based algorithms from the OLS analysis to see how they responded to changing of learning rate and $\lambda$-parameter in predicting the validation data. Again we used 500 iterations for the GD method, and 500 epochs with batch size 200 with the SGD methods. Varying $\lambda \in [10^{-8}, 10^1]$, we compared first with a fixed learning rate between GD and SGD with momentum ($\gamma=0.8$). Then we used a tunable learning rate and SGD with AdaGrad with momentum ($\gamma=0.8$) and finally Adam $(\beta_1=0.9, \beta_2=0.99)$.
@@ -76,12 +78,23 @@
     where $I$ is the indicator function, and $\hat{y}_i \in \{ 1, 0\}$ is our models classification based on the probability $p(x_i)$ and the threshold $\tau$. We note that if all cases are classified correctly, the sum will evaluate to $n$ and if all are classified wrongly, it will evaluate to 0. Thus, the accuracy is bounded by $0 \leq A(y_i, \hat{y}_i) \leq 1$. This will be calculated using the test set from a $\sfrac{3}{4}$ train-test split for both the neural network and logistic regression.
 
     \subsubsection{Logistic Regression}
-    The optimal parameters for our BCE cost function \cref{the:eq:logreg_cost_function} can be found by the variouse optimisation schemes introduces presented in \ref{the:sec:gradient_decent_methods}   
+    The optimal parameters for our BCE cost function \cref{the:eq:logreg_cost_function} can be found by the various optimisation schemes introduces in \cref{the:sec:gradient_decent_methods}. Taking the BCE cost function, we add an $L_2$-penalisation to have some constraint on the parameter sizes. This gives the cost function
+
+    \begin{align}
+        \msub{C}{CLF}(\vec{\theta}) = \msub{C}{BCE}(\vec{\theta}) +  \lambda\norm[2]{\vec{\theta}}^2
+        \label[eq]{met:eq:classification_cost_function}.
+    \end{align}
+    Initially, we will investigate how different methods from the GD and SGD family perform for a range of different learning rates. This will be done without any penalisation, that is $\lambda = 0$ in \cref{met:eq:classification_cost_function}. FILL IN SPECIFICS OF WHAT METHODS AND PARAMTERS.
 
     \subsubsection{Neural Network Approach}
-    As a loss function suitable for classification problems, the Binary Cross Entropy (BCE) \cite{BCE} was used:
-    \begin{align}
-        \msub{C}{BCE} = -\frac{1}{n}\sum_{i=1}^{n} y_i \log{\hat{p}_i} + (1-y_i) \log{(1-\hat{p}_i)},
-        \label{eq:BCE_loss_function}
-    \end{align} 
-    where $\hat{p}_i$ is the predicted probability of $y_i = 1$ given $x_i$.  
+    To use our neural network for classification problems, we must make a restriction on our output layer activation functions. As discussed, since we classify two mutually exclusive outcomes, a single output neuron will be sufficient. Since we wish to interpret this output as the probability for $M$, the output activation function must be bounded by $f(x) \in [0,1]$. Look at our activation function repertoire from \cref{app:activation_functions}, the only applicable functions (without any modifications) is the Sigmoid function. 
+    
+    Despite these restrictions, there are a plethora of components to tweak. Initially, we will begin by investigating how different hidden activation functions perform as a function of learning rate. Specifically, we will try Sigmoid, Hyperbolic tangent, ReLU and Leaky ReLU from \cref{app:activation_functions}. This analysis will be repeated for four different network structures, \network{1}{5}, \network{1}{10}, \network{2}{5} and \network{3}{5}  (GRADIENT DECENT METHOD??).
+
+    Taking complexity and performance into account, we will choose two of these structures with two different activation functions and perform an analysis using the $L_2$ penalisation. By varying both $\lambda$ and $\eta$ as hyperparameters, we see how different network structures behave with constraints on weight sizes.  
+    % As a loss function suitable for classification problems, the Binary Cross Entropy (BCE) \cite{BCE} was used:
+    % \begin{align}
+    %     \msub{C}{BCE} = -\frac{1}{n}\sum_{i=1}^{n} y_i \log{\hat{p}_i} + (1-y_i) \log{(1-\hat{p}_i)},
+    %     \label{eq:BCE_loss_function}
+    % \end{align} 
+    % where $\hat{p}_i$ is the predicted probability of $y_i = 1$ given $x_i$.  

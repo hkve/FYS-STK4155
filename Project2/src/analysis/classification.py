@@ -80,7 +80,7 @@ def lmbda_eta_heatmaps(D_train, D_test):
             filename = f"lmbda_lr_struct{i}_{af}"
             cu.lmbda_eta_heatmap(D_train, D_test, eta_range, lmbda_range, nodes=nodes, activation_hidden=af, filename=filename)
 
-def logreg_different_activations(D_train, D_test):
+def logreg_different_opts(D_train, D_test):
     max_iter = 100
     batch_size = 200
     eta_range = (.1,1, 20)
@@ -93,7 +93,7 @@ def logreg_different_activations(D_train, D_test):
     labels = ["GD", "MGD", "SGD", "AdaSGB"]
     opts = [GD, mGD, SGD, adSGD]
 
-    cu.logreg_different_activations(D_train, D_test, eta_range, opts, labels)
+    cu.logreg_different_opts(D_train, D_test, eta_range, opts, labels)
 
 if __name__ == "__main__":
     D_train, D_test = breast_cancer_data()
@@ -102,5 +102,5 @@ if __name__ == "__main__":
 
     # cu.lmbda_eta_heatmap_sklearn(D_train, D_test)
     # cu.logreg_with_sklearn(D_train, D_test)
-    # logreg_different_activations(D_train, D_test)
-    cu.lmbda_eta_heatmap_sklearn(D_train, D_test, (0.001, 0.5, 5), lmbdas=(-6,0,5), filename="lmbda_lr_struct1_sigmoid_sklearn")
+    # logreg_different_opts(D_train, D_test)
+    # cu.lmbda_eta_heatmap_sklearn(D_train, D_test, (0.001, 0.5, 5), lmbdas=(-6,0,5), filename="lmbda_lr_struct1_sigmoid_sklearn")

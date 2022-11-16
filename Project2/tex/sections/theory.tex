@@ -152,7 +152,7 @@ We will assume that the measurements $y_i$ are generated from an exact function 
     \subsubsection{Universal Approximation Theorem}
 
 \subsection{Classification}
-    Instead of predicting targets in a continuous domain ($y_i \in \mathbb{R}$), we aimed to put the target $y_i$ in a specific class ($y_i \in \mathcal{Q}$), where $\mathcal{Q}$ is the set of possible outcomes. This is named \textit{regression} \comment{Is this perhaps a bit confusing nomenclature? -\Carl}, where in the following we will only consider binary cases. This means we will try to classify mutually exclusive properties, that is either we have the outcome $O$ or not the outcome $O$ ($\mathcal{Q} = \{O, \neg O\}$). We will label these as $O = 1$ and $\neg O = 0$.
+    Instead of predicting targets in a continuous domain ($y_i \in \mathbb{R}$), we aimed to put the target $y_i$ in a specific class ($y_i \in \mathcal{Q}$), where $\mathcal{Q}$ is the set of possible outcomes. This is named \textit{classification} \comment{Is this perhaps a bit confusing nomenclature? -\Carl}, where in the following we will only consider binary cases. This means we will try to classify mutually exclusive properties, that is either we have the outcome $O$ or not the outcome $O$ ($\mathcal{Q} = \{O, \neg O\}$). We will label these as $O = 1$ and $\neg O = 0$.
 
     Two different methods for classification will be introduced here. Firstly we will look at \textit{logistic regression}, maybe the most common method in the domain of classification. In addition, under some restrictions, our neural network can be used for classification problems. Both of these models have an output $p(x_i)$ on the domain $[0,1]$, which we will interpret as the probability of the outcome $y_i = 1$. We will classify the data point $x_i$ as $\hat{y}_i = 1$ if $p(x_i) > \tau$ and $\hat{y}_i = 0$ if $p(x_i) < \tau$, where $\tau$ is the \textit{threshold}, a priori set to $\tau = 0.5$. 
 
@@ -169,26 +169,26 @@ We will assume that the measurements $y_i$ are generated from an exact function 
         Following the approach from \cite{Project1}, we have the likelihood for a Binomial distribution:      
 
         \begin{align*}
-            P(\vec{y}|X,\vec{\vec{\theta}}) = \prod_{i = 1}^{n} \sigma(X_{ia} \theta_a)^{y_i}[1-\sigma(X_{ia}\theta_a)]^{1 - y_i},
+            P(\vec{y}|X,\vec{\vec{\theta}}) = \prod_{i = 1}^{n} \sigma(X_{i*}\vec{\theta})^{y_i}[1-\sigma(X_{i*}\vec{\theta})]^{1 - y_i},
         \end{align*}
         where a sum over $a$ is implied. The cost function then follows from taking logarithm of the likelihood, presented with an overall negative sign giving a minimisation problem of the parameters $\vec{\theta}$. In the literature this is often called the \textit{Binary Cross Entropy} (BCE) cost function \cite{BCE}.  
 
         \begin{align}
             \msub{C}{BCE}(\vec{\theta}) =& - \frac{1}{n} \log P(\vec{y}|X,\vec{\vec{\theta}}) \nonumber \\ \nonumber
-            =& - \frac{1}{n} \sum_{i = 1}^{n} \Big\{ y_i \log[\sigma(X_{ia} \theta_a)] \\
-            &+ (1 - y_i)\log[1-\sigma(X_{ia}\theta_a)] \Big\}
+            =& - \frac{1}{n} \sum_{i = 1}^{n} \Big\{ y_i \log[\sigma(X_{i*}\vec{\theta})] \\
+            &+ (1 - y_i)\log[1-\sigma(X_{i*}\vec{\theta})] \Big\}
             \label[eq]{the:eq:logreg_cost_function}
         \end{align}
         Taking the derivative wrt. to a parameter $\theta_b$ recalling the derivative of the Sigmoid function from \cref{app:activation_functions} we find:
 
         \begin{align} \nonumber
-            \pdv{\theta_b} \msub{C}{BCE} =& - \frac{1}{n} \sum_{i = 1}^{n} \Big\{ y_i \bclosed{1-\sigma(X_{ia} \theta_a)}X_{ib} \\ \nonumber
-            &- (1-y_i)\sigma(X_{ia} \theta_a)X_{ib}  \Big\} \\
-            =& \sum_{i=1}^n \bclosed{\sigma(X_{ia}\theta_a) - y_i}X_{ib}
+            \pdv{\theta_b} \msub{C}{BCE} =& - \frac{1}{n} \sum_{i = 1}^{n} \Big\{ y_i \bclosed{1-\sigma(X_{i*}\vec{\theta})}X_{ib} \\ \nonumber
+            &- (1-y_i)\sigma(X_{i*}\vec{\theta})X_{ib}  \Big\} \\
+            =& \frac{1}{n}\sum_{i=1}^n \bclosed{\sigma(X_{i*}\vec{\theta}) - y_i}X_{ib}
         \end{align}
-        Finally, with $p(x_i) = \sigma(X_{ia}\theta_a)$, we can express the gradient of the BCE cost function in vector notation.
+        Finally, with $p(x_i) = \sigma(X_{i*}\vec{\theta})$, we can express the gradient of the BCE cost function in vector notation.
         \begin{align}
-            \nabla_{\vec{\theta}} \msub{C}{BCE}(\vec{\theta}) = X^T (\vec{p} - \vec{y}) 
+            \nabla_{\vec{\theta}} \msub{C}{BCE}(\vec{\theta}) = \frac{1}{n}X^T (\vec{p} - \vec{y}) 
             \label[eq]{the:eq:logreg_gradient}
         \end{align}
 

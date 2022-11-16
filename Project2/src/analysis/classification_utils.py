@@ -195,7 +195,7 @@ def lmbda_eta_heatmap_sklearn(D_train, D_test, etas, lmbdas, nodes=(5,5), filena
     if filename: plt.savefig(plot_utils.make_figs_path(filename))
     plt.show()
 
-def logreg_different_activations(D_train, D_test, eta_range, opts, labels, filename=None):
+def logreg_different_opts(D_train, D_test, eta_range, opts, labels, filename=None):
     etas = np.linspace(*eta_range)
 
     fig, ax = plt.subplots()
