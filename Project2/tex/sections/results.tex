@@ -311,24 +311,14 @@
         \end{subfigure}
     \end{figure}
 
-    
+    Using Adam SGD with $\beta_1 = 0.9, \beta_2 = 0.99$ as an optimasation algorithm, the validation accuracy varied for both penalisation $\lambda$ and learning rate $\eta$ is shown in \cref{res:fig:logreg_penalisation}. We found that multiple models gave the same optimal validation accuracy, for both low penalisation $(\lambda = 10^6)$ and higher penalisation $(\lambda = 10^{-1.5})$. The $(\lambda = 10^6)$ used a learning rate of $\eta = 0.13$ while the $\lambda = 10^{-1.5}$ models used higher learning rates in the range $\eta \in [0.25, 0.5]$
+ 
 
-    \begin{figure*}
-        \begin{subfigure}{.49\textwidth}
-            \includegraphics[width=\linewidth]{logreg_penalisation.pdf}
-            \caption{Validation accuracy for logistic regression as a function of learning rate and penalisation parameter $\lambda$. Largest accuracy of $A = 0.986$ found at $\eta = 0.1, \lambda = 10^{-6}$.}
-            \label[fig]{res:fig:logreg_penalisation_ours}
-        \end{subfigure}
-        \hfill 
-        \begin{subfigure}{.49\textwidth}
-            \centering
-            \includegraphics[width=\linewidth]{logreg_penalisation_sklearn.pdf}
-            \caption{Validation accuracy for scikit-learn's  implementation of logistic regression as a function penalisation parameter $C$. }
-            \label[fig]{res:fig:logreg_penalisation_sklearn}
-        \end{subfigure}
-        \caption{\comment{These plots are stupid, but I am tired and can not bother tweaking to make them look any better.}}
+    \begin{figure}
+        \includegraphics[width=\linewidth]{logreg_penalisation.pdf}
+        \caption{Validation accuracy for logistic regression as a function of learning rate and penalisation parameter $\lambda$. Largest accuracy of $A = 0.986$ found at $\lambda = 10^{-6}$ using $\eta = 0.13$ and $\lambda = 10^{-1.5}$ with $\eta = 0.25, 0.38$ and $0.50$}
         \label[fig]{res:fig:logreg_penalisation}
-    \end{figure*}
+    \end{figure}
 
     \subsubsection{Classification Neural Network}
     \begin{table}

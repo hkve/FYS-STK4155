@@ -243,7 +243,7 @@ def logreg_heatmap(D_train, D_test, etas, lmbdas, filename=None):
     for lmbda in lmbdas: 
         ACC_list = list()
         for eta in etas:
-            opt = SGradientDescent("adagrad_momentum", params={"gamma":0.8, "eta":eta}, epochs=100, batch_size=200)
+            opt = SGradientDescent("adam", params={"eta":eta, "beta1": 0.9, "beta2": 0.99}, epochs=100, batch_size=200)
             clf = LogReg(lmbda=lmbda).fit(D_train, optimizer=opt)
 
             ACC = clf.accuracy(D_test.X, D_test.y) if clf.optimizer.converged else np.nan
@@ -266,7 +266,7 @@ def logreg_heatmap(D_train, D_test, etas, lmbdas, filename=None):
         ax.add_patch(plt.Rectangle((j, i), 1, 1, fc='none', ec='red', lw=5, clip_on=False))
 
     ax.set_xlabel("Learning rate")
-    xticks, xlabels = shoter_labels(round_nearest(etas, decimals=1, sig=True))
+    xticks, xlabels = shoter_labels(round_nearest(etas, decimals=2, sig=True))
     ax.set_xticks(xticks, labels=xlabels)
 
 
