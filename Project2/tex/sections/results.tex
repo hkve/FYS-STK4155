@@ -234,41 +234,50 @@
         \end{figure*}
 
     \subsubsection{Exploring Regularisation}
-        
-        % From $\lambda$ vs validation MSE-plot
-        % Best MSE: 0.0782059642062313
-        % corresponding lambda: 7.906043210907685e-05 or log10 of this: -4.102040816326531
-        \begin{figure}
-            \centering
-            \includegraphics[width=\linewidth]{lmbdas_NN_reg.pdf}
-            \caption{}
+        From \cref{res:fig:regularisation_2D} the $\lambda$ yielding the lowest MSE value was $\lambda = 10^{-4.1}$ giving  $MSE = 0.078$. This was for the network with $\eta = 0.001$. When also varying the learning rate (see \cref{res:fig:regularisation_heatmap}), the optimal network also had $\eta = 0.001$ and now $\lambda = 10^{-4}$. 
+        \begin{figure*}            
+            \begin{subfigure}{.49\textwidth}
+                \centering
+                \includegraphics[width=\linewidth]{lmbdas_NN_reg.pdf}
+                \caption{ Plot of the validation MSE as a function of the regularisation, $\lambda$s. \network{5}{200}, with sigmoid and $\eta = 0.001$.}
+                \label[fig]{res:fig:regularisation_2D}
+            \end{subfigure}
+            \begin{subfigure}{.49\textwidth}
+                \centering
+                \includegraphics[width=\linewidth]{lmbdas_etas_heatmap_5_2.pdf}
+                \caption{Heatplot of various $\eta$s, $\lambda$s and the produced R2 score. \network{5}{200}, with sigmoid and $\eta = 0.001$.}
+                \label[fig]{res:fig:regularisation_heatmap}
+            \end{subfigure}
+            \caption{Results from exploring an added regularisation hyperparameter.}
             \label[fig]{res:fig:regularisation}
-        \end{figure}
+        \end{figure*}
+        
 
-    \subsubsection{Comparing with OLS}
+    \subsubsection{Terrain data}
+        In \cref{res:fig:terrain} the plots of the true and predicted Nicaraguan terrains are presented. The MSE of the network-predicted was 0.078 and of the OLS model 0.171
         \begin{figure}
             \begin{subfigure}{.49\textwidth}
                 \includegraphics[width=\linewidth]{terrain_test.pdf}
-                \caption{}
+                \caption{\textbf{True data} from the Nicaraguan terrain.}
                 \label[fig]{res:fig:terrain_test}
             \end{subfigure}
             \hfill 
             \begin{subfigure}{.49\textwidth}
                 \centering
                 \includegraphics[width=\linewidth]{terrain_predicted.pdf}
-                \caption{}
+                \caption{\textbf{Network-predicted} Nicaraguan terrain. MSE = 0.078}
                 \label[fig]{res:fig:terrain_pred_NN}
             \end{subfigure}
             \hfill 
             \begin{subfigure}{.49\textwidth}
                 \centering
                 \includegraphics[width=\linewidth]{terrain_OLS.pdf}
-                \caption{OLS MSE: 0.17086478937446714, $p=11$}
+                \caption{\textbf{OLS-predicted} Nicaraguan terrain. $p=11$. MSE= 0.171}
                 \label[fig]{res:fig:terrain_pred_OLS}
             \end{subfigure}
+            \caption{Plots of the true and predicted Nicaraguan terrains.}
+            \label[fig]{res:fig:terrain}
         \end{figure}
-
-    \comment{We have implemented a simple version of the models from Project 1 to get comparable results.}
         
 
 

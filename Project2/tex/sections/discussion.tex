@@ -45,5 +45,18 @@
             
             \comment{More occurence of non-converging networks and exploding gradients when employing ReLU. }
 
+            \comment{mention the universal approximation theorem}
+
+        \subsubsection{Regularisation}
+            When looking into networks with regularisation, we first used the optimal network from the previous explorations ($\eta = 0.01$) and added various penalisations to it. This resulted in a graph-plot with $\lambda= 10^{-4.1}$ yielding the lowest MSE-value. Subsequently we checked if a network with a different learning rate would perform even better, given some penalisation. We found that this was not the case. The $\eta = 0.01, \lambda = 10^{-4} \text{or} \ \lambda = 10^{-4.1}$ still resulted in the best score. 
+
+            Could have implemented on the gradients of the biases as well as the weights. \comment{Don't know what would've happened though, hehe} If we had employed a stopping criteria in our network, we also would have added it to the cost function. \comment{The last sentence have been mentioned in the method part}
+
+        \subsubsection{Nicaraguan terrain}
+            When comparing with the OLS model, we could see, qualitatively and quantitatively, that the network outperformed the linear regression. One could also argue that the network replicated many of the key elements of the true terrain data.  
+            
+        \subsubsection{Universial approximation theorem}
+            \comment{Write something about the large networks we ended up with.}
+
 \subsection{Model Selection}
     Model selection is prevalent in all parts of this project, and in many cases, the difference between models has been marginal. To get a more thorough examination of which GD methods, regressors and classifiers work best, it would have been helpful to employ resampling techniques like bootstrap or cross-validation, as in~\citep{Project1}, to get better estimates for the scores we have employed throughout, e.g. MSE, R2 and accuracy.
