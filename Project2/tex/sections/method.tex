@@ -56,7 +56,7 @@
         GD methods are quite sensitive to the initial parameters from which to descend, so made sure to initialise all the methods from the same point when comparing performance. We always initialised with randomly drawn parameter values from the standard normal distribution with mean zero and std one. Since we always deal with scaled features, we can safely initialise the parameters with a standard normal distribution without fear of the dimension of the parameters being terribly out of sorts. To further combat the sensitivity to initial conditions, we did all the descents from five different starting points, and computed the average MSE scores we got.
 
 \subsection{Creating a Neural Network and Regression Problems}
-    We started by creating an FFNN with a flexible number of hidden layers and nodes as well as variable learning rate, multiple possible activation functions, and with an optional regularisation parameter. Subsequently we varied these variables, then trained the various networks and tested them on the Nicaraguan terrain data from Project 1. We compared the best network's performance with the results from the linear regression methods (OLS and Ridge) employed in that project. 
+    We started by creating an FFNN with a flexible number of hidden layers and nodes as well as variable learning rate, multiple possible activation functions, and with an optional regularisation parameter. Subsequently we varied these hyperparameters, then trained the various networks and tested them on the Nicaraguan terrain data from Project 1. We compared the best network's performance with the results from the linear regression methods (OLS and Ridge) employed in that project. Our dataset consisted of 600 datapoints in total, and we used a test-train-split of $\sfrac{3}{4}$, meaning our traning data was 450 datapoints. 
     
     \subsubsection{Initialisation of the Network}
         As in the previous section, we set the number of epochs to 500 and batch size to 200. Since we discovered that SGD exceeded GD and that Adam performed best of the GD methods, these algorithms were the ones we employed in our network.    
@@ -64,20 +64,28 @@
 
         In the neural network we chose to implement MSE as the cost function, $C$, for the output. We started by setting the activation of the hidden layers to sigmoid, and since we wanted to perform regression, we selected the identity function for the final output layer. Initially we set the regularisation parameter to zero. 
 
-        When setting up the neural network, the weights and biases need initial values. Choosing these values can affect how the network trains and evetually performes. From \cref{the:eq:bp_w_b_delta} we see that setting all the parameters to $0$ means the network will not backpropogate initially and all the nodes will yield the same output. \comment{is this too theory to be in method?}. In this project we have initialised the weights with a distribution of mean zero and std $1$. We set the initial biases to $0.01$. Since the mean of the initialised weights is 0, setting the initial biases to a small value like this ensures every $z_i^L$ has a value to backpropogate in the first iteration.  
+        When setting up a neural network, the weights and biases need initial values. Choosing these values can affect how the network trains and evetually performes. From \cref{the:eq:bp_w_b_delta} we see that setting all the parameters to $0$ means the network will not backpropogate initially and all the nodes will yield the same output. \comment{is this too theory to be in method?}. In this project we have initialised the weights with a distribution of mean zero and std $1$. We set the initial biases to $0.01$. Since the mean of the initialised weights is 0, setting the initial biases to a small value like this ensures every $z_i^L$ has a value to backpropogate in the first iteration.  
     
     \subsubsection{Varying Layers, Nodes, and Learning Rate}
-        \comment{Introduce the N-notation} 
-        \network{layers}{nodes}
-        We wanted to explore how our neural networks vary depending on their structure. We therefore varied the number of layers, number of nodes in each layer, and the learning rate while computing the measures for goodness of fit.
-        A neural network's structure consits mainly of its number of layers and number of nodes in each layer. We chose to only evaluate somewhat symmetrical networks, meaning we did not vary the the number of nodes does not vary between the hidden layers. 
+        We wanted to explore how our neural networks vary depending on their structure. We therefore varied the number of layers, number of nodes in each layer, and the learning rate while computing the measures for goodness of fit. In this case we implemented MSE. See Project 1 for elaboration on these types of measures \citep{Project1}.
+        We chose to only evaluate somewhat symmetrical networks, meaning we used the same number of nodes in all the hidden layers.
+
+        To have a compact way of referring to the various network structures we have created, we now indtroduce a new notation. A network will hereby be referred to as \network{layers}{nodes} with the number of hidden layers as a superscript and number of nodes in the hidden layer as a subscript. E.g. a network with 5 hidden layers and 100 nodes in each of those layers will be referred to as \network{5}{100}.  
+
+        We looked at the 1,3, and 5 number of hidden layers, number of nodes between: 2-200, and learning rates in the range: 0.8-0.005. We created three heatplots; one for each \#layers. 
+
+        We also compared with a model from SciKit-Learn with the same hyperparameters as our networks. In that case we chose a network with 3 hidden layers. 
 
     \subsubsection{Exploring Activation Functions in Hidden Layers}
+        As activation functions can largely affect the performance of the network, we explored various implementations. We started by fitting networks to a 1D-data of the polynomial $x^2$ with noise (normal distribution with scale=0.1) and plotted the results. We used 600 datapoints and train-test-split of $\sfrac{3}{4}$. We did this to see the shapes of the approximations of the different activation functions. 
+        
+        Next we made similar heatplots as before, again traning and testing on the terrain data, but now employing ReLU and leaky ReLU. 
 
     \subsubsection{Implementing Regularisation}
+        Implementing a penalisation only on the weights (not the biases)
 
     \subsubsection{Terrain Data an Comparison with OLS}
-
+        Lastly we compared the best model with an OLS-model. 
     
 \subsection{Classification Problems}
     For our case using the Wisconsin Breast data set presented in \cref{breast_cancer_dataset}, we aimed to classify either $M$ or $B$. These categories are mutually exclusive, thus determining $M$ or not $M$ is sufficient (i.e. $\mathcal{Q} = \{ M, \neg M \}$). This gave us a binary problem, represented with $y_i \in \{ 1, 0 \}$ where $y_i = 1$ implies $M$ and $y_i = 0$ not $M$.

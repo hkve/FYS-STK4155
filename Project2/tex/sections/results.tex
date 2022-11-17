@@ -130,69 +130,111 @@
 
 
 \subsection{Neural Network and regression}
-    \subsubsection{Network Structure}
+    \subsubsection{Varying Layers, Nodes, and Learning Rate}
+        When varying the number of hidden layers (1,3,5), nodes in each layer (between 2-200), and learning rate (0.8-0.005), we found that the best MSE results, for each \# layers, came from the networks in table \cref{res:tab:heatmap_nodes}. 
+
+        \renewcommand{\arraystretch}{1.25}
+        \begin{table}[]
+            \centering
+            \begin{tabular}{r|c|c|c}
+                \# Layers & Best network & $\eta$ &  MSE \\ \hline
+                1         & \network{1}{50}            & 0.8    & 0.13              \\
+                3         & \network{3}{200}            & 0.01   & 0.094             \\
+                5         & \network{5}{200}            & 0.001  & 0.088             \\
+                3, SciKit & \network{1}{10}            & 0.08   & 0.18              \\
+            \end{tabular}
+            \caption{Table of the best networks' MSE value.}
+            \label[tab]{res:tab:heatmap_nodes}
+        \end{table}
+        \renewcommand{\arraystretch}{1}
+
+        See \cref{res:fig:heatmap_nodes} for all results in heatmap. We see that increase in the \#layers leads to more networks that are unable to converge (see high MSE-values).  
 
         \begin{figure*}
             \begin{subfigure}{.49\textwidth}
                 \includegraphics[width=\linewidth]{nodes_etas_heatmap_1.pdf}
-                \caption{}
+                \caption{\textbf{1 Layer} The best result from \network{1}{50} MSE = 0.13.}
                 \label[fig]{res:fig:1_lay}
             \end{subfigure}
             \hfill 
             \begin{subfigure}{.49\textwidth}
                 \centering
                 \includegraphics[width=\linewidth]{nodes_etas_heatmap_3.pdf}
-                \caption{}
+                \caption{\textbf{3 Layers} The best result from \network{3}{200} MSE = 0.094.}
                 \label[fig]{res:fig:3_lay}
             \end{subfigure}
             \hfill 
             \begin{subfigure}{.49\textwidth}
                 \centering
                 \includegraphics[width=\linewidth]{nodes_etas_heatmap_5.pdf}
-                \caption{}
+                \caption{\textbf{5 Layers}The best result from \network{5}{200} MSE = 0.088.}
                 \label[fig]{res:fig:5_lay}
             \end{subfigure}
             \hfill 
             \begin{subfigure}{.49\textwidth}
                 \centering
                 \includegraphics[width=\linewidth]{nodes_etas_heatmap_sk_3.pdf}
-                \caption{}
+                \caption{\textbf{3 Layers SciKit-Learn} The best result from \network{3}{10} MSE = 0.18.}
                 \label[fig]{res:fig:sk_3_lay}
             \end{subfigure}
+            \caption{Heatmaps of the various networks constructed varying number nodes in each layer and learning rate for different number of layers. }
+            \label[fig]{res:fig:heatmap_nodes}
         \end{figure*}
 
 
     \subsubsection{Exploring Activation Functions}
+        The results in \cref{res:fig:plots_act_func} show that the implementation of activation functions affects the networks' performance. \cref{res:fig:act_funcs} illustrates that the shape of a network's predicted graph shares similarities with the graph of the implemented activation function; identity is linear, sigmoid and tanh are rather smooth, and ReLU and leaky ReLU are more discontinuous. The MSE values of the predictions are given in \cref{res:tab:act_funcs}. 
+
+        \begin{table}[]
+            \centering
+            \begin{tabular}{r|l}
+                \textbf{Activation Function} & \textbf{Validation MSE} \\ \hline
+                identity                                                       & 0.113                                                    \\ 
+                sigmoid                                                        & 0.013                                                    \\ 
+                tanh                                                           & 0.014                                                    \\ 
+                ReLU                                                           & 0.013                                                    \\ 
+                leaky ReLU                                                     & 0.013                                                    \\ 
+            \end{tabular}
+            \caption{Table of the MSE values from the predictions in \cref{res:fig:act_funcs}.}
+            \label[tab]{res:tab:act_funcs}
+        \end{table}
+
+
+        We notice that in the implementation of our network, the optimal network is still \network{5}{200} with the sidmoid activation function (from above). However, the SciKit-Learn improves when changing from sigmoid to ReLU. There are now more non-converging networks and occurence of exploding gradients. 
+
         \begin{figure*}
             \begin{subfigure}{.49\textwidth}
                 \includegraphics[width=\linewidth]{c_activations_2d_data.pdf}
-                \caption{}
+                \caption{Networks with various activation functions trained $x^2 \pm \sigma$ plotted. }
                 \label[fig]{res:fig:act_funcs}
             \end{subfigure}
             \hfill 
             \begin{subfigure}{.49\textwidth}
                 \centering
                 \includegraphics[width=\linewidth]{nodes_etas_heatmap_3_relu.pdf}
-                \caption{}
+                \caption{ \textbf{3 layers, ReLU} activation function implemented. Best MSE value is 0.18.}
                 \label[fig]{res:fig:relu}
             \end{subfigure}
             \hfill 
             \begin{subfigure}{.49\textwidth}
                 \centering
                 \includegraphics[width=\linewidth]{nodes_etas_heatmap_3_lrelu.pdf}
-                \caption{}
+                \caption{ \textbf{3 layers, Leaky ReLU} activation function implemented. Best MSE value is 0.15.}
                 \label[fig]{res:fig:l_relu}
             \end{subfigure}
             \hfill 
             \begin{subfigure}{.49\textwidth}
                 \centering
                 \includegraphics[width=\linewidth]{nodes_etas_heatmap_sk_3_relu.pdf}
-                \caption{}
+                \caption{ \textbf{3 layers, SciKit-Learn with ReLU} activation function implemented. Best MSE value is 0.11.}
                 \label[fig]{res:fig:sk_relu}
             \end{subfigure}
+            \caption{Plots from exploration of the activation functions.}
+            \label[fig]{res:fig:plots_act_func}
         \end{figure*}
 
     \subsubsection{Exploring Regularisation}
+        
         % From $\lambda$ vs validation MSE-plot
         % Best MSE: 0.0782059642062313
         % corresponding lambda: 7.906043210907685e-05 or log10 of this: -4.102040816326531

@@ -65,7 +65,9 @@ def activation_func_2d():
     )
 
     plt.scatter(D_test.X[:,0][::5], D_test.y[::5], color=plot_utils.colors[-1], label='Datapoints', s=10)
+    act_funcs_names = ["sigmoid", "ReLU", "leaky ReLU", "tanh", "identity"]
     act_funcs = ["sigmoid", "relu", "leaky_relu", "tanh", "linear"]
+
     for i, act in enumerate(act_funcs):
         NN = NeuralNetwork(
             SGD, 
@@ -84,9 +86,9 @@ def activation_func_2d():
         print(f"{act} gives {mse = :.6f}")
 
         sorted_idcs = D_test.X[:,0].argsort()
-        plt.plot(D_test.X[sorted_idcs,0], y_pred[sorted_idcs], color=plot_utils.colors[i], label=act)
+        plt.plot(D_test.X[sorted_idcs,0], y_pred[sorted_idcs], color=plot_utils.colors[i], label=act_funcs_names[i])
     plt.legend()    
-    # plt.savefig(make_figs_path("c_activations_2d_data.pdf"))
+    plt.savefig(make_figs_path("c_activations_2d_data.pdf"))
     plt.show()
 
 def plot_NN_vs_test(D_train, D_test, eta, nodes, batch_size, epochs=500, lmbda=None, random_state=321, filename_test=None, filename_pred=None):
@@ -427,5 +429,5 @@ if __name__ == "__main__":
 
 
     # Check activation functions:
-    # activation_func_2d()
+    activation_func_2d()
     # introducing_act()

@@ -33,5 +33,17 @@
         \subsubsection{Choice of cost function}
             We chose MSE as the cost function for the NN. We could have tested various cost functions, e.g. by implementing a penilisation. 
 
+        \subsubsection{Varying Layers, Nodes, and Learning Rate}
+            We saw that the optimal network with sigmoid activation function in the hidden layers was our implementation of \network{5}{200} with learning rate 0.001. This was the most complex network we tested, meaning we might get even better results with by further increasing the complexity. However, a very complex model could also lead to overfitting. This network had 161 601 parameters (160 600 weights and 1001 biases). The data we sent in had two input variables, and we sent in 450 datapoints in the training process. In conclusion the model is already rather complex. 
+            
+            We saw that our and the SciKit-Learn-model had similar performances, implying our implementation is consistent with the norm.
+
+            \comment{exploding gradients!}
+
+        \subsubsection{Activation Functions}
+            It is interesting to note that the shape of a predicted graph in some sense inherits the shape of the activation function. The reason the network with the identity activation is linear, is that no non-linearity is ever introduced.
+            
+            \comment{More occurence of non-converging networks and exploding gradients when employing ReLU. }
+
 \subsection{Model Selection}
     Model selection is prevalent in all parts of this project, and in many cases, the difference between models has been marginal. To get a more thorough examination of which GD methods, regressors and classifiers work best, it would have been helpful to employ resampling techniques like bootstrap or cross-validation, as in~\citep{Project1}, to get better estimates for the scores we have employed throughout, e.g. MSE, R2 and accuracy.
