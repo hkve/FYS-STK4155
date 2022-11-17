@@ -9,7 +9,6 @@ The underlying assumption of our regression is that the measurements $y_i$ are p
 In fitting our models to the data, we want to produce predictions $\hat{y} = \hat{f}(x)$ that approximates new measurements $y \sim f(x)$.
 
 \subsection{Gradient Descent Methods}\label[sec]{the:sec:gradient_decent_methods}
-    \comment{This section might well be moved to method, it is not too theoretical. -\Carl}\\
     Optimisation of the parameters of the models we will be employing in this project is formulated as minimisation problems, with an associated cost function $C(\vec{\theta})$ to be minimised to find the optimal parameters.
     \subsubsection{Plain Gradient Descent}
         We will compare different variants of GD algorithm, starting first with the plain one. Assume the gradient of the cost function $C(\vec{\theta})$ w.r.t. the parameters $\vec{\theta}$ is well-defined on the entirety of our parameter space, and is calculable either analytically or approximated numerically\footnote{Now this is not always the case, e.g. with $L_1$-penalisation on the parameters.}. The idea is that the fastest direction to move in parameter space to reduce $C(\vec{\theta})$ is to follow the direction of $-\Nablatheta C(\vec{\theta})$. Plain gradient descent implements this idea iteratively, starting from an initial guess $\vec{\theta}_0$, finding the next point by
@@ -35,14 +34,13 @@ In fitting our models to the data, we want to produce predictions $\hat{y} = \ha
 
     \subsubsection{Improving Convergence Rate}
         As stochasticity is added to the algorithm, the rate of convergence does slow down. As such, it would be nice to add algorithms that can adapt the learning rate $\eta$ in such a way as to increase the rate of convergence. The AdaGrad algorithm does this with the idea to use different learning rates along different directions in parameter space; i.e. use larger learning rates in flat directions, while keeping it small in steep directions. This is done by keeping a running sum $G_k$ of the outer product of the gradients $\vec{g}_k$ at the points $\vec{\theta}_k$, and use this to adapt the learning rate.
-        \comment{I don't know whether to include the update rules in the \LaTeX-document, or maybe move them to method, or whatever. -\Carl}
         \begin{subequations}
             \begin{align}
                 \vec{g}_k &= \Nablatheta C_k(\vec{\theta}_{k-1}) \\
                 G_k &= G_{k-1} + \vec{g}_j \otimes \vec{g}_j \\
                 \vec{\theta}_k &= \vec{\theta}_{k-1} - \eta G_k^{-\sfrac{1}{2}} \vec{g}_k
             \end{align}
-            where $\vec{v} \otimes \vec{u}$ denotes the outer product of two vectors $\vec{v}, \vec{u}$, and a matrix $m = M^{-1/2}$ is understood to the matrix satisfying $m^2 = M^{-1}$. Inverting and finding the root of $G_k$ comes at a computational cost, so we will employ the much cheaper version where we update \comment{Discussion note: mention uncorrelated features bettering this approximation, perhaps. -\Carl}
+            where $\vec{v} \otimes \vec{u}$ denotes the outer product of two vectors $\vec{v}, \vec{u}$, and a matrix $m = M^{-1/2}$ is understood to the matrix satisfying $m^2 = M^{-1}$. Inverting and finding the root of $G_k$ comes at a computational cost, so we will employ the much cheaper version where we update
             \begin{align}
                 \vec{\theta}_{k} = \vec{\theta}_{k-1} - \frac{\eta}{\sqrt{\diag(G_k)}+\epsilon} \circ \vec{g}_k,
             \end{align}
@@ -118,7 +116,6 @@ In fitting our models to the data, we want to produce predictions $\hat{y} = \ha
             
             In the output layer the activation function constitutes what analysis the network does. E.g. a form of binary classification can be done by implementing the sigmoid activation function in the output layer, and for regression problems the identity function, $f(x)=x$, is implemented.
             It is normal that all the nodes in a layer have the same activation function $f$.    
-            \comment{See more on activation functions in appendix ref} 
 
             If we were to have a more complex neural network than the one from \cref{the:fig:simple_NN}, now also including hidden layers, $\hat{y}$ (ref \cref{the:eq:output}) would be a node in the hidden layer after the input. Each node in the network would have its own activation bias and would be connected with the input, or activation from the previous layer, through independent weights. \cref{the:eq:node_activation} shows the calculated activation of a specific node $i$ in layer $l$ of the network.
             \begin{equation}
@@ -182,7 +179,7 @@ In fitting our models to the data, we want to produce predictions $\hat{y} = \ha
 
 
 \subsection{Classification}
-    Instead of predicting targets in a continuous domain ($y_i \in \mathbb{R}$), we aimed to put the target $y_i$ in a specific class ($y_i \in \mathcal{Q}$), where $\mathcal{Q}$ is the set of possible outcomes. This is named \textit{classification} \comment{Is this perhaps a bit confusing nomenclature? -\Carl}, where in the following we will only consider binary cases. This means we will try to classify mutually exclusive properties, that is either we have the outcome $O$ or not the outcome $O$ ($\mathcal{Q} = \{O, \neg O\}$). We will label these as $O = 1$ and $\neg O = 0$.
+    Instead of predicting targets in a continuous domain ($y_i \in \mathbb{R}$), we aimed to put the target $y_i$ in a specific class ($y_i \in \mathcal{Q}$), where $\mathcal{Q}$ is the set of possible outcomes. This is named \textit{classification}, where in the following we will only consider binary cases. This means we will try to classify mutually exclusive properties, that is either we have the outcome $O$ or not the outcome $O$ ($\mathcal{Q} = \{O, \neg O\}$). We will label these as $O = 1$ and $\neg O = 0$.
 
     Two different methods for classification will be introduced here. Firstly we will look at \textit{logistic regression}, maybe the most common method in the domain of classification. In addition, under some restrictions, our neural network can be used for classification problems. Both of these models have an output $p(x_i)$ on the domain $[0,1]$, which we will interpret as the probability of the outcome $y_i = 1$. We will classify the data point $x_i$ as $\hat{y}_i = 1$ if $p(x_i) > \tau$ and $\hat{y}_i = 0$ if $p(x_i) < \tau$, where $\tau$ is the \textit{threshold}, a priori set to $\tau = 0.5$. 
 
@@ -191,8 +188,8 @@ In fitting our models to the data, we want to produce predictions $\hat{y} = \ha
         \begin{align*}
             \log(\frac{p(x_i)}{1-p(x_i)}) = x_i^T \vec{\theta},
         \end{align*}
-        where we have defined $p(x_i) \equiv p(y_i = 1 | x_i, \vec{\theta})$, the probability that we guess $\hat{y}_i = 1$ given a data point $x_i$ and parameters $\vec{\theta}$. Solving the above expression for $p(x_i)$ yields the Sigmoid function from \cref{app:activation_functions} evaluated in $x_i^T \vec{\theta}$. \comment{I might be tripping, but I can't see where the sign in the exponent comes from. -\Carl}
-        
+        where we have defined $p(x_i) \equiv p(y_i = 1 | x_i, \vec{\theta})$, the probability that we guess $\hat{y}_i = 1$ given a data point $x_i$ and parameters $\vec{\theta}$. Solving the above expression for $p(x_i)$ yields the Sigmoid function from \cref{app:activation_functions} evaluated in $x_i^T \vec{\theta}$.
+    
         \begin{align*}
             p(x_i) = \sigma(x_i^T \vec{\theta}) = \frac{1}{1+\exp{-x_i^T\vec{\theta}}}
         \end{align*}
