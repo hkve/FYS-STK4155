@@ -12,7 +12,9 @@
 
         Adding the tuning of the learning rate with AdaGrad, we see in \cref{res:fig:lrate3} a marked increase in stability. However, the algorithms struggled to converge, with the momentum based algorithms doing best, SGD slightly bettering the GD results. However, even AdaGrad SGD with momentum could not beat the ordinary momentum based GD and SGD algorithms.
 
-        Introducing RMSprop and Adam to tune the learning rate provided algorithms with a tunable learning rate that converged faster than AdaGrad, seen in \cref{res:fig:lrate4}. Instead of exploding, the MSE of RMSprop gradually increased from around $\eta=0.1$. Ultimately, it performed similarly to the AdaGrad algorithms, with an optimal MSE of 0.1863. The momentum based Adam algorithm performed the best, with an optimal MSE of $0.1660$; but performing well from very low $\eta$-values up to around $\eta=0.35$. After this point Adam was markedly less stable than the AdaGrad algorithms. Aside from converging faster, it was also notable that both RMSprop and Adam were much less sensitive to initial conditions, with generally much tighter confidence intervals. \network{1}{2}
+        Introducing RMSprop and Adam to tune the learning rate provided algorithms with a tunable learning rate that converged faster than AdaGrad, seen in \cref{res:fig:lrate4}. Instead of exploding, the MSE of RMSprop gradually increased from around $\eta=0.1$. Ultimately, it performed similarly to the AdaGrad algorithms, with an optimal MSE of 0.1863. The momentum based Adam algorithm performed the best, with an optimal MSE of $0.1660$; but performing well from very low $\eta$-values up to around $\eta=0.35$. After this point Adam was markedly less stable than the AdaGrad algorithms. Aside from converging faster, it was also notable that both RMSprop and Adam were much less sensitive to initial conditions, with generally much tighter confidence intervals.
+
+        \cref{res:fig:GD_history} shows how GD with momentum, plain SGD, SGD with momentum and Adam SGD converged by epoch. The non-stochastic method converged smoothly, and was very stable. Adding stochasticity clearly exhibited unstable convergence, but overall trended downwards faster. Notably, SGD with momentum was quite explosive, whereas Adam managed to implement stochasticity and momentum in a much more stable way.
 
         \begin{table}[!ht]
             \centering
@@ -33,6 +35,14 @@
             \caption{Table of the best validation MSE scores by GD algorithm, together with the learning rate that produced the best result.}
             \label[tab]{res:tab:OLS_MSEs}
         \end{table}
+
+        \begin{figure}[ht!]
+            \centering
+            \includegraphics[width=\linewidth]{figs/GD_history.pdf} 
+            \caption{Plot of the mean validation MSE of four a linear regression on Franke function data as optimised with GD algorithms after every epoch up to 500. Underneath, the logarithm of the std of the mean across descent from 5 starting points is shown. The momentum methods used $\gamma=0.8$, Adam had $\beta_1=0.9, \beta_2=0.99$ and the stochastic methods all used a batch size 200.\\
+            Best MSEs were: GD w/momentum (0.1775 in iteration 500), Plain SGD (0.1862 in iteration 495), SGD w/momentum (0.1729 in iteration 486), SGD Adam (0.1660 in iteration 500).}
+            \label{res:fig:GD_history}           
+        \end{figure}
 
         \begin{figure*}
             \begin{subfigure}{.49\textwidth}

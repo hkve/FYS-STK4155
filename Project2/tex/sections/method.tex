@@ -42,6 +42,8 @@
 
         Then we looked at algorithms that tune the learning rate, implementing ordinary and stochastic AdaGrad, again with and without momentum. Then we moved on to application of stochastic RMSprop and Adam, and compared how these do in comparison to AdaGrad with SGD.
 
+        To get an overview over how the algorithms converge, we finally plot the validation MSE epoch by epoch for GD with momentum, ordinary SGD, SGD with momentum and Adam SGD, up to epoch 500 with a batch size of 200. Here we used the best learning rates from our OLS analysis for each algorithm.
+
 
     \subsubsection{Ridge Regression}
         Adding an $L_2$-penalisation term to the OLS cost function gives us the Ridge cost function

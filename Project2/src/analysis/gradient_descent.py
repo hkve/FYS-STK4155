@@ -447,11 +447,13 @@ def plot_by_iteration(data_train: Data, data_val: Data,
         sharex=True
     )
     # Plotting mean MSEs across starting points
-    for MSEs, name, color in zip(MSE_array, optimizer_names,
-                                 plot_utils.colors):
+    for MSEs, name, color, optimizer in zip(MSE_array, optimizer_names,
+                                            plot_utils.colors, optimizers):
+        lrate = optimizer.params["eta"](0)
         MSE_means = MSEs.mean(axis=0)
         axes[0].plot(all_iters, MSE_means,
-                     lw=2, alpha=0.8, color=color, label=name)
+                     lw=2, alpha=0.8, color=color,
+                     label=name + fr" $\eta={lrate:.2}$")
         if verbose:
             arg_best_MSE = np.nanargmin(MSE_means)
             print(f"{name} best MSE: {MSE_means[-1]:.4} "
@@ -470,7 +472,7 @@ def plot_by_iteration(data_train: Data, data_val: Data,
         ncol=2,
         mode="expand"
     )
-    axes[1].set(xlabel="Iteration", ylabel=r"$\log_{10}(std)$")
+    axes[1].set(xlabel="Iteration", ylabel=r"$\log_{10}(\mathrm{std})$")
     axes[0].set(ylabel="Validation MSE")
     # Hardcoded lims
     axes[0].set_ylim((0, 0.8))
@@ -650,7 +652,7 @@ if __name__ == "__main__":
     plot1 = ""  # dict key for params1 or empty string
     plot2 = ""  # dict key for params2 or empty string
     plot3 = 0  # True or False
-    plot4 = 0  # True or False
+    plot4 = 1  # True or False
 
     # Plotting
     if plot1:
@@ -697,8 +699,8 @@ if __name__ == "__main__":
                                          params=dict(eta=0.31974,
                                                      beta1=0.9, beta2=0.99),
                                          epochs=1, batch_size=200),),
-            optimizer_names=("Momentum GD", "Plain SGD",
-                             "Momentum SGD", "Adam SGD"),
+            optimizer_names=("Mom GD", "Plain SGD",
+                             "Mom SGD", "Adam SGD"),
             max_iter=max_iter,
             theta0=theta0,
             random_state=random_state,
