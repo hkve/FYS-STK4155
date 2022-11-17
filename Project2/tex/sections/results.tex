@@ -331,10 +331,10 @@
         \begin{tabular}{l|l|l|l|l}
             \network{1}{5} & \network{1}{10} & \network{2}{5} & \network{3}{5} & $f_H$       \\
             \hline
-            0.993             & 0.986              & 0.993             & 0.993             & Sigmoid    \\
-            0.993             & 0.986              & 0.993             & 0.993             & Tanh       \\
-            0.979             & 0.979              & 0.986             & 0.979             & ReLU       \\
-            0.979             & 0.986              & 0.979             & 0.979             & Leaky ReLU
+            0.993             & 0.993              & 0.993             & 0.986             & Sigmoid    \\
+            0.986             & 0.986              & 0.993             & 0.993             & Tanh       \\
+            0.986             & 0.979              & 0.993             & 0.986             & ReLU       \\
+            0.993             & 0.979              & 0.993             & 0.986             & Leaky ReLU
         \end{tabular}
         \caption{The optimal validation accuracy scores calculated using different network structures and hidden activation functions $f_H$, across different learning rates. Multiple learning rates correspond to the same accuracy score.}
         \label[tab]{res:tab:accuracy_score_activation_functions}        
