@@ -335,13 +335,74 @@ def regularization(D_train, D_test, nodes, layers, eta, lmbdas, batch_size, epoc
         plt.show()
 
 #Make a heatplot of eta vs lambda with R2
+def regularization_heatmap(D_train, D_test, nodes, layers, etas, lmbdas, batch_size, activation_hidden="sigmoid", epochs=500, random_state=321, filename=None):
+
+    nodes_ = ((nodes,)*layers, 1)
+    R2_grid = list()
+    for eta in etas: 
+        print(f"{eta=}")
+        R2_list = list()
+        SGD = opt.SGradientDescent(
+            method = "adam",
+            params = {"eta":eta, "beta1":0.9, "beta2":0.99},
+            epochs=epochs,
+            batch_size=batch_size,
+            random_state=random_state
+        )
+        for i, lmbda in enumerate(lmbdas):
+            print(f"{i+1}/{len(lmbdas)}")
+            NN = NeuralNetwork(
+                SGD, 
+                nodes_, 
+                random_state=random_state,
+                cost_func="MSE",
+                lmbda=lmbda,
+                activation_hidden=activation_hidden,
+                activation_output="linear"
+            )
+
+            NN.train(D_train, trainsize=1)
+            y_pred = NN.predict(D_test.X)
+
+            R2_list.append(R2(D_test.y, y_pred))
+        R2_grid.append(R2_list)
+    
+    v_min = 0
+    v_max = np.max(R2_grid) 
+    print(v_min, v_max)
+    
+    # Ploting the heatmap
+    fig, ax = plt.subplots()
+    sns.heatmap(R2_grid, annot=True, cmap=plot_utils.cmap, ax=ax, cbar_kws={'label':'R2'}, vmin=v_min, vmax=v_max)
+    # Plot a red triangle around best value. I think this code is Messi<3
+    arg_best_R2 = np.unravel_index(np.nanargmax(R2_grid), np.shape(R2_grid))
+    ax.add_patch(plt.Rectangle((arg_best_R2[1], arg_best_R2[0]), 1, 1, fc='none', ec='red', lw=5, clip_on=False))
+
+    # Set xylabels and ticks. This code is ronaldo, but it works.
+    ax.set_xlabel(fr"$\lambda$")
+    ax.set_xticks(
+        np.arange(len(lmbdas))+.5,
+        labels=np.log10(lmbdas)
+    )
+    ax.set_ylabel(fr"$\eta$")
+    ax.set_yticks(
+        np.arange(len(etas))+.5,
+        labels=etas
+    )
+    if filename:
+        plt.savefig(make_figs_path(filename), dpi=300)
+    else:
+        plt.show()
+
 
 def MSE(y_test, y_pred):
     assert y_test.shape == y_pred.shape, f"y and y_pred have different shapes. {y_test.shape =}, {y_pred.shape =}"
     return np.mean((y_test - y_pred)**2)
 
 def R2(y_test, y_pred):
-    pass
+    assert y_test.shape == y_pred.shape, f"y and y_pred have different shapes. {y_test.shape =}, {y_pred.shape =}"
+    y_bar = np.mean(y_test)
+    return 1 - np.sum((y_test-y_pred)**2)/np.sum((y_test-y_bar)**2)
 
 
 if __name__ == "__main__":
@@ -358,7 +419,7 @@ if __name__ == "__main__":
     #Heatmap:
     # nodes = [2, 10, 20, 50, 100, 200]
     # etas = [0.0005, 0.001, 0.01, 0.06, 0.08, 0.1, 0.8]
-    # # layers = [1,3,5]
+    # layers = [1,3,5]
     # for l in layers:
     #     filename = f"nodes_etas_heatmap_{l}_lrelu.pdf"
     #     nodes_etas_heatmap(
@@ -409,6 +470,29 @@ if __name__ == "__main__":
     #     filename="lmbdas_NN_reg.pdf"
     # ) 
 
+    # Regularization Heatmap
+    lmbdas = np.logspace(-7, -1, 7)
+    etas = [0.0005, 0.001, 0.01, 0.06, 0.08, 0.1, 0.8]
+    layers = 5
+    nodes = 200
+    # lmbdas = [1e-4, 1e-3]
+    # etas = [0.01, 0.001]
+    # layers = 1
+    # nodes = 50
+    filename = f"lmbdas_etas_heatmap_{layers}_2.pdf"
+    regularization_heatmap(
+        D_train=D_train, 
+        D_test=D_test, 
+        etas=etas, 
+        nodes=nodes, 
+        layers=layers,
+        lmbdas=lmbdas, 
+        epochs=epochs, 
+        batch_size=batch_size, 
+        activation_hidden="sigmoid", 
+        filename=filename
+    )
+
 
     #Plot terrain data:
     # nodes = ((200,)*5, 1)
@@ -429,5 +513,5 @@ if __name__ == "__main__":
 
 
     # Check activation functions:
-    activation_func_2d()
+    # activation_func_2d()
     # introducing_act()

@@ -244,41 +244,50 @@
         \end{figure*}
 
     \subsubsection{Exploring Regularisation}
-        
-        % From $\lambda$ vs validation MSE-plot
-        % Best MSE: 0.0782059642062313
-        % corresponding lambda: 7.906043210907685e-05 or log10 of this: -4.102040816326531
-        \begin{figure}
-            \centering
-            \includegraphics[width=\linewidth]{lmbdas_NN_reg.pdf}
-            \caption{}
+        From \cref{res:fig:regularisation_2D} the $\lambda$ yielding the lowest MSE value was $\lambda = 10^{-4.1}$ giving  $MSE = 0.078$. This was for the network with $\eta = 0.001$. When also varying the learning rate (see \cref{res:fig:regularisation_heatmap}), the optimal network also had $\eta = 0.001$ and now $\lambda = 10^{-4}$. 
+        \begin{figure*}            
+            \begin{subfigure}{.49\textwidth}
+                \centering
+                \includegraphics[width=\linewidth]{lmbdas_NN_reg.pdf}
+                \caption{ Plot of the validation MSE as a function of the regularisation, $\lambda$s. \network{5}{200}, with sigmoid and $\eta = 0.001$.}
+                \label[fig]{res:fig:regularisation_2D}
+            \end{subfigure}
+            \begin{subfigure}{.49\textwidth}
+                \centering
+                \includegraphics[width=\linewidth]{lmbdas_etas_heatmap_5_2.pdf}
+                \caption{Heatplot of various $\eta$s, $\lambda$s and the produced R2 score. \network{5}{200}, with sigmoid and $\eta = 0.001$.}
+                \label[fig]{res:fig:regularisation_heatmap}
+            \end{subfigure}
+            \caption{Results from exploring an added regularisation hyperparameter.}
             \label[fig]{res:fig:regularisation}
-        \end{figure}
+        \end{figure*}
+        
 
-    \subsubsection{Comparing with OLS}
+    \subsubsection{Terrain data}
+        In \cref{res:fig:terrain} the plots of the true and predicted Nicaraguan terrains are presented. The MSE of the network-predicted was 0.078 and of the OLS model 0.171
         \begin{figure}
             \begin{subfigure}{.49\textwidth}
                 \includegraphics[width=\linewidth]{terrain_test.pdf}
-                \caption{}
+                \caption{\textbf{True data} from the Nicaraguan terrain.}
                 \label[fig]{res:fig:terrain_test}
             \end{subfigure}
             \hfill 
             \begin{subfigure}{.49\textwidth}
                 \centering
                 \includegraphics[width=\linewidth]{terrain_predicted.pdf}
-                \caption{}
+                \caption{\textbf{Network-predicted} Nicaraguan terrain. MSE = 0.078}
                 \label[fig]{res:fig:terrain_pred_NN}
             \end{subfigure}
             \hfill 
             \begin{subfigure}{.49\textwidth}
                 \centering
                 \includegraphics[width=\linewidth]{terrain_OLS.pdf}
-                \caption{OLS MSE: 0.17086478937446714, $p=11$}
+                \caption{\textbf{OLS-predicted} Nicaraguan terrain. $p=11$. MSE= 0.171}
                 \label[fig]{res:fig:terrain_pred_OLS}
             \end{subfigure}
+            \caption{Plots of the true and predicted Nicaraguan terrains.}
+            \label[fig]{res:fig:terrain}
         \end{figure}
-
-    \comment{We have implemented a simple version of the models from Project 1 to get comparable results.}
         
 
 
@@ -286,7 +295,9 @@
     \subsubsection{Logistic regression}
     The different optimisation algorithms from our library of gradient decent methods were applied to optimise the BCE cost function without penalisation \cref{the:eq:logreg_cost_function} using Logistic regression. This is presented in \cref{res:fig:logreg_GD_opt} for GD methods with and without momentum, while SGD based methods is presented in \cref{res:fig:logreg_SGD_opt}. We found that every method, given the correct learning rate and number of iterations, manged to obtain an accuracy above $0.9$.  
     
-    We found that plain gradient decent performed the worst, but with a high enough learning rate and number of iterations
+    Plain gradient decent running 5 iterations performed the worst, giving the best accuracy of $0.958$ at $\eta = 0.859$. However, when allowed to run for 50 iterations, accuracy scores $> 0.95$ were constantly achieved across all learning rates. The addition of momentum made the optimasation converge faster, where the case for 50 iterations is especially stable. In the domain of SGD based methods, both Adam and AdaGrad SGD out competed plain SGD for 5 epochs. However, when allowed to run for 50 epochs, plain SGD also managed to converge giving constantly accuracy scores $> 0.95$ across all learning rates.
+    
+    Validation accuracies calculated while optimasation using GD and SGD based methods is presented in \cref{res:fig:logreg_under_optimazation}. Adam SGD and mGD achieved an accuracy of $~0.95$ using just a few iterations, while again GD and SGD clearly performing worst.  
 
     \begin{figure}
         \begin{subfigure}{.49\textwidth}
@@ -309,22 +320,14 @@
         \end{subfigure}
     \end{figure}
 
-    \begin{figure*}
-        \begin{subfigure}{.49\textwidth}
-            \includegraphics[width=\linewidth]{logreg_penalisation.pdf}
-            \caption{Validation accuracy for logistic regression as a function of learning rate and penalisation parameter $\lambda$. Largest accuracy of $A = 0.986$ found at $\eta = 0.1, \lambda = 10^{-6}$.}
-            \label[fig]{res:fig:logreg_penalisation_ours}
-        \end{subfigure}
-        \hfill 
-        \begin{subfigure}{.49\textwidth}
-            \centering
-            \includegraphics[width=\linewidth]{logreg_penalisation_sklearn.pdf}
-            \caption{Validation accuracy for scikit-learn's  implementation of logistic regression as a function penalisation parameter $C$. }
-            \label[fig]{res:fig:logreg_penalisation_sklearn}
-        \end{subfigure}
-        \caption{\comment{These plots are stupid, but I am tired and can not bother tweaking to make them look any better.}}
+    Using Adam SGD with $\beta_1 = 0.9, \beta_2 = 0.99$ as an optimasation algorithm, the validation accuracy varied for both penalisation $\lambda$ and learning rate $\eta$ is shown in \cref{res:fig:logreg_penalisation}. We found that multiple models gave the same optimal validation accuracy, for both low penalisation $(\lambda = 10^6)$ and higher penalisation $(\lambda = 10^{-1.5})$. The $(\lambda = 10^6)$ used a learning rate of $\eta = 0.13$ while the $\lambda = 10^{-1.5}$ models used higher learning rates in the range $\eta \in [0.25, 0.5]$
+ 
+
+    \begin{figure}
+        \includegraphics[width=\linewidth]{logreg_penalisation.pdf}
+        \caption{Validation accuracy for logistic regression as a function of learning rate and penalisation parameter $\lambda$. Largest accuracy of $A = 0.986$ found at $\lambda = 10^{-6}$ using $\eta = 0.13$ and $\lambda = 10^{-1.5}$ with $\eta = 0.25, 0.38$ and $0.50$}
         \label[fig]{res:fig:logreg_penalisation}
-    \end{figure*}
+    \end{figure}
 
     \subsubsection{Classification Neural Network}
     \begin{table}
