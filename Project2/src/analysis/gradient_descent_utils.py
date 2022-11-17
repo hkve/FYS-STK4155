@@ -16,7 +16,7 @@ def OLS_solution(X: np.ndarray, y: np.ndarray) -> np.ndarray:
 
 
 def ridge_solution(X: np.ndarray, y: np.ndarray, lmbda: float) -> np.ndarray:
-    Id = np.eye(X.shape(1))
+    Id = np.eye(X.shape[1])
     return np.linalg.pinv(X.T @ X + lmbda*Id) @ X.T @ y
 
 

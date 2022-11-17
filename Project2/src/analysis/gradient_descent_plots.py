@@ -424,12 +424,12 @@ if __name__ == "__main__":
     # All the gradient descent instances
     GD = GradientDescent("plain", dict(eta=0.),
                          its=max_iter)
-    mGD = GradientDescent("momentum", dict(gamma=0.8, eta=0.),
+    mGD = GradientDescent("momentum", dict(gamma=0.8, eta=0.13027),
                           its=max_iter)
-    SGD = SGradientDescent("plain", dict(eta=0.),
+    SGD = SGradientDescent("plain", dict(eta=0.06911),
                            epochs=max_iter, batch_size=batch_size,
                            random_state=random_state)
-    mSGD = SGradientDescent("momentum", dict(gamma=0.8, eta=0.),
+    mSGD = SGradientDescent("momentum", dict(gamma=0.8, eta=0.11915),
                             epochs=max_iter, batch_size=batch_size,
                             random_state=random_state)
     mSGD2 = SGradientDescent("momentum", dict(gamma=0.01, eta=0.),
@@ -466,7 +466,7 @@ if __name__ == "__main__":
     rmSGD = SGradientDescent("rmsprop", dict(eta=0., beta=0.9),
                              epochs=max_iter, batch_size=batch_size,
                              random_state=random_state)
-    adSGD = SGradientDescent("adam", dict(eta=0., beta1=0.9, beta2=0.99),
+    adSGD = SGradientDescent("adam", dict(eta=0.31974, beta1=0.9, beta2=0.99),
                              epochs=max_iter, batch_size=batch_size,
                              random_state=random_state)
 
@@ -573,8 +573,8 @@ if __name__ == "__main__":
     # Choosing plot to plot
     plot1 = ""  # dict key for params1 or empty string
     plot2 = ""  # dict key for params2 or empty string
-    plot3 = 0  # True or False
-    plot4 = 0  # True or False
+    plot3 = 1  # True or False
+    plot4 = 1  # True or False
 
     # Plotting
     if plot1:
@@ -608,19 +608,7 @@ if __name__ == "__main__":
     if plot4:
         plot_by_iteration(
             D_train, D_val,
-            optimizers=(GradientDescent(method="momentum",
-                                        params=dict(eta=0.13027, gamma=0.8),
-                                        its=1),
-                        SGradientDescent(method="plain",
-                                         params=dict(eta=0.06911),
-                                         epochs=1, batch_size=200),
-                        SGradientDescent(method="momentum",
-                                         params=dict(eta=0.11915, gamma=0.8),
-                                         epochs=1, batch_size=200),
-                        SGradientDescent(method="adam",
-                                         params=dict(eta=0.31974,
-                                                     beta1=0.9, beta2=0.99),
-                                         epochs=1, batch_size=200),),
+            optimizers=(mGD, SGD, mSGD, adSGD),
             optimizer_names=("Mom GD", "Plain SGD",
                              "Mom SGD", "Adam SGD"),
             max_iter=max_iter,
