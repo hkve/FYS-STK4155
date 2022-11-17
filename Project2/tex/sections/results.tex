@@ -12,7 +12,9 @@
 
         Adding the tuning of the learning rate with AdaGrad, we see in \cref{res:fig:lrate3} a marked increase in stability. However, the algorithms struggled to converge, with the momentum based algorithms doing best, SGD slightly bettering the GD results. However, even AdaGrad SGD with momentum could not beat the ordinary momentum based GD and SGD algorithms.
 
-        Introducing RMSprop and Adam to tune the learning rate provided algorithms with a tunable learning rate that converged faster than AdaGrad, seen in \cref{res:fig:lrate4}. Instead of exploding, the MSE of RMSprop gradually increased from around $\eta=0.1$. Ultimately, it performed similarly to the AdaGrad algorithms, with an optimal MSE of 0.1863. The momentum based Adam algorithm performed the best, with an optimal MSE of $0.1660$; but performing well from very low $\eta$-values up to around $\eta=0.35$. After this point Adam was markedly less stable than the AdaGrad algorithms. Aside from converging faster, it was also notable that both RMSprop and Adam were much less sensitive to initial conditions, with generally much tighter confidence intervals. \network{1}{2}
+        Introducing RMSprop and Adam to tune the learning rate provided algorithms with a tunable learning rate that converged faster than AdaGrad, seen in \cref{res:fig:lrate4}. Instead of exploding, the MSE of RMSprop gradually increased from around $\eta=0.1$. Ultimately, it performed similarly to the AdaGrad algorithms, with an optimal MSE of 0.1863. The momentum based Adam algorithm performed the best, with an optimal MSE of $0.1660$; but performing well from very low $\eta$-values up to around $\eta=0.35$. After this point Adam was markedly less stable than the AdaGrad algorithms. Aside from converging faster, it was also notable that both RMSprop and Adam were much less sensitive to initial conditions, with generally much tighter confidence intervals.
+
+        \cref{res:fig:GD_history} shows how GD with momentum, plain SGD, SGD with momentum and Adam SGD converged by epoch. The non-stochastic method converged smoothly, and was very stable. Adding stochasticity clearly exhibited unstable convergence, but overall trended downwards faster. Notably, SGD with momentum was quite explosive, whereas Adam managed to implement stochasticity and momentum in a much more stable way.
 
         \begin{table}[!ht]
             \centering
@@ -33,6 +35,14 @@
             \caption{Table of the best validation MSE scores by GD algorithm, together with the learning rate that produced the best result.}
             \label[tab]{res:tab:OLS_MSEs}
         \end{table}
+
+        \begin{figure}[ht!]
+            \centering
+            \includegraphics[width=\linewidth]{figs/GD_history.pdf} 
+            \caption{Plot of the mean validation MSE of four a linear regression on Franke function data as optimised with GD algorithms after every epoch up to 500. Underneath, the logarithm of the std of the mean across descent from 5 starting points is shown. The momentum methods used $\gamma=0.8$, Adam had $\beta_1=0.9, \beta_2=0.99$ and the stochastic methods all used a batch size 200.\\
+            Best MSEs were: GD w/momentum (0.1775 in iteration 500), Plain SGD (0.1862 in iteration 495), SGD w/momentum (0.1729 in iteration 486), SGD Adam (0.1660 in iteration 500).}
+            \label{res:fig:GD_history}           
+        \end{figure}
 
         \begin{figure*}
             \begin{subfigure}{.49\textwidth}
@@ -285,7 +295,9 @@
     \subsubsection{Logistic regression}
     The different optimisation algorithms from our library of gradient decent methods were applied to optimise the BCE cost function without penalisation \cref{the:eq:logreg_cost_function} using Logistic regression. This is presented in \cref{res:fig:logreg_GD_opt} for GD methods with and without momentum, while SGD based methods is presented in \cref{res:fig:logreg_SGD_opt}. We found that every method, given the correct learning rate and number of iterations, manged to obtain an accuracy above $0.9$.  
     
-    We found that plain gradient decent performed the worst, but with a high enough learning rate and number of iterations
+    Plain gradient decent running 5 iterations performed the worst, giving the best accuracy of $0.958$ at $\eta = 0.859$. However, when allowed to run for 50 iterations, accuracy scores $> 0.95$ were constantly achieved across all learning rates. The addition of momentum made the optimasation converge faster, where the case for 50 iterations is especially stable. In the domain of SGD based methods, both Adam and AdaGrad SGD out competed plain SGD for 5 epochs. However, when allowed to run for 50 epochs, plain SGD also managed to converge giving constantly accuracy scores $> 0.95$ across all learning rates.
+    
+    Validation accuracies calculated while optimasation using GD and SGD based methods is presented in \cref{res:fig:logreg_under_optimazation}. Adam SGD and mGD achieved an accuracy of $~0.95$ using just a few iterations, while again GD and SGD clearly performing worst.  
 
     \begin{figure}
         \begin{subfigure}{.49\textwidth}
@@ -308,6 +320,8 @@
         \end{subfigure}
     \end{figure}
 
+    
+
     \begin{figure*}
         \begin{subfigure}{.49\textwidth}
             \includegraphics[width=\linewidth]{logreg_penalisation.pdf}
@@ -318,7 +332,7 @@
         \begin{subfigure}{.49\textwidth}
             \centering
             \includegraphics[width=\linewidth]{logreg_penalisation_sklearn.pdf}
-            \caption{Validation accuracy for \textbf{scikit-learn}'s implementation of logistic regression as a function penalisation parameter $C$. }
+            \caption{Validation accuracy for scikit-learn's  implementation of logistic regression as a function penalisation parameter $C$. }
             \label[fig]{res:fig:logreg_penalisation_sklearn}
         \end{subfigure}
         \caption{\comment{These plots are stupid, but I am tired and can not bother tweaking to make them look any better.}}
@@ -330,10 +344,10 @@
         \begin{tabular}{l|l|l|l|l}
             \network{1}{5} & \network{1}{10} & \network{2}{5} & \network{3}{5} & $f_H$       \\
             \hline
-            0.993             & 0.986              & 0.993             & 0.993             & Sigmoid    \\
-            0.993             & 0.986              & 0.993             & 0.993             & Tanh       \\
-            0.979             & 0.979              & 0.986             & 0.979             & ReLU       \\
-            0.979             & 0.986              & 0.979             & 0.979             & Leaky ReLU
+            0.993             & 0.993              & 0.993             & 0.986             & Sigmoid    \\
+            0.986             & 0.986              & 0.993             & 0.993             & Tanh       \\
+            0.986             & 0.979              & 0.993             & 0.986             & ReLU       \\
+            0.993             & 0.979              & 0.993             & 0.986             & Leaky ReLU
         \end{tabular}
         \caption{The optimal validation accuracy scores calculated using different network structures and hidden activation functions $f_H$, across different learning rates. Multiple learning rates correspond to the same accuracy score.}
         \label[tab]{res:tab:accuracy_score_activation_functions}        
@@ -373,28 +387,28 @@
     \begin{figure*}
         \begin{subfigure}{.49\textwidth}
             \includegraphics[width=\linewidth]{lmbda_lr_struct0_sigmoid.pdf}
-            \caption{Network \network{1}{5} with a Sigmoid activation function for the hidden layer. A single maximum was found with an accuracy $A = 0.993$, using $\eta = 0.1$ and $\lambda = 10^{-3.5}$}
+            \caption{Network \network{1}{5} with a Sigmoid activation function for the hidden layer. Multiple maxima was found with an accuracy $A = 0.993$}
             \label[fig]{res:fig:clf_heatmap_N_1_5_sig}
         \end{subfigure}
         \hfill
         \begin{subfigure}{.49\textwidth}
             \centering
             \includegraphics[width=\linewidth]{lmbda_lr_struct0_tanh.pdf}
-            \caption{Network \network{1}{5} with a Hyperbolic tangent activation function for the hidden layer. A single maximum was found with an accuracy $A = 0.986$, using $\eta = 0.03$ and $\lambda = 10^{-1.25}$}
+            \caption{Network \network{1}{5} with a Hyperbolic tangent activation function for the hidden layer. Multiple maxima was found with an accuracy $A = 0.986$.}
             \label[fig]{res:fig:clf_heatmap_N_1_5_tanh}
         \end{subfigure}
         \hfill
         \begin{subfigure}{.49\textwidth}
             \centering
             \includegraphics[width=\linewidth]{lmbda_lr_struct1_sigmoid.pdf}
-            \caption{Network \network{2}{5} with a Sigmoid activation function for the hidden layers. Multiple maxima was found with an accuracy $A = 0.986$.}
+            \caption{Network \network{2}{5} with a Sigmoid activation function for the hidden layers. Multiple maxima was found with an accuracy $A = 0.993$.}
             \label[fig]{res:fig:res:fig:clf_heatmap_N_2_5_sig}
         \end{subfigure}
         \hfill
         \begin{subfigure}{.49\textwidth}
             \centering
             \includegraphics[width=\linewidth]{lmbda_lr_struct1_tanh.pdf}
-            \caption{Network \network{2}{5} with a Hyperbolic activation function for the hidden layers. Multiple maxima was found with an accuracy $A = 0.986$.}
+            \caption{Network \network{2}{5} with a Hyperbolic activation function for the hidden layers. A single maximum was found with accuracy $A = 0.993$, using $\eta = 0.03$ and $\lambda = 10^{-3.5}$}
             \label[fig]{res:fig:clf_heatmap_N_2_5_tanh}
         \end{subfigure}
         \caption{Plots of validation accuracy score varied against learning rate and penalisation term $\lambda$. Red squares mark the best accuracy scores. The first row contains the network structures \network{1}{5} with Sigmoid (a) and Hyperbolic tangent (b) activation functions for the output layer, while the second row contains \network{2}{5} with Sigmoid (a) and Hyperbolic tangent (b). The AdaGrad algorithm with momentum $\gamma = 0.8$ has been used for optimisation, running 100 epochs with a batch size of 200.}

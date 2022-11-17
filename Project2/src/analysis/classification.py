@@ -39,7 +39,7 @@ def acc_eta_activation_functions(D_train, D_test):
     ylims = [
         (0.95, 1),
         (0.95, 1),
-        (0.90, 1),
+        (0.95, 1),
         (0.90, 1)
     ]
 
@@ -67,7 +67,7 @@ def lmbda_eta_heatmaps(D_train, D_test):
     
     structures = [
         ((5,), 1),
-        ((10,10,), 1)
+        ((5,5,), 1)
     ]
 
     activations = [
@@ -127,9 +127,9 @@ if __name__ == "__main__":
 
     # cu.lmbda_eta_heatmap_sklearn(D_train, D_test)
     # cu.logreg_with_sklearn(D_train, D_test)
-    # logreg_different_opts(D_train, D_test)
+    logreg_different_opts(D_train, D_test)
     # logreg_different_opts_during_training(D_train, D_test)
-    cu.lmbda_eta_heatmap_sklearn(D_train, D_test, (0.001, 0.1, 5), lmbdas=(-6,0,5), filename="lmbda_lr_struct1_sigmoid_sklearn")
+    # cu.lmbda_eta_heatmap_sklearn(D_train, D_test, (0.001, 0.1, 5), lmbdas=(-6,0,5), filename="lmbda_lr_struct1_sigmoid_sklearn")
 
     # cu.logreg_heatmap(D_train, D_test, etas=(0.001, 0.5, 5), lmbdas=(-6,0,5), filename="logreg_penalisation")
     # cu.logreg_with_sklearn(D_train, D_test, (0.01, 3, 40), filename="logreg_penalisation_sklearn")

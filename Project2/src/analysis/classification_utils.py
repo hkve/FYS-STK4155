@@ -30,13 +30,12 @@ def shoter_labels(arg, n=5):
         labels = arg[::skip]
         ticks = np.arange(len(labels), step=skip)+.75
 
-    print(len(ticks), len(labels))
     return ticks, labels
 
 def network_trainer(**kwargs):
     GB_defaults = {
-        "method": "adagrad_momentum",
-        "params": {"gamma":0.8, "eta":0.1}, 
+        "method": "adam",
+        "params": {"eta":0.1, "beta1": 0.9, "beta1": 0.99}, 
         "epochs": 100,
         "batch_size": 200,
         "random_state": 321,
@@ -82,7 +81,7 @@ def varying_activation_functions(D_train, D_test,
         acc = np.zeros_like(etas)
 
         for j, eta in enumerate(etas):
-            NN = network_trainer(params={"eta":eta, "gamma":0.8}, activation_hidden=af, nodes=nodes)
+            NN = network_trainer(params={"eta":eta, "beta1": 0.9, "beta2": 0.99}, activation_hidden=af, nodes=nodes)
             NN.train(D_train, trainsize=1)
 
             if NN.optimizer.converged:
@@ -113,7 +112,7 @@ def lmbda_eta_heatmap(D_train, D_test, etas, lmbdas, nodes=((1,), 1), activation
     for lmbda in lmbdas: 
         ACC_list = list()
         for eta in etas:
-            NN = network_trainer(nodes=nodes, params={"gamma":0.8, "eta":eta}, lmbda=lmbda, activation_hidden=activation_hidden)
+            NN = network_trainer(nodes=nodes, params={"eta":eta, "beta1": 0.9, "beta2": 0.99}, lmbda=lmbda, activation_hidden=activation_hidden)
             NN.train(D_train, trainsize=1)
 
             ACC = NN.accuracy(D_test.X, D_test.y) if NN.optimizer.converged else np.nan
@@ -211,6 +210,8 @@ def logreg_different_opts(D_train, D_test, eta_range, opts, labels, filename=Non
             clf = LogReg().fit(D_train, opt)
             ACC[j] = clf.accuracy(D_test.X, D_test.y)
         ax.plot(etas, ACC, label=labels[i])
+        max_i = np.argmax(ACC)
+        print(f"{labels[i]}, {ACC[max_i] = } at {etas[max_i] = }")
 
     ax.set(xlabel="Learning rate", ylabel="Accuracy")
     ax.legend()

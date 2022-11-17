@@ -5,7 +5,7 @@ EPSILON = float_info.epsilon**0.5
 MAX = 1 / float_info.epsilon
 
 
-def isfinite(x: np.ndarray, threshold: float = MAX):
+def isNotFinite(x: np.ndarray, threshold: float = MAX):
     return any(np.abs(x) > threshold) or any(np.isnan(x))
 
 
@@ -70,7 +70,7 @@ class GradientDescent:
         for it in range(self.its):
             self._it += 1
             g = grad(self.x, *args)
-            if isfinite(np.abs(g), threshold=self.threshold):
+            if isNotFinite(np.abs(g), threshold=self.threshold):
                 self.converged = 0
                 return self.x
             self.x = self._update_rule(self, self.x, g)
@@ -185,7 +185,7 @@ class SGradientDescent(GradientDescent):
             self._it += 1
             for batch in batches:
                 g = grad(self.x, *args, batch)
-                if isfinite(np.abs(g), threshold=self.threshold):
+                if isNotFinite(np.abs(g), threshold=self.threshold):
                     self.converged = 0
                     return self.x
                 self.x = self._update_rule(self, self.x, g)

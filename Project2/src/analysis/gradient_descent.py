@@ -13,7 +13,7 @@ import plot_utils
 import context
 from sknotlearn.data import Data
 from sknotlearn.linear_model import OLS_gradient, ridge_gradient
-from sknotlearn.optimize import GradientDescent, SGradientDescent
+from sknotlearn.optimize import GradientDescent, SGradientDescent, isNotFinite
 
 
 def MSE(y_pred: np.ndarray, y_target: np.ndarray) -> float:
@@ -359,10 +359,131 @@ def analytical_lmbda_plot(data_train: Data, data_val: Data, lmbdas: np.ndarray,
     plt.show()
 
 
+def do_GD_iteration(optimizer: GradientDescent, grad: Callable,
+                    data: Data, idcs: np.ndarray) -> None:
+    """Do one iteration of gradient descent 'by hand'.
+
+    Args:
+        optimizer (GradientDescent): GradientDescent instance to do iteration.
+        grad (Callable): Gradient of the relevant cost function to use.
+        data (Data): Data instance with data to fit to.
+        idcs (np.ndarray): Available indices to pass to grad.
+    """
+    # Spltting up iterations between stochastic and non-stochastic methods
+    if isinstance(optimizer, SGradientDescent):
+        batches = optimizer._make_batches(idcs)
+        for batch in batches:
+            g = grad(optimizer.x, data, batch)
+            if isNotFinite(np.abs(g)):
+                break
+            else:
+                optimizer.x = optimizer._update_rule(optimizer, optimizer.x, g)
+    else:
+        g = grad(optimizer.x, data, idcs)
+        if isNotFinite(np.abs(g)):
+            pass
+        else:
+            optimizer.x = optimizer._update_rule(optimizer, optimizer.x, g)
+
+
+def plot_by_iteration(data_train: Data, data_val: Data,
+                      optimizers: tuple, optimizer_names: tuple,
+                      max_iter: int, theta0: tuple,
+                      random_state: int = None,
+                      verbose: bool = False,
+                      filename: str = None) -> None:
+    """Plot the history of the validation MSE as parameters of
+    OLS cost function are optimised using given optimizers.
+
+    Args:
+        data_train (Data): Data instance with training data.
+        data_val (Data): Data instance with validation data.
+        optimizers (tuple): tuple of GradientDescent instances.
+        optimizer_names (tuple): Labels for the methods.
+        max_iter (int): Number of iterations to plot.
+        theta0 (tuple): nd.array or tuple of nd.arrays of
+                        initial parameters descend from
+        random_state (int, optional): np.random.seed to set. Defaults to None.
+        verbose (bool, optional): Whether to print best MSE values.
+                                  Defaults to False.
+        filename (str, optional): Filename for saving plot. Defaults to None.
+    """
+    # Wrapping theta0 if not a tuple/list
+    if not isinstance(theta0, (tuple, list)):
+        theta0 = (theta0,)
+
+    y_val, X_val = data_val.unpacked()
+
+    MSE_array = np.zeros((len(optimizers), len(theta0), max_iter))
+    all_iters = np.arange(max_iter)
+    for i, optimizer in enumerate(optimizers):
+        # Iterating through optimizers
+        for j, x0 in enumerate(theta0):
+            # Iterating through starting parameters
+            # All available idcs in order
+            all_data_idcs = np.arange(len(data_train))
+            if random_state is not None:
+                # Setting random_state to be same for every descent
+                np.random.seed(random_state)
+            optimizer._initialize(optimizer, x0)
+            optimizer._it = 0
+            for it in all_iters:
+                # Doing iterations
+                optimizer._it += 1
+                do_GD_iteration(optimizer,
+                                OLS_gradient,
+                                data_train,
+                                all_data_idcs)
+                # Clipping exploded gradients resulting in poor MSEs
+                MSE_array[i, j, it] = clip_exploded_gradients(
+                    val=MSE(X_val@optimizer.x, y_val),
+                    lim=8,  # This is semi-arbitrarily hardcoded
+                    convergence=1  # Disregarding convergence
+                )
+
+    fig, axes = plt.subplots(
+        nrows=2,
+        gridspec_kw={'height_ratios': [2, 1]},
+        sharex=True
+    )
+    # Plotting mean MSEs across starting points
+    for MSEs, name, color, optimizer in zip(MSE_array, optimizer_names,
+                                            plot_utils.colors, optimizers):
+        lrate = optimizer.params["eta"](0)
+        MSE_means = MSEs.mean(axis=0)
+        axes[0].plot(all_iters, MSE_means,
+                     lw=2, alpha=0.8, color=color,
+                     label=name + fr" $\eta={lrate:.2}$")
+        if verbose:
+            arg_best_MSE = np.nanargmin(MSE_means)
+            print(f"{name} best MSE: {MSE_means[-1]:.4} "
+                  f"(it {arg_best_MSE+1})")
+        if len(theta0) > 1:  # Adding 95% confidence interval
+            MSE_stds = MSEs.std(axis=0) / np.sqrt(len(theta0)-1)
+            # axes[1].fill_between(all_iters,
+            #                      MSE_means-2*MSE_stds, MSE_means+2*MSE_stds,
+            #                      alpha=0.3, color=color)
+            axes[1].plot(all_iters, np.log10(MSE_stds),
+                         color=color, lw=1, alpha=0.5)
+
+    axes[0].legend(
+        bbox_to_anchor=(0, 1.13, 1, 0.2),
+        loc="upper left",
+        ncol=2,
+        mode="expand"
+    )
+    axes[1].set(xlabel="Iteration", ylabel=r"$\log_{10}(\mathrm{std})$")
+    axes[0].set(ylabel="Validation MSE")
+    # Hardcoded lims
+    axes[0].set_ylim((0, 0.8))
+    if filename is not None:
+        plt.savefig(plot_utils.make_figs_path(filename))
+    plt.show()
+
+
 if __name__ == "__main__":
     # Import data
-    from sknotlearn.datasets import make_FrankeFunction, load_Terrain
-    # D = load_Terrain(n=600, random_state=321)
+    from sknotlearn.datasets import make_FrankeFunction
     random_state = 321
     D = make_FrankeFunction(n=600, noise_std=0.1, random_state=random_state)
     D = D.polynomial(degree=5, with_intercept=False)
@@ -463,18 +584,21 @@ if __name__ == "__main__":
         ),
         "tunable": dict(
             # funky learning rate to get more small eta evaluations
-            learning_rates=(np.linspace(0., 0.1**(1/2), 101)**2)[1:],
+            learning_rates=(np.linspace(0., 0.6**(1/2), 101)**2)[1:],
             optimizers=(rmSGD, adSGD, aSGD, maSGD),
             optimizer_names=("RMSprop SGD", "Adam SGD",
                              "AdaGrad SGD", "AdaGradMom SGD"),
             ylims=(0, 0.6)
         ),
-        "test2": dict(
-            learning_rates=np.linspace(0.0001, 0.1, 101),
-            optimizers=(adSGD,),
-            optimizer_names=("Adam",),
+        "test": dict(
+            learning_rates=np.linspace(0.11915, 0.11915, 1),
+            optimizers=(SGradientDescent(method="momentum",
+                                         params=dict(eta=0.11915, gamma=0.8),
+                                         epochs=500, batch_size=200,
+                                         random_state=random_state),),
+            optimizer_names=("Momentum SGD",),
             ylims=(0, 0.8)
-        )
+        ),
     }
     #######################
     # heatmap plot params #
@@ -528,6 +652,7 @@ if __name__ == "__main__":
     plot1 = ""  # dict key for params1 or empty string
     plot2 = ""  # dict key for params2 or empty string
     plot3 = 0  # True or False
+    plot4 = 1  # True or False
 
     # Plotting
     if plot1:
@@ -556,4 +681,29 @@ if __name__ == "__main__":
             lmbdas=np.logspace(-8, 0, 81),
             verbose=True,
             filename="lmbda_plot_ana"
+        )
+
+    if plot4:
+        plot_by_iteration(
+            D_train, D_val,
+            optimizers=(GradientDescent(method="momentum",
+                                        params=dict(eta=0.13027, gamma=0.8),
+                                        its=1),
+                        SGradientDescent(method="plain",
+                                         params=dict(eta=0.06911),
+                                         epochs=1, batch_size=200),
+                        SGradientDescent(method="momentum",
+                                         params=dict(eta=0.11915, gamma=0.8),
+                                         epochs=1, batch_size=200),
+                        SGradientDescent(method="adam",
+                                         params=dict(eta=0.31974,
+                                                     beta1=0.9, beta2=0.99),
+                                         epochs=1, batch_size=200),),
+            optimizer_names=("Mom GD", "Plain SGD",
+                             "Mom SGD", "Adam SGD"),
+            max_iter=max_iter,
+            theta0=theta0,
+            random_state=random_state,
+            verbose=True,
+            filename="GD_history"
         )
