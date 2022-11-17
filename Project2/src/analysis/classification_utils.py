@@ -210,6 +210,8 @@ def logreg_different_opts(D_train, D_test, eta_range, opts, labels, filename=Non
             clf = LogReg().fit(D_train, opt)
             ACC[j] = clf.accuracy(D_test.X, D_test.y)
         ax.plot(etas, ACC, label=labels[i])
+        max_i = np.argmax(ACC)
+        print(f"{labels[i]}, {ACC[max_i] = } at {etas[max_i] = }")
 
     ax.set(xlabel="Learning rate", ylabel="Accuracy")
     ax.legend()
