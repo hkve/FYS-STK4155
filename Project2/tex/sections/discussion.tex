@@ -58,5 +58,14 @@
         \subsubsection{Universial approximation theorem}
             \comment{Write something about the large networks we ended up with.}
 
+    \subsection{Classification, Wisconsin Breast Cancer}
+    Both Logistic regression and our Neural network managed to achieve a very good accuracy score calculated on the test set. The entire data set contained 569 unique instances, and by using our train-test split of $\sfrac{3}{4}$, the test set contained 143 points. Looking back at \cref{res:tab:accuracy_score_activation_functions}, we found optimal validation accuracies of $0.933$ for many models, using both different network structures and hyperparameters. This corresponds to a single instance being wrongly classified, which one might consider a highly effective network. However (EASY REF THAT SHIT HERE)
+    
+
+        \subsubsection{Logistic regression}
+        Performed good on this set, sufficiently good.
+
+        \subsubsection{Neural network}
+
 \subsection{Model Selection}
     Model selection is prevalent in all parts of this project, and in many cases, the difference between models has been marginal. To get a more thorough examination of which GD methods, regressors and classifiers work best, it would have been helpful to employ resampling techniques like bootstrap or cross-validation, as in~\citep{Project1}, to get better estimates for the scores we have employed throughout, e.g. MSE, R2 and accuracy.
