@@ -84,10 +84,14 @@
         Next we made similar heatplots as before, again traning and testing on the terrain data, but now employing ReLU and leaky ReLU. 
 
     \subsubsection{Implementing Regularisation}
-        Implementing a penalisation only on the weights (not the biases)
+        Penalising large weights can hinder them from growing arbitrarily large and therefore prevents overfitting. We added the regularisation hyperparameter to the gradients of the weights. If we had implemented a stopping critera, we would also have included it in the cost function. 
 
-    \subsubsection{Terrain Data an Comparison with OLS}
-        Lastly we compared the best model with an OLS-model. 
+        Firstly we chose the best network from the previous explorations: \network{5}{200}, with sigmoid and $\eta = 0.001$. We employd penalisations, $\lambda$, in the range $10^{-9}$ to $10^{-1}$ to this network and plotted the validation MSE as a function of these $\lambda$s.
+        
+        Secondly we used the same network, but now also varied the learning rate, $\eta$. We made a heatplot of the various $\eta$s, $\lambda$s and the R2 score these networks produced. 
+
+    \subsubsection{Terrain Data and Comparison with OLS}
+        Lastly we compared the optimal network with an OLS-model like the ones made in Project 1. From the previous explorations, we had found that the network with the best scores for this data was our implementation of \network{5}{200}, with sigmoid activation function, $\eta = 0.01 \text{and} \lambda=10^{-4.1}$. We trained and tested this network and plotted its prediction of the Nicaraguan terrain. We compared the MSE and plot of the network with an analytical optimalisation of the OLS cost function of a linear regression with a polynomial expansion of degree 11. We also plotted the true data for a qualitative comparison.      
     
 \subsection{Classification Problems}
     For our case using the Wisconsin Breast data set presented in \cref{breast_cancer_dataset}, we aimed to classify either $M$ or $B$. These categories are mutually exclusive, thus determining $M$ or not $M$ is sufficient (i.e. $\mathcal{Q} = \{ M, \neg M \}$). This gave us a binary problem, represented with $y_i \in \{ 1, 0 \}$ where $y_i = 1$ implies $M$ and $y_i = 0$ not $M$.
