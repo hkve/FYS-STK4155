@@ -177,9 +177,9 @@ In fitting our models to the data, we want to produce predictions $\hat{y} = \ha
             Having found the gradients of the parameters for all the layers, gradient descent can be implemented. 
 
     \subsubsection{Universal Approximation Theorem}
-            
+        A lot of the promise of NNs comes from the fact that they are \textit{universal approximators}. It has been shown (\citep{HornikEtAl89}) that a neural network with only a single hidden layer can approximate arbitrarily well any function $f(x): \mathbb{R}^n \to \mathbb{R}$ for any (positive) integer $n$. This requires the activation function of the hidden layer fulfil certain requirements: Namely being a non-constant, bounded and monotonically increasing, continuous function~\citep{MortenUAT}.
 
-    \subsubsection{Regularisation}
+
 
 \subsection{Classification}
     Instead of predicting targets in a continuous domain ($y_i \in \mathbb{R}$), we aimed to put the target $y_i$ in a specific class ($y_i \in \mathcal{Q}$), where $\mathcal{Q}$ is the set of possible outcomes. This is named \textit{classification} \comment{Is this perhaps a bit confusing nomenclature? -\Carl}, where in the following we will only consider binary cases. This means we will try to classify mutually exclusive properties, that is either we have the outcome $O$ or not the outcome $O$ ($\mathcal{Q} = \{O, \neg O\}$). We will label these as $O = 1$ and $\neg O = 0$.
