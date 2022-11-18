@@ -19,7 +19,7 @@
     \subsubsection{Terrain Data}
         We have taken terrain data from the Nicaraguan mountains, sampling height data within the square defined by longitudinal coordinates $[86^\circ\,33'\,20''\,\text{W}, 86^\circ\,28'\,20''\,\text{W}]$ and latitudes $[13^\circ\,26'\,40''\,\text{N}, 13^\circ\,31'\,40''\,\text{N}]$. The data has one arcsecond resolution.
 
-    \subsubsection{Wisconsin Breast Cancer data set}\label[sec]{breast_cancer_dataset}
+    \subsubsection{Wisconsin Breast Cancer Dataset}\label[sec]{breast_cancer_dataset}
         For regression problems, the Wisconsin Breast Cancer data set \citep{Dua:2019} was used. Tumour features are computed from digitized images, describing characteristics of the cell nuclei present in the image. In total there are $n = 569$ unique instances, where each instance has the respective tumour marked as either malignant ($M$) or benign ($B$). We aimed to classify the tumour as $M$ or $B$ based on 10 different attributes ranging from tumour radius to texture. Each of these 10 attributes were again split up into three different measurements, named mean, standard error and worst. The latter describes the mean of the three largest measurements. This data set serves a good real-world benchmarking set, containing not too many instances and no missing fields.  
 
     \subsubsection{Data Preparation}
@@ -52,7 +52,7 @@
 
         We selected the four momentum based algorithms from the OLS analysis to see how they responded to changing of learning rate and $\lambda$-parameter in predicting the validation data. Again we used 500 iterations for the GD method, and 500 epochs with batch size 200 with the SGD methods. Varying $\lambda \in [10^{-8}, 10^1]$, we compared first with a fixed learning rate between GD and SGD with momentum ($\gamma=0.8$). Then we used a tunable learning rate and SGD with AdaGrad with momentum ($\gamma=0.8$) and finally Adam $(\beta_1=0.9, \beta_2=0.99)$.
 
-    \subsubsection{Initialisation of DescentProblems}
+    \subsubsection{Initialisation of Descent Problems}
         GD methods are quite sensitive to the initial parameters from which to descend, so made sure to initialise all the methods from the same point when comparing performance. We always initialised with randomly drawn parameter values from the standard normal distribution with mean zero and std one. Since we always deal with scaled features, we can safely initialise the parameters with a standard normal distribution without fear of the dimension of the parameters being terribly out of sorts. To further combat the sensitivity to initial conditions, we did all the descents from five different starting points, and computed the average MSE scores we got.
 
 \subsection{Creating a Neural Network and Regression Problems}
