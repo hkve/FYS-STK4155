@@ -67,7 +67,7 @@
     
 
         \subsubsection{Logistic regression}
-        Performed good on this set, sufficiently good.
+        When investigating the effect of different optimisation algorithms, Adam SGD and mGD achieved a high accuracy for the least amount of iterations, as seen in \cref{res:fig:logreg_under_optimazation}, both yielding a validation accuracy of $0.986$ after about 25 iterations/epochs. When penalisation was added \cref{res:fig:logreg_penalisation}, no increase of validation accuracy was achieved, but two different classes of models performed equally good. For a weak penalisation, $\lambda = 10^{-6}$ the learning rate of $\eta = 0.13$ was found, resembling the model without penalisation. Using the higher penalisation of $\lambda = 10^{-1.5}$, the $0.985$ validation accuracy was achieved for a bigger range of learning rates $\eta \in [0.25, 0.5]$. Despite such high learning rates, no exploding gradients or large variation in validation accuracies was found, indicating that the parameters converges to a good minimum. The $L_2$ regularisation also helps to set non-influencial weights small, reducing the complexity of the model.
 
         \subsubsection{Neural network}
 
