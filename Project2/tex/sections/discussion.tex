@@ -21,51 +21,40 @@
         \subsubsection{Ridge Penalisation on Linear Regression}
         Adding a ridge penalisation on the parameters of our linear regression optimisation seemed to have little to no effect. We might attribute this to the fact that our linear model was not complex, and the data was `nice' enough, as to not be prone to overfitting. Essentially, the degrees of freedom in our fit seemed appropriate, and did not need penalisation. It was interesting to note that it did decrease the sensitivity to the initialisation of the GD methods, however.
 
-    \subsection{Neural Networks and regression}
-        \subsubsection{Initialisation of parameters}
-            With our scaling of the data, every feature with mean at zero and standard deviation equals $1$, the initialisation of the weights with the same distribution intuitively makes sense. \comment{please rewrite in a more academic fashion}
-            We could have explored other ways of initialising the parameters of the network. 
-    
+\subsection{Neural Networks and regression}
+    \subsubsection{Initialisation of parameters}
+        As the data is scaled such that the features and data all have mean zero and std one, initialising the weights with the same distribution ensures that they are all of the same order of magnitude. Thus, it is safe to assume that the weights are initialised without too much bias to away from the area of parameter space that should be of interest. We could have explored other ways of initialising the parameters of the network, like initialising with different distributions, or changing the std, and see how the network performed differently. Perhaps different architectures would do better when initialised in different ways. 
 
-        \subsubsection{The choice of epochs}
-            Could hypotesise that increasing the number of epochs would increase the network's performance. However, there is a trade-off between performance and the some times expensive process of training. 
 
-        \subsubsection{Choice of cost function}
-            We chose MSE as the cost function for the NN. We could have tested various cost functions, e.g. by implementing a penilisation. 
+    \subsubsection{The choice of epochs}
+        Could hypothesise that increasing the number of epochs would increase the network's performance. However, there is a trade-off between performance and the sometimes expensive process of training. 
 
-        \subsubsection{Varying Layers, Nodes, and Learning Rate}
-            We saw that the optimal network with sigmoid activation function in the hidden layers was our implementation of \network{5}{200} with learning rate 0.001. This was the most complex network we tested, meaning we might get even better results with by further increasing the complexity. However, a very complex model could also lead to overfitting. This network had 161 601 parameters (160 600 weights and 1001 biases). The data we sent in had two input variables, and we sent in 450 datapoints in the training process. In conclusion the model is already rather complex. 
-            
-            We saw that our and the SciKit-Learn-model had similar performances, implying our implementation is consistent with the norm.
+    \subsubsection{Choice of cost function}
+        We chose MSE as the cost function for the NN. We could have tested various cost functions, e.g. by implementing a penalisation. 
 
-            \comment{exploding gradients!}
+    \subsubsection{Varying Layers, Nodes, and Learning Rate}
+        We saw that the optimal network with sigmoid activation function in the hidden layers was our implementation of \network{5}{200} with learning rate 0.001. This was the most complex network we tested, meaning we might get even better results with by further increasing the complexity. However, the universal approximation theorem tells us that for the appropriate network and training we can perfectly reproduce the training data, leading to overfitting. This network had 161 601 parameters (160 600 weights and 1001 biases), meaning it is enormous compared to the data we trained on, and could be prone to overfitting. The network did best with lower learning rates, so the fact that it avoided overfitting so well might well be due to the network not training enough. Furthermore, there is no actual noise added to the data, so the training and validation data may be quite similar, which can diminish the problem of overfitting. The data we sent in had two input variables, and we sent in 450 datapoints in the training process.
+        
+        We saw that our and the \verb|scikit-learn|-model had similar performances, implying our implementation is consistent with the norm.
 
-        \subsubsection{Activation Functions}
-            It is interesting to note that the shape of a predicted graph in some sense inherits the shape of the activation function. The reason the network with the identity activation is linear, is that no non-linearity is ever introduced.
-            
-            \comment{More occurence of non-converging networks and exploding gradients when employing ReLU. }
+        \comment{exploding gradients!}
 
-            \comment{mention the universal approximation theorem}
+    \subsubsection{Activation Functions}
+        It is interesting to note that the shape of a predicted graph in some sense inherits the shape of the activation function. The reason the network with the identity activation is linear, is that no non-linearity is ever introduced.
 
-        \subsubsection{Regularisation}
-            When looking into networks with regularisation, we first used the optimal network from the previous explorations ($\eta = 0.01$) and added various penalisations to it. This resulted in a graph-plot with $\lambda= 10^{-4.1}$ yielding the lowest MSE-value. Subsequently we checked if a network with a different learning rate would perform even better, given some penalisation. We found that this was not the case. The $\eta = 0.01, \lambda = 10^{-4} \text{or} \ \lambda = 10^{-4.1}$ still resulted in the best score. 
+        \comment{More occurrence of non-converging networks and exploding gradients when employing ReLU. }
 
-            Could have implemented on the gradients of the biases as well as the weights. \comment{Don't know what would've happened though, hehe} If we had employed a stopping criteria in our network, we also would have added it to the cost function. \comment{The last sentence have been mentioned in the method part}
+        \comment{mention the universal approximation theorem}
 
-        \subsubsection{Nicaraguan terrain}
-            When comparing with the OLS model, we could see, qualitatively and quantitatively, that the network outperformed the linear regression. One could also argue that the network replicated many of the key elements of the true terrain data.  
-            
-        \subsubsection{Universial approximation theorem}
-            \comment{Write something about the large networks we ended up with.}
 
-    \subsection{Classification, Wisconsin Breast Cancer}
+\subsection{Classification, Wisconsin Breast Cancer}
     Both Logistic regression and our Neural network managed to achieve a very good accuracy score calculated on the test set. The entire data set contained 569 unique instances, and by using our train-test split of $\sfrac{3}{4}$, the test set contained 143 points. Looking back at \cref{res:tab:accuracy_score_activation_functions}, we found optimal validation accuracies of $0.933$ for many models, using both different network structures and hyperparameters. This corresponds to a single instance being wrongly classified, which one might consider a highly effective network. However (EASY REF THAT SHIT HERE)
     
 
-        \subsubsection{Logistic regression}
+    \subsubsection{Logistic regression}
         Performed good on this set, sufficiently good.
 
-        \subsubsection{Neural network}
+    \subsubsection{Neural network}
 
 \subsection{Model Selection}
     Model selection is prevalent in all parts of this project, and in many cases, the difference between models has been marginal. To get a more thorough examination of which GD methods, regressors and classifiers work best, it would have been helpful to employ resampling techniques like bootstrap or cross-validation, as in~\citep{Project1}, to get better estimates for the scores we have employed throughout, e.g. MSE, R2 and accuracy.

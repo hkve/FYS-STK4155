@@ -210,12 +210,12 @@
         \end{table}
 
 
-        We notice that in the implementation of our network, the optimal network is still \network{5}{200} with the sidmoid activation function (from above). However, the SciKit-Learn improves when changing from sigmoid to ReLU. There are now more non-converging networks and occurence of exploding gradients. 
+        We notice that in the implementation of our network, the optimal network is still \network{5}{200} with the sidmoid activation function (from above). However, the \verb|scikit-learn| improves when changing from sigmoid to ReLU. There are now more non-converging networks and occurence of exploding gradients. 
 
         \begin{figure*}
             \begin{subfigure}{.49\textwidth}
                 \includegraphics[width=\linewidth]{c_activations_2d_data.pdf}
-                \caption{Networks with various activation functions trained $x^2 + \epsilon$ ($\epsilon \distas \normal{0}{0.1}$) with $x \in [-1,1]$ plotted. }
+                \caption{Networks with various activation functions trained $x^2 + \epsilon$ ($\epsilon \distas \normal{0}{0.1^2}$) with $x \in [-1,1]$ plotted.}
                 \label[fig]{res:fig:act_funcs}
             \end{subfigure}
             \hfill 
@@ -244,7 +244,7 @@
         \end{figure*}
 
     \subsubsection{Exploring Regularisation}
-        From \cref{res:fig:regularisation_2D} the $\lambda$ yielding the lowest MSE value was $\lambda = 10^{-4.1}$ giving  $MSE = 0.078$. This was for the network with $\eta = 0.001$. When also varying the learning rate (see \cref{res:fig:regularisation_heatmap}), the optimal network also had $\eta = 0.001$ and now $\lambda = 10^{-4}$. 
+        From \cref{res:fig:regularisation_2D} the $\lambda$ yielding the lowest MSE value was $\lambda = 10^{-4.1}$ giving  an MSE of 0.078. This was for the network with $\eta = 0.001$. When also varying the learning rate (see \cref{res:fig:regularisation_heatmap}), the optimal network also had $\eta = 0.001$ and now $\lambda = 10^{-4}$. 
         \begin{figure*}            
             \begin{subfigure}{.49\textwidth}
                 \centering
@@ -264,7 +264,7 @@
         
 
     \subsubsection{Terrain data}
-        In \cref{res:fig:terrain} the plots of the true and predicted Nicaraguan terrains are presented. The MSE of the network-predicted was 0.078 and of the OLS model 0.171
+        In \cref{res:fig:terrain} the plots of the true and predicted Nicaraguan terrains are presented. The MSE of the network-predicted was 0.078 and of the OLS model 0.171. We saw, qualitatively and quantitatively, that the network outperformed the linear regression. By eye, it seemed also that the network replicated many of the key elements of the true terrain data.
         \begin{figure}
             \begin{subfigure}{.49\textwidth}
                 \includegraphics[width=\linewidth]{terrain_test.pdf}
@@ -333,7 +333,7 @@
         The validation accuracy of the network models \network{1}{5}, \network{1}{10}, \network{2}{5} and \network{3}{5} using different hidden activation functions is shown in \cref{res:fig:clf_afs}, with the optimal accuracy scores presented in \cref{res:tab:accuracy_score_activation_functions}. For \network{1}{5} \cref{res:fig:clf_af_N_1_5}, the sigmoid function seemed always to perform the best, with only Leaky ReLU matching its best accuracy of 0.993 for $\eta = 0.23$. From \cref{res:fig:clf_af_N_1_10}, \network{1}{10} also performed the best using the sigmoid function, with hyperbolic tangent being the second best. For this structure, both ReLU and Leaky ReLU performed worse across all learning rates tested here. The two and three layer structures \network{2}{5} and \network{3}{5} seen in \cref{res:fig:clf_af_N_2_5} and \cref{res:fig:clf_af_N_3_5} respectively was less clear on the preferred hidden activation function. \network{2}{5} seemed to be more learning rate dependent when choosing a hidden activation function, where all four functions tried here yielded an accuracy of $0.993$ for different learning rates. Increasing the complexity to \network{3}{5} did not yield any increase in validation accuracy, but the results from the sigmoid function was particularly stable in this case.  
 
         Due to the stable performance of the \network{1}{5} structure, we chose to include this in the penalisation optimisation. To include slightly deeper structure, \network{2}{5} was also chosen, since there were no significant increase in validation accuracy when moving to \network{3}{5}. Using the sigmoid and hyperbolic tangent hidden activation functions, the $\lambda$ and $\eta$ optimisation for these two structures is shown in \cref{res:fig:clf_heatmaps}. The \network{1}{5} structure had its best validation accuracy when using the sigmoid function for learning rates $\eta = 0.08, 0.1$ with penalisations $\lambda = 10^{-3.5}, 10^{-5.75}$ and $10^{-8.0}$ as seen in \cref{res:fig:clf_heatmap_N_1_5_sig}. The slightly lower accuracy of $0.986$ was found using hyperbolic tangent function as seen in \cref{res:fig:clf_heatmap_N_1_5_tanh}, with optimal parameters $\lambda =10^{-5.75},  10^{-8.0}$ for $\eta = 0.05$ and $\lambda = 10^{-3.5}$ for $\eta = 0.08$. When moving to the structure \network{2}{5}, both the sigmoid and hyperbolic tangent functions yielded an accuracy of $0.993$ as seen in \cref{res:fig:clf_heatmap_N_2_5_sig} and \cref{res:fig:clf_heatmap_N_2_5_tanh} respectively. For the sigmoid, five sets of hyperparameters gave this accuracy: $\lambda = 10^{-8.0}, 10^{-5.75}$ for $\eta = 0.03, 0.05$ in addition to $\lambda = 10^{-5.75}$ for $\eta = 0.1$. The hyperbolic tangent only had a single set, $\lambda = 10^{-3.5}$ for $\eta = 0.03$.
-        Lastly, using \verb|SciKit-Learn|'s neural network implementation, the \network{2}{5} structure using sigmoid activation function for both the hidden and output layer yielded a validation accuracy of 0.986 for multiple penalisation and learning rates, as shown in \cref{res:fig:clf_heatmap_sklearn}. Again, the obtained validation accuracy scores are in the vicinity of the results from our own +implementation.
+        Lastly, using \verb|scikit-learn|'s neural network implementation, the \network{2}{5} structure using sigmoid activation function for both the hidden and output layer yielded a validation accuracy of 0.986 for multiple penalisation and learning rates, as shown in \cref{res:fig:clf_heatmap_sklearn}. Again, the obtained validation accuracy scores are in the vicinity of the results from our own +implementation.
 
         \begin{table}
             \begin{tabular}{l|l|l|l|l}
