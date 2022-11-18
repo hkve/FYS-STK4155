@@ -574,7 +574,7 @@ if __name__ == "__main__":
     plot1 = ""  # dict key for params1 or empty string
     plot2 = ""  # dict key for params2 or empty string
     plot3 = 0  # True or False
-    plot4 = 1  # True or False
+    plot4 = 0  # True or False
 
     # Plotting
     if plot1:
