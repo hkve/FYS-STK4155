@@ -109,7 +109,7 @@ def tune_learning_rate(
         if verbose:
             print(f"{name} MSE score: {MSE_means[argbest]:.4} "
                   f"+- {MSE_stds[argbest]:.3} "
-                  f"(Learning rate {learning_rates[argbest]:.2}) "
+                  f"(Learning rate {learning_rates[argbest]}) "
                   f"({time()-start_time:.2f} s)")
 
     # Calculating analytical solution from matrix inversion
@@ -457,13 +457,13 @@ if __name__ == "__main__":
                           its=max_iter)
     maGD = GradientDescent("adagrad_momentum", dict(gamma=0.8, eta=0.),
                            its=max_iter)
-    aSGD = SGradientDescent("adagrad", dict(eta=0.),
+    aSGD = SGradientDescent("adagrad", dict(eta=0.49686),
                             epochs=max_iter, batch_size=batch_size,
                             random_state=random_state)
-    maSGD = SGradientDescent("adagrad_momentum", dict(gamma=0.8, eta=0.),
+    maSGD = SGradientDescent("adagrad_momentum", dict(gamma=0.8, eta=0.46464),
                              epochs=max_iter, batch_size=batch_size,
                              random_state=random_state)
-    rmSGD = SGradientDescent("rmsprop", dict(eta=0., beta=0.9),
+    rmSGD = SGradientDescent("rmsprop", dict(eta=0.01944, beta=0.9),
                              epochs=max_iter, batch_size=batch_size,
                              random_state=random_state)
     adSGD = SGradientDescent("adam", dict(eta=0.31974, beta1=0.9, beta2=0.99),
@@ -573,7 +573,7 @@ if __name__ == "__main__":
     # Choosing plot to plot
     plot1 = ""  # dict key for params1 or empty string
     plot2 = ""  # dict key for params2 or empty string
-    plot3 = 1  # True or False
+    plot3 = 0  # True or False
     plot4 = 1  # True or False
 
     # Plotting

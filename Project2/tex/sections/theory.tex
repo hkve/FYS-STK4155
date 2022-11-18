@@ -32,8 +32,8 @@ In fitting our models to the data, we want to produce predictions $\hat{y} = \ha
 
         SGD is done in so-called epochs, where we divide the full set $A$ into equally sized batches $A_k$, and do one GD iteration on every batch once. After this, $A$ is reshuffled and new mini-batches are drawn.
 
-    \subsubsection{Improving Convergence Rate}
-        As stochasticity is added to the algorithm, the rate of convergence does slow down. As such, it would be nice to add algorithms that can adapt the learning rate $\eta$ in such a way as to increase the rate of convergence. The AdaGrad algorithm does this with the idea to use different learning rates along different directions in parameter space; i.e. use larger learning rates in flat directions, while keeping it small in steep directions. This is done by keeping a running sum $G_k$ of the outer product of the gradients $\vec{g}_k$ at the points $\vec{\theta}_k$, and use this to adapt the learning rate.
+    \subsubsection{Improving Convergence and Stability}
+        As stochasticity is added to the algorithm, the stability might decrease. As such, it would be nice to add algorithms that can adapt the learning rate $\eta$ in such a way as to increase it. The AdaGrad algorithm does this with the idea to use different learning rates along different directions in parameter space; i.e. use larger learning rates in flat directions, while keeping it small in steep directions. This is done by keeping a running sum $G_k$ of the outer product of the gradients $\vec{g}_k$ at the points $\vec{\theta}_k$, and use this to adapt the learning rate.
         \begin{subequations}
             \begin{align}
                 \vec{g}_k &= \Nablatheta C_k(\vec{\theta}_{k-1}) \\

@@ -10,7 +10,7 @@
 
         Exploring the increase in epochs and decrease in batch size in \cref{res:fig:lrate2}, we see that decreasing batch size made the algorithm less stable, and more easily prone to exploding gradients. Increasing the number of epochs improved the result, and made increased the convergence, but did not affect stability.
 
-        Adding the tuning of the learning rate with AdaGrad, we see in \cref{res:fig:lrate3} a marked increase in stability. However, the algorithms struggled to converge, with the momentum based algorithms doing best, SGD slightly bettering the GD results. However, even AdaGrad SGD with momentum could not beat the ordinary momentum based GD and SGD algorithms.
+        Adding the tuning of the learning rate with AdaGrad, we see in \cref{res:fig:lrate3} a marked increase in stability. However, the algorithms struggled to converge, with the momentum based algorithms doing best; SGD slightly bettering the GD results. However, even AdaGrad SGD with momentum could not beat the ordinary momentum based GD and SGD algorithms.
 
         Introducing RMSprop and Adam to tune the learning rate provided algorithms with a tunable learning rate that converged faster than AdaGrad, seen in \cref{res:fig:lrate4}. Instead of exploding, the MSE of RMSprop gradually increased from around $\eta=0.1$. Ultimately, it performed similarly to the AdaGrad algorithms, with an optimal MSE of 0.1863. The momentum based Adam algorithm performed the best, with an optimal MSE of $0.1660$; but performing well from very low $\eta$-values up to around $\eta=0.35$. After this point Adam was markedly less stable than the AdaGrad algorithms. Aside from converging faster, it was also notable that both RMSprop and Adam were much less sensitive to initial conditions, with generally much tighter confidence intervals.
 
@@ -293,126 +293,126 @@
 
 \subsection{Wisconsin Breast Cancer}
     \subsubsection{Logistic regression}
-    The different optimisation algorithms from our library of gradient decent methods were applied to optimise the BCE cost function without penalisation \cref{the:eq:logreg_cost_function} using Logistic regression. This is presented in \cref{res:fig:logreg_GD_opt} for GD methods with and without momentum, while SGD based methods is presented in \cref{res:fig:logreg_SGD_opt}. We found that every method, given the correct learning rate and number of iterations, manged to obtain an accuracy above $0.9$.  
-    
-    Plain gradient decent running 5 iterations performed the worst, giving the best accuracy of $0.958$ at $\eta = 0.859$. However, when allowed to run for 50 iterations, accuracy scores $> 0.95$ were constantly achieved across all learning rates. The addition of momentum made the optimasation converge faster, where the case for 50 iterations is especially stable. In the domain of SGD based methods, both Adam and AdaGrad SGD out competed plain SGD for 5 epochs. However, when allowed to run for 50 epochs, plain SGD also managed to converge giving constantly accuracy scores $> 0.95$ across all learning rates.
-    
-    Validation accuracies calculated while optimasation using GD and SGD based methods is presented in \cref{res:fig:logreg_under_optimazation}. Adam SGD and mGD achieved an accuracy of $~0.95$ using just a few iterations, while again GD and SGD clearly performing worst.  
+        The different optimisation algorithms from our library of gradient decent methods were applied to optimise the BCE cost function without penalisation \cref{the:eq:logreg_cost_function} using Logistic regression. This is presented in \cref{res:fig:logreg_GD_opt} for GD methods with and without momentum, while SGD based methods are presented in \cref{res:fig:logreg_SGD_opt}. We found that every method, given the correct learning rate and number of iterations, managed to obtain an accuracy above $0.9$.  
+        
+        Plain gradient decent running 5 iterations performed the worst, at best acheiving an accuracy of $0.958$ at $\eta = 0.859$. However, when allowed to run for 50 iterations, accuracy scores $> 0.95$ were achieved across all learning rates. The addition of momentum made the optimisation converge faster, where the case for 50 iterations is especially stable. In the domain of SGD based methods, both Adam and AdaGrad SGD out-competed plain SGD for 5 epochs. However, when allowed to run for 50 epochs, plain SGD also managed to converge acheiving accuracy scores $> 0.95$ across all learning rates.
+        
+        Validation accuracies calculated while optimising using GD and SGD based methods are presented in \cref{res:fig:logreg_under_optimazation}. Adam SGD and mGD achieved an accuracy of $~0.95$ using just a few iterations, while again GD and SGD performed the worst.  
 
-    \begin{figure}
-        \begin{subfigure}{.49\textwidth}
-            \centering
-            \includegraphics[width=\linewidth]{logreg_GD.pdf}
-            \caption{Showing accuracy as a function of learning rate, optimised using GD with ($\gamma = 0.8$) and without momentum for 5 and 50 iterations.}
-            \label[fig]{res:fig:logreg_GD_opt}
-        \end{subfigure}
-        \begin{subfigure}{.49\textwidth}
-            \centering
-            \includegraphics[width=\linewidth]{logreg_SGD.pdf}
-            \caption{Showing accuracy as a function of learning rate, optimised plain, Adam ($\beta_1 = 0.9, \beta_2 = 0.99$) and AdaGrad SGD while varying the number of epochs. For all optimisations, a batch size of 200 was used.}
-            \label[fig]{res:fig:logreg_SGD_opt}
-        \end{subfigure}
-        \begin{subfigure}{.49\textwidth}
-            \centering
-            \includegraphics[width=\linewidth]{logreg_acc_during_optimazation.pdf}
-            \caption{Showing accuracy as a function of iterations/epochs. All methods used $\eta = 0.05$, with Adam having $\beta_1 = 0.9, \beta_2 = 0.99$ and momentum GD $\gamma = 0.8$.}
-            \label[fig]{res:fig:logreg_under_optimazation}
-        \end{subfigure}
-    \end{figure}
+        \begin{figure}
+            \begin{subfigure}{.49\textwidth}
+                \centering
+                \includegraphics[width=\linewidth]{logreg_GD.pdf}
+                \caption{Showing accuracy as a function of learning rate, optimised using GD with ($\gamma = 0.8$) and without momentum for 5 and 50 iterations.}
+                \label[fig]{res:fig:logreg_GD_opt}
+            \end{subfigure}
+            \begin{subfigure}{.49\textwidth}
+                \centering
+                \includegraphics[width=\linewidth]{logreg_SGD.pdf}
+                \caption{Showing accuracy as a function of learning rate, optimised plain, Adam ($\beta_1 = 0.9, \beta_2 = 0.99$) and AdaGrad SGD while varying the number of epochs. For all optimisations, a batch size of 200 was used.}
+                \label[fig]{res:fig:logreg_SGD_opt}
+            \end{subfigure}
+            \begin{subfigure}{.49\textwidth}
+                \centering
+                \includegraphics[width=\linewidth]{logreg_acc_during_optimazation.pdf}
+                \caption{Showing accuracy as a function of iterations/epochs. All methods used $\eta = 0.05$, with Adam having $\beta_1 = 0.9, \beta_2 = 0.99$ and momentum GD $\gamma = 0.8$.}
+                \label[fig]{res:fig:logreg_under_optimazation}
+            \end{subfigure}
+        \end{figure}
 
-    Using Adam SGD with $\beta_1 = 0.9, \beta_2 = 0.99$ as an optimasation algorithm, the validation accuracy varied for both penalisation $\lambda$ and learning rate $\eta$ is shown in \cref{res:fig:logreg_penalisation}. We found that multiple models gave the same optimal validation accuracy, for both low penalisation $(\lambda = 10^6)$ and higher penalisation $(\lambda = 10^{-1.5})$. The $(\lambda = 10^6)$ used a learning rate of $\eta = 0.13$ while the $\lambda = 10^{-1.5}$ models used higher learning rates in the range $\eta \in [0.25, 0.5]$. When using the logistic regression implementation from \verb|SciKit-Learn|, we found a validation accuracy score of 0.986 without any penalisation, which lay in the vicinity of the results obtained from our implementation.
+        Using Adam SGD with $\beta_1 = 0.9, \beta_2 = 0.99$ as an optimisation algorithm, the validation accuracy varied for both penalisation $\lambda$ and learning rate $\eta$ is shown in \cref{res:fig:logreg_penalisation}. We found that multiple models gave the same optimal validation accuracy, for both low penalisation $(\lambda = 10^{-6})$ and higher penalisation $(\lambda = 10^{-1.5})$. The $(\lambda = 10^{-6})$ used a learning rate of $\eta = 0.13$ while the $\lambda = 10^{-1.5}$ models used higher learning rates in the range $\eta \in [0.25, 0.5]$. When using the logistic regression implementation from \verb|scikit-learn|, we found a validation accuracy score of 0.986 without any penalisation, which lay in the vicinity of the results obtained from our own implementation.
  
 
-    \begin{figure}
-        \includegraphics[width=\linewidth]{logreg_penalisation.pdf}
-        \caption{Validation accuracy for logistic regression as a function of learning rate and penalisation parameter $\lambda$. Largest accuracy of $A = 0.986$ found at $\lambda = 10^{-6}$ using $\eta = 0.13$ and $\lambda = 10^{-1.5}$ with $\eta = 0.25, 0.38$ and $0.50$}
-        \label[fig]{res:fig:logreg_penalisation}
-    \end{figure}
+        \begin{figure}
+            \includegraphics[width=\linewidth]{logreg_penalisation.pdf}
+            \caption{Validation accuracy for logistic regression as a function of learning rate and penalisation parameter $\lambda$. Largest accuracy of $A = 0.986$ found at $\lambda = 10^{-6}$ using $\eta = 0.13$ and $\lambda = 10^{-1.5}$ with $\eta = 0.25, 0.38$ and $0.50$}
+            \label[fig]{res:fig:logreg_penalisation}
+        \end{figure}
 
     \subsubsection{Classification Neural Network}
-    The validation accuracy of the network models \network{1}{5}, \network{1}{10}, \network{2}{5} and \network{3}{5} using different hidden activation functions is shown in \cref{res:fig:clf_afs}, with the optimal accuracy scores presented in \cref{res:tab:accuracy_score_activation_functions}. For \network{1}{5} \cref{res:fig:clf_af_N_1_5}, the Sigmoid function seems to constantly perform the best, with only Leaky ReLU matching its best accuracy of 0.993 for $\eta = 0.23$. From \cref{res:fig:clf_af_N_1_10}, \network{1}{10} also performed the best using the Sigmoid function, with Hyperbolic tangent being the second best. For this structure, both ReLU and Leaky ReLU performed worse across all learning rates tested here. The two and three layer structures \network{2}{5} and \network{3}{5} seen in \cref{res:fig:clf_af_N_2_5} and \cref{res:fig:clf_af_N_3_5} respectively was less clear on the preferred hidden activation function. \network{2}{5} seemed to be more learning rate dependent when choosing a hidden activation function, where all four functions tried here yielded an accuracy of $0.993$ for different learning rates. Increasing the complexity to \network{3}{5} did not yield any increase in validation accuracy, but the results from the Sigmoid function was particularly stable in this case.  
+        The validation accuracy of the network models \network{1}{5}, \network{1}{10}, \network{2}{5} and \network{3}{5} using different hidden activation functions is shown in \cref{res:fig:clf_afs}, with the optimal accuracy scores presented in \cref{res:tab:accuracy_score_activation_functions}. For \network{1}{5} \cref{res:fig:clf_af_N_1_5}, the sigmoid function seemed always to perform the best, with only Leaky ReLU matching its best accuracy of 0.993 for $\eta = 0.23$. From \cref{res:fig:clf_af_N_1_10}, \network{1}{10} also performed the best using the sigmoid function, with hyperbolic tangent being the second best. For this structure, both ReLU and Leaky ReLU performed worse across all learning rates tested here. The two and three layer structures \network{2}{5} and \network{3}{5} seen in \cref{res:fig:clf_af_N_2_5} and \cref{res:fig:clf_af_N_3_5} respectively was less clear on the preferred hidden activation function. \network{2}{5} seemed to be more learning rate dependent when choosing a hidden activation function, where all four functions tried here yielded an accuracy of $0.993$ for different learning rates. Increasing the complexity to \network{3}{5} did not yield any increase in validation accuracy, but the results from the sigmoid function was particularly stable in this case.  
 
-    Due to the stable performance of the \network{1}{5} structure, we chose to include this in the penalisation optimasation. To include slightly deeper structure, \network{2}{5} was also chosen, since there were no significant increase in validation accuracy when moving to \network{3}{5}. Using the Sigmoid and Hyperbolic tangent hidden activation functions, the $\lambda$ and $\eta$ optimasation for these two structures is shown in \cref{res:fig:clf_heatmaps}. The \network{1}{5} structure had its best validation accuracy when using the Sigmoid function for learning rates $\eta = 0.08, 0.1$ with penalisations $\lambda = 10^{-3.5}, 10^{-5.75}$ and $10^{-8.0}$ as seen in \cref{res:fig:clf_heatmap_N_1_5_sig}. The slightly lower accuracy of $0.986$ was found using Hyperbolic tangent function as seen in \cref{res:fig:clf_heatmap_N_1_5_tanh}, with optimal parameters $\lambda =10^{-5.75},  10^{-8.0}$ for $\eta = 0.05$ and $\lambda = 10^{-3.5}$ for $\eta = 0.08$. When moving to the structure \network{2}{5}, both the Sigmoid and Hyperbolic tangent function yielded an accuracy of $0.993$ as seen in \cref{res:fig:clf_heatmap_N_2_5_sig} and \cref{res:fig:clf_heatmap_N_2_5_tanh} respectively. For the sigmoid, five sets of hyperparameters gave this accuracy: $\lambda = 10^{-8.0}, 10^{-5.75}$ for $\eta = 0.03, 0.05$ in addition to $\lambda = 10^{-5.75}$ for $\eta = 0.1$. The Hyperbolic tangent only had a single set, $\lambda = 10^{-3.5}$ for $\eta = 0.03$.
-    Lastly, using \verb|SciKit-Learn|'s neural network implementation, the \network{2}{5} structure using Sigmoid activation function for both the hidden and output layer yielded a validation accuracy of 0.986 for multiple penalisation and learning rates, as shown in \cref{res:fig:clf_heatmap_sklearn}. Again, the obtained validation accuracy scores are in the vicinity of the results from our implementation.
+        Due to the stable performance of the \network{1}{5} structure, we chose to include this in the penalisation optimisation. To include slightly deeper structure, \network{2}{5} was also chosen, since there were no significant increase in validation accuracy when moving to \network{3}{5}. Using the sigmoid and hyperbolic tangent hidden activation functions, the $\lambda$ and $\eta$ optimisation for these two structures is shown in \cref{res:fig:clf_heatmaps}. The \network{1}{5} structure had its best validation accuracy when using the sigmoid function for learning rates $\eta = 0.08, 0.1$ with penalisations $\lambda = 10^{-3.5}, 10^{-5.75}$ and $10^{-8.0}$ as seen in \cref{res:fig:clf_heatmap_N_1_5_sig}. The slightly lower accuracy of $0.986$ was found using hyperbolic tangent function as seen in \cref{res:fig:clf_heatmap_N_1_5_tanh}, with optimal parameters $\lambda =10^{-5.75},  10^{-8.0}$ for $\eta = 0.05$ and $\lambda = 10^{-3.5}$ for $\eta = 0.08$. When moving to the structure \network{2}{5}, both the sigmoid and hyperbolic tangent functions yielded an accuracy of $0.993$ as seen in \cref{res:fig:clf_heatmap_N_2_5_sig} and \cref{res:fig:clf_heatmap_N_2_5_tanh} respectively. For the sigmoid, five sets of hyperparameters gave this accuracy: $\lambda = 10^{-8.0}, 10^{-5.75}$ for $\eta = 0.03, 0.05$ in addition to $\lambda = 10^{-5.75}$ for $\eta = 0.1$. The hyperbolic tangent only had a single set, $\lambda = 10^{-3.5}$ for $\eta = 0.03$.
+        Lastly, using \verb|SciKit-Learn|'s neural network implementation, the \network{2}{5} structure using sigmoid activation function for both the hidden and output layer yielded a validation accuracy of 0.986 for multiple penalisation and learning rates, as shown in \cref{res:fig:clf_heatmap_sklearn}. Again, the obtained validation accuracy scores are in the vicinity of the results from our own implementation.
 
-    \begin{table}
-        \begin{tabular}{l|l|l|l|l}
-            \network{1}{5} & \network{1}{10} & \network{2}{5} & \network{3}{5} & $f_H$       \\
-            \hline
-            0.993             & 0.993              & 0.993             & 0.986             & Sigmoid    \\
-            0.986             & 0.986              & 0.993             & 0.993             & Tanh       \\
-            0.986             & 0.979              & 0.993             & 0.986             & ReLU       \\
-            0.993             & 0.979              & 0.993             & 0.986             & Leaky ReLU
-        \end{tabular}
-        \caption{The optimal validation accuracy scores calculated using different network structures and hidden activation functions $f_H$, across different learning rates. Multiple learning rates correspond to the same accuracy score.}
-        \label[tab]{res:tab:accuracy_score_activation_functions}        
-    \end{table}
+        \begin{table}
+            \begin{tabular}{l|l|l|l|l}
+                \network{1}{5} & \network{1}{10} & \network{2}{5} & \network{3}{5} & $f_H$       \\
+                \hline
+                0.993             & 0.993              & 0.993             & 0.986             & sigmoid    \\
+                0.986             & 0.986              & 0.993             & 0.993             & Tanh       \\
+                0.986             & 0.979              & 0.993             & 0.986             & ReLU       \\
+                0.993             & 0.979              & 0.993             & 0.986             & Leaky ReLU
+            \end{tabular}
+            \caption{The optimal validation accuracy scores calculated using different network structures and hidden activation functions $f_H$, across different learning rates. Multiple learning rates correspond to the same accuracy score.}
+            \label[tab]{res:tab:accuracy_score_activation_functions}        
+        \end{table}
 
-    \begin{figure*}
-        \begin{subfigure}{.49\textwidth}
-            \includegraphics[width=\linewidth]{clasf_activation_functions1.pdf}
-            \caption{Network \network{1}{5}, plotted for $\eta \in [ 0.1, 0.4 ]$ using 8 linearly spaced points}
-            \label[fig]{res:fig:clf_af_N_1_5}
-        \end{subfigure}
-        \hfill 
-        \begin{subfigure}{.49\textwidth}
-            \centering
-            \includegraphics[width=\linewidth]{clasf_activation_functions2.pdf}
-            \caption{Network \network{1}{10}, plotted for $\eta \in [ 0.01, 0.01 ]$ using 8 linearly spaced points}
-            \label[fig]{res:fig:clf_af_N_1_10}
-        \end{subfigure}
-        \hfill 
-        \begin{subfigure}{.49\textwidth}
-            \centering
-            \includegraphics[width=\linewidth]{clasf_activation_functions3.pdf}
-            \caption{Network \network{2}{5}, plotted for $\eta \in [ 0.01, 0.01 ]$ using 8 linearly spaced points}
-            \label[fig]{res:fig:clf_af_N_2_5}
-        \end{subfigure}
-        \hfill 
-        \begin{subfigure}{.49\textwidth}
-            \centering
-            \includegraphics[width=\linewidth]{clasf_activation_functions4.pdf}
-            \caption{Network \network{3}{5}, plotted for $\eta \in [ 0.01, 0.01 ]$ using 8 linearly spaced points}
-            \label[fig]{res:fig:clf_af_N_3_5}
-        \end{subfigure}
-        \caption{Plots of the accuracy score against learning rate for different activation functions for used for the hidden layer(s). Different network models have been used for the four plots. The AdaGrad algorithm with momentum $\gamma = 0.8$ has been used for optimisation, running 100 epochs with a batch size of 200.}
-        \label[fig]{res:fig:clf_afs}
-    \end{figure*}
+        \begin{figure*}
+            \begin{subfigure}{.49\textwidth}
+                \includegraphics[width=\linewidth]{clasf_activation_functions1.pdf}
+                \caption{Network \network{1}{5}, plotted for $\eta \in [ 0.1, 0.4 ]$ using 8 linearly spaced points}
+                \label[fig]{res:fig:clf_af_N_1_5}
+            \end{subfigure}
+            \hfill 
+            \begin{subfigure}{.49\textwidth}
+                \centering
+                \includegraphics[width=\linewidth]{clasf_activation_functions2.pdf}
+                \caption{Network \network{1}{10}, plotted for $\eta \in [ 0.01, 0.01 ]$ using 8 linearly spaced points}
+                \label[fig]{res:fig:clf_af_N_1_10}
+            \end{subfigure}
+            \hfill 
+            \begin{subfigure}{.49\textwidth}
+                \centering
+                \includegraphics[width=\linewidth]{clasf_activation_functions3.pdf}
+                \caption{Network \network{2}{5}, plotted for $\eta \in [ 0.01, 0.01 ]$ using 8 linearly spaced points}
+                \label[fig]{res:fig:clf_af_N_2_5}
+            \end{subfigure}
+            \hfill 
+            \begin{subfigure}{.49\textwidth}
+                \centering
+                \includegraphics[width=\linewidth]{clasf_activation_functions4.pdf}
+                \caption{Network \network{3}{5}, plotted for $\eta \in [ 0.01, 0.01 ]$ using 8 linearly spaced points}
+                \label[fig]{res:fig:clf_af_N_3_5}
+            \end{subfigure}
+            \caption{Plots of the accuracy score against learning rate for different activation functions for used for the hidden layer(s). Different network models have been used for the four plots. The AdaGrad algorithm with momentum $\gamma = 0.8$ has been used for optimisation, running 100 epochs with a batch size of 200.}
+            \label[fig]{res:fig:clf_afs}
+        \end{figure*}
 
-    \begin{figure*}
-        \begin{subfigure}{.49\textwidth}
-            \includegraphics[width=\linewidth]{lmbda_lr_struct0_sigmoid.pdf}
-            \caption{Network \network{1}{5} with a Sigmoid activation function for the hidden layer. Multiple maxima was found with an accuracy of $0.993$}
-            \label[fig]{res:fig:clf_heatmap_N_1_5_sig}
-        \end{subfigure}
-        \hfill
-        \begin{subfigure}{.49\textwidth}
-            \centering
-            \includegraphics[width=\linewidth]{lmbda_lr_struct0_tanh.pdf}
-            \caption{Network \network{1}{5} with a Hyperbolic tangent activation function for the hidden layer. Multiple maxima was found with an accuracy of $0.986$.}
-            \label[fig]{res:fig:clf_heatmap_N_1_5_tanh}
-        \end{subfigure}
-        \hfill
-        \begin{subfigure}{.49\textwidth}
-            \centering
-            \includegraphics[width=\linewidth]{lmbda_lr_struct1_sigmoid.pdf}
-            \caption{Network \network{2}{5} with a Sigmoid activation function for the hidden layers. Multiple maxima was found with an accuracy of $0.993$.}
-            \label[fig]{res:fig:clf_heatmap_N_2_5_sig}
-        \end{subfigure}
-        \hfill
-        \begin{subfigure}{.49\textwidth}
-            \centering
-            \includegraphics[width=\linewidth]{lmbda_lr_struct1_tanh.pdf}
-            \caption{Network \network{2}{5} with a Hyperbolic activation function for the hidden layers. A single maximum was found with accuracy of $0.993$, using $\eta = 0.03$ and $\lambda = 10^{-3.5}$}
-            \label[fig]{res:fig:clf_heatmap_N_2_5_tanh}
-        \end{subfigure}
-        \caption{Plots of validation accuracy score varied against learning rate and penalisation term $\lambda$. Red squares mark the best accuracy scores. The first row contains the network structures \network{1}{5} with Sigmoid (a) and Hyperbolic tangent (b) activation functions for the output layer, while the second row contains \network{2}{5} with Sigmoid (a) and Hyperbolic tangent (b). The AdaGrad algorithm with momentum $\gamma = 0.8$ has been used for optimisation, running 100 epochs with a batch size of 200.}
-        \label[fig]{res:fig:clf_heatmaps}
-    \end{figure*}
+        \begin{figure*}
+            \begin{subfigure}{.49\textwidth}
+                \includegraphics[width=\linewidth]{lmbda_lr_struct0_sigmoid.pdf}
+                \caption{Network \network{1}{5} with a sigmoid activation function for the hidden layer. Multiple maxima was found with an accuracy of $0.993$}
+                \label[fig]{res:fig:clf_heatmap_N_1_5_sig}
+            \end{subfigure}
+            \hfill
+            \begin{subfigure}{.49\textwidth}
+                \centering
+                \includegraphics[width=\linewidth]{lmbda_lr_struct0_tanh.pdf}
+                \caption{Network \network{1}{5} with a hyperbolic tangent activation function for the hidden layer. Multiple maxima was found with an accuracy of $0.986$.}
+                \label[fig]{res:fig:clf_heatmap_N_1_5_tanh}
+            \end{subfigure}
+            \hfill
+            \begin{subfigure}{.49\textwidth}
+                \centering
+                \includegraphics[width=\linewidth]{lmbda_lr_struct1_sigmoid.pdf}
+                \caption{Network \network{2}{5} with a sigmoid activation function for the hidden layers. Multiple maxima was found with an accuracy of $0.993$.}
+                \label[fig]{res:fig:clf_heatmap_N_2_5_sig}
+            \end{subfigure}
+            \hfill
+            \begin{subfigure}{.49\textwidth}
+                \centering
+                \includegraphics[width=\linewidth]{lmbda_lr_struct1_tanh.pdf}
+                \caption{Network \network{2}{5} with a hyperbolic activation function for the hidden layers. A single maximum was found with accuracy of $0.993$, using $\eta = 0.03$ and $\lambda = 10^{-3.5}$}
+                \label[fig]{res:fig:clf_heatmap_N_2_5_tanh}
+            \end{subfigure}
+            \caption{Plots of validation accuracy score varied against learning rate and penalisation term $\lambda$. Red squares mark the best accuracy scores. The first row contains the network structures \network{1}{5} with sigmoid (a) and hyperbolic tangent (b) activation functions for the output layer, while the second row contains \network{2}{5} with sigmoid (a) and hyperbolic tangent (b). The AdaGrad algorithm with momentum $\gamma = 0.8$ has been used for optimisation, running 100 epochs with a batch size of 200.}
+            \label[fig]{res:fig:clf_heatmaps}
+        \end{figure*}
 
-    \begin{figure}
-        \centering
-        \includegraphics[width=\linewidth]{alpha_lr_struct1_sigmoid_sklearn.pdf}
-        \caption{Network \network{2}{5} validation accuracy scores using SciKit-Learn's neural network implementation, varied against learning rate $\eta$ and $L_2$ penalisation term $\alpha$. Multiple maxima was found with an accuracy of 0.986.}
-        \label[fig]{res:fig:clf_heatmap_sklearn}
-    \end{figure}
+        \begin{figure}
+            \centering
+            \includegraphics[width=\linewidth]{alpha_lr_struct1_sigmoid_sklearn.pdf}
+            \caption{Network \network{2}{5} validation accuracy scores using SciKit-Learn's neural network implementation, varied against learning rate $\eta$ and $L_2$ penalisation term $\alpha$. Multiple maxima was found with an accuracy of 0.986.}
+            \label[fig]{res:fig:clf_heatmap_sklearn}
+        \end{figure}
