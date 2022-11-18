@@ -124,14 +124,14 @@ if __name__ == "__main__":
     D_train, D_test = breast_cancer_data()
     print(D_train.n_points + D_test.n_points)
 
-    # acc_eta_activation_functions(D_train, D_test)
-    # lmbda_eta_heatmaps(D_train, D_test)
+    acc_eta_activation_functions(D_train, D_test)
+    lmbda_eta_heatmaps(D_train, D_test)
 
 
-    # cu.logreg_with_sklearn(D_train, D_test)
-    # logreg_different_opts(D_train, D_test)
-    # logreg_different_opts_during_training(D_train, D_test)
-    # cu.lmbda_eta_heatmap_sklearn(D_train, D_test, (0.001, 0.1, 5), lmbdas=(-6,0,5), filename="alpha_lr_struct1_sigmoid_sklearn")
+    cu.logreg_with_sklearn(D_train, D_test)
+    logreg_different_opts(D_train, D_test)
+    logreg_different_opts_during_training(D_train, D_test)
+    cu.lmbda_eta_heatmap_sklearn(D_train, D_test, (0.001, 0.1, 5), lmbdas=(-6,0,5), filename="alpha_lr_struct1_sigmoid_sklearn")
 
-    # cu.logreg_heatmap(D_train, D_test, etas=(0.001, 0.5, 5), lmbdas=(-6,0,5), filename="logreg_penalisation")
-    # cu.logreg_with_sklearn(D_train, D_test, (0.01, 3, 40), filename="logreg_penalisation_sklearn")
+    cu.logreg_heatmap(D_train, D_test, etas=(0.001, 0.5, 5), lmbdas=(-6,0,5), filename="logreg_penalisation")
+    cu.logreg_with_sklearn(D_train, D_test, (0.01, 3, 40), filename="logreg_penalisation_sklearn")
