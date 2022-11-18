@@ -137,8 +137,8 @@
         \end{figure}
 
 
-\subsection{Neural Network and regression}
-    \subsubsection{Varying Layers, Nodes, and Learning Rate}
+\subsection{Neural Network and Regression}
+    \subsubsection{Varying Network Architecture and Learning Rate}
         When varying the number of hidden layers (1,3,5), nodes in each layer (between 2-200), and learning rate (0.8-0.005), we found that the best MSE results, for each \# layers, came from the networks in table \cref{res:tab:heatmap_nodes}. 
 
         \renewcommand{\arraystretch}{1.25}
@@ -290,7 +290,7 @@
 
 
 \subsection{Wisconsin Breast Cancer}
-    \subsubsection{Logistic regression}
+    \subsubsection{Logistic Regression}
         The different optimisation algorithms from our library of gradient decent methods were applied to optimise the BCE cost function without penalisation \cref{the:eq:logreg_cost_function} using Logistic regression. This is presented in \cref{res:fig:logreg_GD_opt} for GD methods with and without momentum, while SGD based methods are presented in \cref{res:fig:logreg_SGD_opt}. We found that every method, given the correct learning rate and number of iterations, managed to obtain an accuracy above $0.9$.  
         
         Plain gradient decent running 5 iterations performed the worst, at best acheiving an accuracy of $0.958$ at $\eta = 0.859$. However, when allowed to run for 50 iterations, accuracy scores $> 0.95$ were achieved across all learning rates. The addition of momentum made the optimisation converge faster, where the case for 50 iterations is especially stable. In the domain of SGD based methods, both Adam and AdaGrad SGD out-competed plain SGD for 5 epochs. However, when allowed to run for 50 epochs, plain SGD also managed to converge acheiving accuracy scores $> 0.95$ across all learning rates.

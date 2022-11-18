@@ -52,7 +52,7 @@
 
         We selected the four momentum based algorithms from the OLS analysis to see how they responded to changing of learning rate and $\lambda$-parameter in predicting the validation data. Again we used 500 iterations for the GD method, and 500 epochs with batch size 200 with the SGD methods. Varying $\lambda \in [10^{-8}, 10^1]$, we compared first with a fixed learning rate between GD and SGD with momentum ($\gamma=0.8$). Then we used a tunable learning rate and SGD with AdaGrad with momentum ($\gamma=0.8$) and finally Adam $(\beta_1=0.9, \beta_2=0.99)$.
 
-    \subsubsection{Initialisation of descent problems}
+    \subsubsection{Initialisation of DescentProblems}
         GD methods are quite sensitive to the initial parameters from which to descend, so made sure to initialise all the methods from the same point when comparing performance. We always initialised with randomly drawn parameter values from the standard normal distribution with mean zero and std one. Since we always deal with scaled features, we can safely initialise the parameters with a standard normal distribution without fear of the dimension of the parameters being terribly out of sorts. To further combat the sensitivity to initial conditions, we did all the descents from five different starting points, and computed the average MSE scores we got.
 
 \subsection{Creating a Neural Network and Regression Problems}
@@ -65,7 +65,7 @@
 
         When setting up a neural network, the weights and biases need initial values. Choosing these values can affect how the network trains and eventually performs. From \cref{the:eq:bp_w_b_delta} we see that setting all the parameters to $0$ means the network will not backpropogate initially and all the nodes will yield the same output. In this project we have initialised the weights with a distribution of mean zero and std $1$. We set the initial biases to $0.01$. Since the mean of the initialised weights is 0, setting the initial biases to a small value like this ensures every $z_i^L$ has a value to backpropogate in the first iteration.  
     
-    \subsubsection{Varying Layers, Nodes, and Learning Rate}
+    \subsubsection{Varying the Network Architecture and Learning Rate}
         We wanted to explore how our neural networks vary depending on their structure. We therefore varied the number of layers, number of nodes in each layer, and the learning rate while computing the measures for goodness of fit. In this case we implemented MSE. See Project 1 for elaboration on these types of measures \citep{Project1}.
         We chose to only evaluate somewhat symmetrical networks, meaning we used the same number of nodes in all the hidden layers.
 
