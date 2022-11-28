@@ -1,0 +1,97 @@
+% Math
+\usepackage{amsmath}
+\usepackage{physics}
+\usepackage{amsfonts} % for mathbb
+
+% Citetations
+% \usepackage[ backend=bibtex, sorting=none, autocite=plain]{biblatex}
+% \addbibresource{sections/references}
+\usepackage{natbib}
+\bibliographystyle{plainnat}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks,
+    linkcolor={red!50!black},
+    citecolor={blue!50!black},
+    urlcolor={blue!80!black}}
+
+
+% Formatting
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage[font=small, labelfont=bf]{caption}
+
+\graphicspath{ {./figs/} } 
+
+% Referecing sections, equations etc
+\usepackage[capitalize]{cleveref}
+\crefdefaultlabelformat{\textbf{#2}}
+\crefname{eq}{Eq.}{Eq.}
+\crefname{sec}{Sec.}{Sec.}
+\crefname{app}{App.}{App.}
+\crefname{fig}{Fig.}{Fig.}
+\crefname{tab}{Tab.}{Tab.}
+\crefdefaultlabelformat{#2#1#3}
+
+% Misc
+\usepackage{appendix}
+\usepackage{xfrac} % provides \sfrac
+
+% Commands
+
+\newcommand{\comment}[1]{\textcolor{red}{#1}}
+
+\newcommand{\integral}[1]{\ensuremath{\int\!\mathrm{d}#1\,}}
+\renewcommand{\d}[2][x]{\ensuremath{\frac{\mathrm{d}#2}{\mathrm{d}#1}}}
+
+\renewcommand{\vec}[1]{\boldsymbol{#1}}
+\newcommand{\pclosed}[1]{\left(#1\right)}
+\newcommand{\bclosed}[1]{\left[#1\right]}
+\newcommand{\cclosed}[1]{\left\{#1\right\}}
+\newcommand{\vclosed}[1]{\left|#1\right|}
+\renewcommand{\norm}[2][]{\ensuremath{\|#2\|_{#1}}}
+\renewcommand{\exp}[1]{e^{#1}}
+\newcommand{\exptext}[1]{\operatorname{exp}\pclosed{#1}}
+\newcommand{\dimof}[1]{\bigl[#1\bigr]}
+\newcommand{\normal}[2]{\operatorname{\mathcal{N}}\pclosed{#1,#2}}
+% --- INSTRUCTION FOR ANNA ---
+% The following is a command made in the typesetting language, LaTeX.
+% The structure of this specific command, has 3 different parts. Intricate, but elegant.
+
+% Table of context
+% PART I Command initialization keyword
+% PART II Naming the command
+% PART III Command definition 
+
+% PART I Command initialization keyword
+% "\newcommand" says, I want a new command. But what is wanting? Great question! The answer: I do not know.
+
+% PART II Naming the command
+% Here you can give a name to your command. In this specific case, it is named "\network"
+% It follows the keyword explained in the previouse section 
+
+% PART III Command definition 
+% Finally, the last part. I am somewhat tired of writing this, so understanding it is left as an exercise for the read.
+\newcommand{\network}[2]{$\mathbf{N}^{#1}_{#2}$}
+
+\newcommand{\distas}{\overset{d}{\sim}}
+\renewcommand{\expval}{\operatorname{\mathbb{E}}}
+\DeclareMathOperator{\mse}{MSE}
+\renewcommand{\var}{\operatorname{Var}}
+\newcommand{\bias}{\operatorname{Bias}}
+\DeclareMathOperator{\Rsquared}{R^2}
+\DeclareMathOperator{\eye}{\mathbb{I}}
+\DeclareMathOperator{\sgn}{sgn}
+\DeclareMathOperator{\diag}{diag}
+\DeclareMathOperator{\Nabla}{\boldsymbol{\nabla}}
+\DeclareMathOperator{\Nablatheta}{\Nabla_{\vec{\theta}}}
+
+\newcommand{\thetahat}{\hat{\theta}}
+\newcommand{\msub}[2]{\ensuremath{{#1}_\text{#2}}}
+\newcommand{\evalat}[2]{\left.#1\right|_{#2}}
+
+\newcommand{\Hakon}{$\mathcal{H}$}
+\newcommand{\Carl}{$\mathbb{CM}$}
+\newcommand{\Anna}{$\mathfrak{Anna}$}
