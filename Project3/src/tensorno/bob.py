@@ -1,63 +1,104 @@
+"""Contains builders used for creating maxout and channelout neural networks
+in tensorflow"""
 import tensorflow as tf
+import keras_tuner
 
-from tensorno.activations import Activation, Max_out, Channel_out
-from tensorno.utils import initializers
-
-
-def build_model(hp):
-    model = tf.keras.Sequential()
-    for i in range(hp.Choice("stop", [3, 4, 5])):
-        model.add(tf.keras.layers.Dense(
-            hp.Choice("units", [64, 128, 256]),
-            activation=Max_out(hp.Choice("num_groups", [8, 64, 128]))
-        ))
-    model.add(tf.keras.layers.Dense(1))
-    model.compile(
-        optimizer=tf.keras.optimizers.Adam(
-            hp.Choice("learning_rate", [0.001, 0.01]),
-        ),
-        loss="mse"
-    )
-    return model
+if __name__ == "__main__":
+    from layers import MaxOut, ChannelOut
+    from utils import get_custom_initializers
+else:
+    from tensorno.layers import MaxOut, ChannelOut
+    from tensorno.utils import get_custom_initializers
 
 
-def build_from_architecture(num_layers, units, num_groups, activation):
-    if not issubclass(activation, Activation):
-        raise ValueError(
-            f"Given activation ({activation}) is not an instance "
-            "of the Activation class."
-        )
+def build_LWTA_regressor(
+    num_layers: int,
+    units: tuple,
+    num_groups: tuple,
+    Layer: str,
+    num_features: int = 2,
+    **compiler_kwargs
+) -> tf.keras.Sequential:
+    """Builds a FFNN for regression with the specified architecture.
+
+    Args:
+        num_layers (int): Number of hidden layers.
+        units (tuple): Iterable with the number of nodes for each hidden layer.
+        num_groups (tuple): Iterable with the number of competing groups
+                            for each hidden layer.
+        Layer (str): Specifies whether to use MaxOut or ChannelOut layers.
+                     Either "max_out" or "channel_out".
+        num_features (int, optional): Number of input features. Defaults to 2.
+
+    Returns:
+        tf.keras.Sequential: Compiled Sequential model as regressor.
+    """
+    # Get the appropriate Layer class
+    if Layer == "max_out":
+        Layer = MaxOut
+    elif Layer == "channel_out":
+        Layer = ChannelOut
+    else:
+        raise ValueError(f"Given Layer ({Layer}) is not supported. "
+                         "must be `max_out` or `channel_out`.")
+
     model = tf.keras.Sequential()
     model.add(tf.keras.layers.InputLayer(
-        input_shape=(2,),
+        input_shape=(num_features,),
         name="input"
     ))
+
+    # Add hidden layers.
+    num_inputs = num_features
     for layer in range(num_layers):
-        if layer == 0:
-            num_inputs = 2
-        else:
-            num_inputs = num_groups[layer-1]
-        model.add(tf.keras.layers.Dense(
+        model.add(Layer(
             units=units[layer],
-            activation=activation(num_groups[layer]),
-            **initializers(num_inputs),
-            name=f"{activation.__name__}_{layer+1}"
-                #  f"_{units[layer]}n_{num_groups[layer]}g"
+            num_inputs=num_inputs,
+            num_groups=num_groups[layer],
+            **get_custom_initializers(num_inputs),
+            name=f"{Layer.__name__.lower()}_{layer+1}"
         ))
+        # MaxOut and ChannelOut have different number of outputs.
+        if isinstance(Layer, MaxOut):
+            num_inputs = num_groups[layer]
+        else:
+            num_inputs = units[layer]
+    # Add output layer.
     model.add(tf.keras.layers.Dense(
         units=1,
         activation="linear",
-        **initializers(num_groups[-1]),
+        **get_custom_initializers(num_inputs),
         name="output"
     ))
-    model.compile(
+
+    kwargs = dict(
         optimizer="adam",
         loss="mse"
     )
+    kwargs.update(compiler_kwargs)
+    model.compile(**kwargs)
+
     return model
 
 
-def build_model_architecture(hp, activation):
+def build_LWTA_architecture(
+    hp: keras_tuner.HyperParameters,
+    Layer: str,
+    isregressor: bool = True
+) -> tf.keras.Sequential:
+    """Builder for interfacing with keras_tuner to tune model architecture.
+
+    Args:
+        hp (keras_tuner.HyperParameters): Stores and generates hyperparameters
+                                          for the model.
+        Layer (str): Specifies whether to use MaxOut or ChannelOut layers.
+                     Either "max_out" or "channel_out".
+        isregressor (bool, optional): Whether the model is used for regression
+                                      or classification. Defaults to True.
+
+    Returns:
+        tf.keras.Sequential: Sequential model with a choice for architecture.
+    """
     num_layers = hp.Int("num_layers", 2, 4)
     units = list()
     num_groups = list()
@@ -68,15 +109,24 @@ def build_model_architecture(hp, activation):
     for nodes, groups in zip(nodes_by_layer, groups_by_layer):
         units.append(2**nodes)
         num_groups.append(2**groups)
-    return build_from_architecture(num_layers, units, num_groups, activation)
 
-
-def architecture_builder(activation):
-    if activation == "max_out":
-        activation = Max_out
-    elif activation == "channel_out":
-        activation = Channel_out
+    if isregressor:
+        return build_LWTA_regressor(num_layers, units, num_groups, Layer)
     else:
-        raise ValueError(f"{activation} not a valid activation function. "
-                         "Available are: 'max_out', 'channel_out'")
-    return lambda hp: build_model_architecture(hp, activation)
+        raise NotImplementedError("LWTA classifier not yet implemented.")
+
+
+def LWTA_architecture_builder(Layer: str, isregressor: bool = True):
+    """Returns appropriate architecture builder for interfacing with
+    keras_tuner for tuning the architecture of a LWTA model.
+
+    Args:
+        Layer (str): Specifies whether to use MaxOut or ChannelOut layers.
+                     Either "max_out" or "channel_out".
+        isregressor (bool, optional): Whether the model is used for regression
+                                      or classification. Defaults to True.
+
+    Returns:
+        function: Builder that keras_tuner can use for hyperparameter search.
+    """
+    return lambda hp: build_LWTA_architecture(hp, Layer)
