@@ -2,11 +2,14 @@ from random import random
 import numpy as np
 from sklearn.preprocessing import PolynomialFeatures
 
+
 class Data:
-    """Class for storing data y with corresponding design matrix X in a (y, X) type object.
+    """Class for storing data y with corresponding design matrix X
+    in a (y, X) type object.
     Indexing Data object is done as
         data[i] = Data(y[i], X[i]), giving the i'th data point
-        data[i,j] = y[i] or X[i,j] where j=0 refers to y, and j=1,... refers to the features.
+        data[i,j] = y[i] or X[i,j] where j=0 refers to y, and j=1,...
+                                             refers to the features.
 
     Public methods:
     Data is unpacked to its np.ndarrays by
@@ -28,21 +31,34 @@ class Data:
     Features can be expanded to polynomials by
         data = data.polynomial(degree)
     """
-    def __init__(self, y:np.ndarray, X:np.ndarray, unscale=None, scale=None, col_names=None) -> None:
+
+    def __init__(
+        self,
+        y: np.ndarray,
+        X: np.ndarray,
+        unscale=None,
+        scale=None,
+        col_names=None
+    ) -> None:
         self.y = np.array(y)
         self.X = np.array(X)
         self.n_points, self.n_features = X.shape
 
         # initiating unscale function, defaults to trivial function
-        self.unscale = unscale or (lambda data : data)
-        assert callable(self.unscale), f"Specified unscaler is not callable (is {type(self.unscaler)})"
+        self.unscale = unscale or (lambda data: data)
+        assert callable(
+            self.unscale), f"Specified unscaler is not callable "\
+                           "(is {type(self.unscaler)})"
 
         # initiating scale function, defaults to trivial function
-        self.scale = scale or (lambda data : data)
-        assert callable(self.scale), f"Specified scaler is not callable (is {type(self.scaler)})"
+        self.scale = scale or (lambda data: data)
+        assert callable(self.scale),\
+               f"Specified scaler is not callable (is {type(self.scaler)})"
 
         if col_names is not None:
-            assert len(col_names) == self.n_features, f"Number of coulom names {len(col_names)} does not match number of couloms in X {self.n_features}"
+            assert len(col_names) == self.n_features,\
+                   f"Number of coulom names {len(col_names)} "\
+                   "does not match number of couloms in X {self.n_features}"
             self.col_names = col_names
 
     # The following methods are there for indexing and iteration of Data
@@ -57,7 +73,8 @@ class Data:
             elif j > 0 and j < self.X.shape[1]:
                 return self.X[i, j]
             else:
-                raise IndexError(f"Index {j} out of bounds for Data with {self.n_features} features.")
+                raise IndexError(f"Index {j} out of bounds for "
+                                 f"Data with {self.n_features} features.")
         except:
             return Data(self.y[key], self.X[key])
 
@@ -78,56 +95,59 @@ class Data:
             return Data(self.y+other, self.X+other)
         elif type(other) == np.ndarray:
             try:
-                return Data(self.y+other[:,0], self.X+other[:,1:])
+                return Data(self.y+other[:, 0], self.X+other[:, 1:])
             except IndexError:
                 return Data(self.y+other[0], self.X+other[1:])
         elif type(other) == Data:
             return Data(self.y+other.y, self.X+other.X)
         else:
-            raise TypeError(f"Addition not implemented betwee Data and {type(other)}")
-    
+            raise TypeError("Addition not implemented between "
+                            f"Data and {type(other)}")
+
     def __sub__(self, other):
         if type(other) in (int, float, np.int64, np.float64):
             return Data(self.y-other, self.X-other)
         elif type(other) == np.ndarray:
             try:
-                return Data(self.y-other[:,0], self.X-other[:,1:])
+                return Data(self.y-other[:, 0], self.X-other[:, 1:])
             except IndexError:
                 return Data(self.y-other[0], self.X-other[1:])
         elif type(other) == Data:
             return Data(self.y-other.y, self.X-other.X)
         else:
-            raise TypeError(f"Subtraction not implemented betwee Data and {type(other)}")
+            raise TypeError("Subtraction not implemented between "
+                            f"Data and {type(other)}")
 
     def __mul__(self, other):
         if type(other) in (int, float, np.int64, np.float64):
             return Data(self.y*other, self.X*other)
         elif type(other) == np.ndarray:
             try:
-                return Data(self.y*other[:,0], self.X*other[:,1:])
+                return Data(self.y*other[:, 0], self.X*other[:, 1:])
             except IndexError:
                 return Data(self.y*other[0], self.X*other[1:])
         elif type(other) == Data:
             return Data(self.y*other.y, self.X*other.X)
         else:
-            raise TypeError(f"Multiplication not implemented betwee Data and {type(other)}")
+            raise TypeError("Multiplication not implemented between "
+                            f"Data and {type(other)}")
 
     def __truediv__(self, other):
         if type(other) in (int, float, np.int64, np.float64):
             return Data(self.y/other, self.X/other)
         elif type(other) == np.ndarray:
             try:
-                return Data(self.y/other[:,0], self.X/other[:,1:])
+                return Data(self.y/other[:, 0], self.X/other[:, 1:])
             except IndexError:
                 return Data(self.y/other[0], self.X/other[1:])
         elif type(other) == Data:
             return Data(self.y/other.y, self.X/other.X)
         else:
-            raise TypeError(f"Division not implemented between Data and {type(other)}")
+            raise TypeError("Division not implemented between "
+                            f"Data and {type(other)}")
 
     # The remaining methods do stuff
-    def unpacked(self): #-> tuple[np.ndarray, np.ndarray]:
-
+    def unpacked(self):  # -> tuple[np.ndarray, np.ndarray]:
         """Unpacks the Data into the y and X ndarrays
 
         Returns:
@@ -135,26 +155,31 @@ class Data:
         """
         return self.y, self.X
 
-    def sorted(self, axis:int=0):
+    def sorted(self, axis: int = 0):
         """Sorts Data along specified axis.
 
         Args:
-            axis (int, optional): Feature to sort against. 0 is y, 1 etc. are features. Defaults to 0.
+            axis (int, optional): Feature to sort against.
+                                  0 is y, 1 etc. are features. Defaults to 0.
 
         Returns:
             Data: sorted Data
         """
-        sorted_idxs = np.argsort(self[:,axis])
+        sorted_idxs = np.argsort(self[:, axis])
         y_sorted = self.y[sorted_idxs]
-        X_sorted = self.X[sorted_idxs,:]
+        X_sorted = self.X[sorted_idxs, :]
         return Data(y_sorted, X_sorted, unscale=self.unscale)
 
-    def shuffled(self, with_replacement:bool=False, random_state:int=None):
+    def shuffled(self, with_replacement: bool = False, random_state: int = None):
         """Returns shuffled Data.
 
         Args:
-            with_replacement (bool, optional): Whether to drawn data randomly with replacement. Defaults to False.
-            random_state (int, optional): Specifies random seed to use for numpy.random module. Defaults to None.
+            with_replacement (bool, optional): Whether to drawn data randomly
+                                               with replacement.
+                                               Defaults to False.
+            random_state (int, optional): Specifies random seed to use for
+                                          numpy.random module.
+                                          Defaults to None.
 
         Returns:
             Data: with order of rows drawn randomly
@@ -165,8 +190,10 @@ class Data:
         else:
             shuffled_idxs = np.arange(self.y.size)
             np.random.shuffle(shuffled_idxs)
-        return Data(self.y[shuffled_idxs], self.X[shuffled_idxs], unscale=self.unscale)
-    
+        return Data(self.y[shuffled_idxs],
+                    self.X[shuffled_idxs],
+                    unscale=self.unscale)
+
     def unscaled(self):
         """Returns unscaled Data
 
@@ -175,13 +202,21 @@ class Data:
         """
         return self.unscale(self)
 
-    def train_test_split(self, ratio:float=2/3, shuffle:bool=True, random_state:int=None) -> tuple:
-        """Splits the data into training data and test data according to train_test-ratio.
+    def train_test_split(self,
+                         ratio: float = 2/3,
+                         shuffle: bool = True,
+                         random_state: int = None) -> tuple:
+        """Splits the data into training data and test data according to
+        train_test-ratio.
 
         Args:
-            ratio (float, optional): Ratio of training to test data. Defaults to 2/3.
-            shuffle (bool, optional): Whether to shuffle data before splitting. Defaults to True
-            random_state (int, optional): Random seed to pass on to numpy.random module. Defaults to None.
+            ratio (float, optional): Ratio of training to test data.
+                                     Defaults to 2/3.
+            shuffle (bool, optional): Whether to shuffle data before splitting.
+                                      Defaults to True
+            random_state (int, optional): Random seed to pass on to
+                                          numpy.random module.
+                                          Defaults to None.
 
         Returns:
             tuple[Data]: Split Data into train and test Data-instances
@@ -198,12 +233,12 @@ class Data:
         training_data = Data(
             self.y[training_idxs],
             self.X[training_idxs],
-            unscale = self.unscale
+            unscale=self.unscale
         )
         test_data = Data(
             self.y[test_idxs],
             self.X[test_idxs],
-            unscale = self.unscale
+            unscale=self.unscale
         )
         return training_data, test_data
 
@@ -223,7 +258,7 @@ class Data:
         """
         return np.mean((self.y-self.mean())**2)
 
-    def scaled(self, scheme:str="None"):
+    def scaled(self, scheme: str = "None"):
         """Returns scaled Data.
 
         Args:
@@ -245,22 +280,27 @@ class Data:
         """
         return data
 
-    def polynomial(self, degree:int, with_intercept:bool=True, return_powers:bool=False):
+    def polynomial(self,
+                   degree: int,
+                   with_intercept: bool = True,
+                   return_powers: bool = False):
         """
         Makes polynomials based on features (columns) in X. Optionally,
         the ordering of powers can be saved to data object.
 
         Args:
             degree (int): Highest degree to include in polynomial
-            save_powers (bool): If the ordering of power should be saved. Defaults to False
+            save_powers (bool): If the ordering of power should be saved.
+                                Defaults to False
 
         Returns:
-            Data: at Data-instance with a new design matrix based on polynomials of prior features.
+            Data: a Data-instance with a new design matrix based on
+                  polynomials of prior features.
         """
         poly = PolynomialFeatures(degree=degree, include_bias=with_intercept)
         X = poly.fit_transform(self.X)
         out = Data(self.y, X)
-        
+
         if return_powers:
             return out, poly.powers_
         else:
@@ -280,11 +320,13 @@ class Data:
         # vectorised scaling
         data_mean = np.mean(data_array, axis=0)
         data_std = np.std(data_array, axis=0)
-        data_std = np.where(data_std != 0, data_std, 1) # sets unvaried data-columns to 0
+        # sets unvaried data-columns to 0
+        data_std = np.where(data_std != 0, data_std, 1)
         data_scaled = (data_array - data_mean) / data_std
 
         # function to unscale scaled Data
-        unscaler = lambda data_ : data_*data_std + data_mean
+        def unscaler(data): return data*data_std + data_mean
+
         # function to replicate exact scaling done here
         def fit_scaler(data):
             out = (data - data_mean) / data_std
@@ -293,10 +335,11 @@ class Data:
 
         # packing result into new Data-instance
         scaled_data = Data(
-            data_scaled[:,0],
-            data_scaled[:,1:],
-            unscale = unscaler, # teching new Data how to unscale
-            scale = fit_scaler, # teaching new Data how to scale other Data the same way.
+            data_scaled[:, 0],
+            data_scaled[:, 1:],
+            unscale=unscaler,  # teching new Data how to unscale
+            # teaching new Data how to scale other Data the same way.
+            scale=fit_scaler,
         )
         return scaled_data
 
@@ -319,9 +362,10 @@ class Data:
                                0, (data_array-data_min) / data_diff)
 
         # function to unscale scaled Data
-        unscaler = lambda data_ : np.where(data_diff == 0,
-                                           data_min, data_diff*data + data_min)
+        def unscaler(data): return np.where(data_diff == 0,
+                                            data_min, data_diff*data + data_min)
         # function to replicate exact scaling done here
+
         def fit_scaler(data):
             out = (data - data_min) / data_diff
             out.unscale = unscaler
@@ -329,15 +373,16 @@ class Data:
 
         # packing result into new Data-instance
         scaled_data = Data(
-            data_scaled[:,0],
-            data_scaled[:,1:],
-            unscale = unscaler, # teching new Data how to unscale
-            scale = fit_scaler, # teaching new Data how to scale other Data the same way.
+            data_scaled[:, 0],
+            data_scaled[:, 1:],
+            unscale=unscaler,  # teching new Data how to unscale
+            # teaching new Data how to scale other Data the same way.
+            scale=fit_scaler,
         )
         return scaled_data
-    
+
     scalers_ = {
-        "None" : none_scaler_,
-        "Standard" : standard_scaler_,
-        "Minmax" : min_max_,
+        "None": none_scaler_,
+        "Standard": standard_scaler_,
+        "Minmax": min_max_,
     }
