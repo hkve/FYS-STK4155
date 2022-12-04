@@ -7,11 +7,11 @@ import context
 from tensorno.layers import MaxOut, ChannelOut
 
 
-def get_layer_names(network: tf.keras.model.Model) -> list:
+def get_layer_names(network: tf.keras.Model) -> list:
     """Get the string names of the layers of a tf Model instance.
 
     Args:
-        network (tf.keras.model.Model): Model from which to get layer names.
+        network (tf.keras.Model): Model from which to get layer names.
 
     Returns:
         list: list of the string names of the layers in network.
@@ -19,13 +19,13 @@ def get_layer_names(network: tf.keras.model.Model) -> list:
     return list(map(lambda x: x.name, network.layers))
 
 
-def get_layer_activations(network: tf.keras.model.Model,
+def get_layer_activations(network: tf.keras.Model,
                           layer,
                           input):
     """Get the output from a given layer in a tf Model given input.
 
     Args:
-        network (tf.keras.model.Model): Model from which to extract activation.
+        network (tf.keras.Model): Model from which to extract activation.
         layer (str or tf.keras.layers.Layer): Either the name of the layer or
                                               the Layer instance from which to
                                               get the outputs.
@@ -53,11 +53,11 @@ def get_layer_activations(network: tf.keras.model.Model,
         return intermediate_model(input)
 
 
-def get_all_activations(network: tf.keras.model.Model, input) -> list:
+def get_all_activations(network: tf.keras.Model, input) -> list:
     """Gets the output from every layer in a tf Model instance given input.
 
     Args:
-        network (tf.keras.model.Model): Model from which to extract activation.
+        network (tf.keras.Model): Model from which to extract activation.
         input (np.ndarray or tf.Tensor): The initial feature input to generate
                                          the activations.
 
