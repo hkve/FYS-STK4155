@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 import context
+import plot_utils
 from tensorno.layers import MaxOut, ChannelOut
 
 
@@ -80,6 +81,9 @@ def group_nodes(x: float, nodes: int, groups: int, ax):
         nodes (int): Number of nodes in the layer.
         groups (int): Number of groups in the layer.
         ax (ax): plt ax object on which to plot.
+
+    Returns:
+        tuple: ax object on which the function plotted.
     """
     competitors = nodes // groups
     for group in range(groups):
@@ -87,9 +91,11 @@ def group_nodes(x: float, nodes: int, groups: int, ax):
                                     group*competitors - nodes/2 - 0.3),
                                    0.2, competitors-0.4,
                                    fc='none',
-                                   ec='grey',
-                                   lw=1,
+                                   ec=plot_utils.colors[-1],
+                                   lw=1.2,
                                    clip_on=False))
+
+    return ax
 
 
 def plot_nodes(layers: list, ax=None):
@@ -98,19 +104,25 @@ def plot_nodes(layers: list, ax=None):
     Args:
         layers (list): list of tf.keras.layers.Layer instances.
         ax (ax, optional): plt ax on which to plot. Defaults to None.
+
+    Returns:
+        tuple: ax object on which the function plotted.
     """
     if ax is None:
         _, ax = plt.subplots()
+        ax.set_facecolor("white")
         ax.set_xticks([])
         ax.set_yticks([])
 
     for x, layer in enumerate(layers):
         nodes = layer.units
         for node in np.arange(-nodes/2, nodes/2):
-            ax.scatter([x], [node], c="grey")
+            ax.scatter([x], [node], color=plot_utils.colors[0])
 
         if isinstance(layer, (MaxOut, ChannelOut)):
             group_nodes(x, nodes, layer.num_groups, ax=ax)
+
+    return ax
 
 
 def plot_active_nodes(layers: list, isactive: list, ax=None):
@@ -122,9 +134,13 @@ def plot_active_nodes(layers: list, isactive: list, ax=None):
         isactive (list): list of boolean np.ndarrays indicating whether node
                          is active or not by layer.
         ax (ax, optional): plt ax on which to plot. Defaults to None.
+
+    Returns:
+        tuple: ax object on which the function plotted.
     """
     if ax is None:
         _, ax = plt.subplots()
+        ax.set_facecolor("white")
         ax.set_xticks([])
         ax.set_yticks([])
 
@@ -137,6 +153,8 @@ def plot_active_nodes(layers: list, isactive: list, ax=None):
         if isinstance(layer, (MaxOut, ChannelOut)):
             group_nodes(x, nodes, layer.num_groups, ax=ax)
 
+    return ax
+
 
 def plot_pathways(layers: list, isactive: list, ax=None, **plot_kwargs):
     """Plots lines going through all active nodes of all layers.
@@ -146,20 +164,24 @@ def plot_pathways(layers: list, isactive: list, ax=None, **plot_kwargs):
         isactive (list): list of boolean np.ndarrays indicating whether node
                          is active or not by layer.
         ax (ax, optional): plt ax on which to plot. Defaults to None.
+
+    Returns:
+        tuple: ax object on which the function plotted.
     """
     if ax is None:
         _, ax = plt.subplots()
+        ax.set_facecolor("white")
         ax.set_xticks([])
         ax.set_yticks([])
 
     line_kwargs = dict(
-        c="r",
-        lw=0.5,
-        alpha=0.01
+        color=plot_utils.colors[1],
+        lw=1,
+        alpha=0.05
     )
     line_kwargs.update(plot_kwargs)
 
-    active_nodes_old = [-0.5, 0.5]
+    active_nodes_old = [np.nan]
     for x, (layer, active) in enumerate(zip(layers, isactive)):
         nodes = layer.units
         active_nodes_new = np.where(active,
@@ -169,3 +191,5 @@ def plot_pathways(layers: list, isactive: list, ax=None, **plot_kwargs):
             for new_node in active_nodes_new:
                 ax.plot([x-1, x], [old_node, new_node], **line_kwargs)
         active_nodes_old = active_nodes_new
+
+    return ax
