@@ -6,6 +6,8 @@ excercises/
 sandkasse.py
 .DS_store
 .vscode
+channel_out/
+max_out/
 
 *.blg
 *.aux
