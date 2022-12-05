@@ -17,9 +17,9 @@ def build_LWTA_regressor(
     num_groups: tuple,
     Layer: str,
     num_features: int = 2,
-    **compiler_kwargs
+    **compile_kwargs
 ) -> tf.keras.Sequential:
-    """Builds a FFNN for regression with the specified architecture.
+    """Builds a LWTA FFNN for regression with the specified architecture.
 
     Args:
         num_layers (int): Number of hidden layers.
@@ -55,7 +55,9 @@ def build_LWTA_regressor(
             units=units[layer],
             num_inputs=num_inputs,
             num_groups=num_groups[layer],
-            **get_custom_initializers(num_inputs),
+            **get_custom_initializers(
+                num_inputs if Layer is MaxOut else num_groups[layer]
+            ),
             name=f"{Layer.__name__.lower()}_{layer+1}"
         ))
         # MaxOut and ChannelOut have different number of outputs.
@@ -63,6 +65,7 @@ def build_LWTA_regressor(
             num_inputs = num_groups[layer]
         else:
             num_inputs = units[layer]
+
     # Add output layer.
     model.add(tf.keras.layers.Dense(
         units=1,
@@ -75,7 +78,83 @@ def build_LWTA_regressor(
         optimizer="adam",
         loss="mse"
     )
-    kwargs.update(compiler_kwargs)
+    kwargs.update(compile_kwargs)
+    model.compile(**kwargs)
+
+    return model
+
+
+def build_LWTA_classifier(
+    num_layers: int,
+    units: tuple,
+    num_groups: tuple,
+    Layer: str,
+    num_features: int = 2,
+    num_categories: int = 1,
+    **compile_kwargs
+) -> tf.keras.Sequential:
+    """Builds a LWTA FFNN for classification with the specified architecture.
+
+    Args:
+        num_layers (int): Number of hidden layers.
+        units (tuple): Iterable with the number of nodes for each hidden layer.
+        num_groups (tuple): Iterable with the number of competing groups
+                            for each hidden layer.
+        Layer (str): Specifies whether to use MaxOut or ChannelOut layers.
+                     Either "max_out" or "channel_out".
+        num_features (int, optional): Number of input features. Defaults to 2.
+        num_categories (int, optional): Number of output categories.
+                                        Defaults to 2.
+
+    Returns:
+        tf.keras.Sequential: Compiled Sequential model as classifier.
+    """
+    # Get the appropriate Layer class
+    if Layer == "max_out":
+        Layer = MaxOut
+    elif Layer == "channel_out":
+        Layer = ChannelOut
+    else:
+        raise ValueError(f"Given Layer ({Layer}) is not supported. "
+                         "must be `max_out` or `channel_out`.")
+
+    model = tf.keras.Sequential()
+    model.add(tf.keras.layers.InputLayer(
+        input_shape=(num_features,),
+        name="input"
+    ))
+
+    # Add hidden layers.
+    num_inputs = num_features
+    for layer in range(num_layers):
+        model.add(Layer(
+            units=units[layer],
+            num_inputs=num_inputs,
+            num_groups=num_groups[layer],
+            **get_custom_initializers(num_inputs),
+            name=f"{Layer.__name__.lower()}_{layer+1}"
+        ))
+        # MaxOut and ChannelOut have different number of outputs.
+        if isinstance(Layer, MaxOut):
+            num_inputs = num_groups[layer]
+        else:
+            num_inputs = units[layer]
+
+    # Add output layer.
+    model.add(tf.keras.layers.Dense(
+        units=num_categories,
+        activation="sigmoid" if num_categories == 1 else "softmax",
+        **get_custom_initializers(num_inputs),
+        name="output"
+    ))
+
+    kwargs = dict(
+        optimizer="adam",
+        loss=("binary" if num_categories == 1 else "categorical")
+        + "_crossentropy",
+        metrics=["accuracy"]
+    )
+    kwargs.update(compile_kwargs)
     model.compile(**kwargs)
 
     return model
