@@ -56,7 +56,7 @@ def build_LWTA_regressor(
             num_inputs=num_inputs,
             num_groups=num_groups[layer],
             **get_custom_initializers(
-                num_inputs if Layer is MaxOut else num_groups[layer]
+                num_features if layer == 1 else num_groups[layer-1]
             ),
             name=f"{Layer.__name__.lower()}_{layer+1}"
         ))
@@ -131,11 +131,13 @@ def build_LWTA_classifier(
             units=units[layer],
             num_inputs=num_inputs,
             num_groups=num_groups[layer],
-            **get_custom_initializers(num_inputs),
+            **get_custom_initializers(
+                num_features if layer == 1 else num_groups[layer-1]
+            ),
             name=f"{Layer.__name__.lower()}_{layer+1}"
         ))
         # MaxOut and ChannelOut have different number of outputs.
-        if isinstance(Layer, MaxOut):
+        if Layer is MaxOut:
             num_inputs = num_groups[layer]
         else:
             num_inputs = units[layer]
@@ -163,7 +165,9 @@ def build_LWTA_classifier(
 def build_LWTA_architecture(
     hp: keras_tuner.HyperParameters,
     Layer: str,
-    isregressor: bool = True
+    isregressor: bool = True,
+    num_features: int = None,
+    num_categories: int = None
 ) -> tf.keras.Sequential:
     """Builder for interfacing with keras_tuner to tune model architecture.
 
@@ -178,24 +182,31 @@ def build_LWTA_architecture(
     Returns:
         tf.keras.Sequential: Sequential model with a choice for architecture.
     """
-    num_layers = hp.Int("num_layers", 2, 4)
+    num_layers = hp.Int("num_layers", 1, 5)
     units = list()
     num_groups = list()
-    nodes_by_layer = [hp.Int(f"log2(num_nodes{i})", 4, 7)
+    nodes_by_layer = [hp.Int(f"log2(num_nodes{i})", 2, 4)
                       for i in range(1, num_layers+1)]
-    groups_by_layer = [hp.Int(f"log2(num_groups{i})", 3, 6)
+    groups_by_layer = [hp.Int(f"log2(num_groups{i})", 0, 4)
                        for i in range(1, num_layers+1)]
     for nodes, groups in zip(nodes_by_layer, groups_by_layer):
         units.append(2**nodes)
         num_groups.append(2**groups)
 
     if isregressor:
-        return build_LWTA_regressor(num_layers, units, num_groups, Layer)
+        return build_LWTA_regressor(num_layers, units, num_groups, Layer,
+                                    num_features)
     else:
-        raise NotImplementedError("LWTA classifier not yet implemented.")
+        return build_LWTA_classifier(num_layers, units, num_groups, Layer,
+                                     num_features, num_categories)
 
 
-def LWTA_architecture_builder(Layer: str, isregressor: bool = True):
+def LWTA_architecture_builder(
+    Layer: str,
+    isregressor: bool = True,
+    num_features: int = None,
+    num_categories: int = None
+):
     """Returns appropriate architecture builder for interfacing with
     keras_tuner for tuning the architecture of a LWTA model.
 
@@ -208,4 +219,8 @@ def LWTA_architecture_builder(Layer: str, isregressor: bool = True):
     Returns:
         function: Builder that keras_tuner can use for hyperparameter search.
     """
-    return lambda hp: build_LWTA_architecture(hp, Layer)
+    return lambda hp: build_LWTA_architecture(hp,
+                                              Layer,
+                                              isregressor,
+                                              num_features,
+                                              num_categories)
