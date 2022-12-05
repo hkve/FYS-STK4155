@@ -165,6 +165,9 @@ def build_LWTA_classifier(
 def build_LWTA_architecture(
     hp: keras_tuner.HyperParameters,
     Layer: str,
+    layer_choices: list = [2, 3, 4, 5],
+    node_choices: list = [4, 8, 16, 32],
+    group_choices: list = [1, 2, 4, 8],
     isregressor: bool = True,
     num_features: int = None,
     num_categories: int = None
@@ -182,12 +185,12 @@ def build_LWTA_architecture(
     Returns:
         tf.keras.Sequential: Sequential model with a choice for architecture.
     """
-    num_layers = hp.Int("num_layers", 1, 5)
+    num_layers = hp.Choice("num_layers", layer_choices)
     units = list()
     num_groups = list()
-    nodes_by_layer = [hp.Int(f"log2(num_nodes{i})", 2, 4)
+    nodes_by_layer = [hp.Choice(f"num_nodes{i}", node_choices)
                       for i in range(1, num_layers+1)]
-    groups_by_layer = [hp.Int(f"log2(num_groups{i})", 0, 4)
+    groups_by_layer = [hp.Choice(f"num_groups{i}", group_choices)
                        for i in range(1, num_layers+1)]
     for nodes, groups in zip(nodes_by_layer, groups_by_layer):
         units.append(2**nodes)
