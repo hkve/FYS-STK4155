@@ -11,6 +11,9 @@ def tune_LWTA_architecture(layer_type: str,
                            train_data: tuple,
                            val_data: tuple,
                            isregression: bool = True,
+                           layer_choices: list = [2, 3, 4, 5],
+                           node_choices: list = [4, 8, 16, 32],
+                           group_choices: list = [1, 2, 4, 8],
                            _tuner_kwargs: dict = None,
                            _search_kwargs: dict = None) -> keras_tuner.Tuner:
     tuner_kwargs = dict(
@@ -26,7 +29,10 @@ def tune_LWTA_architecture(layer_type: str,
         LWTA_architecture_builder(layer_type,
                                   isregressor=isregression,
                                   num_features=train_data[0].shape[-1],
-                                  num_categories=train_data[1].shape[-1]),
+                                  num_categories=train_data[1].shape[-1],
+                                  layer_choices=layer_choices,
+                                  node_choices=node_choices,
+                                  group_choices=group_choices),
         **tuner_kwargs
     )
     search_kwargs = dict(
