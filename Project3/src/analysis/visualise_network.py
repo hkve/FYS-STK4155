@@ -48,6 +48,7 @@ if __name__ == "__main__":
     from sklearn.preprocessing import StandardScaler
     from sklearn.datasets import load_digits
     from tensorno.bob import build_LWTA_regressor, build_LWTA_classifier
+    from tensorno.tuner import tune_LWTA_architecture
     import numpy as np
 
     # D = load_Terrain(random_state=123, n=600)
@@ -67,41 +68,73 @@ if __name__ == "__main__":
     # y_train = np.c_[y_train, 1-y_train]
     # y_test = np.c_[y_test, 1-y_test]
 
+    # tuner = tune_LWTA_architecture(
+    #     layer_type="channel_out",
+    #     train_data=(x_train, y_train),
+    #     val_data=(x_test, y_test),
+    #     isregression=False,
+    #     layer_choices=[2, 3, 4, 5],
+    #     node_choices=[4, 8, 16, 32],
+    #     group_choices=[1, 2, 4, 8],
+    #     _tuner_kwargs=dict(
+    #         max_epochs=50,
+    #         hyperband_iterations=3,
+    #         project_name="test1",
+    #         # overwrite=True
+    #     ),
+    #     _search_kwargs=dict(
+    #         epochs=50
+    #     )
+    # )
+
+    # tuner.results_summary(num_trials=3)
+
+    """Standard model for visualisation"""
+    # model = build_LWTA_classifier(
+    #     num_layers=3,
+    #     units=[8, 8, 8],
+    #     num_groups=[2, 4, 4],
+    #     num_features=x_train.shape[-1],
+    #     num_categories=len(labels),
+    #     Layer="channel_out",
+    # )
+
     model = build_LWTA_classifier(
         num_layers=3,
-        units=[8, 8, 8],
-        num_groups=[2, 4, 4],
+        units=[32, 16, 8],
+        num_groups=[4, 8, 8],
         num_features=x_train.shape[-1],
         num_categories=len(labels),
         Layer="channel_out",
     )
+    # model = build_LWTA_classifier(
+    #     num_layers=2,
+    #     units=[2**3, 2**4],
+    #     num_groups=[2**3, 2**3],
+    #     num_features=x_train.shape[-1],
+    #     num_categories=len(labels),
+    #     Layer="channel_out",
+    # )
 
     test_digits = np.argwhere(y_test == 1)[:, 1]
     idcs_ones = np.argwhere(test_digits == 1)
     idcs_fours = np.argwhere(test_digits == 4)
 
-    _, ax = plt.subplots()
-    ax.set_facecolor("white")
-    ax.set_xticks([])
-    ax.set_yticks([])
-    plot_channelout_architecture(model, inputs=x_test[idcs_ones], ax=ax,
-                                 color=plot_utils.colors[1])
-    plot_channelout_architecture(model, inputs=x_test[idcs_fours], ax=ax,
-                                 color=plot_utils.colors[2])
-    plt.show()
+    # ax = plot_channelout_architecture(model, inputs=x_test[idcs_ones],
+    #                                   color=plot_utils.colors[1])
+    # plot_channelout_architecture(model, inputs=x_test[idcs_fours], ax=ax,
+    #                              color=plot_utils.colors[2])
+    # plt.show()
 
+    tf.random.set_seed(321)
     model.fit(
         x_train, y_train,
         epochs=50,  # 500,
         validation_data=(x_test, y_test)
     )
 
-    _, ax = plt.subplots()
-    ax.set_facecolor("white")
-    ax.set_xticks([])
-    ax.set_yticks([])
-    plot_channelout_architecture(model, inputs=x_test[idcs_ones], ax=ax,
-                                 color=plot_utils.colors[1])
+    ax = plot_channelout_architecture(model, inputs=x_test[idcs_ones],
+                                      color=plot_utils.colors[1])
     plot_channelout_architecture(model, inputs=x_test[idcs_fours], ax=ax,
                                  color=plot_utils.colors[2])
     plt.show()

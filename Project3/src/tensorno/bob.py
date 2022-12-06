@@ -127,6 +127,8 @@ def build_LWTA_classifier(
     # Add hidden layers.
     num_inputs = num_features
     for layer in range(num_layers):
+        if num_groups[layer] > units[layer]:
+            num_groups[layer] = units[layer]
         model.add(Layer(
             units=units[layer],
             num_inputs=num_inputs,
@@ -186,15 +188,10 @@ def build_LWTA_architecture(
         tf.keras.Sequential: Sequential model with a choice for architecture.
     """
     num_layers = hp.Choice("num_layers", layer_choices)
-    units = list()
-    num_groups = list()
-    nodes_by_layer = [hp.Choice(f"num_nodes{i}", node_choices)
-                      for i in range(1, num_layers+1)]
-    groups_by_layer = [hp.Choice(f"num_groups{i}", group_choices)
-                       for i in range(1, num_layers+1)]
-    for nodes, groups in zip(nodes_by_layer, groups_by_layer):
-        units.append(2**nodes)
-        num_groups.append(2**groups)
+    units = [hp.Choice(f"num_nodes{i}", node_choices)
+             for i in range(1, num_layers+1)]
+    num_groups = [hp.Choice(f"num_groups{i}", group_choices)
+                  for i in range(1, num_layers+1)]
 
     if isregressor:
         return build_LWTA_regressor(num_layers, units, num_groups, Layer,
@@ -206,6 +203,9 @@ def build_LWTA_architecture(
 
 def LWTA_architecture_builder(
     Layer: str,
+    layer_choices: list = [2, 3, 4, 5],
+    node_choices: list = [4, 8, 16, 32],
+    group_choices: list = [1, 2, 4, 8],
     isregressor: bool = True,
     num_features: int = None,
     num_categories: int = None
@@ -223,7 +223,10 @@ def LWTA_architecture_builder(
         function: Builder that keras_tuner can use for hyperparameter search.
     """
     return lambda hp: build_LWTA_architecture(hp,
-                                              Layer,
-                                              isregressor,
-                                              num_features,
-                                              num_categories)
+                                              Layer=Layer,
+                                              layer_choices=layer_choices,
+                                              node_choices=node_choices,
+                                              group_choices=group_choices,
+                                              isregressor=isregressor,
+                                              num_features=num_features,
+                                              num_categories=num_categories)
