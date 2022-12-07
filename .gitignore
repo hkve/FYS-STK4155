@@ -21,6 +21,7 @@ max_out/
 *.gz
 *.bcf
 *.toc
+*.sh
 
 
 *.npz
