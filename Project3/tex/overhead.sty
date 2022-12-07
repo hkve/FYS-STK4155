@@ -38,6 +38,8 @@
 % Misc
 \usepackage{appendix}
 \usepackage{xfrac} % provides \sfrac
+\usepackage{algorithm}
+\usepackage{algpseudocode} % for pseudocode
 
 % Commands
 
@@ -45,6 +47,7 @@
 
 \newcommand{\integral}[1]{\ensuremath{\int\!\mathrm{d}#1\,}}
 \renewcommand{\d}[2][x]{\ensuremath{\frac{\mathrm{d}#2}{\mathrm{d}#1}}}
+\newcommand{\pd}[2][x]{\ensuremath{\frac{\partial #2}{\partial #1}}}
 
 \renewcommand{\vec}[1]{\boldsymbol{#1}}
 \newcommand{\pclosed}[1]{\left(#1\right)}
