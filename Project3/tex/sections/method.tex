@@ -1,3 +1,22 @@
 Method here, in past tense.
 
 We reference like this using \verb|cleveref|: \cref{int:fig:example_a}, \cref{theo:eq:newton2}.
+
+\subsection{Datasets}
+\comment{Here we describe how we construct and prepare the dataset. -\Carl}
+
+
+\subsection{Initialisation of the Neural Network Weights}
+    It is important to take care when initialising the weights and biases of a neural network to ensure fast convergence during training. We initialised the weights according to the He algorithm~\citep{He}. In our case it meant initialising the weights of node $i$ in layer $\ell$ by the distribution
+    \begin{align}
+        w^\ell_{ij} \distas \normal{0}{\sqrt{2/\hat{n}}},
+    \end{align}
+    where $\hat{n}$ is the number of inputs to the layer. The biases were all initialised to zero.
+
+
+\subsection{Dropout}
+    A problem that can occur in LWTA layers is when the weights of one node becomes much larger than those of the other nodes in the group, resulting in training of just this single node. A common technique to combat this is to add a dropout layer before and/or after the LWTA layer. The dropout layer randomly sets elements in its input vector to zero, according to a dropout rate, before passing it on to the next layer. This means that the nodes in a group cannot solely lean on one specific node, and forces pathways in the network to not learn specific trends `too much'. As such, it prevents overfitting, and can be seen as a regularisation method.
+
+    The dropout layers are only active during training, and do not drop any activations at inference time.
+
+
