@@ -17,6 +17,8 @@ def build_LWTA_regressor(
     num_groups: tuple,
     Layer: str,
     num_features: int = 2,
+    dropout_rate: float = None,
+    lmbda: float = None,
     **compile_kwargs
 ) -> tf.keras.Sequential:
     """Builds a LWTA FFNN for regression with the specified architecture.
@@ -47,6 +49,17 @@ def build_LWTA_regressor(
         input_shape=(num_features,),
         name="input"
     ))
+    if dropout_rate is not None:
+        model.add(
+            tf.keras.layers.Dropout(
+                dropout_rate,
+                input_shape=(num_features,)
+            )
+        )
+    if lmbda is not None:
+        weight_penaliser = tf.keras.regularizers.L2(lmbda)
+    else:
+        weight_penaliser = None
 
     # Add hidden layers.
     num_inputs = num_features
@@ -58,8 +71,18 @@ def build_LWTA_regressor(
             **get_custom_initializers(
                 num_features if layer == 1 else num_groups[layer-1]
             ),
+            kernel_regularizer=weight_penaliser,
             name=f"{Layer.__name__.lower()}_{layer+1}"
         ))
+
+        if dropout_rate is not None:
+            model.add(
+                tf.keras.layers.Dropout(
+                    dropout_rate,
+                    input_shape=(num_inputs,)
+                )
+            )
+
         # MaxOut and ChannelOut have different number of outputs.
         if isinstance(Layer, MaxOut):
             num_inputs = num_groups[layer]
@@ -91,6 +114,8 @@ def build_LWTA_classifier(
     Layer: str,
     num_features: int = 2,
     num_categories: int = 1,
+    dropout_rate: float = None,
+    lmbda: float = None,
     **compile_kwargs
 ) -> tf.keras.Sequential:
     """Builds a LWTA FFNN for classification with the specified architecture.
@@ -123,6 +148,17 @@ def build_LWTA_classifier(
         input_shape=(num_features,),
         name="input"
     ))
+    if dropout_rate is not None:
+        model.add(
+            tf.keras.layers.Dropout(
+                dropout_rate,
+                input_shape=(num_features,)
+            )
+        )
+    if lmbda is not None:
+        weight_penaliser = tf.keras.regularizers.L2(lmbda)
+    else:
+        weight_penaliser = None
 
     # Add hidden layers.
     num_inputs = num_features
@@ -136,8 +172,18 @@ def build_LWTA_classifier(
             **get_custom_initializers(
                 num_features if layer == 1 else num_groups[layer-1]
             ),
+            kernel_regularizer=weight_penaliser,
             name=f"{Layer.__name__.lower()}_{layer+1}"
         ))
+
+        if dropout_rate is not None:
+            model.add(
+                tf.keras.layers.Dropout(
+                    dropout_rate,
+                    input_shape=(num_inputs,)
+                )
+            )
+
         # MaxOut and ChannelOut have different number of outputs.
         if Layer is MaxOut:
             num_inputs = num_groups[layer]

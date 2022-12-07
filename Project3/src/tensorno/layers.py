@@ -18,6 +18,7 @@ class MaxOut(Layer):
         num_groups: int = 2,
         kernel_initializer="glorot_uniform",
         bias_initializer="zeros",
+        kernel_regularizer=None,
         **kwargs
     ):
         # Using Layer initialization
@@ -47,11 +48,13 @@ class MaxOut(Layer):
         # Initializing weights and biases
         self.kernel_initializer = tf.keras.initializers.get(kernel_initializer)
         self.bias_initializer = tf.keras.initializers.get(bias_initializer)
+        self.kernel_regularizer = tf.keras.regularizers.get(kernel_regularizer)
 
         self.kernel = self.add_weight(
             "kernel",
             shape=[num_inputs, self.units],
             initializer=self.kernel_initializer,
+            regularizer=self.kernel_regularizer,
             dtype=tf.float32,
             trainable=True,
         )
@@ -85,7 +88,10 @@ class MaxOut(Layer):
         config.update(
             {
                 "units": self.units,
-                "num_groups": self.num_groups
+                "num_groups": self.num_groups,
+                "kernel_regularizer": tf.keras.regularizers.serialize(
+                    self.kernel_regularizer
+                )
             }
         )
         return config
@@ -101,6 +107,7 @@ class ChannelOut(Layer):
         num_groups: int = 2,
         kernel_initializer="glorot_uniform",
         bias_initializer="zeros",
+        kernel_regularizer=None,
         **kwargs
     ):
         super().__init__(**kwargs)
@@ -129,11 +136,13 @@ class ChannelOut(Layer):
         # Initializing weights and biases
         self.kernel_initializer = tf.keras.initializers.get(kernel_initializer)
         self.bias_initializer = tf.keras.initializers.get(bias_initializer)
+        self.kernel_regularizer = tf.keras.regularizers.get(kernel_regularizer)
 
         self.kernel = self.add_weight(
             "kernel",
             shape=[num_inputs, self.units],
             initializer=self.kernel_initializer,
+            regularizer=self.kernel_regularizer,
             dtype=tf.float32,
             trainable=True,
         )
@@ -174,7 +183,10 @@ class ChannelOut(Layer):
         config.update(
             {
                 "units": self.units,
-                "num_groups": self.num_groups
+                "num_groups": self.num_groups,
+                "kernel_regularizer": tf.keras.regularizers.serialize(
+                    self.kernel_regularizer
+                )
             }
         )
         return config
