@@ -8,6 +8,14 @@ import plot_utils
 from tensorno.layers import MaxOut, ChannelOut
 
 
+def count_parameters(network: tf.keras.Model):
+    counter = 0
+    for layer in network.layers:
+        for variable in layer._trainable_weights:
+            counter += np.prod(variable.get_shape())
+    return counter
+
+
 def get_layer_names(network: tf.keras.Model) -> list:
     """Get the string names of the layers of a tf Model instance.
 
@@ -115,7 +123,11 @@ def plot_nodes(layers: list, ax=None):
         ax.set_yticks([])
 
     for x, layer in enumerate(layers):
-        nodes = layer.units
+        try:
+            nodes = layer.units
+        except AttributeError:
+            continue
+
         for node in np.arange(-nodes/2, nodes/2):
             ax.scatter([x], [node], color=plot_utils.colors[0])
 
@@ -146,7 +158,10 @@ def plot_active_nodes(layers: list, isactive: list, ax=None):
 
     for x, (layer, active) in enumerate(layers, isactive):
         colors = np.where(active, "r", "b")
-        nodes = layer.units
+        try:
+            nodes = layer.units
+        except AttributeError:
+            continue
         for node, color in zip(np.arange(-nodes/2, nodes/2), colors):
             ax.scatter([x], [node], c=color)
 
@@ -183,7 +198,10 @@ def plot_pathways(layers: list, isactive: list, ax=None, **plot_kwargs):
 
     active_nodes_old = [np.nan]
     for x, (layer, active) in enumerate(zip(layers, isactive)):
-        nodes = layer.units
+        try:
+            nodes = layer.units
+        except AttributeError:
+            continue
         active_nodes_new = np.where(active,
                                     np.arange(-nodes/2, nodes/2),
                                     np.nan)
