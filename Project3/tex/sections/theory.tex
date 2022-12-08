@@ -5,12 +5,12 @@ This is an equation
     F = ma.
 \end{align}
 
-We cite our sources like this~\cite{Project1}.
+We cite our sources like this~\citep{Project1}.
 
 \subsection{Neural Networks}
     First, it will be wise to take a minute to recap some of the details of how a \textit{feed-forward nerual network} (FFNN) is built and trained from~\cite{Project2}. They are made up of sequential \textit{layers} taking in the input from the previous layer and passing it on to the next one. There will always be an input layer, taking in the features $x$ producing some observation $y$, and an output layer transforming the input from the second to last layer into an appropriate output. In classification problems, the outputs will usually be probabilities between $0$ and $1$ for the input to produce an output in a given category. In regression, the output layer usually transforms the output to be a single number $\tilde{y}$ for the predicted value.
 
-    When passing the output from one layer to the next, a kernel transformation is done. Denoting the output vector from layer $\ell$ as $\vec{a}^\ell$, the transformation produces $\vec{z}^{\ell+1} = W^\ell \vec{a}^\ell + \vec{b}^\ell$, where $W$ is a weight matrix, and $\vec{b}$ is called the bias. 
+    When passing the output from one layer to the next, a linear transformation is done. Denoting the output vector from layer $\ell$ as $\vec{a}^\ell$, the transformation produces a \textit{response} $\vec{z}^{\ell} = W^\ell \vec{a}^{\ell-1} + \vec{b}^\ell$, where $W^\ell$ is a weight matrix, and $\vec{b}^\ell$ is called the bias. The response vector is then passed through an activation function (which is generally non-linear) to produce the \textit{activation} $\vec{a}^\ell = f(\vec{z}^\ell)$.
 
 
 \subsection{Local Winner Takes All (LWTA)}
