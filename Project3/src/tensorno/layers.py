@@ -18,6 +18,7 @@ class MaxOut(Layer):
         num_groups: int = 2,
         kernel_initializer="glorot_uniform",
         bias_initializer="zeros",
+        kernel_regularizer=None,
         **kwargs
     ):
         # Using Layer initialization
@@ -47,11 +48,13 @@ class MaxOut(Layer):
         # Initializing weights and biases
         self.kernel_initializer = tf.keras.initializers.get(kernel_initializer)
         self.bias_initializer = tf.keras.initializers.get(bias_initializer)
+        self.kernel_regularizer = tf.keras.regularizers.get(kernel_regularizer)
 
         self.kernel = self.add_weight(
             "kernel",
             shape=[num_inputs, self.units],
             initializer=self.kernel_initializer,
+            regularizer=self.kernel_regularizer,
             dtype=tf.float32,
             trainable=True,
         )
@@ -65,19 +68,19 @@ class MaxOut(Layer):
 
     def call(self, inputs: tf.Tensor) -> tf.Tensor:
         # Passing input through weight kernel and adding bias terms
-        outputs = gen_math_ops.MatMul(a=inputs, b=self.kernel)
-        outputs = nn_ops.bias_add(outputs, self.bias)
+        inputs = gen_math_ops.MatMul(a=inputs, b=self.kernel)
+        inputs = nn_ops.bias_add(inputs, self.bias)
 
-        num_inputs = outputs.shape[0]
+        num_inputs = inputs.shape[0]
         if num_inputs is None:
             num_inputs = -1
 
         # Reshaping outputs such that they are grouped correctly
         num_competitors = self.units // self.num_groups
         new_shape = [num_inputs, self.num_groups, num_competitors]
-        outputs = tf.reshape(outputs, new_shape)
+        inputs = tf.reshape(inputs, new_shape)
         # Finding maximum activation in each group
-        outputs = tf.math.reduce_max(outputs, axis=-1)
+        outputs = tf.math.reduce_max(inputs, axis=-1)
         return outputs
 
     def get_config(self):
@@ -85,7 +88,10 @@ class MaxOut(Layer):
         config.update(
             {
                 "units": self.units,
-                "num_groups": self.num_groups
+                "num_groups": self.num_groups,
+                "kernel_regularizer": tf.keras.regularizers.serialize(
+                    self.kernel_regularizer
+                )
             }
         )
         return config
@@ -101,6 +107,7 @@ class ChannelOut(Layer):
         num_groups: int = 2,
         kernel_initializer="glorot_uniform",
         bias_initializer="zeros",
+        kernel_regularizer=None,
         **kwargs
     ):
         super().__init__(**kwargs)
@@ -129,11 +136,13 @@ class ChannelOut(Layer):
         # Initializing weights and biases
         self.kernel_initializer = tf.keras.initializers.get(kernel_initializer)
         self.bias_initializer = tf.keras.initializers.get(bias_initializer)
+        self.kernel_regularizer = tf.keras.regularizers.get(kernel_regularizer)
 
         self.kernel = self.add_weight(
             "kernel",
             shape=[num_inputs, self.units],
             initializer=self.kernel_initializer,
+            regularizer=self.kernel_regularizer,
             dtype=tf.float32,
             trainable=True,
         )
@@ -174,7 +183,10 @@ class ChannelOut(Layer):
         config.update(
             {
                 "units": self.units,
-                "num_groups": self.num_groups
+                "num_groups": self.num_groups,
+                "kernel_regularizer": tf.keras.regularizers.serialize(
+                    self.kernel_regularizer
+                )
             }
         )
         return config

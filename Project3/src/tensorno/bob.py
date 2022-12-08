@@ -17,6 +17,8 @@ def build_LWTA_regressor(
     num_groups: tuple,
     Layer: str,
     num_features: int = 2,
+    dropout_rate: float = None,
+    lmbda: float = None,
     **compile_kwargs
 ) -> tf.keras.Sequential:
     """Builds a LWTA FFNN for regression with the specified architecture.
@@ -47,6 +49,17 @@ def build_LWTA_regressor(
         input_shape=(num_features,),
         name="input"
     ))
+    if dropout_rate is not None:
+        model.add(
+            tf.keras.layers.Dropout(
+                dropout_rate,
+                input_shape=(num_features,)
+            )
+        )
+    if lmbda is not None:
+        weight_penaliser = tf.keras.regularizers.L2(lmbda)
+    else:
+        weight_penaliser = None
 
     # Add hidden layers.
     num_inputs = num_features
@@ -56,10 +69,20 @@ def build_LWTA_regressor(
             num_inputs=num_inputs,
             num_groups=num_groups[layer],
             **get_custom_initializers(
-                num_inputs if Layer is MaxOut else num_groups[layer]
+                num_features if layer == 1 else num_groups[layer-1]
             ),
+            kernel_regularizer=weight_penaliser,
             name=f"{Layer.__name__.lower()}_{layer+1}"
         ))
+
+        if dropout_rate is not None:
+            model.add(
+                tf.keras.layers.Dropout(
+                    dropout_rate,
+                    input_shape=(num_inputs,)
+                )
+            )
+
         # MaxOut and ChannelOut have different number of outputs.
         if isinstance(Layer, MaxOut):
             num_inputs = num_groups[layer]
@@ -91,6 +114,8 @@ def build_LWTA_classifier(
     Layer: str,
     num_features: int = 2,
     num_categories: int = 1,
+    dropout_rate: float = None,
+    lmbda: float = None,
     **compile_kwargs
 ) -> tf.keras.Sequential:
     """Builds a LWTA FFNN for classification with the specified architecture.
@@ -123,19 +148,44 @@ def build_LWTA_classifier(
         input_shape=(num_features,),
         name="input"
     ))
+    if dropout_rate is not None:
+        model.add(
+            tf.keras.layers.Dropout(
+                dropout_rate,
+                input_shape=(num_features,)
+            )
+        )
+    if lmbda is not None:
+        weight_penaliser = tf.keras.regularizers.L2(lmbda)
+    else:
+        weight_penaliser = None
 
     # Add hidden layers.
     num_inputs = num_features
     for layer in range(num_layers):
+        if num_groups[layer] > units[layer]:
+            num_groups[layer] = units[layer]
         model.add(Layer(
             units=units[layer],
             num_inputs=num_inputs,
             num_groups=num_groups[layer],
-            **get_custom_initializers(num_inputs),
+            **get_custom_initializers(
+                num_features if layer == 1 else num_groups[layer-1]
+            ),
+            kernel_regularizer=weight_penaliser,
             name=f"{Layer.__name__.lower()}_{layer+1}"
         ))
+
+        if dropout_rate is not None:
+            model.add(
+                tf.keras.layers.Dropout(
+                    dropout_rate,
+                    input_shape=(num_inputs,)
+                )
+            )
+
         # MaxOut and ChannelOut have different number of outputs.
-        if isinstance(Layer, MaxOut):
+        if Layer is MaxOut:
             num_inputs = num_groups[layer]
         else:
             num_inputs = units[layer]
@@ -163,7 +213,14 @@ def build_LWTA_classifier(
 def build_LWTA_architecture(
     hp: keras_tuner.HyperParameters,
     Layer: str,
-    isregressor: bool = True
+    layer_choices: list = [2, 3, 4, 5],
+    node_choices: list = [4, 8, 16, 32],
+    group_choices: list = [1, 2, 4, 8],
+    isregressor: bool = True,
+    num_features: int = None,
+    num_categories: int = None,
+    dropout_rate: float = None,
+    lmbda: float = None
 ) -> tf.keras.Sequential:
     """Builder for interfacing with keras_tuner to tune model architecture.
 
@@ -178,24 +235,32 @@ def build_LWTA_architecture(
     Returns:
         tf.keras.Sequential: Sequential model with a choice for architecture.
     """
-    num_layers = hp.Int("num_layers", 2, 4)
-    units = list()
-    num_groups = list()
-    nodes_by_layer = [hp.Int(f"log2(num_nodes{i})", 4, 7)
-                      for i in range(1, num_layers+1)]
-    groups_by_layer = [hp.Int(f"log2(num_groups{i})", 3, 6)
-                       for i in range(1, num_layers+1)]
-    for nodes, groups in zip(nodes_by_layer, groups_by_layer):
-        units.append(2**nodes)
-        num_groups.append(2**groups)
+    num_layers = hp.Choice("num_layers", layer_choices)
+    units = [hp.Choice(f"num_nodes{i}", node_choices)
+             for i in range(1, num_layers+1)]
+    num_groups = [hp.Choice(f"num_groups{i}", group_choices)
+                  for i in range(1, num_layers+1)]
 
     if isregressor:
-        return build_LWTA_regressor(num_layers, units, num_groups, Layer)
+        return build_LWTA_regressor(num_layers, units, num_groups, Layer,
+                                    num_features, dropout_rate, lmbda)
     else:
-        raise NotImplementedError("LWTA classifier not yet implemented.")
+        return build_LWTA_classifier(num_layers, units, num_groups, Layer,
+                                     num_features, num_categories,
+                                     dropout_rate, lmbda)
 
 
-def LWTA_architecture_builder(Layer: str, isregressor: bool = True):
+def get_LWTA_architecture_builder(
+    Layer: str,
+    layer_choices: list = [2, 3, 4, 5],
+    node_choices: list = [4, 8, 16, 32],
+    group_choices: list = [1, 2, 4, 8],
+    isregressor: bool = True,
+    num_features: int = None,
+    num_categories: int = None,
+    dropout_rate: float = None,
+    lmbda: float = None
+):
     """Returns appropriate architecture builder for interfacing with
     keras_tuner for tuning the architecture of a LWTA model.
 
@@ -208,4 +273,13 @@ def LWTA_architecture_builder(Layer: str, isregressor: bool = True):
     Returns:
         function: Builder that keras_tuner can use for hyperparameter search.
     """
-    return lambda hp: build_LWTA_architecture(hp, Layer)
+    return lambda hp: build_LWTA_architecture(hp,
+                                              Layer=Layer,
+                                              layer_choices=layer_choices,
+                                              node_choices=node_choices,
+                                              group_choices=group_choices,
+                                              isregressor=isregressor,
+                                              num_features=num_features,
+                                              num_categories=num_categories,
+                                              dropout_rate=dropout_rate,
+                                              lmbda=lmbda)
