@@ -5,8 +5,22 @@ We reference like this using \verb|cleveref|: \cref{int:fig:example_a}, \cref{th
 \subsection{Datasets}
     \comment{Here we describe how we construct and prepare the dataset. -\Carl}
 
+    \subsubsection{CIFAR-10}
+        Initially, we applied our the LWTA NNs on the CIFAR-10 benchmark dataset for image recognition. This dataset consists of 60 000 images with $32 \times 32$ coloured pixels with RGB values, amounting to 3072 features per image. The images are divided into 10 categories, depicting one of either aeroplanes, birds, cars, cats, deer, dogs, frogs, horses, ships or trucks.
+
+        \begin{figure}[ht!]
+            \centering
+            \includegraphics[width=\linewidth]{CIFAR10_examples.jpg}
+            \caption{Examples of the images in the CIFAR10 dataset.}
+            \label[fig]{met:fig:CIFAR10}
+        \end{figure}
+
+    \subsubsection{Premier League 2019 Season?}
+
+
     \subsubsection{Data Preparation}
         \comment{Describe preprocessing of data, i.e. scaling etc. -\Carl}
+
 
 
 \subsection{Initialisation of the Neural Network Weights}
@@ -27,3 +41,7 @@ We reference like this using \verb|cleveref|: \cref{int:fig:example_a}, \cref{th
     A problem that can occur in LWTA layers is when the weights of one node becomes much larger than those of the other nodes in the group, resulting in training of just this single node. A common technique to combat this is to add a dropout layer before and/or after the LWTA layer. The dropout layer randomly sets elements in its input vector to zero, according to a dropout rate, before passing it on to the next layer. This means that the nodes in a group cannot solely lean on one specific node, and forces pathways in the network to not learn specific trends `too much'. As such, it prevents overfitting, and can be seen as a regularisation method. The dropout layers are only active during training, and do not drop any activations at inference time.
 
     We tried adding dropout to our networks to see whether the performance was improved. \comment{Write more on this when it has been done.}
+
+
+\subsection{Architecture tuning}
+    \comment{Write something about how we explore and choose the network architecture. \Carl}
