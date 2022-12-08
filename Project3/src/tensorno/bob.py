@@ -218,7 +218,9 @@ def build_LWTA_architecture(
     group_choices: list = [1, 2, 4, 8],
     isregressor: bool = True,
     num_features: int = None,
-    num_categories: int = None
+    num_categories: int = None,
+    dropout_rate: float = None,
+    lmbda: float = None
 ) -> tf.keras.Sequential:
     """Builder for interfacing with keras_tuner to tune model architecture.
 
@@ -241,20 +243,23 @@ def build_LWTA_architecture(
 
     if isregressor:
         return build_LWTA_regressor(num_layers, units, num_groups, Layer,
-                                    num_features)
+                                    num_features, dropout_rate, lmbda)
     else:
         return build_LWTA_classifier(num_layers, units, num_groups, Layer,
-                                     num_features, num_categories)
+                                     num_features, num_categories,
+                                     dropout_rate, lmbda)
 
 
-def LWTA_architecture_builder(
+def get_LWTA_architecture_builder(
     Layer: str,
     layer_choices: list = [2, 3, 4, 5],
     node_choices: list = [4, 8, 16, 32],
     group_choices: list = [1, 2, 4, 8],
     isregressor: bool = True,
     num_features: int = None,
-    num_categories: int = None
+    num_categories: int = None,
+    dropout_rate: float = None,
+    lmbda: float = None
 ):
     """Returns appropriate architecture builder for interfacing with
     keras_tuner for tuning the architecture of a LWTA model.
@@ -275,4 +280,6 @@ def LWTA_architecture_builder(
                                               group_choices=group_choices,
                                               isregressor=isregressor,
                                               num_features=num_features,
-                                              num_categories=num_categories)
+                                              num_categories=num_categories,
+                                              dropout_rate=dropout_rate,
+                                              lmbda=lmbda)
