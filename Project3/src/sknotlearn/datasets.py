@@ -146,5 +146,21 @@ def load_BreastCancer(filename="breast_cancer.csv"):
 
 	return Data(y, X, col_names=col_names)
 
+
+def load_CIFAR10():
+	from tensorflow.keras import datasets
+
+	labels = ["airplane", "car", "bird", "cat", "deer", "dog", "frog", "horse", "ship", "truck"]
+
+	(x_train, train_labels), (x_test, test_labels) = datasets.cifar10.load_data()
+
+	y_train = np.array([np.where(y == range(len(labels)), 1, 0) for y in train_labels])
+	y_test = np.array([np.where(y == range(len(labels)), 1, 0) for y in test_labels])	
+
+	return x_train.reshape(x_train.shape[0], np.prod(x_train.shape[1:])), \
+		   y_train, \
+		   x_test.reshape(x_test.shape[0], np.prod(x_test.shape[1:])), \
+		   y_test
+
 if __name__ == "__main__":
-	pass
+	D = load_CIFAR10()
