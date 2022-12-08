@@ -31,6 +31,12 @@ def build_LWTA_regressor(
         Layer (str): Specifies whether to use MaxOut or ChannelOut layers.
                      Either "max_out" or "channel_out".
         num_features (int, optional): Number of input features. Defaults to 2.
+        dropout_rate (float, optional): Rate with which to use dropout
+                                        between layers. None means no dropout.
+                                        Defaults to None.
+        lmbda (float, optional): L2 penalisation parameters on the kernel
+                                 parameters of the layers. None means
+                                 no penalisation. Defaults to None.
 
     Returns:
         tf.keras.Sequential: Compiled Sequential model as regressor.
@@ -130,6 +136,12 @@ def build_LWTA_classifier(
         num_features (int, optional): Number of input features. Defaults to 2.
         num_categories (int, optional): Number of output categories.
                                         Defaults to 2.
+        dropout_rate (float, optional): Rate with which to use dropout
+                                        between layers. None means no dropout.
+                                        Defaults to None.
+        lmbda (float, optional): L2 penalisation parameters on the kernel
+                                 parameters of the layers. None means
+                                 no penalisation. Defaults to None.
 
     Returns:
         tf.keras.Sequential: Compiled Sequential model as classifier.
@@ -229,8 +241,26 @@ def build_LWTA_architecture(
                                           for the model.
         Layer (str): Specifies whether to use MaxOut or ChannelOut layers.
                      Either "max_out" or "channel_out".
+        layer_choices (list, optional): The choices for number of layers in
+                                        the networks. Defaults to [2, 3, 4, 5].
+        node_choices (list, optional): The choices for number of nodes in the
+                                       layers of the networks.
+                                       Defaults to [4, 8, 16, 32].
+        group_choices (list, optional): The choices for number of groups in
+                                        the layers of the networks.
+                                        Defaults to [1, 2, 4, 8].
         isregressor (bool, optional): Whether the model is used for regression
                                       or classification. Defaults to True.
+        num_features (int, optional): Number of input features.
+                                      Defaults to None.
+        num_categories (int, optional): Number of output categories.
+                                        Defaults to None.
+        dropout_rate (float, optional): Rate with which to use dropout
+                                        between layers. None means no dropout.
+                                        Defaults to None.
+        lmbda (float, optional): L2 penalisation parameters on the kernel
+                                 parameters of the layers. None means
+                                 no penalisation. Defaults to None.
 
     Returns:
         tf.keras.Sequential: Sequential model with a choice for architecture.
@@ -267,8 +297,26 @@ def get_LWTA_architecture_builder(
     Args:
         Layer (str): Specifies whether to use MaxOut or ChannelOut layers.
                      Either "max_out" or "channel_out".
+        layer_choices (list, optional): The choices for number of layers in
+                                        the networks. Defaults to [2, 3, 4, 5].
+        node_choices (list, optional): The choices for number of nodes in the
+                                       layers of the networks.
+                                       Defaults to [4, 8, 16, 32].
+        group_choices (list, optional): The choices for number of groups in
+                                        the layers of the networks.
+                                        Defaults to [1, 2, 4, 8].
         isregressor (bool, optional): Whether the model is used for regression
                                       or classification. Defaults to True.
+        num_features (int, optional): Number of input features.
+                                      Defaults to None.
+        num_categories (int, optional): Number of output categories.
+                                        Defaults to None.
+        dropout_rate (float, optional): Rate with which to use dropout
+                                        between layers. None means no dropout.
+                                        Defaults to None.
+        lmbda (float, optional): L2 penalisation parameters on the kernel
+                                 parameters of the layers. None means
+                                 no penalisation. Defaults to None.
 
     Returns:
         function: Builder that keras_tuner can use for hyperparameter search.

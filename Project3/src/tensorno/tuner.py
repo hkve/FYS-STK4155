@@ -17,6 +17,36 @@ def tune_LWTA_architecture(layer_type: str,
                            builder_kwargs: dict = {},
                            tuner_kwargs: dict = {},
                            search_kwargs: dict = {}) -> keras_tuner.Tuner:
+    """_summary_
+
+    Args:
+        layer_type (str): Specifies whether to use MaxOut or ChannelOut layers.
+                          Either "max_out" or "channel_out".
+        train_data (tuple): The data used for training the models on.
+                            Like (inputs, targets).
+        val_data (tuple): The data used for validating the models.
+                          Like (inputs, targets).
+        isregression (bool, optional): Whether the model is used for regression
+                                       or classification. Defaults to True.
+        layer_choices (list, optional): The choices for number of layers in
+                                        the networks. Defaults to [2, 3, 4, 5].
+        node_choices (list, optional): The choices for number of nodes in the
+                                       layers of the networks.
+                                       Defaults to [4, 8, 16, 32].
+        group_choices (list, optional): The choices for number of groups in
+                                        the layers of the networks.
+                                        Defaults to [1, 2, 4, 8].
+        builder_kwargs (dict, optional): kwargs to pass on to
+                                         get_LWTA_architecture_builder.
+        tuner_kwargs (dict, optional): kwargs to pass on to keras_tuner.
+        search_kwargs (dict, optional): kwargs to pass on to
+                                        keras_tuner.search.
+
+    Returns:
+        keras_tuner.Tuner: keras_tuner.Tuner instance
+                           that search is completed.
+    """
+    # Default arguments to pass to tuner.
     _tuner_kwargs = dict(
         max_epochs=150,
         hyperband_iterations=1,
@@ -36,6 +66,8 @@ def tune_LWTA_architecture(layer_type: str,
                                       **builder_kwargs),
         **_tuner_kwargs
     )
+
+    # Default arguments to pass to search.
     _search_kwargs = dict(
         epochs=150,
     )
