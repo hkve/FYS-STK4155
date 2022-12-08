@@ -15,39 +15,37 @@ def tune_LWTA_architecture(layer_type: str,
                            node_choices: list = [4, 8, 16, 32],
                            group_choices: list = [1, 2, 4, 8],
                            builder_kwargs: dict = {},
-                           _tuner_kwargs: dict = {},
-                           _search_kwargs: dict = {}) -> keras_tuner.Tuner:
-    tuner_kwargs = dict(
+                           tuner_kwargs: dict = {},
+                           search_kwargs: dict = {}) -> keras_tuner.Tuner:
+    _tuner_kwargs = dict(
         max_epochs=150,
         hyperband_iterations=1,
         objective="val_loss",
         directory=layer_type,
     )
-    if _tuner_kwargs is not None:
-        tuner_kwargs.update(_tuner_kwargs)
+    _tuner_kwargs.update(tuner_kwargs)
 
     tuner = keras_tuner.Hyperband(
         get_LWTA_architecture_builder(layer_type,
-                                  isregressor=isregression,
-                                  num_features=train_data[0].shape[-1],
-                                  num_categories=train_data[1].shape[-1],
-                                  layer_choices=layer_choices,
-                                  node_choices=node_choices,
-                                  group_choices=group_choices,
-                                  **builder_kwargs),
-        **tuner_kwargs
+                                      isregressor=isregression,
+                                      num_features=train_data[0].shape[-1],
+                                      num_categories=train_data[1].shape[-1],
+                                      layer_choices=layer_choices,
+                                      node_choices=node_choices,
+                                      group_choices=group_choices,
+                                      **builder_kwargs),
+        **_tuner_kwargs
     )
-    search_kwargs = dict(
+    _search_kwargs = dict(
         epochs=150,
     )
-    if _search_kwargs is not None:
-        search_kwargs.update(_search_kwargs)
+    _search_kwargs.update(search_kwargs)
 
     tuner.search(
         x=train_data[0],
         y=train_data[1],
         validation_data=val_data,
-        **search_kwargs
+        **_search_kwargs
     )
 
     return tuner
