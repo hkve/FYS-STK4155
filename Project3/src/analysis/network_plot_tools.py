@@ -122,7 +122,8 @@ def plot_nodes(layers: list, ax=None):
         ax.set_xticks([])
         ax.set_yticks([])
 
-    for x, layer in enumerate(layers):
+    x = 0  # Position to plot current layer
+    for layer in layers:
         try:
             nodes = layer.units
         except AttributeError:
@@ -134,6 +135,7 @@ def plot_nodes(layers: list, ax=None):
         if isinstance(layer, (MaxOut, ChannelOut)):
             group_nodes(x, nodes, layer.num_groups, ax=ax)
 
+        x += 1
     return ax
 
 
@@ -156,7 +158,8 @@ def plot_active_nodes(layers: list, isactive: list, ax=None):
         ax.set_xticks([])
         ax.set_yticks([])
 
-    for x, (layer, active) in enumerate(layers, isactive):
+    x = 0  # Position to plot current layer
+    for layer, active in zip(layers, isactive):
         colors = np.where(active, "r", "b")
         try:
             nodes = layer.units
@@ -168,6 +171,7 @@ def plot_active_nodes(layers: list, isactive: list, ax=None):
         if isinstance(layer, (MaxOut, ChannelOut)):
             group_nodes(x, nodes, layer.num_groups, ax=ax)
 
+        x += 1
     return ax
 
 
@@ -197,7 +201,9 @@ def plot_pathways(layers: list, isactive: list, ax=None, **plot_kwargs):
     line_kwargs.update(plot_kwargs)
 
     active_nodes_old = [np.nan]
-    for x, (layer, active) in enumerate(zip(layers, isactive)):
+
+    x = 0  # Position to plot current layer
+    for layer, active in zip(layers, isactive):
         try:
             nodes = layer.units
         except AttributeError:
@@ -210,4 +216,5 @@ def plot_pathways(layers: list, isactive: list, ax=None, **plot_kwargs):
                 ax.plot([x-1, x], [old_node, new_node], **line_kwargs)
         active_nodes_old = active_nodes_new
 
+        x += 1
     return ax
