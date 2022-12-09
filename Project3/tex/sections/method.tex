@@ -5,8 +5,11 @@ We reference like this using \verb|cleveref|: \cref{int:fig:example_a}, \cref{th
 \subsection{Datasets}
     \comment{Here we describe how we construct and prepare the dataset. -\Carl}
 
+    \subsubsection{MNIST}
+        A simpler test for our neural networks is the MNIST benchmark dataset. It consists of 60 000 training images and 10 000 testing images. Each image consists $28 \times 28$ pixels depicting handwritten number between 0 and 9. As such, the images are to be classified to one of the 10 categories of digits.
+
     \subsubsection{CIFAR-10}
-        Initially, we applied our the LWTA NNs on the CIFAR-10 benchmark dataset for image recognition. This dataset consists of 60 000 images with $32 \times 32$ coloured pixels with RGB values, amounting to 3072 features per image. The images are divided into 10 categories, depicting one of either aeroplanes, birds, cars, cats, deer, dogs, frogs, horses, ships or trucks.
+        Initially, we applied our the LWTA NNs on the CIFAR-10 benchmark dataset for image recognition. This dataset consists of 60 000 images with $32 \times 32$ coloured pixels with RGB values, amounting to 3072 features per image. The images are divided into 10 categories, depicting one of either aeroplanes, birds, cars, cats, deer, dogs, frogs, horses, ships or trucks (see \cref{met:fig:CIFAR10}).
 
         \begin{figure}[ht!]
             \centering
@@ -22,26 +25,29 @@ We reference like this using \verb|cleveref|: \cref{int:fig:example_a}, \cref{th
         \comment{Describe preprocessing of data, i.e. scaling etc. -\Carl}
 
 
+\subsection{Neural Network training}
 
-\subsection{Initialisation of the Neural Network Weights}
-    It is important to take care when initialising the weights and biases of a neural network to ensure fast convergence during training. We initialised the weights according to the He algorithm~\citep{He}. In our case it meant initialising the weights of node $i$ in layer $\ell$ by the distribution
-    \begin{align}
-        w^\ell_{ij} \distas \normal{0}{\sqrt{2/\hat{n}}},
-    \end{align}
-    where $\hat{n}$ is the number of inputs to the layer. The biases were all initialised to zero.
+    \subsubsection{Initialisation of the Neural Network Weights}
+        It is important to take care when initialising the weights and biases of a neural network to ensure fast convergence during training. We initialised the weights according to the He algorithm~\citep{He}. In our case it meant initialising the weights of node $i$ in layer $\ell$ by the distribution
+        \begin{align}
+            w^\ell_{ij} \distas \normal{0}{\sqrt{2/\hat{n}}},
+        \end{align}
+        where $\hat{n}$ is the number of inputs to the layer. The biases were all initialised to zero.
 
+    \subsubsection{Optimisation Algorithm}
+        When optimising the cost function of our problems we built on what we found in \citep{Project2}, using stochastic gradient descent with a batch size of 32. We used the Adam algorithm with hyperparameters $\beta_1 = 0.9$, $\beta_2 = 0.999$ and a learning rate $\eta = 0.001$. These hyperparameters were not tuned in any of our searches. The number of training epochs was decided with early stopping termination criterion. This means monitoring the loss of the network on a validation dataset after each epoch of training, and stopping the training if there is no improvement after a number of epochs $p$, called the \textit{patience}.
 
-\subsection{Termination of Neural Network}
-    \comment{Comment on early stopping.}
+        \comment{Discussion note: Early stopping prevents overfitting. -\Carl}
 
+    \subsubsection{Regularisation}
+        \comment{Write about L2-regularisation. -\Carl}
 
-\subsection{Regularisation}
-    \comment{Write about L2-regularisation. -\Carl}
+        A problem that can occur in LWTA layers is when the weights of one node becomes much larger than those of the other nodes in the group, resulting in training of just this single node. A common technique to combat this is to add a dropout layer before and/or after the LWTA layer. The dropout layer randomly sets elements in its input vector to zero, according to a dropout rate, before passing it on to the next layer. This means that the nodes in a group cannot solely lean on one specific node, and forces pathways in the network to not learn specific trends `too much'. As such, it prevents overfitting, and can be seen as a regularisation method. The dropout layers are only active during training, and do not drop any activations at inference time.
 
-    A problem that can occur in LWTA layers is when the weights of one node becomes much larger than those of the other nodes in the group, resulting in training of just this single node. A common technique to combat this is to add a dropout layer before and/or after the LWTA layer. The dropout layer randomly sets elements in its input vector to zero, according to a dropout rate, before passing it on to the next layer. This means that the nodes in a group cannot solely lean on one specific node, and forces pathways in the network to not learn specific trends `too much'. As such, it prevents overfitting, and can be seen as a regularisation method. The dropout layers are only active during training, and do not drop any activations at inference time.
-
-    We tried adding dropout to our networks to see whether the performance was improved. \comment{Write more on this when it has been done.}
+        We tried adding dropout to our networks to see whether the performance was improved. \comment{Write more on this when it has been done.}
 
 
 \subsection{Architecture tuning}
     \comment{Write something about how we explore and choose the network architecture. \Carl}
+
+    When tuning the architecture, we split the training data into a training set used for tuning and a validation set used for monitoring overfitting. We used a split of $\sfrac{3}{4}$.
