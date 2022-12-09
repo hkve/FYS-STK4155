@@ -42,99 +42,71 @@ def plot_channelout_architecture(network: tf.keras.Model,
 
 
 if __name__ == "__main__":
-    from sknotlearn.datasets import load_Terrain, load_BreastCancer
-    from sknotlearn.data import Data
     from sklearn.model_selection import train_test_split
-    from sklearn.preprocessing import StandardScaler
-    from sklearn.datasets import load_digits
-    from tensorno.bob import build_LWTA_regressor, build_LWTA_classifier
-    from tensorno.tuner import tune_LWTA_architecture
+    from sklearn.preprocessing import StandardScaler, MinMaxScaler
     import numpy as np
 
-    # D = load_Terrain(random_state=123, n=600)
-    # D = load_BreastCancer()
-    x, y = load_digits(return_X_y=True, as_frame=False)
-    labels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-    y = np.array([np.where(y_ == labels, 1, 0) for y_ in y])
+    import context
+    from sknotlearn.datasets import load_MNIST, load_CIFAR10
+    from tensorno.bob import build_LWTA_classifier
 
-    x_train, x_test, y_train, y_test = train_test_split(
-        x, y, train_size=0.75, random_state=42
-    )
+    # x_train, y_train, x_test, y_test = load_MNIST()
+    x_train, y_train, x_test, y_test = load_CIFAR10()
+
+    # Flattening image arrays.
+    x_train = x_train.reshape((x_train.shape[0], np.prod(x_train.shape[1:])))
+    x_test = x_test.reshape((x_test.shape[0], np.prod(x_test.shape[1:])))
 
     scaler = StandardScaler()
+    # scaler = MinMaxScaler()
     x_train = scaler.fit_transform(x_train)
     x_test = scaler.transform(x_test)
 
-    # y_train = np.c_[y_train, 1-y_train]
-    # y_test = np.c_[y_test, 1-y_test]
+    x_val, y_val = x_test, y_test
 
-    # tuner = tune_LWTA_architecture(
-    #     layer_type="channel_out",
-    #     train_data=(x_train, y_train),
-    #     val_data=(x_test, y_test),
-    #     isregression=False,
-    #     layer_choices=[2, 3, 4, 5],
-    #     node_choices=[4, 8, 16, 32],
-    #     group_choices=[1, 2, 4, 8],
-    #     _tuner_kwargs=dict(
-    #         max_epochs=50,
-    #         hyperband_iterations=3,
-    #         project_name="test1",
-    #         # overwrite=True
-    #     ),
-    #     _search_kwargs=dict(
-    #         epochs=50
-    #     )
+    # x_train, x_val, y_train, y_val = train_test_split(
+    #     x_train, y_train, train_size=0.75, random_state=42
     # )
-
-    # tuner.results_summary(num_trials=3)
 
     """Standard model for visualisation"""
-    # model = build_LWTA_classifier(
-    #     num_layers=3,
-    #     units=[8, 8, 8],
-    #     num_groups=[2, 4, 4],
-    #     num_features=x_train.shape[-1],
-    #     num_categories=len(labels),
-    #     Layer="channel_out",
-    # )
-
     model = build_LWTA_classifier(
         num_layers=3,
-        units=[32, 16, 8],
-        num_groups=[4, 8, 8],
+        units=[8, 8, 8],
+        num_groups=[4, 2, 4],
         num_features=x_train.shape[-1],
-        num_categories=len(labels),
+        num_categories=y_train.shape[-1],
+        dropout_rate=0.1,
+        lmbda=1e-2,
         Layer="channel_out",
     )
-    # model = build_LWTA_classifier(
-    #     num_layers=2,
-    #     units=[2**3, 2**4],
-    #     num_groups=[2**3, 2**3],
-    #     num_features=x_train.shape[-1],
-    #     num_categories=len(labels),
-    #     Layer="channel_out",
-    # )
 
     test_digits = np.argwhere(y_test == 1)[:, 1]
-    idcs_ones = np.argwhere(test_digits == 1)
-    idcs_fours = np.argwhere(test_digits == 4)
+    idcs_zeros = np.argwhere(test_digits == 0)[:50]
+    idcs_ones = np.argwhere(test_digits == 1)[:50]
 
-    # ax = plot_channelout_architecture(model, inputs=x_test[idcs_ones],
-    #                                   color=plot_utils.colors[1])
-    # plot_channelout_architecture(model, inputs=x_test[idcs_fours], ax=ax,
-    #                              color=plot_utils.colors[2])
-    # plt.show()
+    ax = plot_channelout_architecture(model, inputs=x_test[idcs_zeros],
+                                      color=plot_utils.colors[1])
+    plot_channelout_architecture(model, inputs=x_test[idcs_ones],
+                                 ax=ax, color=plot_utils.colors[2])
+
+    early_stopper = tf.keras.callbacks.EarlyStopping(monitor="val_loss",
+                                                     patience=5,
+                                                     verbose=1,
+                                                     restore_best_weights=True)
 
     tf.random.set_seed(321)
     model.fit(
         x_train, y_train,
-        epochs=50,  # 500,
-        validation_data=(x_test, y_test)
+        epochs=500,
+        validation_data=(x_val, y_val),
+        callbacks=[early_stopper]
     )
 
-    ax = plot_channelout_architecture(model, inputs=x_test[idcs_ones],
+    model.evaluate(x_test, y_test)
+    print(f"Number of parameters in network: {npt.count_parameters(model)}")
+
+    ax = plot_channelout_architecture(model, inputs=x_test[idcs_zeros],
                                       color=plot_utils.colors[1])
-    plot_channelout_architecture(model, inputs=x_test[idcs_fours], ax=ax,
-                                 color=plot_utils.colors[2])
+    plot_channelout_architecture(model, inputs=x_test[idcs_ones],
+                                 ax=ax, color=plot_utils.colors[2])
     plt.show()
