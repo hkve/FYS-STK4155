@@ -11,6 +11,93 @@ else:
     from tensorno.utils import get_custom_initializers
 
 
+def build_FFNN_classifier(
+    num_layers: int,
+    units: tuple,
+    activation: str,
+    num_features: int = 2,
+    num_categories: int = 1,
+    dropout_rate: float = None,
+    lmbda: float = None,
+    **compile_kwargs
+) -> tf.keras.Sequential:
+    """Builds a LWTA FFNN for classification with the specified architecture.
+
+    Args:
+        num_layers (int): Number of hidden layers.
+        units (tuple): Iterable with the number of nodes for each hidden layer.
+        activation (str): The name of the activation function to use.
+        num_features (int, optional): Number of input features. Defaults to 2.
+        num_categories (int, optional): Number of output categories.
+                                        Defaults to 1.
+        dropout_rate (float, optional): Rate with which to use dropout
+                                        between layers. None means no dropout.
+                                        Defaults to None.
+        lmbda (float, optional): L2 penalisation parameters on the kernel
+                                 parameters of the layers. None means
+                                 no penalisation. Defaults to None.
+
+    Returns:
+        tf.keras.Sequential: Compiled Sequential model as classifier.
+    """
+    model = tf.keras.Sequential()
+    model.add(tf.keras.layers.InputLayer(
+        input_shape=(num_features,),
+        name="input"
+    ))
+    if dropout_rate is not None:
+        model.add(
+            tf.keras.layers.Dropout(
+                dropout_rate,
+                input_shape=(num_features,)
+            )
+        )
+    if lmbda is not None:
+        weight_penaliser = tf.keras.regularizers.L2(lmbda)
+    else:
+        weight_penaliser = None
+
+    # Add hidden layers.
+    num_inputs = num_features
+    for layer in range(num_layers):
+        model.add(tf.keras.layers.Dense(
+            units=units[layer],
+            num_inputs=num_inputs,
+            activation=activation,
+            **get_custom_initializers(num_inputs),
+            kernel_regularizer=weight_penaliser,
+            name=f"{activation}_{layer+1}"
+        ))
+
+        if dropout_rate is not None:
+            model.add(
+                tf.keras.layers.Dropout(
+                    dropout_rate,
+                    input_shape=(num_inputs,)
+                )
+            )
+        num_inputs = units[layer]
+
+    # Add output layer.
+    model.add(tf.keras.layers.Dense(
+        units=num_categories,
+        activation="sigmoid" if num_categories == 1 else "softmax",
+        **get_custom_initializers(num_inputs),
+        name="output"
+    ))
+
+    kwargs = dict(
+        optimizer="adam",
+        loss=("binary" if num_categories == 1 else "categorical")
+        + "_crossentropy",
+        metrics=["accuracy"]
+    )
+    kwargs.update(compile_kwargs)
+    model.compile(**kwargs)
+
+    return model
+
+
 def build_LWTA_regressor(
     num_layers: int,
     units: tuple,
