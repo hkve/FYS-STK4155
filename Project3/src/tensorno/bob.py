@@ -62,13 +62,14 @@ def build_FFNN_classifier(
     for layer in range(num_layers):
         model.add(tf.keras.layers.Dense(
             units=units[layer],
-            num_inputs=num_inputs,
+            input_shape=(num_inputs,),
             activation=activation,
             **get_custom_initializers(num_inputs),
             kernel_regularizer=weight_penaliser,
             name=f"{activation}_{layer+1}"
         ))
 
+        num_inputs = units[layer]
         if dropout_rate is not None:
             model.add(
                 tf.keras.layers.Dropout(
@@ -76,7 +77,6 @@ def build_FFNN_classifier(
                     input_shape=(num_inputs,)
                 )
             )
-        num_inputs = units[layer]
 
     # Add output layer.
     model.add(tf.keras.layers.Dense(
@@ -168,6 +168,12 @@ def build_LWTA_regressor(
             name=f"{Layer.__name__.lower()}_{layer+1}"
         ))
 
+        # MaxOut and ChannelOut have different number of outputs.
+        if isinstance(Layer, MaxOut):
+            num_inputs = num_groups[layer]
+        else:
+            num_inputs = units[layer]
+
         if dropout_rate is not None:
             model.add(
                 tf.keras.layers.Dropout(
@@ -175,12 +181,6 @@ def build_LWTA_regressor(
                     input_shape=(num_inputs,)
                 )
             )
-
-        # MaxOut and ChannelOut have different number of outputs.
-        if isinstance(Layer, MaxOut):
-            num_inputs = num_groups[layer]
-        else:
-            num_inputs = units[layer]
 
     # Add output layer.
     model.add(tf.keras.layers.Dense(
@@ -275,6 +275,12 @@ def build_LWTA_classifier(
             name=f"{Layer.__name__.lower()}_{layer+1}"
         ))
 
+        # MaxOut and ChannelOut have different number of outputs.
+        if Layer is MaxOut:
+            num_inputs = num_groups[layer]
+        else:
+            num_inputs = units[layer]
+
         if dropout_rate is not None:
             model.add(
                 tf.keras.layers.Dropout(
@@ -282,12 +288,6 @@ def build_LWTA_classifier(
                     input_shape=(num_inputs,)
                 )
             )
-
-        # MaxOut and ChannelOut have different number of outputs.
-        if Layer is MaxOut:
-            num_inputs = num_groups[layer]
-        else:
-            num_inputs = units[layer]
 
     # Add output layer.
     model.add(tf.keras.layers.Dense(
