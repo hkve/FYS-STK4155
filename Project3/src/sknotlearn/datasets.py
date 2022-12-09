@@ -12,7 +12,7 @@ from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from mpl_toolkits.mplot3d import Axes3D
 import seaborn as sns
 import pathlib as pl
-
+from fifa21_EAsports_reader import load_fifa
 
 def make_FrankeFunction(n=1000, linspace=False, noise_std=0, random_state=42):
     x, y = None, None
