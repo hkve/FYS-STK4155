@@ -1,7 +1,7 @@
 import pandas as pd
 import pathlib as pl
 
-def load_fifa(filename="players_21_subset.csv"):
+def load_fifa(filename="players_21.csv", n=None):
     path = pl.Path(__file__).parent / filename
     assert path.exists(), f"Missing {filename = } at {path.parent = }"
     df = pd.read_csv(path)
@@ -52,6 +52,9 @@ def load_fifa(filename="players_21_subset.csv"):
     ]
 
     cols = info_cols + attr_cols + mics_cols
+    df = df[cols].dropna(axis=0)
 
+    if not n or n > len(df): n = len(df)
+    df = df.sample(n=n)
 
-    return df[cols].dropna(axis=0)
+    return df
