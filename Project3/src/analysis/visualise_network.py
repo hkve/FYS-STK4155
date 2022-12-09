@@ -6,6 +6,9 @@ import tensorflow as tf
 import network_plot_tools as npt
 import plot_utils
 
+import context
+from tensorno.utils import get_all_activations
+
 
 def plot_channelout_architecture(network: tf.keras.Model,
                                  inputs,
@@ -28,8 +31,8 @@ def plot_channelout_architecture(network: tf.keras.Model,
 
     npt.plot_nodes(network.layers, ax=ax)
     for input in inputs:
-        all_activations = npt.get_all_activations(network,
-                                                  input.reshape(1, -1))
+        all_activations = get_all_activations(network,
+                                              input.reshape(1, -1))
         isactive = [(activations != 0.).reshape([activations.shape[-1]])
                     for activations in all_activations]
         isactive[-1] = np.where(
@@ -46,9 +49,9 @@ if __name__ == "__main__":
     from sklearn.preprocessing import StandardScaler, MinMaxScaler
     import numpy as np
 
-    import context
     from sknotlearn.datasets import load_MNIST, load_CIFAR10
     from tensorno.bob import build_LWTA_classifier
+    from tensorno.utils import count_parameters
 
     # x_train, y_train, x_test, y_test = load_MNIST()
     x_train, y_train, x_test, y_test = load_CIFAR10()
@@ -103,7 +106,7 @@ if __name__ == "__main__":
     )
 
     model.evaluate(x_test, y_test)
-    print(f"Number of parameters in network: {npt.count_parameters(model)}")
+    print(f"Number of parameters in network: {count_parameters(model)}")
 
     ax = plot_channelout_architecture(model, inputs=x_test[idcs_zeros],
                                       color=plot_utils.colors[1])
