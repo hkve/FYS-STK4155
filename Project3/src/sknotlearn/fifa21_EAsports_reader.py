@@ -1,7 +1,7 @@
 import pandas as pd
 import pathlib as pl
 
-def load_fifa(filename="players_21.csv", n=None):
+def load_fifa(filename="players_21.csv", n=None, random_state=321):
     path = pl.Path(__file__).parent / filename
     assert path.exists(), f"Missing {filename = } at {path.parent = }"
     df = pd.read_csv(path)
@@ -55,6 +55,8 @@ def load_fifa(filename="players_21.csv", n=None):
     df = df[cols].dropna(axis=0)
 
     if not n or n > len(df): n = len(df)
-    df = df.sample(n=n)
+
+    df["freq"] = 1./df.groupby('international_reputation')['international_reputation'].transform('count')
+    df = df.sample(n=n, weights=df["freq"], random_state=random_state).drop(["freq"], axis=1)
 
     return df
