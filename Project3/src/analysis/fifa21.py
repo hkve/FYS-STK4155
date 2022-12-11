@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.ticker
 
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
@@ -9,7 +10,8 @@ import fifa21_utils as utils
 Ridge = utils.RidgeInt
 Lasso = utils.LassoInt  
 LinearRegression = utils.LinearRegressionInt
-import matplotlib.ticker as mticker
+DecisionTreeRegressor = utils.DecisionTreeRegressorInt
+BaggingRegressor = utils.BaggingRegressorInt
 
 def LinearModel_comparison(X, y, filename=None, random_state=321):
     alpha = np.logspace(-5, np.log10(5), 100)
@@ -61,11 +63,71 @@ def LinearModel_comparison(X, y, filename=None, random_state=321):
     plot_utils.save(filename)
     plt.show()
 
+def singel_tree_increasing_depth(X, y, filename=None, random_state=321):
+    max_depths = np.arange(1,10+1)
+    
+    c = plot_utils.colors[0]
+    ls = {
+        "mse": "solid",
+        "bias": "dashed",
+        "var": "dotted"
+    }
 
+    n = len(max_depths)
+    mse, bias, var, regs = utils.bootstrap(X, y, DecisionTreeRegressor, param_name="max_depth", params=max_depths, method_params={"splitter": "best", "random_state": random_state}, save_regs=True, random_state=random_state)
+
+    actual_depth = [reg.get_depth() for reg in regs]
+    leaves = [reg.get_n_leaves() for reg in regs]
+
+
+
+    fig, ax = plt.subplots()
+    ax.plot(max_depths, mse, label="mse", ls=ls["mse"], c=c, marker="*", markersize=8)
+    ax.plot(max_depths, bias, label="bias", ls=ls["bias"], c=c, marker="o")
+    ax.plot(max_depths, var, label="var", ls=ls["var"], c=c, marker="P")
+
+    ax.set_xticks(max_depths)
+    
+    ax2 = ax.twiny()
+    l = ax.get_xlim()
+    l2 = ax2.get_xlim()
+    f = lambda x : l2[0]+(x-l[0])/(l[1]-l[0])*(l2[1]-l2[0])
+    ticks = f(ax.get_xticks())
+    ax2.xaxis.set_major_locator(matplotlib.ticker.FixedLocator(ticks))
+    ax2.set_xticklabels([f"{d}/{l}" for d, l in zip(actual_depth, leaves)])
+
+    ax2.grid(False)
+    ax.set(xlabel="Allowed depth")
+    ax2.set(xlabel="Actual depth/number of leaves")
+    ax.legend()
+    plot_utils.save(filename)
+    plt.show()
+
+def Bagging_increase_number_of_trees(X, y, filename=None, random_state=321):
+    n_estimators = np.linspace(10, 100, 5, dtype=int)
+
+    c = plot_utils.colors[0]
+    ls = {
+        "mse": "solid",
+        "bias": "dashed",
+        "var": "dotted"
+    }
+
+    mse, bias, var = utils.bootstrap(X, y, BaggingRegressor, param_name="n_estimators", params=n_estimators)
+
+    fig, ax = plt.subplots()
+    ax.plot(n_estimators, mse, label="mse", ls=ls["mse"], c=c, marker="*", markersize=8)
+    ax.plot(n_estimators, bias, label="bias", ls=ls["bias"], c=c, marker="o")
+    ax.plot(n_estimators, var, label="var", ls=ls["var"], c=c, marker="P")
+    ax.legend()
+    plt.show()
 
 if __name__ == "__main__":
     rnd = 3211
     X, y = utils.get_fifa_data(n=10000, random_state=rnd)
     X_train, X_val, y_train, y_val = train_test_split(X, y, train_size=3/4, random_state=rnd)
 
-    LinearModel_comparison(X_train, y_train, filename="BiasVar_LinearRegression", random_state=rnd)
+    # LinearModel_comparison(X_train, y_train, filename="BiasVar_LinearRegression", random_state=rnd)
+    # singel_tree_increasing_depth(X, y, filename="BiasVar_SingleTree", random_state=rnd)
+
+    Bagging_increase_number_of_trees(X, y)
