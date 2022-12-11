@@ -14,7 +14,7 @@ We cite our sources like this~\citep{Project1}.
     \comment{Which feature matrix dimension to use? (m,n) or (n,p). Easy to change, but consistency -\Johan}
 
     Suppose $X$ is z-score normalised (zero mean) $m\cross n$ matrix representing our data, which consists of $m$ features and $n$ samples. Mathematically, we want to find an $m\cross m$ matrix $P$ such that $PX=Y$ where the covariance matrix of $Y$, $S_Y$, is diagonalised. The covariance matrix of an arbitrary $m\cross n$ matrix $A$ is defined as:
-
+    \comment{Move covariance def. to appendix -\Johan}
     \begin{align} \label{theo:eq:covariance_definition}
         S_A = \frac{1}{n-1}AA^T.
     \end{align}
@@ -25,6 +25,47 @@ We cite our sources like this~\citep{Project1}.
     Each row $p_i$ of $P$ represent a new created feature as linear combinations of the original features. As initially stated, we want to maximise the variance, and thus choosing a set of $p_i$ whose variances are above some threshold is the same as selecting the most important non-co-varying features of the data. If we choose $d$ such values the dimensionality of our problem is reduced by $m-d$.
     
     \comment{will link this to the SVD -\Johan}
+
+    \comment{will actually rewrite this with (n,m) convention, and agreed upon notation -\Johan}
+
+    \comment{draft for gooder version below}
+
+    [insert some well written explanation as to why we do this, and a conceptual understanding, with hyperplanes and projections and other fancy thingies, perhaps hyperplanes and the fancy things below the math idk yet]
+
+    Now to the mathematics:
+
+    We want $Y = XP$
+
+    $n_c = 1/(n-1)$ is the normalisation.
+
+    \begin{align}
+        S_Y &= n_cY^TY\nonumber\\
+        &= n_c(XP)^T(XP) \nonumber\\
+        &= n_cP^T(X^TX)P.
+    \end{align} 
+
+    A theorem shows that any symmetric matrix $A$ can be decomposed into $A=EDE^T$ where the columns in $E$ are the orthonormal eigenvectors of $A$ and $D$ is a diagonal matrix. We want $P$ to be orthonormal (which implies $P^{-1}=P^T$), and therefore try: $E=P$ which yield $X^TX=PDP^T$, so that:
+
+    \begin{align}
+        S_Y &= n_cP^TPDP^TP\nonumber\\
+        &= n_cP^{-1}PDP^{-1}P\nonumber\\
+        &= n_cD.
+    \end{align}
+    Now, choosing the columns of $P$ to be the orthonormal eigenvectors of $X^TX$ yield a diagonal covariance matrix $S_Y$, exactly what we want. 
+
+    SVD $X=U\Sigma V^T$
+
+    $V$ is a set of orthonormal eigenvector of $X^TX$, spanning $\mathrm{Row}(X)$, which means that the columns of $V$ are the principal components of $X$. 
+
+    \comment{explain the meaning of the diagonal elements of $S_Y$}
+
+    \begin{enumerate}
+        \item Make sure $X$ has shape $(n\cross m)$ and is $z$-score normalised.
+        \item Find $P$ either from $V$ or the eigenvectors of $X^TX$.
+        \item Calculate $Y=XP$.
+        \item Find the diagonal covariance $S_Y=n_cY^TY$.
+        \item Sort the principal components $p_i$ and corresponding variances $\sigma^2_i$ in descending order, and choose the $d$ most important features. This reduces the dimensionality of the problem from $m$ to $d$.
+    \end{enumerate}
 
 
 
