@@ -12,7 +12,7 @@ def make_figs_path(filename):
     while root_path.name != "FYS-STK4155":
         root_path = root_path.parent
 
-    figs_path = root_path / pl.Path("Project2/tex/figs")
+    figs_path = root_path / pl.Path("Project3/tex/figs")
 
     if not figs_path.exists():
         return None
@@ -23,6 +23,10 @@ def make_figs_path(filename):
 
     return str(figs_path)
 
+def save(filename):
+    if filename:
+        filename = make_figs_path(filename)
+        plt.savefig(filename)
 
 colors = [
     sns.color_palette('husl')[-3],
