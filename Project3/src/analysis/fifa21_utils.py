@@ -5,6 +5,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LinearRegression, Ridge, Lasso
 from sklearn.tree import DecisionTreeRegressor
+from sklearn.ensemble import BaggingRegressor
 from mlxtend.evaluate import bias_variance_decomp
 
 import context
@@ -38,6 +39,12 @@ class DecisionTreeRegressorInt(DecisionTreeRegressor):
     def predict(self, X):
         return np.round_(super().predict(X), decimals=0).astype(int)
 
+class BaggingRegressorInt(BaggingRegressor):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def predict(self, X):
+        return np.round_(super().predict(X), decimals=0).astype(int)
 
 class CustomScaler(StandardScaler): 
     def __init__(self):
