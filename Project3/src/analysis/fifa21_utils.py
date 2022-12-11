@@ -9,6 +9,27 @@ from mlxtend.evaluate import bias_variance_decomp
 import context
 from sknotlearn.datasets import load_fifa
 
+class LinearRegressionInt(LinearRegression):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def predict(self, X):
+        return np.round_(super().predict(X), decimals=0).astype(int)
+
+class RidgeInt(Ridge):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def predict(self, X):
+        return np.round_(super().predict(X), decimals=0).astype(int)
+
+class LassoInt(Lasso):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def predict(self, X):
+        return np.round_(super().predict(X), decimals=0).astype(int)
+
 class CustomScaler(StandardScaler): 
     def __init__(self):
         self.n_ohe = 5
