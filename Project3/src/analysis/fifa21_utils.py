@@ -77,3 +77,10 @@ def bootstrap(X, y, method, param_name, params, method_params=None, random_state
         mse[i], bias[i], var[i] = bias_variance_decomp(reg, X_train, y_train, X_test, y_test, loss="mse", num_rounds=200, random_seed=random_state)
 
     return mse, bias, var
+
+def boostrap_single(X, y, method, method_params=None, random_state=321):
+    X_train, X_test, y_train, y_test = process_fifa_data(X, y, random_state=321)
+
+    reg = method(**method_params)
+
+    return bias_variance_decomp(reg, X_train, y_train, X_test, y_test, loss="mse", num_rounds=200, random_seed=random_state)
