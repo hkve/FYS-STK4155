@@ -2,10 +2,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import Ridge, Lasso
 from sklearn.metrics import mean_squared_error
 import plot_utils
 import fifa21_utils as utils
+
+Ridge = utils.RidgeInt
+Lasso = utils.LassoInt  
 
 import matplotlib.ticker as mticker
 
@@ -23,7 +25,7 @@ def LinearModel_comparison(X, y, random_state=321):
         Lasso: plot_utils.colors[1],
     }
 
-    method_params = {Ridge: None, Lasso: {"max_iter": 10000}}
+    method_params = {Ridge: {"positive": True}, Lasso: {"max_iter": 10000, "positive": True}}
     
     fig, ax = plt.subplots()
     for Reg in [Ridge, Lasso]:
