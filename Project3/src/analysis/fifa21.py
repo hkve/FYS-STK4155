@@ -11,7 +11,7 @@ Ridge = utils.RidgeInt
 Lasso = utils.LassoInt  
 LinearRegression = utils.LinearRegressionInt
 DecisionTreeRegressor = utils.DecisionTreeRegressorInt
-
+BaggingRegressor = utils.BaggingRegressorInt
 
 def LinearModel_comparison(X, y, filename=None, random_state=321):
     alpha = np.logspace(-5, np.log10(5), 100)
@@ -103,11 +103,31 @@ def singel_tree_increasing_depth(X, y, filename=None, random_state=321):
     plot_utils.save(filename)
     plt.show()
 
+def Bagging_increase_number_of_trees(X, y, filename=None, random_state=321):
+    n_estimators = np.linspace(10, 100, 5, dtype=int)
+
+    c = plot_utils.colors[0]
+    ls = {
+        "mse": "solid",
+        "bias": "dashed",
+        "var": "dotted"
+    }
+
+    mse, bias, var = utils.bootstrap(X, y, BaggingRegressor, param_name="n_estimators", params=n_estimators)
+
+    fig, ax = plt.subplots()
+    ax.plot(n_estimators, mse, label="mse", ls=ls["mse"], c=c, marker="*", markersize=8)
+    ax.plot(n_estimators, bias, label="bias", ls=ls["bias"], c=c, marker="o")
+    ax.plot(n_estimators, var, label="var", ls=ls["var"], c=c, marker="P")
+    ax.legend()
+    plt.show()
+
 if __name__ == "__main__":
     rnd = 3211
     X, y = utils.get_fifa_data(n=10000, random_state=rnd)
     X_train, X_val, y_train, y_val = train_test_split(X, y, train_size=3/4, random_state=rnd)
 
     # LinearModel_comparison(X_train, y_train, filename="BiasVar_LinearRegression", random_state=rnd)
+    # singel_tree_increasing_depth(X, y, filename="BiasVar_SingleTree", random_state=rnd)
 
-    singel_tree_increasing_depth(X, y, filename="BiasVar_SingleTree", random_state=rnd)
+    Bagging_increase_number_of_trees(X, y)
