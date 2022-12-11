@@ -9,12 +9,31 @@ We cite our sources like this~\citep{Project1}.
 
 \subsection{Principal Component Analysis (PCA)}
 \comment{not sure where to put this yet (also winging the notation until we meet) -\Johan}
+    The motivation behind performing principal component analysis (PCA) is to minimise redundancy of features, by putting emphasis on features which are most \textit{unlike} \comment{need to structure entire section to maximise the sensemaking -\Johan}. The overlap of features is measured as their \textit{covariance}. The goal is to construct a set of new features whose covariance is minimised, which also minimise feature overlapping, then represent the data using these new features in a new feature matrix $Y$. 
+    
+    \comment{Which feature matrix dimension to use? (m,n) or (n,p). Easy to change, but consistency -\Johan}
+
+    Suppose $X$ is z-score normalised (zero mean) $m\cross n$ matrix representing our data, which consists of $m$ features and $n$ samples. Mathematically, we want to find an $m\cross m$ matrix $P$ such that $PX=Y$ where the covariance matrix of $Y$, $S_Y$, is diagonalised. The covariance matrix of an arbitrary $m\cross n$ matrix $A$ is defined as:
+
+    \begin{align} \label{theo:eq:covariance_definition}
+        S_A = \frac{1}{n-1}AA^T.
+    \end{align}
+    What we effectively do is finding the orthogonal hyperplane in feature space that lies closest to the data. The orthonormal matrix $P$ is then the change of base matrix between the original features spanning $X$, and the newly constructed features that span $Y$. $Y$ can also be interpreted as the projection of the data onto the hyperplane, i.e. the same data represented with a different basis/features which consequently are linear combinations of the original basis/features. 
+
+    Considering the matrix $P$, its rows are \textit{the principal components} of $X$, and it can be shown (\comment{appendix? or leave as an exercise?-\Johan}) that choosing these rows to be eigenvectors of $XX^T$ diagonalises $S_Y$.  The diagonal elements of $S_Y$ are the variances of the projected data. 
+
+    Each row $p_i$ of $P$ represent a new created feature as linear combinations of the original features. As initially stated, we want to maximise the variance, and thus choosing a set of $p_i$ whose variances are above some threshold is the same as selecting the most important non-co-varying features of the data. If we choose $d$ such values the dimensionality of our problem is reduced by $m-d$.
+    
+    \comment{will link this to the SVD -\Johan}
+
+
+
+     
 
 \subsection{Neural Networks}
     First, it will be wise to take a minute to recap some of the details of how a \textit{feed-forward nerual network} (FFNN) is built and trained from~\cite{Project2}. They are made up of sequential \textit{layers} taking in the input from the previous layer and passing it on to the next one. There will always be an input layer, taking in the features $x$ producing some observation $y$, and an output layer transforming the input from the second to last layer into an appropriate output. In classification problems, the outputs will usually be probabilities between $0$ and $1$ for the input to produce an output in a given category. In regression, the output layer usually transforms the output to be a single number $\tilde{y}$ for the predicted value.
 
     When passing the output from one layer to the next, a linear transformation is done. Denoting the output vector from layer $\ell$ as $\vec{a}^\ell$, the transformation produces a \textit{response} $\vec{z}^{\ell} = W^\ell \vec{a}^{\ell-1} + \vec{b}^\ell$, where $W^\ell$ is a weight matrix, and $\vec{b}^\ell$ is called the bias. The response vector is then passed through an activation function (which is generally non-linear) to produce the \textit{activation} $\vec{a}^\ell = f(\vec{z}^\ell)$.
-
 
 \subsection{Local Winner Takes All (LWTA)}
     \comment{Explain local learning and sparse pathways -\Anna}
