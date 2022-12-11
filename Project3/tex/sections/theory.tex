@@ -20,8 +20,6 @@ We cite our sources like this~\citep{Project1}.
     \comment{Explain local learning and sparse pathways -\Anna}
     The idea of LWTA algorithms is to implement local learning in the neural network, such that the entire network does not learn how to transform a given input, but it is rather outsourced to local parts of the network. In LWTA algorithms, sparse pathways learn during training, and these pathways are selected at inference time. The nodes in each layer are grouped into a number of groups $G$, and Winner Takes All is applied on the activation of each of these groups, only passing on the maximal output in the group.
 
-    \subsubsection{Neurological Background}
-
     \subsubsection{Maxout and Channel-Out}
         \comment{Some introductory sentence establishing the excistence of the two algorithms. "There are mainly two algowithms classifying as LWTA; maxout, where pathways are only formed posteriori, and channel-out, where they are also formed anteriori." or something -\Anna}
         The \textit{maxout} activation passes the input from the previous layer through the weight kernel and adds the bias as normal, but then only passes on the activation from the most active node in each group of the layer. Each group then has a common set of weight connections to the next layer in  the network.
@@ -47,4 +45,13 @@ We cite our sources like this~\citep{Project1}.
         \textit{Channel-out} makes a subtle, but meaningful, change to the maxout algorithm. Instead of every group having a common set of weight connections to the next layer, every node has its own set of weight connections. This results in not only local learning of the weights during backpropagation, but also leads to the activation winner choosing the set of weights that will be used in the next layer at inference time.
         Effectively, a channel-out layer works the same way as an ordinary dense layer with a linear activation function, but sets all the activations of the nodes that do not win their group to zero before passing them on to the next layer.
         Same as with maxout, only the weights of the active nodes are trained, but this also applies to the next layer, where only weights connected to the active nodes are trained. So the local learning goes both forwards and backwards from a channel-out layer, in contrast to just backwards in the case of maxout.
+
+    \subsection{Neurological Background}
+    Winner-takes-all is an important concept in biological neural networks. 
+    \comment{Mention maps} \Anna
+
+    \subsubsection{Lateral inhibition}
+    A neurological phenomena called lateral inhibition is the primary theoretical justification for LWTA algorithms~\citep{Chen}. 
+
+    
         
