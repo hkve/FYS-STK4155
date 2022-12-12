@@ -39,6 +39,9 @@ prevTEAMS_WAGES_CSV = "salary18"
 TEAMS_WAGES_CSV = "salary19"
 PATH = pl.Path(__file__).parent
 
+### Extra features to consider (must be present in 'MATCH_DATA_CSV' with H/A-prefixes)
+EXTRA_FEATURES = ["S", "ST", "C", "F", "Y", "R"]
+
 
 
 ''' Comments:
@@ -81,7 +84,7 @@ def get_wages(csv_filename : str) -> pd.DataFrame:
     for i in wages.index:
         sal = wages.at[i, "annual_wages"]
         sal = sal.split("(")[0].replace("£", "").strip()
-        wages.at[i, "annual_wages"] = float(sal)
+        wages.at[i, "annual_wages"] = float(sal)*1e-6
     # use name convention:
     names = {"Manchester Utd": "Manchester United", "Newcastle Utd": "Newcastle United", "Wolves":"Wolverhampton Wanderers", "Sheffield Utd": "Sheffield United", "Leicester City": "Leicester", "Norwich City": "Norwich"}
     for shortname in names.keys():
@@ -143,6 +146,7 @@ def build_team_profiles(
 def get_opponent(   
             understats_per_game : pd.DataFrame, 
             match_data : pd.DataFrame) -> tuple: # how do I say "tuple[pd.DataFrame, pd.DataFrame]"??
+
     
     # run through all matches in the season to pair up understats
     for match_no in range(len(match_data)):
@@ -154,6 +158,7 @@ def get_opponent(
         match_day = match_data.at[match_no, "date"]
         home_team = match_data.at[match_no, "home_team"]
         away_team = match_data.at[match_no, "away_team"]
+        weekday = pd.to_datetime(match_day, format=DATE_FORMAT).isoweekday()
         
         # isolate two per-game understats:
         understats_home_team = understats_per_game.loc[(understats_per_game["ground"] == "h") & (understats_per_game["team"] == home_team) & (understats_per_game["date"] == match_day)]
@@ -166,6 +171,15 @@ def get_opponent(
         understats_per_game.at[idx_away_team, "opp_team"] = home_team
         understats_per_game.at[idx_home_team, "match_id"] = match_id
         understats_per_game.at[idx_away_team, "match_id"] = match_id
+        
+        understats_per_game.at[idx_home_team, "day"] = weekday
+        understats_per_game.at[idx_away_team, "day"] = weekday
+
+        # additional data
+        for feature in EXTRA_FEATURES:
+            understats_per_game.at[idx_home_team, feature] = match_data.at[match_no, "H" + feature]
+            understats_per_game.at[idx_away_team, feature] = match_data.at[match_no, "A" + feature]
+
     
     # sort by match ID:
     understats_per_game = understats_per_game.sort_values(["match_id", "ground"], ascending=[True, False]).reset_index(drop=True, inplace=False)
@@ -186,7 +200,7 @@ def get_team_record(
     teamdf = understats_per_game.loc[(understats_per_game["team"] == team)]
     teamdf = teamdf.reset_index(drop=True, inplace=False)
     # prepare new dataframes:
-    keep = ["match_id", "team", "opp_team", "date", "ground", "result"]
+    keep = ["match_id", "team", "opp_team", "date", "ground", "result", "day"]
     pre_game = pd.DataFrame()
     kpi = teamdf.drop((["match_id", "team", "opp_team", "date"]), axis=1)
     # fill new feature object using brute (?) force:
@@ -310,11 +324,136 @@ def get_result_distribution(previous_season : bool = True):
 
     return res/np.sum(res)
 
+    
+### (NB! Very not general) Get decription of feature codes (xG, ST etc.)
+def get_feature_description(md_filename : str = None) -> dict:
+
+    # helper dicts:
+    _key_match_features = {
+        "ground":       "Home (= h) or away (= a) pitch of team",
+        "day":          "Weekday (= 1, .., 7 = Mon., ..., Sun.)",
+        "days_rest":    "Number of days the team have been resting from league matches"
+    }
+    
+    _extra_match_stats = {
+        "S":    "Shots",
+        "ST":   "Shots on target",
+        "C":    "Corners won",
+        "F":    "Fouls committed",
+        "Y":    "Yellow cards recieved",
+        "R":    "Red cards recieved"
+
+    }
+
+    _understats = {
+        "xG":           "Expected goals",
+        "xGA":          "Expected goals against",
+        "npxG":         "Expected goals, not counting penalties or own goals",
+        "npxGA":        "Expected goals against, not counting penalties or own goals",
+        "deep":         "Passes completed within an estimated 20 yards of goal (crosses excluded)",
+        "deep_allowed": "Opponent passes completed within an estimated 20 yards of goal (crosses excluded)",
+        "scored":       "Goals scored",
+        "missed":       "Goals conceded",
+        "wins":         "Whether the team has won (1) or not (0)",
+        "draws":        "Whether the team has drwan (1) or not (0)",
+        "loses":        "Whether the team has lost (1) or not (0)",
+        "pts":          "League points gained (= 3, 1, 0 for w, d, l)",
+        "npxGD":        "The difference between 'for' and 'against' expected goals without penalties and own goals",
+        "ppda_coef":    "Passes allowed per defensive action (PPDA) in the opposition half",
+        "oppda_coef":   "Opponent passes allowed per defensive action (OPPDA) in the opposition half",
+        "xG_diff":      "Difference betweeen xG and actual goals scored",
+        "xGA_diff":     "Difference between expected goals against and missed",
+        "xpts_diff":    "Difference between actual and expected points"
+    }
+
+    _match_understats = {
+        "result":       "Full time result (= w, d, l = win, draw, loss) for the team",
+        **_understats,
+        "ppda_att":     "PPDA attacking actions",
+        "ppda_def":     "PPDA defensive actions",
+        "oppda_att":    "OPPDA attacking actions",
+        "oppda_def":    "OPPDA defensive actions"
+    }
+
+    ### Match features (only those that we know before game start)
+    match_day = {
+        "team":         "Full team name",
+        "opp_team":     "Oppoent's full team name",
+        "date":         "Date of match day (%s)"%DATE_FORMAT,
+        **_key_match_features
+    }
+
+    ### Team season stats (only those that we know or can assume before the league is ended)
+    season = {
+        "annual_wages": "Million £ used on player wages",
+        "n_contracts":  "Players under contract"
+    }
+
+    ### Previous match stats
+    prev_match = {
+        **_key_match_features,
+        **_extra_match_stats,
+        **_match_understats
+    }
+
+    ### Previous season stats
+    prev_season = {
+        "position": "League position",
+        "matches":  "(omitted) Macthes played",
+        **_understats
+    }
+    
+    # create dataframes for easy suffix-fix:
+    match_day_pd        = pd.DataFrame.from_dict(match_day, orient="index").transpose()
+    season_pd           = pd.DataFrame.from_dict(season, orient="index").transpose()
+    prev_match_pd       = pd.DataFrame.from_dict(prev_match, orient="index").transpose().add_suffix("_pg")
+    prev_season_pd      = pd.DataFrame.from_dict(prev_season, orient="index").transpose().add_suffix("_ps")
+    # FIXME
+
+    ### Previous season stats of opponent
+    season_opp_pd       = season_pd.add_suffix("_opp")
+    prev_season_opp_pd  = prev_season_pd.add_suffix("_opp")
+
+
+    # back to dict:
+    match_day       = match_day_pd.to_dict()
+    season          = season_pd.to_dict()
+    prev_match      = prev_match_pd.to_dict()
+    prev_season     = prev_season_pd.to_dict()
+    season_opp      = season_opp_pd.to_dict()
+    prev_season_opp = prev_season_opp_pd.to_dict()
+
+    ### Combine to one large frame/dict
+    info = {**match_day, **season, **prev_match, **prev_season, **season_opp, **prev_season_opp}
+
+    if md_filename is not None:
+        infopd = pd.DataFrame.from_dict(info, orient='index')  
+        infopd.columns = ["Description"]
+        filename = md_filename.strip(".md") + ".md"
+        infopd.to_markdown(PATH/filename)
+    
+    return info
+
+
 
 if __name__ == "__main__":
 
     print("\n>>>\n")
     RUN()
+
+    # season = ['position','team','matches','wins','draws','loses','scored','missed','pts','xG','xG_diff','npxG','xGA','xGA_diff','npxGA','npxGD','ppda_coef','oppda_coef','deep','deep_allowed','xpts','xpts_diff']
+    # match = ['h_a','xG','xGA','npxG','npxGA','deep','deep_allowed','scored','missed','xpts','result','date','wins','draws','loses','pts','npxGD','ppda_coef','ppda_att','ppda_def','oppda_coef','oppda_att','oppda_def','team','xG_diff','xGA_diff','xpts_diff']
+
+    # print("\n SEASON")
+    # for s in season:
+    #     if s not in match:
+    #         print(s)
+    # print("\n MATCH")
+    # for m in match:
+    #     if m not in season:
+    #         print(m)
+
+    info = get_feature_description("tmp.md")
 
 
     data = stats_EPL19_per_game.copy()
@@ -344,10 +483,10 @@ if __name__ == "__main__":
         else:
             other.append(col)
 
-    print("This game: \n", other)
-    print("Previous season: \n", prevseason)
-    print("Previous game: \n", prevgame)
-    print("Opponent: \n", opp)
+    # print("This game: \n", other)
+    # print("Previous season: \n", prevseason)
+    # print("Previous game: \n", prevgame)
+    # print("Opponent: \n", opp)
     
 
 
