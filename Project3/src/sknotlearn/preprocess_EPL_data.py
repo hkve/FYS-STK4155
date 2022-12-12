@@ -84,7 +84,7 @@ def get_wages(csv_filename : str) -> pd.DataFrame:
     for i in wages.index:
         sal = wages.at[i, "annual_wages"]
         sal = sal.split("(")[0].replace("£", "").strip()
-        wages.at[i, "annual_wages"] = float(sal)
+        wages.at[i, "annual_wages"] = float(sal)*1e-6
     # use name convention:
     names = {"Manchester Utd": "Manchester United", "Newcastle Utd": "Newcastle United", "Wolves":"Wolverhampton Wanderers", "Sheffield Utd": "Sheffield United", "Leicester City": "Leicester", "Norwich City": "Norwich"}
     for shortname in names.keys():
@@ -385,7 +385,7 @@ def get_feature_description(md_filename : str = None) -> dict:
 
     ### Team season stats (only those that we know or can assume before the league is ended)
     season = {
-        "annual_wages": "Money in £ used on player wages",
+        "annual_wages": "Million £ used on player wages",
         "n_contracts":  "Players under contract"
     }
 
