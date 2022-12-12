@@ -32,33 +32,40 @@ We cite our sources like this~\citep{Project1}.
 
     [insert some well written explanation as to why we do this, and a conceptual understanding, with hyperplanes and projections and other fancy thingies, perhaps hyperplanes and the fancy things below the math idk yet]
 
-    Now to the mathematics:
+    \subsubsection{Motivation and assumptions}
+        Consider the collection of data $X$ which is a $(n\cross m)$ matrix, with $n$ data points, and $m$ features. We might find ourselves in a situation where some features are highly correlated. As a result, some features might be considered obsolete since the trend they describe can easily be described by other features, or combinations of other features. If this is the case, then $X$ contains more features than is strictly necessary in order to explain the trends in the data. Principal component analysis is a technique where we make linear combinations of the original features in such a way that we can describe the data with as few as possible of these new features, effectively reducing the dimensionality of the problem, without loosing too much information about the data itself. By doing this we can perform the computations with a dataset of fewer dimensions, increasing the computational efficiency. We assume that we can describe the data by its variance only. This implies that the mean must be zero, i.e. the data must be in mean-deviation form. We also assume the data to be normally distributed, as a mean-centred normal distribution is the only distribution described by its variance alone.
+        
+        \begin{figure}
+            \includegraphics[width=\linewidth]{figs/pca_schematic.png}
+            \caption{Schematic representation of PCA - perhaps need a better illustration (or no illustration idk)\citep{pca_img}}
+            \label{theo:fig:pca_schematic}
+        \end{figure}
+        
+        From a geometrical point of view, this can be thought of as expressing the data in a different coordinate system, and PCA involves determining these new axes. Figure \ref{theo:fig:pca_schematic}  shows a visual interpretation of this, where the black axes are the original ones, and we find the new blue axes with PCA. These are determined in such a way that the variance of the data is maximised in the new coordinate system, while minimising the covariance between features. We must impose this criterion since we want as few new features as possible, hence we do not want them to co-vary, but rather vary as much as possible. 
 
-    We want $Y = XP$
+    \subsubsection{Mathematical consideration}
 
-    $n_c = 1/(n-1)$ is the normalisation.
+    Our goal is to reduce the dimensionality of the data, thus we want to represent the data as a matrix $Y$ with shape $(n\cross d)$ where $d\leq m$. This indicates that we are after a linear transformation $T:\mathbb{R}^{n\cross m} \to \mathbb{R}^{n\cross d}$ which we can define by $T(X) = XP = Y$, where $P$ is an orthonormal matrix of shape $m\cross d$, which we intend to find. $P$ must fulfil our criterion on $Y$, which is high variance and low covariance. This can be done by diagonalising the covariance matrix of $Y$ given by:
 
-    \begin{align}
+    \begin{align}\label{theo:eq:Y_covariance}
         S_Y &= n_cY^TY\nonumber\\
         &= n_c(XP)^T(XP) \nonumber\\
-        &= n_cP^T(X^TX)P.
+        &= n_cP^T(X^TX)P,
     \end{align} 
+    where $n_c = 1/(n-1)$ is the normalisation due to $n$ data points.
 
-    A theorem shows that any symmetric matrix $A$ can be decomposed into $A=EDE^T$ where the columns in $E$ are the orthonormal eigenvectors of $A$ and $D$ is a diagonal matrix. We want $P$ to be orthonormal (which implies $P^{-1}=P^T$), and therefore try: $E=P$ which yield $X^TX=PDP^T$, so that:
+    With \citep[ch. 5.3]{linalgbok} we can show that any square symmetric matrix, like $X^TX$, can be expressed as $EDE^T$ where the columns of $E$ are the orthonormal eigenvectors of $X^TX$, and $D$ is a diagonal matrix. Inserting this into equation  \ref{theo:eq:Y_covariance} we obtain that $S_Y = n_cP^TEDE^TP$. We see that $P=E \implies S_Y=n_c D$\footnotemark, since $P$ is then orthonormal and thus $P^T=P^{-1}$.
 
-    \begin{align}
-        S_Y &= n_cP^TPDP^TP\nonumber\\
-        &= n_cP^{-1}PDP^{-1}P\nonumber\\
-        &= n_cD.
-    \end{align}
+    \footnotetext{This is not necessarily trivial since we want $P$ to have shape $(m\cross d)$. $E$ contains all the eigenvectors of $X^TX$ and has thus shape $(m\cross m)$. This is easily surpassed by setting $d=m$ while showing this, and then reduce the dimension of $P$ when we need it later. We also note that this works mathematically if we let $E$ contain the $d$ eigenvectors of $X^TX$ with the largest eigenvalues. Then $D$ must be a $(d\cross d)$ diagonal matrix, which is of similar shape as $S_Y$.}
+
     Now, choosing the columns of $P$ to be the orthonormal eigenvectors of $X^TX$ yield a diagonal covariance matrix $S_Y$, exactly what we want. 
 
     SVD $X=U\Sigma V^T$
-
+    
     $V$ is a set of orthonormal eigenvector of $X^TX$, spanning $\mathrm{Row}(X)$, which means that the columns of $V$ are the principal components of $X$. 
-
+    
     \comment{explain the meaning of the diagonal elements of $S_Y$}
-
+    
     \begin{enumerate}
         \item Make sure $X$ has shape $(n\cross m)$ and is $z$-score normalised.
         \item Find $P$ either from $V$ or the eigenvectors of $X^TX$.
@@ -66,7 +73,8 @@ We cite our sources like this~\citep{Project1}.
         \item Find the diagonal covariance $S_Y=n_cY^TY$.
         \item Sort the principal components $p_i$ and corresponding variances $\sigma^2_i$ in descending order, and choose the $d$ most important features. This reduces the dimensionality of the problem from $m$ to $d$.
     \end{enumerate}
-
+    
+    \subsubsection{Interpretation}
 
 
      
