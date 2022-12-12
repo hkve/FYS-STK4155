@@ -14,7 +14,7 @@ We cite our sources like this~\citep{Project1}.
         
         \begin{figure}
             \includegraphics[width=\linewidth]{figs/pca_schematic.png}
-            \caption{Schematic representation of PCA - perhaps need a better illustration (or no illustration idk)\citep{pca_img}}
+            \caption{Schematic representation of PCA. New axes, represented as $z$ in the figure are generated, forming a new basis and a new hyperplane onto which we project the data in order to maximise variance and minimise covariance.\citep{pca_img}}
             \label{theo:fig:pca_schematic}
         \end{figure}
         
@@ -49,7 +49,7 @@ We cite our sources like this~\citep{Project1}.
     \subsubsection{Interpretation}
     Now we have a recipe of finding the principal component $P$, but what do they really mean? We perform PCA in order to reduce the redundancy of features, to express the data with as few features/dimensions as possible without loosing too much information. We therefore make new features that are linear combinations of the original features, but with zero covariance. This means that when we ``choose'' the first principal component $\vec{p}_1$, we find the direction in feature space, along which the variance of the data is maximised. In other words, if we were to project all data points down on a line, $\vec{p}_1$ would be the line that gives the largest variance, i.e. yield as much information about the data as possible for a 1D data set. When finding the next principal component we repeat this process, but restrict ourselves to only ``choosing'' directions in feature space orthogonal to the previous. 
     
-    Having $d$ principal components means that we have found $d$ directions in feature space, all with a maximised variance. These can be though of as a new basis or representing our data $X$. Then the matrix $P$ can be interpreted as the change of basis matrix between $X$ and $Y$. $Y$ are the same data points, but expressed in the basis of the principal components. They are the data points projected onto a hyperplane set up by the vectors $\vec{p}_i$. We also notice a rather neat consequence of the SVD, that finding the principal components of $X$ equates to finding an orthonormal basis that span $\text{Row}(X)$. The $i$-th diagonal element of $S_Y$ is the variance, $\sigma_i^2$ of the data along $\vec{p}_i$. The total variance is the sum over these diagonal elements, or the trace, $\text{tr}(S_Y)$.
+    Having $d$ principal components means that we have found $d$ directions in feature space, all with a maximised variance. These can be though of as a new basis or representing our data $X$. Then the matrix $P$ can be interpreted as the change of basis matrix between $X$ and $Y$. $Y$ are the same data points, but expressed in the basis of the principal components. They are the data points projected onto a hyperplane set up by the vectors $\vec{p}_i$. This can also be inferred from figure \ref{theo:fig:pca_schematic}. We also notice a rather neat consequence of the SVD, that finding the principal components of $X$ equates to finding an orthonormal basis that span $\text{Row}(X)$. The $i$-th diagonal element of $S_Y$ is the variance, $\sigma_i^2$ of the data along $\vec{p}_i$. The total variance is the sum over these diagonal elements, or the trace, $\text{tr}(S_Y)$.
 
      
 
