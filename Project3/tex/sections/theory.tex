@@ -76,7 +76,7 @@ We cite our sources like this~\citep{Project1}.
 
     When passing the output from one layer to the next, a linear transformation is done. Denoting the output vector from layer $\ell$ as $\vec{a}^\ell$, the transformation produces a \textit{response} $\vec{z}^{\ell} = W^\ell \vec{a}^{\ell-1} + \vec{b}^\ell$, where $W^\ell$ is a weight matrix, and $\vec{b}^\ell$ is called the bias. The response vector is then passed through an activation function (which is generally non-linear) to produce the \textit{activation} $\vec{a}^\ell = f(\vec{z}^\ell)$.
 
-\subsection{Local Winner Takes All (LWTA)}
+\subsection{Local Winner-Takes-All (LWTA)}
     \comment{Explain local learning and sparse pathways -\Anna}
     The idea of LWTA algorithms is to implement local learning in the neural network, such that the entire network does not learn how to transform a given input, but it is rather outsourced to local parts of the network. In LWTA algorithms, sparse pathways learn during training, and these pathways are selected at inference time. The nodes in each layer are grouped into a number of groups $G$, and Winner Takes All is applied on the activation of each of these groups, only passing on the maximal output in the group.
 
