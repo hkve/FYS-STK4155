@@ -51,7 +51,8 @@ if __name__ == "__main__":
 
     container = load_EPL(True)
     
-    trainx, testx, trainy, testy = train_test_split(container.x, container.y)
+    trainx, testx, trainy, testy = train_test_split(container.x, container.y, test_size=0.2)
+    # trainx, valx,  trainy, valy  = train_test_split(trainx,      trainy,      test_size=0.2)
     print(trainx.head())
     cols = trainx.columns
 
@@ -83,7 +84,7 @@ if __name__ == "__main__":
 
     ax.plot(range(1,len(five)+1), five)
 
-    plt.show()
+
 
 
 
@@ -113,7 +114,7 @@ if __name__ == "__main__":
     ax.set_xlabel(r"\# PCA features")
     ax.set_ylabel(r"Variance [\%]")
 
-    # plt.show()
+    plt.show()
    
 
     print("\n --- \n")
