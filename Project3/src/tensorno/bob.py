@@ -1,5 +1,6 @@
 """Contains builders used for creating maxout and channelout neural networks
 in tensorflow"""
+# TODO: Comment and document better.
 import tensorflow as tf
 import keras_tuner
 
@@ -53,9 +54,9 @@ def build_FFNN_classifier(
             )
         )
     if lmbda is not None:
-        weight_penaliser = tf.keras.regularizers.L2(lmbda)
+        weight_penalizer = tf.keras.regularizers.L2(lmbda)
     else:
-        weight_penaliser = None
+        weight_penalizer = None
 
     # Add hidden layers.
     num_inputs = num_features
@@ -65,7 +66,7 @@ def build_FFNN_classifier(
             input_shape=(num_inputs,),
             activation=activation,
             **get_custom_initializers(num_inputs),
-            kernel_regularizer=weight_penaliser,
+            kernel_regularizer=weight_penalizer,
             name=f"{activation}_{layer+1}"
         ))
 
@@ -150,23 +151,37 @@ def build_LWTA_regressor(
             )
         )
     if lmbda is not None:
-        weight_penaliser = tf.keras.regularizers.L2(lmbda)
+        weight_penalizer = tf.keras.regularizers.L2(lmbda)
     else:
-        weight_penaliser = None
+        weight_penalizer = None
 
     # Add hidden layers.
     num_inputs = num_features
     for layer in range(num_layers):
-        model.add(Layer(
-            units=units[layer],
-            num_inputs=num_inputs,
-            num_groups=num_groups[layer],
-            **get_custom_initializers(
-                num_features if layer == 1 else num_groups[layer-1]
-            ),
-            kernel_regularizer=weight_penaliser,
-            name=f"{Layer.__name__.lower()}_{layer+1}"
-        ))
+        if num_groups[layer] > units[layer]:
+            num_groups[layer] = units[layer]
+        if num_groups[layer] == units[layer]:
+            model.add(tf.keras.layers.Dense(
+                units=units[layer],
+                input_shape=(num_inputs,),
+                activation="ReLU",
+                **get_custom_initializers(
+                    num_features if layer == 1 else num_groups[layer-1]
+                ),
+                kernel_regularizer=weight_penalizer,
+                name=f"ReLU_{layer+1}"
+            ))
+        else:
+            model.add(Layer(
+                units=units[layer],
+                num_inputs=num_inputs,
+                num_groups=num_groups[layer],
+                **get_custom_initializers(
+                    num_features if layer == 1 else num_groups[layer-1]
+                ),
+                kernel_regularizer=weight_penalizer,
+                name=f"{Layer.__name__.lower()}_{layer+1}"
+            ))
 
         # MaxOut and ChannelOut have different number of outputs.
         if isinstance(Layer, MaxOut):
@@ -255,25 +270,37 @@ def build_LWTA_classifier(
             )
         )
     if lmbda is not None:
-        weight_penaliser = tf.keras.regularizers.L2(lmbda)
+        weight_penalizer = tf.keras.regularizers.L2(lmbda)
     else:
-        weight_penaliser = None
+        weight_penalizer = None
 
     # Add hidden layers.
     num_inputs = num_features
     for layer in range(num_layers):
         if num_groups[layer] > units[layer]:
             num_groups[layer] = units[layer]
-        model.add(Layer(
-            units=units[layer],
-            num_inputs=num_inputs,
-            num_groups=num_groups[layer],
-            **get_custom_initializers(
-                num_features if layer == 1 else num_groups[layer-1]
-            ),
-            kernel_regularizer=weight_penaliser,
-            name=f"{Layer.__name__.lower()}_{layer+1}"
-        ))
+        if num_groups[layer] == units[layer]:
+            model.add(tf.keras.layers.Dense(
+                units=units[layer],
+                input_shape=(num_inputs,),
+                activation="ReLU",
+                **get_custom_initializers(
+                    num_features if layer == 1 else num_groups[layer-1]
+                ),
+                kernel_regularizer=weight_penalizer,
+                name=f"ReLU_{layer+1}"
+            ))
+        else:
+            model.add(Layer(
+                units=units[layer],
+                num_inputs=num_inputs,
+                num_groups=num_groups[layer],
+                **get_custom_initializers(
+                    num_features if layer == 1 else num_groups[layer-1]
+                ),
+                kernel_regularizer=weight_penalizer,
+                name=f"{Layer.__name__.lower()}_{layer+1}"
+            ))
 
         # MaxOut and ChannelOut have different number of outputs.
         if Layer is MaxOut:
@@ -353,10 +380,14 @@ def build_LWTA_architecture(
         tf.keras.Sequential: Sequential model with a choice for architecture.
     """
     num_layers = hp.Choice("num_layers", layer_choices)
-    units = [hp.Choice(f"num_nodes{i}", node_choices)
-             for i in range(1, num_layers+1)]
-    num_groups = [hp.Choice(f"num_groups{i}", group_choices)
-                  for i in range(1, num_layers+1)]
+    units = list()
+    num_groups = list()
+    for layer in range(num_layers):
+        with hp.conditional_scope(
+            "num_layers", list(range(layer + 1, max(layer_choices) + 1))
+        ):
+            units.append(hp.Choice(f"num_nodes_{layer+1}", node_choices))
+            num_groups.append(hp.Choice(f"num_groups_{layer+1}", group_choices))
 
     if isregressor:
         return build_LWTA_regressor(num_layers, units, num_groups, Layer,
