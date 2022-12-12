@@ -115,8 +115,12 @@ def build_team_profiles(
                 prev_season_attributes : pd.DataFrame,
                 avg_X_teams : int = 5) -> pd.DataFrame:
 
+    # add suffix to metrics
+    prev_season_attributes = prev_season_attributes.add_suffix("_ps").rename(columns={"team_ps":"team"})
+    prev_season_understats = prev_season_understats.add_suffix("_ps").rename(columns={"team_ps":"team"})
+
     # deal with promoted teams' understats:
-    assumed_understats = prev_season_understats.loc[prev_season_understats["position"] > (20-avg_X_teams)] # avg X of lower table half
+    assumed_understats = prev_season_understats.loc[prev_season_understats["position_ps"] > (20-avg_X_teams)] # avg X of lower table half
     
     # put together all attributes:
     attributes = season_attributes.merge(prev_season_attributes, how="left", on="team", suffixes=("", "_ps"))
@@ -221,11 +225,9 @@ def build_features(
     ### (5)
     pergame_stats = pergame_stats.sort_values(by=["match_id", "ground"], ascending=[True, False]).reset_index(drop=True)
     # associate team stats to match p.o.v.:
-    pergame_stats = pergame_stats.merge(team_profiles, how="left", on="team", suffixes=("", "_ps"))
+    pergame_stats = pergame_stats.merge(team_profiles, how="left", on="team", suffixes=("", "_ps")).drop(["opp_team_ps"], axis=1)
     # associate oppositon stats to opp match p.o.v.:
-    pergame_stats = pergame_stats.merge(team_profiles, how="left", on="opp_team", suffixes=("", "_opp_ps"))
-
-    pergame_stats = pergame_stats.drop(["opp_team_ps", "team_opp_ps"], axis=1)
+    pergame_stats = pergame_stats.merge(team_profiles, how="left", on="opp_team", suffixes=("", "_opp")).drop(["team_opp"], axis=1)
 
     return pergame_stats
 
@@ -253,8 +255,9 @@ def RUN():
 
 ### Write to file??
 
-""" (6) Encode and scale data """
+""" Additional functionalities: """
 
+### Encode (and scale?) data
 def translate_data(
         data : pd.DataFrame,
         omit_features=[None]) -> pd.DataFrame:
@@ -284,7 +287,6 @@ def scale_data():
 
 
 
-""" Additional functionalities: """
 
 
 ### Simple way of collecting data (temp.) 
@@ -322,7 +324,30 @@ if __name__ == "__main__":
     from sklearn.model_selection import train_test_split   
 
     trainx, testx, trainy, testy = train_test_split(container.x, container.y)
-    print(trainx)
+    # print(trainx)
+
+    cols = trainx.columns
+
+    prevseason = []
+    prevgame = []
+    opp = []
+    other = []
+ 
+    for col in cols:
+        col = str(col)
+        if col.split("_")[-1] == "ps":
+            prevseason.append(col)
+        elif col.split("_")[-1] == "pg":
+            prevgame.append(col)
+        elif col.split("_")[-1] == "opp":
+            opp.append(col)
+        else:
+            other.append(col)
+
+    print("This game: \n", other)
+    print("Previous season: \n", prevseason)
+    print("Previous game: \n", prevgame)
+    print("Opponent: \n", opp)
     
 
 

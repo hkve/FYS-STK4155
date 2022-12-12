@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.decomposition import PCA
+from sklearn.metrics import accuracy_score, multilabel_confusion_matrix
 
 
 
@@ -51,33 +52,68 @@ if __name__ == "__main__":
     container = load_EPL(True)
     
     trainx, testx, trainy, testy = train_test_split(container.x, container.y)
+    print(trainx.head())
+    cols = trainx.columns
 
-    scaler = MinMaxScaler()
-    scaled_data = scaler.fit_transform(trainx)
+    scaler = StandardScaler()
+    trainx = scaler.fit_transform(trainx)
+
+    cov_mat = np.cov(trainx.T)
+    eigvals, eigvecs = np.linalg.eig(cov_mat)
+    
+    print(eigvals)
+    print(eigvecs)
+    best_eigvec = eigvecs[0] 
+
+    a_match = trainx[200]#.loc[trainx["match_id"] == 20190020]
+    # cols = trainx.columns
+
+    for i in range(len(best_eigvec)):
+        print(best_eigvec[i], cols[i], a_match[i])
+
     num_matches = len(trainx)
+    n_features_org = np.shape(trainx)[1]
+
+
+    print("five")
+    five = np.sum(eigvecs[:5], axis=0)
+    print(five)
+
+    fig, ax = plt.subplots()
+
+    ax.plot(range(1,len(five)+1), five)
+
+    plt.show()
+
+
 
     guessed_results = randomGuesses(num_matches, get_result_distribution())    
 
     pca = PCA()
-    principal_components = pca.fit_transform(scaled_data)
-    principal_data = pd.DataFrame(data=principal_components)
+    principal_components = pca.fit_transform(trainx)
+    
+    # print(np.shape(principal_components))
     cum_var_ratio = np.cumsum(pca.explained_variance_ratio_)
-
-    final_data = pd.concat([principal_data, trainy.reset_index(drop=True)], axis=1)
-    print(final_data.head())
-
     thresh = 0.99
     n_features = list(cum_var_ratio).index(cum_var_ratio[cum_var_ratio >= thresh][0])
     print(f"Best #features = {n_features}")
 
+    print("\n", np.shape(principal_components), "\n..")
+
+    principal_data = pd.DataFrame(data=principal_components[:,:n_features])
+    
+
+    final_data = pd.concat([principal_data, trainy.reset_index(drop=True)], axis=1)
+    print(final_data.head())
+
     fig, ax = plt.subplots()
-    ax.plot(cum_var_ratio)
+    ax.step(range(1,n_features_org+1),cum_var_ratio)
     ax.axvline(n_features, ls='--')
     
     ax.set_xlabel(r"\# PCA features")
     ax.set_ylabel(r"Variance [\%]")
 
-    plt.show()
+    # plt.show()
    
 
     print("\n --- \n")
