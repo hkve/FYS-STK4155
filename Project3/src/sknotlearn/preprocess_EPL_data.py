@@ -4,6 +4,7 @@ import os
 from datetime import datetime
 import copy
 from collections import namedtuple, OrderedDict
+import pathlib as pl
 
 
 
@@ -36,43 +37,46 @@ LEAGUE = "EPL"
 MATCH_DATA_CSV = "EPL1920"
 prevTEAMS_WAGES_CSV = "salary18"
 TEAMS_WAGES_CSV = "salary19"
+PATH = pl.Path(__file__).parent
+
+
 
 ''' Comments:
     > Leaving the variable names specific to our case
     > Still possible to change league and season by changing the global variables
 
-    > Names of teams according to "understat_per_game.csv"
+    > Names of teams according to "understat_per_game.csv" 
 '''
 
 
 
 """ (1) Extract relevant data """
 
+def READ():
+    global understats_EPL18, understats_EPL19_per_game
+    ### Read understats of previous season (18/19) and chosen season (19/20) of league (EPL)
+    understats = pd.read_csv(PATH/"understat.com.csv").rename(index=int, columns={"Unnamed: 0": "league", "Unnamed: 1": "year"}) 
+    # English Premier League:
+    understats_EPL = understats[(understats["league"] == LEAGUE)].drop(["league", "matches"], axis=1)
+    # English Premier League 2018/19:
+    understats_EPL18 = understats_EPL[(understats_EPL["year"] == prevYEAR)].drop(["year"], axis=1)
 
-### Read understats of previous season (18/19) and chosen season (19/20) of league (EPL)
-understats = pd.read_csv("understat.com.csv").rename(index=int, columns={"Unnamed: 0": "league", "Unnamed: 1": "year"}) 
-# English Premier League:
-understats_EPL = understats[(understats["league"] == LEAGUE)].drop(["league"], axis=1)
-# English Premier League 2018/19:
-understats_EPL18 = understats_EPL[(understats_EPL["year"] == prevYEAR)].drop(["year"], axis=1)
+    ### Read understats per game of the chosen season (19/20) of league (EPL)
+    understats_per_game = pd.read_csv(PATH/"understat_per_game.csv").rename(columns={"h_a": "ground"})
+    understats_per_game.date = pd.to_datetime(understats_per_game.date, format="%Y-%m-%d").dt.strftime(DATE_FORMAT)
+    # English Premier League:
+    understats_EPL_per_game = understats_per_game.loc[(understats_per_game["league"] == LEAGUE)].drop((["league"]), axis=1)
+    # English Premier League 2019/20:
+    understats_EPL19_per_game = understats_EPL_per_game.loc[(understats_EPL_per_game["year"] == YEAR)].drop((["year"]), axis=1)
+    understats_EPL19_per_game = understats_EPL19_per_game.sort_values(by="date")
+    understats_EPL19_per_game.reset_index(drop=True, inplace=True)
 
 
-
-### Read understats per game of the chosen season (19/20) of league (EPL)
-understats_per_game = pd.read_csv("understat_per_game.csv").rename(columns={"h_a": "ground"})
-understats_per_game.date = pd.to_datetime(understats_per_game.date, format="%Y-%m-%d").dt.strftime(DATE_FORMAT)
-# English Premier League:
-understats_EPL_per_game = understats_per_game.loc[(understats_per_game["league"] == LEAGUE)].drop((["league"]), axis=1)
-# English Premier League 2019/20:
-understats_EPL19_per_game = understats_EPL_per_game.loc[(understats_EPL_per_game["year"] == YEAR)].drop((["year"]), axis=1)
-understats_EPL19_per_game = understats_EPL19_per_game.sort_values(by="date")
-understats_EPL19_per_game.reset_index(drop=True, inplace=True)
-
-
-### Get team attributes for the previous season (18/19) and chosen season (19/20) of league (EPL) [...]
+### Get team attributes for the previous season (18/19) and chosen season (19/20) of league (EPL)
 def get_wages(csv_filename : str) -> pd.DataFrame:
     # read wages file and fix dataframe:
-    wages = pd.read_csv(csv_filename.replace(".csv", "")+".csv").rename(columns={"Squad": "team", "# Pl": "n_contracts", "Annual Wages": "annual_wages"}).drop((["Rk", "Weekly Wages", "% Estimated"]), axis=1)
+    filename = csv_filename.replace(".csv", "")+".csv"
+    wages = pd.read_csv(PATH/filename).rename(columns={"Squad": "team", "# Pl": "n_contracts", "Annual Wages": "annual_wages"}).drop((["Rk", "Weekly Wages", "% Estimated"]), axis=1)
     # fill in for teams (should I use merge??):
     for i in wages.index:
         sal = wages.at[i, "annual_wages"]
@@ -84,15 +88,11 @@ def get_wages(csv_filename : str) -> pd.DataFrame:
         wages = wages.replace(shortname, names[shortname])
     return wages
 
-wages_EPL18 = get_wages(prevTEAMS_WAGES_CSV)
-wages_EPL19 = get_wages(TEAMS_WAGES_CSV)
-
-### Other attributes ??
-
 
 ### Get basic match data [...]
 def get_match_data(csv_filename : str) -> pd.DataFrame:
-    match_data = pd.read_csv(csv_filename.replace(".csv", "")+".csv").rename(columns={"Date": "date", "HomeTeam": "home_team", "AwayTeam": "away_team"})
+    filename = csv_filename.replace(".csv", "")+".csv"
+    match_data = pd.read_csv(PATH/filename).rename(columns={"Date": "date", "HomeTeam": "home_team", "AwayTeam": "away_team"})
     # drop irrelevant coloumns
     init_date_format = "%d/%m/%Y"
     # final_date_format = "%d%m$Y"
@@ -104,29 +104,16 @@ def get_match_data(csv_filename : str) -> pd.DataFrame:
         match_data = match_data.replace(shortname, names[shortname])
     return match_data
 
-match_data_EPL19 = get_match_data(MATCH_DATA_CSV)
-    
-
 
 
 """ (2) Combine season understats and attributes """
 
-
-### Put together team attributes for previous season (18/19)
-attributes_EPL18 = pd.concat([wages_EPL18]) # not very intersting atm
-
-### Put together team attributes for this season (19/20)
-attributes_EPL19 = pd.concat([wages_EPL19]) # not very intersting atm
-
-### Build team profile for this season (19/20) [...]
+### Build team profile for this season (19/20)
 def build_team_profiles(
                 season_attributes : pd.DataFrame, 
                 prev_season_understats : pd.DataFrame, 
                 prev_season_attributes : pd.DataFrame,
                 avg_X_teams : int = 5) -> pd.DataFrame:
-
-    # omit trivial categories
-    prev_season_understats = prev_season_understats.drop(["league", "year", "matches"], axis=1)
 
     # deal with promoted teams' understats:
     assumed_understats = prev_season_understats.loc[prev_season_understats["position"] > (20-avg_X_teams)] # avg X of lower table half
@@ -143,14 +130,12 @@ def build_team_profiles(
 
     return season_stats
 
-team_profiles_EPL19 = build_team_profiles(attributes_EPL19, understats_EPL18, attributes_EPL18)
-
 
 
 """ (3) Combine game understats with opponent's understats """
 
 
-### Put together per-game stats of current season (19/20) and plain match data [...]
+### Put together per-game stats of current season (19/20) and plain match data
 def get_opponent(   
             understats_per_game : pd.DataFrame, 
             match_data : pd.DataFrame) -> tuple: # how do I say "tuple[pd.DataFrame, pd.DataFrame]"??
@@ -223,6 +208,7 @@ def build_features(
         understats_per_game : pd.DataFrame, 
         team_profiles : pd.DataFrame) -> pd.DataFrame:
 
+
     ### (3) 
     understats_per_game, match_data = get_opponent(understats_per_game, match_data)
     
@@ -239,11 +225,30 @@ def build_features(
     # associate oppositon stats to opp match p.o.v.:
     pergame_stats = pergame_stats.merge(team_profiles, how="left", on="opp_team", suffixes=("", "_opp_ps"))
 
+    pergame_stats = pergame_stats.drop(["opp_team_ps", "team_opp_ps"], axis=1)
+
     return pergame_stats
 
 
+def RUN():
+   
+    ### (1)
+    READ()
+    wages_EPL18 = get_wages(prevTEAMS_WAGES_CSV)
+    wages_EPL19 = get_wages(TEAMS_WAGES_CSV)
+    match_data_EPL19 = get_match_data(MATCH_DATA_CSV)
 
-stats_EPL19_per_game = build_features(match_data_EPL19, understats_EPL19_per_game, team_profiles_EPL19)
+    ### (2)
+    # put together team attributes for previous season (18/19):
+    attributes_EPL18 = pd.concat([wages_EPL18]) # not very intersting atm
+    # put together team attributes for this season (19/20):
+    attributes_EPL19 = pd.concat([wages_EPL19]) # not very intersting atm
+
+    team_profiles_EPL19 = build_team_profiles(attributes_EPL19, understats_EPL18, attributes_EPL18)
+
+    global stats_EPL19_per_game
+
+    stats_EPL19_per_game = build_features(match_data_EPL19, understats_EPL19_per_game, team_profiles_EPL19)
  
 
 ### Write to file??
@@ -266,22 +271,48 @@ def translate_data(
     features = data.copy()
     for feat in omit_features:
         if feat is not None:
-            features[feat] = data.drop()
+            features[feat] = data.drop(feat)
 
-
-    features = encoder(features, ["team", "opp_team", "result", "ground"])
+    features = encoder(features, ["team", "opp_team", "result", "result_pg", "ground", "ground_pg", "date"])
     ind_feats = features.drop(["result"], axis=1)
     return container(ind_feats, features["result"])
 
 
 
+def scale_data():
+    pass
 
 
+
+""" Additional functionalities: """
+
+
+### Simple way of collecting data (temp.) 
+def load_EPL(encoded : bool = False) -> pd.DataFrame:
+    RUN()
+    if encoded:
+        return translate_data(stats_EPL19_per_game)
+    else:
+        return stats_EPL19_per_game
+
+### Get latest (W, D, L)-distribution
+def get_result_distribution(previous_season : bool = True):
+    res = np.ones(3)
+    if previous_season:
+        # this does not make any sense atm, will fix at some points
+        W = understats_EPL18["wins"].sum()
+        D = understats_EPL18["draws"].sum()
+        L = understats_EPL18["loses"].sum()
+
+        res = np.array([W, D, L])
+
+    return res/np.sum(res)
 
 
 if __name__ == "__main__":
 
     print("\n>>>\n")
+    RUN()
 
 
     data = stats_EPL19_per_game.copy()
@@ -296,3 +327,16 @@ if __name__ == "__main__":
 
 
     print("\n---\n")
+
+
+
+### Data credit:
+'''
+Basic match data:
+    https://www.football-data.co.uk/englandm.php
+Team player wages:
+    https://fbref.com/en/comps/9/2018-2019/2018-2019-Premier-League-Stats
+Match/season metrics: 
+    https://www.kaggle.com/datasets/slehkyi/extended-football-stats-for-european-leagues-xg?select=understat_per_game.csv
+
+'''
