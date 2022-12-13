@@ -30,10 +30,15 @@
             \begin{align}
                 \underset{a,s}{\text{argmin}}\Bigg[ \sum_{y_i \in R_1} (y_i - \bar{y}_{R_1})^2 + \sum_{y_i \in R_2} (y_i - \bar{y}_{R_2})^2 \Bigg] \label{eq:app:tree_optimasation} 
             \end{align}
-            Where $\bar{y}_{R_j}$ is the calculated mean of the training data within $R_j$. This is done in a top-down approach, performing the optimasation from \cref{eq:app:tree_optimasation} down each branch, continuing until a stopping criterion is reached. 
+            Where $\bar{y}_{R_j}$ is the calculated mean of the training data within $R_j$. This is done in a top-down approach, performing the optimasation from \cref{eq:app:tree_optimasation} down each branch, continuing until a stopping criterion is reached. This gives us our regression tree $\hat{f}(x)$, following a specific branch when evaluated for a data point $x_i$.  
 
-            \subsubsection{Bagging Trees}
-            
+            \subsubsection{Bagged Trees}
+            Based on the idea of bootstrap, an ensemble of trees can be constructed. Decision trees are notorious high-variance models which are easily overfitted. By performing bootstrap resampling, a single tree can be fitted for each bag $b$, with the final prediction being the average prediction of each tree.
+
+            \begin{align*}
+                \hat{F}(x) = \frac{1}{B}\sum_{b = 1}^{B} \hat{f}^b (x)
+            \end{align*}
+            Where $B$ is the total number of bootstrap rounds and $\hat{f}^b$ is a single decision tree, fitted using the data from bag $b$.
 
             \subsubsection{Random Forest}
             $\lfloor p/3 \rfloor$~\citep{hastie01statisticallearning}
