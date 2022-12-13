@@ -12,6 +12,7 @@ Lasso = utils.LassoInt
 LinearRegression = utils.LinearRegressionInt
 DecisionTreeRegressor = utils.DecisionTreeRegressorInt
 BaggingRegressor = utils.BaggingRegressorInt
+GradientBoostingRegressor = utils.GradientBoostingRegressorInt
 
 def LinearModel_comparison(X, y, filename=None, random_state=321):
     alpha = np.logspace(-5, np.log10(5), 100)
@@ -36,17 +37,17 @@ def LinearModel_comparison(X, y, filename=None, random_state=321):
     for i, Reg in enumerate([Ridge, Lasso]):
         mse, bias, var = utils.bootstrap(X_train, y_train, Reg, "alpha", alpha, method_params=method_params[Reg], random_state=rnd)
         
-        ax.plot(alpha, mse, label="mse", ls=ls["mse"], c=c[Reg])
-        ax.plot(alpha, bias, label="bias", ls=ls["bias"], c=c[Reg])
-        ax.plot(alpha, var, label="var", ls=ls["var"], c=c[Reg])
+        ax.plot(alpha, mse, label="MSE", ls=ls["mse"], c=c[Reg])
+        ax.plot(alpha, bias, label="Bias$^2$", ls=ls["bias"], c=c[Reg])
+        ax.plot(alpha, var, label="Var", ls=ls["var"], c=c[Reg])
         
         i_min = np.argmin(mse)
         mins[Reg] = {"alpha": alpha[i_min], "mse": mse[i_min]} 
     
     mse, bias, var = utils.boostrap_single(X_train, y_train, method=LinearRegression, method_params={"positive": True}, random_state=rnd)
-    ax.scatter(1e-5, mse, label="mse", marker="*", color=c[LinearRegression])
-    ax.scatter(1e-5, bias, label="bias", marker="o", color=c[LinearRegression])
-    ax.scatter(1e-5, var, label="var", marker="P", color=c[LinearRegression])
+    ax.scatter(1e-5, mse, label="MSE", marker="*", color=c[LinearRegression])
+    ax.scatter(1e-5, bias, label="Bias$^2$", marker="o", color=c[LinearRegression])
+    ax.scatter(1e-5, var, label="Var", marker="P", color=c[LinearRegression])
 
     ax.set_yscale("log")
     ax.set_xscale("log")
@@ -63,7 +64,7 @@ def LinearModel_comparison(X, y, filename=None, random_state=321):
     plot_utils.save(filename)
     plt.show()
 
-def singel_tree_increasing_depth(X, y, filename=None, random_state=321):
+def Singel_tree_increasing_depth(X, y, filename=None, random_state=321):
     max_depths = np.arange(1,10+1)
     
     c = plot_utils.colors[0]
@@ -76,15 +77,20 @@ def singel_tree_increasing_depth(X, y, filename=None, random_state=321):
     n = len(max_depths)
     mse, bias, var, regs = utils.bootstrap(X, y, DecisionTreeRegressor, param_name="max_depth", params=max_depths, method_params={"splitter": "best", "random_state": random_state}, save_regs=True, random_state=random_state)
 
+    train_mse = np.zeros_like(mse)
+    for i, reg in enumerate(regs):
+        train_mse[i] = reg.train_mse
+
     actual_depth = [reg.get_depth() for reg in regs]
     leaves = [reg.get_n_leaves() for reg in regs]
 
 
 
     fig, ax = plt.subplots()
-    ax.plot(max_depths, mse, label="mse", ls=ls["mse"], c=c, marker="*", markersize=8)
-    ax.plot(max_depths, bias, label="bias", ls=ls["bias"], c=c, marker="o")
-    ax.plot(max_depths, var, label="var", ls=ls["var"], c=c, marker="P")
+    ax.plot(max_depths, train_mse, label="Train MSE", c=plot_utils.colors[1], alpha=0.5)
+    ax.plot(max_depths, mse, label="MSE", ls=ls["mse"], c=c, marker="*", markersize=8)
+    ax.plot(max_depths, bias, label="Bias$^2$", ls=ls["bias"], c=c, marker="o")
+    ax.plot(max_depths, var, label="Var", ls=ls["var"], c=c, marker="P")
 
     ax.set_xticks(max_depths)
     
@@ -99,13 +105,17 @@ def singel_tree_increasing_depth(X, y, filename=None, random_state=321):
     ax2.grid(False)
     ax.set(xlabel="Allowed depth")
     ax2.set(xlabel="Actual depth/number of leaves")
-    ax.legend()
+    old_ylims = ax.get_ylim()
+    ax.set(ylim=(old_ylims[0], old_ylims[1]*1.2))
+    ax.legend(ncol=4, loc="upper center")
     plot_utils.save(filename)
     plt.show()
 
-def Bagging_increase_number_of_trees(X, y, filename=None, random_state=321):
-    n_estimators = np.linspace(10, 100, 5, dtype=int)
-
+def Trees_increasing_ensamble(X, y, filename=None, random_state=321):
+    n_estimators = np.linspace(2,100,51, dtype=int)
+    
+    n = len(n_estimators)
+    mse, bias, var = np.zeros(n), np.zeros(n), np.zeros(n)
     c = plot_utils.colors[0]
     ls = {
         "mse": "solid",
@@ -113,21 +123,87 @@ def Bagging_increase_number_of_trees(X, y, filename=None, random_state=321):
         "var": "dotted"
     }
 
-    mse, bias, var = utils.bootstrap(X, y, BaggingRegressor, param_name="n_estimators", params=n_estimators)
+    c = {
+        "Bag": plot_utils.colors[0],
+        "Rf": plot_utils.colors[1]
+    }
 
     fig, ax = plt.subplots()
-    ax.plot(n_estimators, mse, label="mse", ls=ls["mse"], c=c, marker="*", markersize=8)
-    ax.plot(n_estimators, bias, label="bias", ls=ls["bias"], c=c, marker="o")
-    ax.plot(n_estimators, var, label="var", ls=ls["var"], c=c, marker="P")
+    max_features = {
+        "Bag": 1.0,
+        "Rf": 0.33
+    }
+
+    mins = {}
+
+    for method in ["Bag", "Rf"]:
+        for i, n in enumerate(n_estimators):
+            reg = BaggingRegressor(
+                estimator=DecisionTreeRegressor(
+                    max_depth=10,
+                    random_state=random_state
+                ),
+                max_features=max_features[method],
+                n_estimators=n,
+                random_state=random_state
+            )
+
+            mse[i], bias[i], var[i] = utils.bv_decomp(X,y,reg,random_state=random_state)
+        
+        mins[method] = {"n": n_estimators[np.argmin(mse)], "mse": np.min(mse)}
+
+        ax.plot(n_estimators, mse, label="MSE", ls=ls["mse"], c=c[method])
+        ax.plot(n_estimators, bias, label="Bias$^2$", ls=ls["bias"], c=c[method])
+        ax.plot(n_estimators, var, label="Var", ls=ls["var"], c=c[method])
+
+    x = [mins["Bag"]["n"], mins["Rf"]["n"]]
+    y = [mins["Bag"]["mse"], mins["Rf"]["mse"]]
+    ax.vlines(x=x, ymin=ax.get_ylim()[0], ymax=y, ls="dashed", color="k", alpha=0.25)
+    ax.scatter(x, y, color="k", marker="x", alpha=0.25)
+    ax.set_xlabel("Ensamble size")
+    ax.legend(ncol=2)
+    plot_utils.save(filename)
+    plt.show()
+
+def Boosting(X, y, filename=None, random_state=321):
+    n_estimators = np.linspace(10,100,5, dtype=int)
+
+    ls = {
+        "mse": "solid",
+        "bias": "dashed",
+        "var": "dotted"
+    }
+    c = plot_utils.colors[0]
+
+    mse, bias, var = utils.bootstrap(X, y, GradientBoostingRegressor, param_name="n_estimators", params=n_estimators, method_params={"criterion": "squared_error"})
+
+    fig, ax = plt.subplots()
+    ax.plot(n_estimators, mse, label="MSE", ls=ls["mse"], c=c)
+    ax.plot(n_estimators, bias, label="Bias$^2$", ls=ls["bias"], c=c)
+    ax.plot(n_estimators, var, label="Var", ls=ls["var"], c=c)
+    ax.set(xlabel="Ensamble size")
     ax.legend()
     plt.show()
 
+    subsamples = np.linspace(0.2,0.9, 8)
+
+    mse, bias, var = utils.bootstrap(X, y, GradientBoostingRegressor, param_name="subsample", params=subsamples, method_params={"criterion": "squared_error", "n_estimators": 40})
+
+    fig, ax = plt.subplots()
+    ax.plot(subsamples, mse, label="MSE", ls=ls["mse"], c=c)
+    ax.plot(subsamples, bias, label="Bias$^2$", ls=ls["bias"], c=c)
+    ax.plot(subsamples, var, label="Var", ls=ls["var"], c=c)
+
+    ax.legend()
+    plot_utils.save(filename)
+    plt.show()
 if __name__ == "__main__":
     rnd = 3211
     X, y = utils.get_fifa_data(n=10000, random_state=rnd)
     X_train, X_val, y_train, y_val = train_test_split(X, y, train_size=3/4, random_state=rnd)
 
     # LinearModel_comparison(X_train, y_train, filename="BiasVar_LinearRegression", random_state=rnd)
-    # singel_tree_increasing_depth(X, y, filename="BiasVar_SingleTree", random_state=rnd)
+    Singel_tree_increasing_depth(X, y, filename="BiasVar_SingleTree", random_state=rnd)
+    # Trees_increasing_ensamble(X, y, filename="BiasVar_Bag_and_Rf.pdf")
 
-    Bagging_increase_number_of_trees(X, y)
+    # Boosting(X, y)

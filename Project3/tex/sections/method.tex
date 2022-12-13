@@ -55,6 +55,29 @@ We reference like this using \verb|cleveref|: \cref{int:fig:example_a}, \cref{th
 
     \subsubsection{Hyperband Search}
         \comment{Outline the hyperband search method. -\Carl}
-        The hyperband search algorithm serves as a way to tune the hyperparameters of a model in a way such that more computing resources are dedicated to more promising areas of the hyperparameter space. It is based on the \textit{successive halving} algorithm, in which a finite budget $B$ (i.e. number of training epochs) is divided evenly between $n$ randomly sampled points from the hyperparameter space. These hyperparameters are then used to build $n$ models that are trained according to $r = B/n$ allocated resources on a tuning datasets, and their loss evaluated on a validation dataset, passing on the $k$ top performing models.\footnote{Usually the top half of the is passed on, as the algorithm name would indicate.} These models are then trained further, and the process is repeated until only one hyperparameter point is left. As such, as hyperparameter points are discarded ($n$ decreases), the amount of allocated resources $r$ increases; meaning the more promising hyperparameter points are allotted exponentially more resources.
+        The hyperband search algorithm serves as a way to tune the hyperparameters of a model in a way such that more computing resources are dedicated to more promising areas of the hyperparameter space. It is based on the \textit{successive halving} algorithm, in which a finite budget $B$ (i.e. number of training epochs) is divided evenly between $n$ randomly sampled points from the hyperparameter space. These hyperparameters are then used to build $n$ models that are trained according to $r = B/n$ allocated resources on a tuning datasets, and their loss evaluated on a validation dataset, passing on the $k$ top performing models.\footnote{Usually the top half of the is passed on, as the algorithm name would indicate.} 
+        These $k$ models are then trained further, with a new $n=k$ and more resources $r$. This halving is then repeated until there is one model remaining. As such, as hyperparameter points are discarded ($n$ decreases), the amount of allocated resources $r$ increases; meaning the more promising hyperparameter points are allotted exponentially more resources.
 
-        This introduces a trade-off in the division of the resources $B$; sampling a larger number of hyperparameter points $n$ leaves less resources $r$ for exploring each point. The hyperband algorithm aims remedy this by doing a grid search of different values of $n$ and smaller resource allotments $r$. For each value of $n$ and $r$, the successive halving is performed, and the best preforming model is found. In the end, models will be found that perform better deeper into the training, and many hyperparameter points will have been explored.
+        This introduces a trade-off in the division of the resources $B$; sampling a larger number of hyperparameter points $n$ leaves less resources $r$ for exploring each point. The hyperband algorithm aims remedy this by doing a grid search of different values of $n$ and smaller resource allotments $r$. For each value of $n$ and $r$, the successive halving is performed, and the best preforming model is found. In the end, models that perform better deeper into the training will be found, but many hyperparameter points will have been explored.
+
+        Hyperband takes two hyper(hyper)parameters, $R$ indicating the maximum amount of epochs of training for any single hyperparameter point, and a factor $\eta$ which is the reciprocal of the fraction of points that are passed on during each halving.
+
+        \comment{$R=30$, $\eta=3$ gives $27+12+6+4 = 49$ hyperparameter points explored.}
+
+        % \begin{algorithm}
+        %     \caption{Hyperband search algorithm}
+        %     \begin{algorithmic}[1]
+        %         \Procedure{Hyperband}{$R, \eta$}
+        %             \State $\msub{s}{max} \gets \floor{\log_\eta(R)},\quad B \gets (\msub{s}{max}+1) R$
+        %             \For{$s \in \cclosed{\msub{s}{max}, \msub{s}{max}-1, \ldots, 0}$}
+        %                 \State $n \gets \ceil{\frac{B}{R} \frac{\eta^s}{(s+1)}},\quad r \gets R\eta^{-s}$
+        %                 \State $T \gets \mathtt{get\_hyperparameter\_configurations}(n)$
+        %                 \For{$i \in \cclosed{0, \ldots, s}$}
+        %                     \State $n_i \gets \floor{n \eta^{-i}},\quad r_i \gets r \eta^{i}$
+        %                     \State $L \gets \cclosed{\mathtt{fit\_then\_eval\_val\_loss}(t, r_i): t\in T}$
+        %                     \State $T \gets \mathtt{top\_k}(T, L, \floor{\sfrac{n_i}{\eta}})$
+        %                 \EndFor
+        %             \EndFor
+        %         \EndProcedure
+        %     \end{algorithmic}
+        % \end{algorithm}

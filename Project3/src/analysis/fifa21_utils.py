@@ -5,46 +5,60 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LinearRegression, Ridge, Lasso
 from sklearn.tree import DecisionTreeRegressor
-from sklearn.ensemble import BaggingRegressor
+from sklearn.ensemble import BaggingRegressor, GradientBoostingRegressor
 from mlxtend.evaluate import bias_variance_decomp
 
 import context
 from sknotlearn.datasets import load_fifa
 
 class LinearRegressionInt(LinearRegression):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
     def predict(self, X):
         return np.round_(super().predict(X), decimals=0).astype(int)
 
 class RidgeInt(Ridge):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
     def predict(self, X):
         return np.round_(super().predict(X), decimals=0).astype(int)
 
 class LassoInt(Lasso):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
     def predict(self, X):
         return np.round_(super().predict(X), decimals=0).astype(int)
 
 class DecisionTreeRegressorInt(DecisionTreeRegressor):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
     def predict(self, X):
         return np.round_(super().predict(X), decimals=0).astype(int)
 
+    def fit(self, X, y, **kwargs):
+        tmp = super().fit(X, y, **kwargs)
+        mse = np.mean((self.predict(X)-y)**2)
+        self.train_mse = mse
+
+        return tmp
 class BaggingRegressorInt(BaggingRegressor):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
     def predict(self, X):
         return np.round_(super().predict(X), decimals=0).astype(int)
+
+class GradientBoostingRegressorInt(GradientBoostingRegressor):
+    def __init__(self, **kwargs):
+            super().__init__(**kwargs)
+
+    def predict(self, X):
+        return np.round_(super().predict(X), decimals=0).astype(int)
+
 
 class CustomScaler(StandardScaler): 
     def __init__(self):
@@ -83,7 +97,7 @@ def process_fifa_data(X, y, tts=3/4, random_state=321):
 def bootstrap(X, y, method, param_name, params, method_params=None, save_regs=False, random_state=321):
     n = len(params)
     mse, bias, var = np.zeros(n), np.zeros(n), np.zeros(n)
-    X_train, X_test, y_train, y_test = process_fifa_data(X, y, random_state=321)
+    X_train, X_test, y_train, y_test = process_fifa_data(X, y, random_state=random_state)
 
     regs = []
     for i, param in enumerate(params):
@@ -103,8 +117,13 @@ def bootstrap(X, y, method, param_name, params, method_params=None, save_regs=Fa
         return mse, bias, var
 
 def boostrap_single(X, y, method, method_params=None, random_state=321):
-    X_train, X_test, y_train, y_test = process_fifa_data(X, y, random_state=321)
+    X_train, X_test, y_train, y_test = process_fifa_data(X, y, random_state=random_state)
 
     reg = method(**method_params)
+
+    return bias_variance_decomp(reg, X_train, y_train, X_test, y_test, loss="mse", num_rounds=200, random_seed=random_state)
+
+def bv_decomp(X, y, reg, random_state=321):
+    X_train, X_test, y_train, y_test = process_fifa_data(X, y, random_state=random_state)
 
     return bias_variance_decomp(reg, X_train, y_train, X_test, y_test, loss="mse", num_rounds=200, random_seed=random_state)
