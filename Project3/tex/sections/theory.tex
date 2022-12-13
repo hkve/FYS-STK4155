@@ -89,8 +89,24 @@ We cite our sources like this~\citep{Project1}.
         Same as with maxout, only the weights of the active nodes are trained, but this also applies to the next layer, where only weights connected to the active nodes are trained. So the local learning goes both forwards and backwards from a channel-out layer, in contrast to just backwards in the case of maxout.
 
     \subsection{Neurological Background}
-   
+        \comment{General backoground}
+        The first artificial neural networks were inspired by biological neurons (cells mainly located in the brain); artificial nodes represent the neurons and their activation, the weights represent the synapses (connections between neurons), and biases address the threshold for activation of each neuron/node~\citep{Project2}. Since then, the development of neurobiologically inspired artificial intelligence has only increased and many other algorithms mimicking mechanisms of the brain have been employed to enhance machine learning performance. An up-and-coming and interesting field of research is the implementation of biological competative mechanisms. 
+        
+        First some important terms. Biological neurons are often considered to be either activated or not activated; a binary state of either on or off. Neurons are activated by receiving signals from sensory receptors or other activated neurons. When an activated neuron passes on its signal to another neuron, that signal can be either \textit{excitatory}, nudging the second neuron towards activation, or \textit{inhibitory}, reducing the chances of activation. \comment{should perhaps have a source} A series of activated neurons can be considered a pathway created in the brain, and there exists a consensus that information in the brain is represented, not by the signal within a cell (which is very similar for all cells and therefore convey little information), but rather through the signal's pathway between cells~\citep{Chen}\comment{cite should be book instead}. It is hypothesised that some of these pathways arise through competition between adjacent neurons. \comment{source plis, perhaps Self-organized formation of topologically correct feature maps}
+        
+        \subsubsection{Lateral Inhibition}
 
+            An example of competative mechanisms that are present in neurobiological systems is a phenomenon referred to as \textit{lateral inhibition}. It exhibits the competative selectivity between neurons and neuronal pathways. This is assumed to enhance the sense of contrast and is present especially in sensory procedures. \comment{the last sentence is supposed to be a frampek} The mechanism behind lateral inhibition is that the neurons receiving the most sensory input inhibit the activity of the adjacent neurons, making themselves the "winners" and the nearby neurons the "losers". For example, when neurons receive input from receptors of some external stimuli, the neurons connected to the most stimulated receptors will inhibit the nearby neurons connected to less stimulated receptors, making them less likely to be activated. This will lead to the outer part of the stimulus being toned down and the central stimulus appearing stronger in contrast. 
+            \comment{Need some source on the mechanism} 
+            
+            It is hypothesized that between the competing neurons the inhibition occurs through inhibitory interneurons connecting the two neurons together.
+            
 
+        \subsubsection{Function}
+            \comment{Present the unanswered questions. Why is this important in the brain? Implicit: what can we expect from our nns (Next section)}
+            Competative mechanisms can account for: how the brain respond differently to various incoming signals; feature selection; . 
+
+        \subsubsection{Connect to ML}
+            Visual perception. 
     
         
