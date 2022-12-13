@@ -1,39 +1,33 @@
 Results here, in past tense.
 
-\definecolor{mint}{rgb}{0.24, 0.71, 0.54}
-\definecolor{maroon}{rgb}{0.85, 0.2, 0.53}
-\definecolor{cyan}{rgb}{0.0, 0.72, 0.92}
-
-\network{MO}{16,16,16}{8,4,*}
-
 
 \renewcommand{\arraystretch}{2}
 \begin{table}[]
     \centering
     \begin{tabular}{|l|c|c|c|}
     \hline
-    & Regularisation & Model & Accuracy \\
+    & \textbf{Regularisation} & \textbf{Architecture} & \textbf{Accuracy} \\
     \hline
-    \rowcolor{mint!40}
-    \cellcolor{mint!40}                  & None & \network{MO}{16,32}{8,*} &  \\ \cline{2-4} 
-    \rowcolor{mint!40}
-    \cellcolor{mint!40}                  &  &  &  \\ \cline{2-4} 
-    \rowcolor{mint!40}
-    \cellcolor{mint!40}                  &  &  &  \\ \cline{2-4} 
-    \rowcolor{mint!40}
-    \multirow{-4}{*}{\rotatebox[origin=c]{90}{Maxout}}{\cellcolor{mint!40}} &  &  &  \\ \hline
-    \rowcolor{maroon!40}
-    \cellcolor{maroon!40}                  & None &  &  \\ \cline{2-4} 
-    \rowcolor{maroon!40}
-    \cellcolor{maroon!40}                  &  &  &  \\ \cline{2-4} 
-    \rowcolor{maroon!40}
-    \cellcolor{maroon!40}                  &  &  &  \\ \cline{2-4} 
-    \rowcolor{maroon!40}
-    \multirow{-4}{*}{\rotatebox[origin=c]{90}{Channel-Out}}{\cellcolor{maroon!40}} &  &  &  \\ \hline
-    \rowcolor{cyan!40} 
-    \cellcolor{cyan!40}                   & None &  &  \\ \cline{2-4} 
-    \rowcolor{cyan!40} 
-    \multirow{-2}{*}{\rotatebox[origin=c]{90}{Dense}}{\cellcolor{cyan!40} } &  &  &  \\ \cline{2-4} 
+    \rowcolor{mint!20}
+    \cellcolor{mint!20}                  & None & \network{16,32,16,4,32}{8,*,8,*,16} &  \\ \cline{2-4} 
+    \rowcolor{mint!20}
+    \cellcolor{mint!20}                  & Ridge & \network{16,32,16,4,32}{8,*,8,*,16}  &  \\ \cline{2-4} 
+    \rowcolor{mint!20}
+    \cellcolor{mint!20}                  & Dropout &  &  \\ \cline{2-4} 
+    \rowcolor{mint!20}
+    \multirow{-4}{*}{\rotatebox[origin=c]{90}{Maxout}}{\cellcolor{mint!20}} & Both &  &  \\ \hline
+    \rowcolor{maroon!20}
+    \cellcolor{maroon!20}                  & None &  &  \\ \cline{2-4} 
+    \rowcolor{maroon!20}
+    \cellcolor{maroon!20}                  &  &  &  \\ \cline{2-4} 
+    \rowcolor{maroon!20}
+    \cellcolor{maroon!20}                  &  &  &  \\ \cline{2-4} 
+    \rowcolor{maroon!20}
+    \multirow{-4}{*}{\rotatebox[origin=c]{90}{Channel-Out}}{\cellcolor{maroon!20}} &  &  &  \\ \hline
+    \rowcolor{cyan!20} 
+    \cellcolor{cyan!20}                   & None &  &  \\ \cline{2-4} 
+    \rowcolor{cyan!20} 
+    \multirow{-2}{*}{\rotatebox[origin=c]{90}{Dense}}{\cellcolor{cyan!20} } &  &  &  \\ \hline
     \end{tabular}
     \caption{Table of }
     \label[tab]{res:tab:networks}

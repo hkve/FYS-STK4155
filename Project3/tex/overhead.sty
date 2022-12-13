@@ -79,11 +79,11 @@
 % PART III Command definition 
 % Finally, the last part. I am somewhat tired of writing this, so understanding it is left as an exercise for the read.
 % \newcommand{\network}[2]{$\mathbf{N}^{#1}_{#2}$}
-\newcommand{\network}[3]{$^{\text{#1}}\mathbf{N}^{#2}_{#3}$}
+\newcommand{\network}[3][]{$^{\text{#1}}\mathbf{N}^{#2}_{#3}$}
 % #1 refers to the type of model. Either MO (Max-Out), CO (Channel-Out), or D (Dense)
 % #2 refers to the number of nodes in each layer divided by ,
 % #3 refers to the number of groups in each layer also divided by ,. * refers to a relu-layer
-% example \network{MO}{16,16,16}{8,4,*} 
+% example \network[MO]{16,16,16}{8,4,*} 
 
 \newcommand{\distas}{\overset{d}{\sim}}
 \renewcommand{\expval}{\operatorname{\mathbb{E}}}
@@ -106,3 +106,10 @@
 \newcommand{\Anna}{$\mathfrak{Anna}$}
 \newcommand{\Nanna}{$\mathtt{N}$}
 \newcommand{\Johan}{$\mathsf{J}$}
+
+
+% Define colors
+\definecolor{mint}{rgb}{0.24, 0.71, 0.54}
+\definecolor{maroon}{rgb}{0.85, 0.2, 0.53}
+\definecolor{cyan}{rgb}{0.0, 0.72, 0.92}
+\definecolor{tealblue}{rgb}{0.21, 0.46, 0.53}
