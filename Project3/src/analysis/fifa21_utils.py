@@ -6,6 +6,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LinearRegression, Ridge, Lasso
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import BaggingRegressor, GradientBoostingRegressor
+from sklearn.svm import SVR
 from mlxtend.evaluate import bias_variance_decomp
 
 import context
@@ -40,11 +41,13 @@ class DecisionTreeRegressorInt(DecisionTreeRegressor):
         return np.round_(super().predict(X), decimals=0).astype(int)
 
     def fit(self, X, y, **kwargs):
-        tmp = super().fit(X, y, **kwargs)
+        super().fit(X, y, **kwargs)
         mse = np.mean((self.predict(X)-y)**2)
         self.train_mse = mse
 
-        return tmp
+        return self
+
+
 class BaggingRegressorInt(BaggingRegressor):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -59,6 +62,18 @@ class GradientBoostingRegressorInt(GradientBoostingRegressor):
     def predict(self, X):
         return np.round_(super().predict(X), decimals=0).astype(int)
 
+class SVRInt(SVR):
+    def __init__(self, scaler=None, **kwargs):
+        self.scaler = scaler
+        super().__init__(**kwargs)
+
+    def predict(self, X):
+        y = super().predict(X)
+        if X.dtype == float:
+            y = self.scaler.inverse_transform(y.reshape(-1,1))
+            return np.round_(y, decimals=0).astype(int).ravel()
+        else:
+            return y
 
 class CustomScaler(StandardScaler): 
     def __init__(self):
@@ -94,10 +109,20 @@ def process_fifa_data(X, y, tts=3/4, random_state=321):
     X_test = scaler.transform(X_test)
     return X_train, X_test, y_train, y_test
 
-def bootstrap(X, y, method, param_name, params, method_params=None, save_regs=False, random_state=321):
+def bootstrap(X, y, method, param_name, params, method_params=None, save_regs=False, scale_y=False,random_state=321):
+
     n = len(params)
     mse, bias, var = np.zeros(n), np.zeros(n), np.zeros(n)
     X_train, X_test, y_train, y_test = process_fifa_data(X, y, random_state=random_state)
+
+    if scale_y:
+        scaler = StandardScaler().fit(y_train.reshape(-1,1))
+        y_train = scaler.transform(y_train.reshape(-1,1)).ravel()
+        
+        if not method_params:
+            method_params = {}
+        
+        method_params.update({"scaler": scaler})
 
     regs = []
     for i, param in enumerate(params):

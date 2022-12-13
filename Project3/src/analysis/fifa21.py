@@ -13,6 +13,7 @@ LinearRegression = utils.LinearRegressionInt
 DecisionTreeRegressor = utils.DecisionTreeRegressorInt
 BaggingRegressor = utils.BaggingRegressorInt
 GradientBoostingRegressor = utils.GradientBoostingRegressorInt
+SVR = utils.SVRInt
 
 def LinearModel_comparison(X, y, filename=None, random_state=321):
     alpha = np.logspace(-5, np.log10(5), 100)
@@ -197,13 +198,39 @@ def Boosting(X, y, filename=None, random_state=321):
     ax.legend()
     plot_utils.save(filename)
     plt.show()
+
+def SupperVecReg_panalisation(X, y, filename=None, random_state=321):
+    C = np.linspace(0.01, 1, 10)
+    
+    kernels = ["linear", "rbf"]
+
+    ls = {
+        "mse": "solid",
+        "bias": "dashed",
+        "var": "dotted"
+    }
+
+    c = {kernel: plot_utils.colors[i] for i, kernel in enumerate(kernels)}
+    fig, ax = plt.subplots()
+
+    for kernel in kernels:
+        method_params = {"kernel": kernel}
+        mse, bias, var = utils.bootstrap(X, y, SVR, param_name="C", method_params=method_params, params=C, scale_y=True)
+
+        ax.plot(C, mse, label="MSE", ls=ls["mse"], c=c[kernel])
+        ax.plot(C, bias, label="Bias$^2$", ls=ls["bias"], c=c[kernel])
+        ax.plot(C, var, label="Var", ls=ls["var"], c=c[kernel])
+
+    ax.legend()
+    plt.show()
 if __name__ == "__main__":
     rnd = 3211
     X, y = utils.get_fifa_data(n=10000, random_state=rnd)
     X_train, X_val, y_train, y_val = train_test_split(X, y, train_size=3/4, random_state=rnd)
 
     # LinearModel_comparison(X_train, y_train, filename="BiasVar_LinearRegression", random_state=rnd)
-    Singel_tree_increasing_depth(X, y, filename="BiasVar_SingleTree", random_state=rnd)
+    # Singel_tree_increasing_depth(X, y, filename="BiasVar_SingleTree", random_state=rnd)
     # Trees_increasing_ensamble(X, y, filename="BiasVar_Bag_and_Rf.pdf")
 
     # Boosting(X, y)
+    SupperVecReg_panalisation(X, y)
