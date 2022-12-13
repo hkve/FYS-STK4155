@@ -49,9 +49,12 @@ We reference like this using \verb|cleveref|: \cref{int:fig:example_a}, \cref{th
 
 \subsection{Architecture tuning}
     \comment{Write something about how we explore and choose the network architecture. \Carl}
+    To see what kind of network architectures were interesting and useful when applying to the datasets at hand, we tuned the architecture using the \textit{hyperband} search algorithm \citep{Hyperband}. We searched with a variable number of hidden layers between 2\textendash5, a number of nodes in the layers between 8\textendash64 in powers of 2, and a number of groups in the layers between 4\textendash32, again in powers of 2.
 
-    When tuning the architecture, we split the training data into a training set used for tuning and a validation set used for monitoring overfitting. We used a split of $\sfrac{3}{4}$.
+    When tuning the architecture, we split the training data into a tuning set and a validation set used for monitoring overfitting, implementing early stopping with $p=5$. We used a split of $\sfrac{3}{4}$.
 
     \subsubsection{Hyperband Search}
         \comment{Outline the hyperband search method. -\Carl}
-        \citep{Hyperband}
+        The hyperband search algorithm serves as a way to tune the hyperparameters of a model in a way such that more computing resources are dedicated to more promising areas of the hyperparameter space. It is based on the \textit{successive halving} algorithm, in which a finite budget $B$ (i.e. number of training epochs) is divided evenly between $n$ randomly sampled points from the hyperparameter space. These hyperparameters are then used to build $n$ models that are trained according to $r = B/n$ allocated resources on a tuning datasets, and their loss evaluated on a validation dataset, passing on the $k$ top performing models.\footnote{Usually the top half of the is passed on, as the algorithm name would indicate.} These models are then trained further, and the process is repeated until only one hyperparameter point is left. As such, as hyperparameter points are discarded ($n$ decreases), the amount of allocated resources $r$ increases; meaning the more promising hyperparameter points are allotted exponentially more resources.
+
+        This introduces a trade-off in the division of the resources $B$; sampling a larger number of hyperparameter points $n$ leaves less resources $r$ for exploring each point. The hyperband algorithm aims remedy this by doing a grid search of different values of $n$ and smaller resource allotments $r$. For each value of $n$ and $r$, the successive halving is performed, and the best preforming model is found. In the end, models will be found that perform better deeper into the training, and many hyperparameter points will have been explored.
