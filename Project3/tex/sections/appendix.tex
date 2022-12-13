@@ -21,8 +21,22 @@
             
             In addition, since all features are assumed to give a positive contribution to the overall score (setting all to 99 should yield an overall score of 99), the coefficients are constrained to be positive.  
         \subsection{Tree Based Methods}
-            fdslkf ~\citep{hastie01statisticallearning}
+            A decision tree uses a flow-chart like structure to generate predictions. Based on a single features value, a \textit{node} performs some test on the feature (i.e. threshold). Using the outcome of the test, the tree follows one of two paths, called \textit{branches}. Each of these branches can then have new nodes, testing based on new features, creating more branches. This continues until no more nodes are reached, where in the regression case, a specific value is predicted. These final outcomes of branches are called \textit{leaves}. The maximum number of nodes, following a single branch, gives the \textit{depth} of the tree. 
+            There is a plethora of ways to construct a regression tree. The most common approach is \textit{recursive binary splitting}, where separation of the targets into regions $R_1, R_2, \ldots R_J$ is performed based on the input features. When a simple feature inequality is used, these regions are high-dimensional boxes. Considering the set of features $\set{x_a}$ $a = 1,\ldots,p$, we propose a pair of half-planes 
+            \begin{align*}
+                R_1(a,s) = \set{X | x_a < s} \text{ and } R_2(a,s) = \set{X | x_a \geq s}
+            \end{align*}
+            We then aim to find the values of $j$ and $s$ which minimizes
+            \begin{align}
+                \underset{a,s}{\text{argmin}}\Bigg[ \sum_{y_i \in R_1} (y_i - \bar{y}_{R_1})^2 + \sum_{y_i \in R_2} (y_i - \bar{y}_{R_2})^2 \Bigg] \label{eq:app:tree_optimasation} 
+            \end{align}
+            Where $\bar{y}_{R_j}$ is the calculated mean of the training data within $R_j$. This is done in a top-down approach, performing the optimasation from \cref{eq:app:tree_optimasation} down each branch, continuing until a stopping criterion is reached. 
 
+            \subsubsection{Bagging Trees}
+            
+
+            \subsubsection{Random Forest}
+            $\lfloor p/3 \rfloor$~\citep{hastie01statisticallearning}
         \subsection{Support Vector machines}
         \begin{figure}[H]
             \centering
