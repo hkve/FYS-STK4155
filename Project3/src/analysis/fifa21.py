@@ -64,7 +64,7 @@ def LinearModel_comparison(X, y, filename=None, random_state=321):
     plot_utils.save(filename)
     plt.show()
 
-def singel_tree_increasing_depth(X, y, filename=None, random_state=321):
+def Singel_tree_increasing_depth(X, y, filename=None, random_state=321):
     max_depths = np.arange(1,10+1)
     
     c = plot_utils.colors[0]
@@ -77,12 +77,17 @@ def singel_tree_increasing_depth(X, y, filename=None, random_state=321):
     n = len(max_depths)
     mse, bias, var, regs = utils.bootstrap(X, y, DecisionTreeRegressor, param_name="max_depth", params=max_depths, method_params={"splitter": "best", "random_state": random_state}, save_regs=True, random_state=random_state)
 
+    train_mse = np.zeros_like(mse)
+    for i, reg in enumerate(regs):
+        train_mse[i] = reg.train_mse
+
     actual_depth = [reg.get_depth() for reg in regs]
     leaves = [reg.get_n_leaves() for reg in regs]
 
 
 
     fig, ax = plt.subplots()
+    ax.plot(max_depths, train_mse, label="Train MSE", c=plot_utils.colors[1], alpha=0.5)
     ax.plot(max_depths, mse, label="MSE", ls=ls["mse"], c=c, marker="*", markersize=8)
     ax.plot(max_depths, bias, label="Bias$^2$", ls=ls["bias"], c=c, marker="o")
     ax.plot(max_depths, var, label="Var", ls=ls["var"], c=c, marker="P")
@@ -100,7 +105,9 @@ def singel_tree_increasing_depth(X, y, filename=None, random_state=321):
     ax2.grid(False)
     ax.set(xlabel="Allowed depth")
     ax2.set(xlabel="Actual depth/number of leaves")
-    ax.legend()
+    old_ylims = ax.get_ylim()
+    ax.set(ylim=(old_ylims[0], old_ylims[1]*1.2))
+    ax.legend(ncol=4, loc="upper center")
     plot_utils.save(filename)
     plt.show()
 
@@ -196,7 +203,7 @@ if __name__ == "__main__":
     X_train, X_val, y_train, y_val = train_test_split(X, y, train_size=3/4, random_state=rnd)
 
     # LinearModel_comparison(X_train, y_train, filename="BiasVar_LinearRegression", random_state=rnd)
-    # singel_tree_increasing_depth(X, y, filename="BiasVar_SingleTree", random_state=rnd)
-    Trees_increasing_ensamble(X, y, filename="BiasVar_Bag_and_Rf.pdf")
+    Singel_tree_increasing_depth(X, y, filename="BiasVar_SingleTree", random_state=rnd)
+    # Trees_increasing_ensamble(X, y, filename="BiasVar_Bag_and_Rf.pdf")
 
     # Boosting(X, y)

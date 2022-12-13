@@ -39,6 +39,12 @@ class DecisionTreeRegressorInt(DecisionTreeRegressor):
     def predict(self, X):
         return np.round_(super().predict(X), decimals=0).astype(int)
 
+    def fit(self, X, y, **kwargs):
+        tmp = super().fit(X, y, **kwargs)
+        mse = np.mean((self.predict(X)-y)**2)
+        self.train_mse = mse
+
+        return tmp
 class BaggingRegressorInt(BaggingRegressor):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
