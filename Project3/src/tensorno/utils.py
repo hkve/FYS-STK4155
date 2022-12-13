@@ -28,7 +28,15 @@ def get_custom_initializers(num_inputs: int, bias: float = 0.) -> dict:
     return result
 
 
-def count_parameters(network: tf.keras.Model):
+def count_parameters(network: tf.keras.Model) -> int:
+    """Counts the number of trainable parameters in a tf.keras.Model instance.
+
+    Args:
+        network (tf.keras.Model): Network whose parameters will be counted.
+
+    Returns:
+        int: Number of trainable parameters.
+    """
     counter = 0
     for layer in network.layers:
         for variable in layer._trainable_weights:
@@ -36,7 +44,7 @@ def count_parameters(network: tf.keras.Model):
     return counter
 
 
-def get_layer_names(network: tf.keras.Model) -> list:
+def get_layer_names(network: tf.keras.Model) -> list[str]:
     """Get the string names of the layers of a tf Model instance.
 
     Args:

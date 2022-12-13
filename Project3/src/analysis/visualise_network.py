@@ -67,10 +67,6 @@ if __name__ == "__main__":
 
     x_val, y_val = x_test, y_test
 
-    # x_train, x_val, y_train, y_val = train_test_split(
-    #     x_train, y_train, train_size=0.75, random_state=42
-    # )
-
     """Standard model for visualisation"""
     model = build_LWTA_classifier(
         num_layers=3,
