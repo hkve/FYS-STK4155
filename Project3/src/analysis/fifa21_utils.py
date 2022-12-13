@@ -4,6 +4,8 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LinearRegression, Ridge, Lasso
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.ensemble import BaggingRegressor
 from mlxtend.evaluate import bias_variance_decomp
 
 import context
@@ -30,6 +32,20 @@ class LassoInt(Lasso):
     def predict(self, X):
         return np.round_(super().predict(X), decimals=0).astype(int)
 
+class DecisionTreeRegressorInt(DecisionTreeRegressor):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def predict(self, X):
+        return np.round_(super().predict(X), decimals=0).astype(int)
+
+class BaggingRegressorInt(BaggingRegressor):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def predict(self, X):
+        return np.round_(super().predict(X), decimals=0).astype(int)
+
 class CustomScaler(StandardScaler): 
     def __init__(self):
         self.n_ohe = 5
@@ -42,6 +58,7 @@ class CustomScaler(StandardScaler):
     def transform(self, X):
         X_head = self.scaler.transform(X[:, :-self.n_ohe])
         return np.c_[X_head, X[:, -self.n_ohe:]]
+    
 
 def get_fifa_data(n=100, random_state=321):
     df = load_fifa(n = 100, random_state=random_state)
@@ -63,11 +80,12 @@ def process_fifa_data(X, y, tts=3/4, random_state=321):
     X_test = scaler.transform(X_test)
     return X_train, X_test, y_train, y_test
 
-def bootstrap(X, y, method, param_name, params, method_params=None, random_state=321):
+def bootstrap(X, y, method, param_name, params, method_params=None, save_regs=False, random_state=321):
     n = len(params)
     mse, bias, var = np.zeros(n), np.zeros(n), np.zeros(n)
     X_train, X_test, y_train, y_test = process_fifa_data(X, y, random_state=321)
 
+    regs = []
     for i, param in enumerate(params):
         if method_params:
             reg = method(**{param_name: param}, **method_params)
@@ -76,4 +94,17 @@ def bootstrap(X, y, method, param_name, params, method_params=None, random_state
 
         mse[i], bias[i], var[i] = bias_variance_decomp(reg, X_train, y_train, X_test, y_test, loss="mse", num_rounds=200, random_seed=random_state)
 
-    return mse, bias, var
+        if save_regs:
+            regs.append(reg)
+
+    if save_regs:
+        return mse, bias, var, regs
+    else:
+        return mse, bias, var
+
+def boostrap_single(X, y, method, method_params=None, random_state=321):
+    X_train, X_test, y_train, y_test = process_fifa_data(X, y, random_state=321)
+
+    reg = method(**method_params)
+
+    return bias_variance_decomp(reg, X_train, y_train, X_test, y_test, loss="mse", num_rounds=200, random_seed=random_state)
