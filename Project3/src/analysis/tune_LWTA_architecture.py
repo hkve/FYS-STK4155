@@ -4,6 +4,7 @@ if __name__ == "__main__":
     from sklearn.model_selection import train_test_split
     from sklearn.preprocessing import StandardScaler, MinMaxScaler
     import numpy as np
+    import tensorflow as tf
 
     import context
     from sknotlearn.datasets import load_MNIST, load_CIFAR10
@@ -25,26 +26,32 @@ if __name__ == "__main__":
         x_train, y_train, train_size=0.75, random_state=42
     )
 
+    early_stopper = tf.keras.callbacks.EarlyStopping(monitor="val_loss",
+                                                     patience=5,
+                                                     verbose=1,
+                                                     restore_best_weights=True)
+
     tuner = tune_LWTA_architecture(
-        layer_type="max_out",
+        layer_type="channel_out",
         train_data=(x_train, y_train),
         val_data=(x_val, y_val),
         isregression=False,
         layer_choices=[2, 3, 4, 5],
         node_choices=[8, 16, 32, 64],
-        group_choices=[1, 2, 4, 8, 16],
+        group_choices=[4, 8, 16, 32],
         builder_kwargs=dict(
             dropout_rate=0.1,
-            lmbda=1e-4
+            # lmbda=1e-4
         ),
         tuner_kwargs=dict(
             max_epochs=30,
             hyperband_iterations=1,
-            project_name="CIFAR10_1",
-            overwrite=True
+            project_name="CIFAR10_do_es",
+            # overwrite=True
         ),
         search_kwargs=dict(
-            epochs=30
+            epochs=30,
+            callbacks=[early_stopper, ]
         )
     )
 

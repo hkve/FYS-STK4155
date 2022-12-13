@@ -17,7 +17,8 @@ def tune_LWTA_architecture(layer_type: str,
                            builder_kwargs: dict = {},
                            tuner_kwargs: dict = {},
                            search_kwargs: dict = {}) -> keras_tuner.Tuner:
-    """_summary_
+    """Tunes the architecture of a LWTA model with a given layer type with
+    the available choices given. Returns the tuner after search is completed.
 
     Args:
         layer_type (str): Specifies whether to use MaxOut or ChannelOut layers.
