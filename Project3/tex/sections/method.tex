@@ -42,6 +42,11 @@ We reference like this using \verb|cleveref|: \cref{int:fig:example_a}, \cref{th
     \subsubsection{Optimisation Algorithm}
         When optimising the cost function of our problems we built on what we found in \citep{Project2}, using stochastic gradient descent with a batch size of 32. We used the Adam algorithm with hyperparameters $\beta_1 = 0.9$, $\beta_2 = 0.999$ and a learning rate $\eta = 0.001$. These hyperparameters were not tuned in any of our searches. The number of training epochs was decided with early stopping termination criterion. This means monitoring the loss of the network on a validation dataset after each epoch of training, and stopping the training if there is no improvement after a number of epochs $p$, called the \textit{patience}.
 
+        All the datasets used pose classification problems with 3 or 10 categories. The cost function we used for optimisation was the standard categorical cross-entropy. Predicting $\vec{\tilde{y}}$ for the datapoints $\vec{y}$, with $n$ datapoints and $C$ categories, the categorical cross-entropy is given by
+        \begin{align}
+            \mathcal{L}(\tilde{y}) = \sum_{i=1}^n \sum_{c \in \mathrm{categories}} y_i \log\pclosed{y=c|\tilde{y}_i}
+        \end{align}
+
         \comment{Discussion note: Early stopping prevents overfitting. -\Carl}
 
     \subsubsection{Regularisation}
@@ -53,13 +58,11 @@ We reference like this using \verb|cleveref|: \cref{int:fig:example_a}, \cref{th
 
 
 \subsection{Architecture tuning}
-    \comment{Write something about how we explore and choose the network architecture. \Carl}
-    To see what kind of network architectures were interesting and useful when applying to the datasets at hand, we tuned the architecture using the \textit{hyperband} search algorithm \citep{Hyperband}. We searched with a variable number of hidden layers between 2\textendash5, a number of nodes in the layers between 8\textendash64 in powers of 2, and a number of groups in the layers between 4\textendash32, again in powers of 2.
+    To see what kind of network architectures were interesting and useful when applying to the datasets at hand, we tuned the architecture using the \textit{hyperband} search algorithm \citep{Hyperband}. We searched with a variable number of hidden layers between 2\textendash5, a number of nodes in the layers between 8\textendash64 in powers of 2, and a number of groups in the layers between 4\textendash32, again in powers of 2. When hyperparameters were chosen such that the number of groups was equal to or greater than the number of units in a layer, we set the layer to be a dense layer with the specified number of units, but added a ReLU activation to the output. During the tuning, we used early stopping with $p=5$ to terminate the training.
 
-
+    When the best network architectures were found, we fitted them on the full training dataset, evaluating their accuracy on the test dataset. We used early stopping with $p=10$ during this training.
 
     \subsubsection{Hyperband Search}
-        \comment{Outline the hyperband search method. -\Carl}
         The hyperband search algorithm serves as a way to tune the hyperparameters of a model in a way such that more computing resources are dedicated to more promising areas of the hyperparameter space. It is based on the \textit{successive halving} algorithm, in which a finite budget $B$ (i.e. number of training epochs) is divided evenly between $n$ randomly sampled points from the hyperparameter space. These hyperparameters are then used to build $n$ models that are trained according to $r = B/n$ allocated resources on a tuning dataset, and their loss evaluated on a validation dataset, passing on the $k$ top performing models.\footnote{Usually the top half of the is passed on, as the algorithm name would indicate.} 
         These $k$ models are then trained further, with a new $n=k$ and consequently more resources $r$. This halving is then repeated until there is one model remaining. As hyperparameter points are discarded ($n$ decreases), the amount of allocated resources $r$ increases; meaning the more promising hyperparameter points are allotted exponentially more resources.
 

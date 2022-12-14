@@ -7,25 +7,27 @@ Results here, in past tense.
             \centering
             \includegraphics[width=\linewidth]{figs/LWTA_architecture_untrained.pdf}
             \caption{The untrained network predicting validation images of zeros in blue and ones in pink.}
-            \label[fig]{LWTA_architecture_untrained}
+            \label[fig]{res:fig:LWTA_architecture_untrained}
         \end{subfigure}
         \begin{subfigure}{\linewidth}
             \centering
             \includegraphics[width=\linewidth]{figs/LWTA_architecture_trained01.pdf}
             \caption{The trained network predicting validation images of zeros in blue and ones in pink.}
-            \label[fig]{LWTA_architecture_trained01}
+            \label[fig]{res:fig:LWTA_architecture_trained01}
         \end{subfigure}
         \begin{subfigure}{\linewidth}
             \centering
             \includegraphics[width=\linewidth]{figs/LWTA_architecture_trained45.pdf}
-            \caption{The untrained network predicting validation images of fours in blue and fives in pink.}
-            \label[fig]{LWTA_architecture_trained45}
+            \caption{The trained network predicting validation images of fours in blue and fives in pink.}
+            \label[fig]{res:fig:LWTA_architecture_trained45}
         \end{subfigure}
         \caption{An illustration of the active pathways as 100 input images belonging to two different classes are passed through a channel-out network. The network was trained on the full training dataset for 26 epochs before stopping early with $p=5$, and had a final validation accuracy of $0.8555$.}
-        \label[fig]{LWTA_architecture}
+        \label[fig]{res:fig:LWTA_architecture}
     \end{figure}
 
 \subsection{Tuning LWTA Architecture}
+    Tuning the architecture of our LWTA networks, we found the maxout network architecture \network{64,64}{32,16} with dropout to do the best on the CIFAR-10 dataset, achieving a test accuracy of 51.57\%. Likewise, the best performing channel-out network architecture was \network{64,16,64}{32,*,32} with L2 penalisation added, achieving a test accuracy of 50.75\%, slightly underperforming maxout. The ordinary ReLU dense network achieved an accuracy of 49.19\% on the test dataset with two layers of 32 nodes. The results are tabulated in \cref{res:tab:networks}.
+
     \renewcommand{\arraystretch}{2}
     \begin{table}[ht!]
         \centering
@@ -34,27 +36,45 @@ Results here, in past tense.
         & \textbf{Regularisation} & \textbf{Architecture} & \textbf{Accuracy} \\
         \hline
         \rowcolor{mint!20}
-        \cellcolor{mint!20} & None & \network{64, 32, 64}{32, 16, 8} & 0.4877 \\ \cline{2-4} 
+        \cellcolor{mint!20} & None & \network{64, 32, 64}{32, 16, 8} & 0.4894 \\ \cline{2-4} 
         \rowcolor{mint!20}
-        \cellcolor{mint!20} & Ridge & \network{64, 32}{32, *}  & 0.5090 \\ \cline{2-4} 
+        \cellcolor{mint!20} & Ridge & \network{64, 32}{32, *}  & 0.5094 \\ \cline{2-4} 
         \rowcolor{mint!50}
-        \cellcolor{mint!20} & Dropout & \network{64, 64}{32, 16} & 0.5146 \\ \cline{2-4} 
+        \cellcolor{mint!20} & Dropout & \network{64, 64}{32, 16} & 0.5157 \\ \cline{2-4} 
         \rowcolor{mint!20}
-        \multirow{-4}{*}{\rotatebox[origin=c]{90}{Maxout}}{\cellcolor{mint!20}} & Both & \network{32, 64}{16, 16} & 0.4943 \\ \hline
+        \multirow{-4}{*}{\rotatebox[origin=c]{90}{Maxout}}{\cellcolor{mint!20}} & Both & \network{32, 64}{16, 16} & 0.4938 \\ \hline
         \rowcolor{maroon!20}
-        \cellcolor{maroon!20} & None & \network{64, 16, 32}{16, 8, *} & 0.4856 \\ \cline{2-4} 
+        \cellcolor{maroon!20} & None & \network{64, 16, 32}{16, 8, *} & 0.4956 \\ \cline{2-4} 
         \rowcolor{maroon!50}
-        \cellcolor{maroon!20} & Ridge & \network{64, 16, 64}{32, *, 32} & 0.5100 \\ \cline{2-4} 
+        \cellcolor{maroon!20} & Ridge & \network{64, 16, 64}{32, *, 32} & 0.5075 \\ \cline{2-4} 
         \rowcolor{maroon!20}
-        \cellcolor{maroon!20} & Dropout & \network{32, 16, 64}{16, *, 32} & 0.4747 \\ \cline{2-4} 
+        \cellcolor{maroon!20} & Dropout & \network{32, 16, 64}{16, *, 32} & 0.4826 \\ \cline{2-4} 
         \rowcolor{maroon!20}
         \multirow{-4}{*}{\rotatebox[origin=c]{90}{Channel-Out}}{\cellcolor{maroon!20}} & Both & \network{32, 64}{16, 32} & 0.4917 \\ \hline
         \rowcolor{cyan!20} 
-        \cellcolor{cyan!20} & None & \network{32,32}{} & 0.4843 \\ \cline{2-4} 
+        \cellcolor{cyan!20} & None & \network{32,32}{\mathrm{ReLU}} & 0.4843 \\ \cline{2-4} 
         \rowcolor{cyan!50} 
-        \multirow{-2}{*}{\rotatebox[origin=c]{90}{Dense}}{\cellcolor{cyan!20} } & Ridge & \network{32,32}{} & 0.4899 \\ \hline
+        \multirow{-2}{*}{\rotatebox[origin=c]{90}{Dense}}{\cellcolor{cyan!20} } & Ridge & \network{32,32}{\mathrm{ReLU}} & 0.4919 \\ \hline
         \end{tabular}
-        \caption{Table of }
+        \caption{Table of the best performing network architectures with maxout, channel-out or dense ReLU layers and various combinations of dropout and ridge penalisation added.}
         \label[tab]{res:tab:networks}
     \end{table}
     \renewcommand{\arraystretch}{1}
+
+    \begin{figure}
+        \begin{subfigure}{\linewidth}
+            \centering
+            \includegraphics[width=\linewidth]{figs/best_models_maxout.pdf}
+            \caption{The validation accuracy history of the best performing maxout networks.}
+            \label[fig]{res:fig:best_maxout}
+        \end{subfigure}
+        \begin{subfigure}{\linewidth}
+            \centering
+            \includegraphics[width=\linewidth]{figs/best_models_channelout.pdf}
+            \caption{The validation accuracy history of the best performing channel-out networks.}
+            \label[fig]{res:fig:best_channelout}
+        \end{subfigure}
+        \caption{The best performing LWTA models after tuning were trained on the full training dataset and their validation accuracy history is plotted here. For the network architecture of the various models see \cref{res:tab:networks}.}
+        \label[fig]{res:fig:best_LWTA}
+    \end{figure}
+    \comment{Discussion note: Comment on the lack of resampling used here. -\Carl}
