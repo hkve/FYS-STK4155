@@ -23,8 +23,15 @@ We reference like this using \verb|cleveref|: \cref{int:fig:example_a}, \cref{th
 
     \subsubsection{Data Preparation}
         \comment{Describe preprocessing of data, i.e. scaling etc. -\Carl}
-        \comment{Data splitting figure \Anna}
-        When tuning the architecture, we split the training data into a tuning set and a validation set used for monitoring overfitting, implementing early stopping with $p=5$. We used a split of $\sfrac{3}{4}$.
+        \comment{Data splitting \Anna}
+        To train and evaluate our models we implemented the relevant data and and as in our previous projects we split it in training data ($\sfrac{5}{6}$ of the data) and testing data ($\sfrac{1}{6}$ of the data) \citep{Project1}\citep{Project2}. When tuning the architecture, we further split the training data into a tuning set and a validation set used for monitoring overfitting, implementing early stopping with $p=5$. We used a split of $\sfrac{3}{4}$. See \cref{the:fig:illustration_data} for illustration of the data splitting. 
+
+        \begin{figure}[]
+            \centering
+            \includegraphics[width=.9\linewidth]{illustration_data.png}
+            \caption{Illustration of data splitting.}
+            \label[fig]{the:fig:illustration_data}
+        \end{figure}
 
     \subsubsection{PCA}
         \comment{Could perhaps be part of data preparation \Anna}
