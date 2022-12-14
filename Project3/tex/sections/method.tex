@@ -52,15 +52,22 @@ We reference like this using \verb|cleveref|: \cref{int:fig:example_a}, \cref{th
     \subsubsection{Regularisation}
         \comment{Write about L2-regularisation. -\Carl}
 
-        A problem that can occur in LWTA layers is when the weights of one node becomes much larger than those of the other nodes in the group, resulting in training of just this single node. A common technique to combat this is to add a dropout layer before and/or after the LWTA layer. The dropout layer randomly sets elements in its input vector to zero, according to a dropout rate, before passing it on to the next layer. This means that the nodes in a group cannot solely lean on one specific node, and forces pathways in the network to not learn specific trends `too much'. As such, it prevents overfitting, and can be seen as a regularisation method. The dropout layers are only active during training, and do not drop any activations at inference time.
+        A problem that can occur in LWTA layers is when the weights of one node becomes much larger than those of the other nodes in the group, resulting in training of just this single node. A common technique to combat this is to add a dropout layer before and/or after the LWTA layer. The dropout layer randomly sets elements in its input vector to zero, according to a dropout rate, before passing it on to the next layer. This means that the nodes in a group cannot solely lean on one specific node, and forces pathways in the network to not learn specific trends `too much'. As such, it prevents overfitting, and can be seen as a regularisation method. The dropout layers are only active during training, and do not drop any activations at inference time. The effect of dropout on a LWTA network is illustrated in \cref{met:fig:dropout_network}.
 
-        We tried adding dropout to our networks to see whether the performance was improved. \comment{Write more on this when it has been done.}
+        \begin{figure}
+            \centering
+            \includegraphics[width=\linewidth]{figs/illustration_dropout.png}
+            \caption{An illustration channel-out neural network with a dropout added to the second channel-out layer.}
+            \label[fig]{met:fig:dropout_network}
+        \end{figure}
+
+        We added dropout to our networks to see whether the performance was improved. \comment{Write more on this when it has been done.}
 
 
 \subsection{Architecture tuning}
-    To see what kind of network architectures were interesting and useful when applying to the datasets at hand, we tuned the architecture using the \textit{hyperband} search algorithm \citep{Hyperband}. We searched with a variable number of hidden layers between 2\textendash5, a number of nodes in the layers between 8\textendash64 in powers of 2, and a number of groups in the layers between 4\textendash32, again in powers of 2. When hyperparameters were chosen such that the number of groups was equal to or greater than the number of units in a layer, we set the layer to be a dense layer with the specified number of units, but added a ReLU activation to the output. During the tuning, we used early stopping with $p=5$ to terminate the training.
+    To see what kind of network architectures were interesting and useful when applying to the datasets at hand, we tuned the architecture using the \textit{hyperband} search algorithm \citep{Hyperband}.
 
-    When the best network architectures were found, we fitted them on the full training dataset, evaluating their accuracy on the test dataset. We used early stopping with $p=10$ during this training.
+    We searched with a variable number of hidden layers between 2\textendash5, a number of nodes in the layers between 8\textendash64 in powers of 2, and a number of groups in the layers between 4\textendash32, again in powers of 2. When hyperparameters were chosen such that the number of groups was equal to or greater than the number of units in a layer, we set the layer to be a dense layer with the specified number of units, but added a ReLU activation to the output.
 
     \subsubsection{Hyperband Search}
         The hyperband search algorithm serves as a way to tune the hyperparameters of a model in a way such that more computing resources are dedicated to more promising areas of the hyperparameter space. It is based on the \textit{successive halving} algorithm, in which a finite budget $B$ (i.e. number of training epochs) is divided evenly between $n$ randomly sampled points from the hyperparameter space. These hyperparameters are then used to build $n$ models that are trained according to $r = B/n$ allocated resources on a tuning dataset, and their loss evaluated on a validation dataset, passing on the $k$ top performing models.\footnote{Usually the top half of the is passed on, as the algorithm name would indicate.} 
@@ -89,3 +96,8 @@ We reference like this using \verb|cleveref|: \cref{int:fig:example_a}, \cref{th
         %         \EndProcedure
         %     \end{algorithmic}
         % \end{algorithm}
+
+    \subsubsection{CIFAR-10}
+        During the tuning on the CIFAR-10, we used early stopping with $p=5$ to terminate the training. After finding best network architectures, we fitted them on the full training dataset, evaluating their accuracy on the test dataset. We used early stopping with $p=10$ during this training.
+
+    \subsubsection{Premier League Dataset}
