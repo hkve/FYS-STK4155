@@ -23,6 +23,11 @@ We reference like this using \verb|cleveref|: \cref{int:fig:example_a}, \cref{th
 
     \subsubsection{Data Preparation}
         \comment{Describe preprocessing of data, i.e. scaling etc. -\Carl}
+        \comment{Data splitting figure \Anna}
+        When tuning the architecture, we split the training data into a tuning set and a validation set used for monitoring overfitting, implementing early stopping with $p=5$. We used a split of $\sfrac{3}{4}$.
+
+    \subsubsection{PCA}
+        \comment{Could perhaps be part of data preparation \Anna}
 
 
 \subsection{Neural Network training}
@@ -51,7 +56,7 @@ We reference like this using \verb|cleveref|: \cref{int:fig:example_a}, \cref{th
     \comment{Write something about how we explore and choose the network architecture. \Carl}
     To see what kind of network architectures were interesting and useful when applying to the datasets at hand, we tuned the architecture using the \textit{hyperband} search algorithm \citep{Hyperband}. We searched with a variable number of hidden layers between 2\textendash5, a number of nodes in the layers between 8\textendash64 in powers of 2, and a number of groups in the layers between 4\textendash32, again in powers of 2.
 
-    When tuning the architecture, we split the training data into a tuning set and a validation set used for monitoring overfitting, implementing early stopping with $p=5$. We used a split of $\sfrac{3}{4}$.
+
 
     \subsubsection{Hyperband Search}
         \comment{Outline the hyperband search method. -\Carl}
