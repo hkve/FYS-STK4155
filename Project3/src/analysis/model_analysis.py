@@ -26,7 +26,7 @@ def fit_and_plot_val_losses(models: list[tf.keras.Model],
 
     for model, model_name in zip(models, model_names):
         results = model.fit(**fit_kwargs)
-        ax.plot(results.history["val_loss"], label=model_name)
+        ax.plot(results.history["val_accuracy"], label=model_name)
         print(f"Best accuracy of {model_name} : "
               f"{np.max(results.history['val_accuracy'])}")
     ax.set_ylabel("Loss")
@@ -46,19 +46,29 @@ if __name__ == "__main__":
     import plot_utils
 
     import context
-    from sknotlearn.datasets import load_MNIST, load_CIFAR10
+    from sknotlearn.datasets import load_MNIST, load_CIFAR10, load_EPL
     from tensorno.bob import build_LWTA_classifier, build_FFNN_classifier
     from tensorno.utils import count_parameters
 
     # x_train, y_train, x_test, y_test = load_MNIST()
-    x_train, y_train, x_test, y_test = load_CIFAR10()
+    # x_train, y_train, x_test, y_test = load_CIFAR10()
+    dataset = load_EPL(encoded=True)
+    y = dataset.y.to_numpy()
+    labels = np.array(["w", "d", "l"])
+    y = np.array([np.where(y_ == range(len(labels)), 1, 0) for y_ in y],
+                 dtype=int)
+    x = dataset.x
+    x = x.astype(float)
+
+    x_train, x_test, y_train, y_test = train_test_split(x, y,
+                                                        train_size=5/6,
+                                                        shuffle=False)
 
     # Flattening image arrays.
-    x_train = x_train.reshape((x_train.shape[0], np.prod(x_train.shape[1:])))
-    x_test = x_test.reshape((x_test.shape[0], np.prod(x_test.shape[1:])))
+    # x_train = x_train.reshape((x_train.shape[0], np.prod(x_train.shape[1:])))
+    # x_test = x_test.reshape((x_test.shape[0], np.prod(x_test.shape[1:])))
 
     scaler = StandardScaler()
-    # scaler = MinMaxScaler()
     x_train = scaler.fit_transform(x_train)
     x_test = scaler.transform(x_test)
 
@@ -99,6 +109,24 @@ if __name__ == "__main__":
     #     lmbda=1e-4,
     #     Layer="max_out",
     # )
+    model1 = build_LWTA_classifier(  # EPL
+        num_layers=2,
+        units=[8, 16],
+        num_groups=[8, 8],
+        num_features=x_train.shape[-1],
+        num_categories=y_train.shape[-1],
+        Layer="max_out",
+    )
+    model2 = build_LWTA_classifier(  # EPL_do_l2
+        num_layers=2,
+        units=[16, 64],
+        num_groups=[8, 32],
+        num_features=x_train.shape[-1],
+        num_categories=y_train.shape[-1],
+        dropout_rate=0.25,
+        lmbda=1e-4,
+        Layer="max_out",
+    )
 
     # model1 = build_LWTA_classifier(  # CIFAR10
     #     num_layers=3,
@@ -136,45 +164,65 @@ if __name__ == "__main__":
     #     lmbda=1e-4,
     #     Layer="channel_out",
     # )
+    model3 = build_LWTA_classifier(  # EPL
+        num_layers=4,
+        units=[8, 64, 16, 64],
+        num_groups=[8, 32, 16, 32],
+        num_features=x_train.shape[-1],
+        num_categories=y_train.shape[-1],
+        Layer="channel_out",
+    )
+    model4 = build_LWTA_classifier(  # EPL_dp_l2
+        num_layers=2,
+        units=[8, 64],
+        num_groups=[8, 32],
+        num_features=x_train.shape[-1],
+        num_categories=y_train.shape[-1],
+        dropout_rate=0.25,
+        lmbda=1e-4,
+        Layer="channel_out",
+    )
 
     early_stopper = tf.keras.callbacks.EarlyStopping(monitor="val_loss",
-                                                     patience=5,
+                                                     patience=30,
                                                      verbose=1,
                                                      restore_best_weights=True)
 
-    # fit_and_plot_val_losses(
-    #     models=[model1, model2, model3, model4],
-    #     model_names=[r"channelout", r"channelout w/ L2",
-    #                  r"channelout w/ DO", r"channelout w/ DO \& L2"],
-    #     fit_kwargs=dict(
-    #         x=x_train,
-    #         y=y_train,
-    #         epochs=100,
-    #         validation_data=(x_test, y_test),
-    #         callbacks=[early_stopper]
-    #     ),
-    #     filename="best_models_channelout"
-    # )
-    # plt.show()
+    fit_and_plot_val_losses(
+        models=[model1, model2, model3, model4],
+        # model_names=[r"channelout", r"channelout w/ L2",
+        #              r"channelout w/ DO", r"channelout w/ DO \& L2"],
+        model_names=[r"maxout", r"maxout w/ DO \& L2",
+                     r"channelout", r"channelout w/ DO \& L2"],
+        fit_kwargs=dict(
+            x=x_train,
+            y=y_train,
+            epochs=300,
+            validation_data=(x_test, y_test),
+            callbacks=[early_stopper]
+        ),
+        filename="best_models_EPL"
+    )
+    plt.show()
 
     """
-    results = model.fit(
+    results = model2.fit(
         x_train, y_train,
-        epochs=100,
+        epochs=300,
         validation_data=(x_test, y_test),
         callbacks=[early_stopper]
     )
 
-    model.evaluate(x_test, y_test)
-    print(f"Number of parameters in network: {count_parameters(model)}")
+    model2.evaluate(x_test, y_test)
+    print(f"Number of parameters in network: {count_parameters(model2)}")
 
     history = {
         "train loss LWTA": results.history["loss"],
         "val loss LWTA": results.history["val_loss"]
     }
+    _, ax = plt.subplots()
     ax = plot_loss_history(history, ax=ax)
 
-    """
     ###
     # Ordinary Network
     ###
@@ -204,3 +252,4 @@ if __name__ == "__main__":
     plot_loss_history(history)
 
     plt.show()
+    """
