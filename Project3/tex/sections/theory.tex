@@ -132,6 +132,16 @@ We cite our sources like this~\citep{Project1}.
             \label[fig]{the:fig:illustration_channelout}
         \end{figure}
 
+        \comment{I place the activation illustration here, but might well be moved. -\Carl}\\
+        A way to look at the function of the LWTA groups is to study the effective activation output of the group. Simplifying by looking at a group of nodes whose input is only one scalar quantity $x$. The response of the nodes in the groups are linear functions $z_i = w_i x + b_i$ of the input, and the activation output is $\operatorname{max}(z_i)$. \cref{the:fig:activation_imitation} illustrates how the maximum of a group of such functions can mimic and parameterise different convex function. In fact, it is shown that a group of an arbitrary amount of nodes can approximate any convex function \citep{Maxout_Networks}.
+
+        \begin{figure}[]
+            \centering
+            \includegraphics[width=\linewidth]{figs/maxout_activations.pdf}
+            \caption{An example of how different convex activations functions ReLU, $|x|$ and $x^2$ can be approximated or exactly reproduced with the max-function on the responses of a group of units. The responses are here depicted with dashed lines.}
+            \label[fig]{the:fig:activation_imitation}
+        \end{figure}
+
 
 
     
