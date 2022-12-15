@@ -34,15 +34,15 @@
             Where $\bar{y}_{R_j}$ is the calculated mean of the training data within $R_j$. This is done in a top-down approach, performing the optimasation from \cref{eq:app:tree_optimasation} down each branch, continuing until a stopping criterion is reached. This gives us our regression tree $\hat{f}(x)$, following a specific branch when evaluated for a data point $x_i$. There is no single good measure of model complexity for decision trees, but the depth gives an indication of high finely tuned predictions can become.    
 
             \subsubsection{Bagged Trees}
-            Based on the idea of bootstrap, an ensemble of trees can be constructed. Decision trees are notorious high-variance models which are easily overfitted. By performing bootstrap resampling, a single tree can be fitted for each bag $b$, with the final prediction being the average prediction of each tree.
+                Based on the idea of bootstrap, an ensemble of trees can be constructed. Decision trees are notorious high-variance models which are easily overfitted. By performing bootstrap resampling, a single tree can be fitted for each bag $b$, with the final prediction being the average prediction of each tree.
 
-            \begin{align}
-                \hat{F}(x) = \frac{1}{B}\sum_{b = 1}^{B} \hat{f}^b (x) \label{eq:app:bagged_trees}
-            \end{align}
-            Where $\hat{f}^b$ is a single decision tree, fitted using the data from bag $b$. $B$ represents the total number of trees, which we will call ensemble size. We will call this method bagged trees (BT).
+                \begin{align}
+                    \hat{F}(x) = \frac{1}{B}\sum_{b = 1}^{B} \hat{f}^b (x) \label{eq:app:bagged_trees}
+                \end{align}
+                Where $\hat{f}^b$ is a single decision tree, fitted using the data from bag $b$. $B$ represents the total number of trees, which we will call ensemble size. We will call this method bagged trees (BT).
 
             \subsubsection{Random Forest}
-            Random forest (RF) uses the same methodology as bagged trees. Bootstrap is performed in the same manner \cref{eq:app:bagged_trees}, but only a random subset of features is considered at each node split. We represent the number of features considered by $m$, with $m = 1$ reducing to bagged trees. From ~\citep{hastie01statisticallearning}, a ration of $m = \lfloor p/3 \rfloor$ usually performs well on regression problems. This is expedient since trees might be highly correlated, especially if a single feature is very important for reducing the training MSE. If all features are considered for each split, the random forest reduced to the bagged trees.
+                Random forest (RF) uses the same methodology as bagged trees. Bootstrap is performed in the same manner \cref{eq:app:bagged_trees}, but only a random subset of features is considered at each node split. We represent the number of features considered by $m$, with $m = 1$ reducing to bagged trees. From ~\citep{hastie01statisticallearning}, a ration of $m = \lfloor p/3 \rfloor$ usually performs well on regression problems. This is expedient since trees might be highly correlated, especially if a single feature is very important for reducing the training MSE. If all features are considered for each split, the random forest reduced to the bagged trees.
             
             \subsubsection{Boosted trees}
                 The idea behind boosted trees is combining several weak learners which iteratively learn from previous mistakes to enhance performance. In the case of decision trees, weak learners are simple trees only performing slightly better than random guesses. 
@@ -53,73 +53,80 @@
                 \end{equation}
                 $\beta$ can be dynamic for various $m$. In that case the gradient of the cost function must also be calculated with respect to $\beta_m$ \citep{hastie01statisticallearning}. 
 
-            \subsection{Support Vector Machines}
+        \subsection{Support Vector Machines}
             The Support Vector Machine (SVM) is most commonly used in classification problems, with the idea of constricting some hyperplane separating target classes in feature space. By a slight change of approach, the method can also be applied to regression problems, proposed in~\citep{SVR}. 
             
-                \subsubsection{Regression Approach}
-                    The predictions are performed using a simple linear function
-                    \begin{align}
-                        f(x_i) = \vec{w}^T x_i + b \text{ with } \vec{w} \in \mathbb{R}^p, b \in \mathbb{R} \label[eq]{eq:SVM_predict} 
-                    \end{align}
-                    We want to find the optimal values of $\set{\vec{w}, b}$ such that the predictions of $f(x_i)$ lies inside some region around the $y_i$ training data. This region is defined by the hyperparameter $\epsilon$ (the so-called $\epsilon$ intensive tube \footnote{Not to be confused with the famouse $\epsilon$-sausage used for proofs of continuity, introduced by the math professor \textit{Arne Hole}.}). This can be formulated as an optimasation of $\vec{w}$, subject to the $\epsilon$ constraint ~\citep{SVRgood}.  
-                    \begin{align}
-                        \underset{\vec{w}}{\text{argmin  }}   ||\vec{w}||^2 
-                        \hspace{10px}\text{subject to}\hspace{10px} |y_i - f(x_i)| \leq \epsilon \label[eq]{eq:SVM_optimasation}
-                    \end{align}
-                    This is a so-called \textit{hard margin} approach, where $f(x_i)$ must make a prediction in $[y_i - \epsilon, y_i + \epsilon]$. Relaxations of this constraint can be done, allowing small deviations around the $\epsilon$ tube. This is characterized by the hyperparameter $C \geq 0$, often called a \textit{soft margin}. $C$ is proportional to the margin relaxation (inversely proportional to the regularisation strength), with $C = 0$ reducing to the hard margin approach.  
-                
-                \subsubsection{Kernels}
-                    One of the benefits of SVMs is the magic of the \textit{kernel trick}. Introducing some non-linearity can improve predictions (for instance, see~\citep{Project1} for an example using linear regression). This is done by applying some transformation $\phi$ giving new features in another (often higher dimensional) space $\mathcal{F}$, $\phi: \mathbb{R}^p \xrightarrow{} \mathcal{F}$. For large data sets, especially if $\text{dim}(\mathcal{F}) \gg p$, the transformation complexity can result in long computation times. Luckily, both our model \cref{eq:SVM_predict} and optimasation \cref{eq:SVM_optimasation} only requires the computation of the dot product in $\mathcal{F}$. The kernel trick then gives us a method to calculate the transformed dot product $\phi(x_i)^T \phi(x_i)$, without explicitly calculating $\phi(x_i)$~\citep{kernelTrick}. We express this a function $K(x_i, x_j)$, witch usually some simpler dot product such as $x_i^T x_j$ or $||x_i - x_j||^2$.      
-                    \begin{align*}
-                        \phi(x_i)^T \phi(x_j) &= K(x_i, x_j)
-                    \end{align*}
-                    In the following, we will, in addition to the linear (not transformed) product $K(x_i, x_j) = x_i^T x_j$, consider the \textit{Gaussian radial basis function} (RBF) kernel
-                    \begin{align}
-                        \text{RBF:}\hspace{20px}& K(x_i, x_j) = \text{exp}(-\gamma ||x_i - x_j||)
-                    \end{align}
-                    Where $\gamma > 0$ is a hyperparameter. Here we will only consider $\gamma = 1/(p\sigma_X^2)$, sometimes simply called the Gaussian kernel, where $\sigma_X^2$ is the variance in $X$ across all features. 
+            \subsubsection{Regression Approach}
+                The predictions are performed using a simple linear function
+                \begin{align}
+                    f(x_i) = \vec{w}^T x_i + b \text{ with } \vec{w} \in \mathbb{R}^p, b \in \mathbb{R} \label[eq]{eq:SVM_predict} 
+                \end{align}
+                We want to find the optimal values of $\set{\vec{w}, b}$ such that the predictions of $f(x_i)$ lies inside some region around the $y_i$ training data. This region is defined by the hyperparameter $\epsilon$ (the so-called $\epsilon$ intensive tube \footnote{Not to be confused with the famouse $\epsilon$-sausage used for proofs of continuity, introduced by the math professor \textit{Arne Hole}.}). This can be formulated as an optimasation of $\vec{w}$, subject to the $\epsilon$ constraint ~\citep{SVRgood}.  
+                \begin{align}
+                    \underset{\vec{w}}{\text{argmin  }}   ||\vec{w}||^2 
+                    \hspace{10px}\text{subject to}\hspace{10px} |y_i - f(x_i)| \leq \epsilon \label[eq]{eq:SVM_optimasation}
+                \end{align}
+                A larger $\epsilon$ gives larger errors admitted to the solution. This is a so-called \textit{hard margin} approach, where $f(x_i)$ must make a prediction in $[y_i - \epsilon, y_i + \epsilon]$. Relaxations of this constraint can be done, allowing small deviations around the $\epsilon$ tube. This is characterized by the hyperparameter $C \geq 0$, often called a \textit{soft margin}. $C$ is proportional to the margin relaxation (inversely proportional to the regularisation strength), with $C = 0$ reducing to the hard margin approach.
+            
+            \subsubsection{Kernels}
+                One of the benefits of SVMs is the magic of the \textit{kernel trick}. Introducing some non-linearity can improve predictions (for instance, see~\citep{Project1} for an example using linear regression). This is done by applying some transformation $\phi$ giving new features in another (often higher dimensional) space $\mathcal{F}$, $\phi: \mathbb{R}^p \xrightarrow{} \mathcal{F}$. For large data sets, especially if $\text{dim}(\mathcal{F}) \gg p$, the transformation complexity can result in long computation times. Luckily, both our model \cref{eq:SVM_predict} and optimasation \cref{eq:SVM_optimasation} only requires the computation of the dot product in $\mathcal{F}$. The kernel trick then gives us a method to calculate the transformed dot product $\phi(x_i)^T \phi(x_i)$, without explicitly calculating $\phi(x_i)$~\citep{kernelTrick}. We express this a function $K(x_i, x_j)$, witch usually some simpler dot product such as $x_i^T x_j$ or $||x_i - x_j||^2$.      
+                \begin{align*}
+                    \phi(x_i)^T \phi(x_j) &= K(x_i, x_j)
+                \end{align*}
+                In the following, we will, in addition to the linear (not transformed) product $K(x_i, x_j) = x_i^T x_j$, consider the \textit{Gaussian radial basis function} (RBF) kernel
+                \begin{align}
+                    \text{RBF:}\hspace{20px}& K(x_i, x_j) = \text{exp}(-\gamma ||x_i - x_j||)
+                \end{align}
+                Where $\gamma > 0$ is a hyperparameter. Here we will only consider $\gamma = 1/(p\sigma_X^2)$, sometimes simply called the Gaussian kernel, where $\sigma_X^2$ is the variance in $X$ across all features. 
 
     \section{Findings and Discussion}
         \subsection{Linear Regression}
-        The bias-variance decomposition of OLS, Ridge and Lasso can be seen in figure \cref{fig:linreg_biasvar_decomp}. For OLS, there is no penalisation to vary, and all bias contributions comes from the assumption of first order polynomial response. Increasing the feature space, be it introducing higher order polynomials or exponential terms, would allow the fit to be more flexible, presumably increasing bias. When increasing the penalisation parameter $\alpha$ slightly, both Ridge and Lasso stays quite close to the simple OLS case as expected. At around $\alpha = 10^{-2}$ there is a slight decrease in both bias and variance for both models, with MSE minima at $8.46$, $8.27$ using $\alpha = 1.38, 0.12$ for Ridge and Lasso respectively. In these regions, the variance decreases as expect since the solution space for the optimal parameters shrink. There is also a dip in bias, which might be due to finding a specific set of parameters that works better for our subset of features. We do not use all of FIFAs features, as well as probably including some unimportant ones. There is probably some exclusion and inclusion bias where a penalised model better handles these by shrinking unimportant features. Going beyond the dip both Ridge and Lasso bias increases, indicating that the model is underfitting.
-        \begin{figure}[H]
-            \centering
-            \includegraphics[width=\linewidth]{BiasVar_LinearRegression.pdf}
-            \caption{MSE, bias and variance estimates for OLS (pink), Ridge (green) and Lasso (blue) as a function of regularisation parameter $\alpha$.}
-            \label[fig]{fig:linreg_biasvar_decomp}
-        \end{figure}
+            The bias-variance decomposition of OLS, Ridge and Lasso can be seen in figure \cref{fig:linreg_biasvar_decomp}. For OLS, there is no penalisation to vary, and all bias contributions comes from the assumption of first order polynomial response. Increasing the feature space, be it introducing higher order polynomials or exponential terms, would allow the fit to be more flexible, presumably increasing bias. When increasing the penalisation parameter $\alpha$ slightly, both Ridge and Lasso stays quite close to the simple OLS case as expected. At around $\alpha = 10^{-2}$ there is a slight decrease in both bias and variance for both models, with MSE minima at $8.46$, $8.27$ using $\alpha = 1.38, 0.12$ for Ridge and Lasso respectively. In these regions, the variance decreases as expect since the solution space for the optimal parameters shrink. There is also a dip in bias, which might be due to finding a specific set of parameters that works better for our subset of features. We do not use all of FIFAs features, as well as probably including some unimportant ones. There is probably some exclusion and inclusion bias where a penalised model better handles these by shrinking unimportant features. Going beyond the dip both Ridge and Lasso bias increases, indicating that the model is underfitting.
+            \begin{figure}[H]
+                \centering
+                \includegraphics[width=\linewidth]{BiasVar_LinearRegression.pdf}
+                \caption{MSE, bias and variance estimates for OLS (pink), Ridge (green) and Lasso (blue) as a function of regularisation parameter $\alpha$.}
+                \label[fig]{fig:linreg_biasvar_decomp}
+            \end{figure}
 
         \subsection{Tree Based Methods}
-        We begin by fitting a single tree, gradually allowing for more complexity by increasing the allowed tree depth, shown in figure \cref{fig:singletree_biasvar_decomp}. In contrast to the linear regression models, the variance is significantly larger, overcoming the bias contribution for a tree of depth 2. The MSE values are generally quite large, with a minimum of $22.3$ using a depth of 2 with 4 leafs. By considering the train MSE, we see that we quickly move into the realm of extreme overfitting. Allowing the tree to grow to a depth of 5 results in close to zero train MSE. A single tree, through the parameters searched here, does not result in a good model for this problem. 
-        \begin{figure}[H]
-            \centering
-            \includegraphics[width=\linewidth]{BiasVar_SingleTree.pdf}
-            \caption{MSE, bias and variance estimates for a single tree against increasing relaxation of tree depth. Train MSE is also included to show the drastic overfitting.}
-            \label[fig]{fig:singletree_biasvar_decomp}
-        \end{figure}
-        Even though a single tree did not perform well, an ensemble of trees can often give better results. Varying the number of trees in our ensemble, both the BT and RF can be seen in \cref{fig:bag_and_rf_biasvar_decomp}. Comparing with the single tree from \cref{fig:singletree_biasvar_decomp}, we see a large improvement concerning both MSE, bias and variance. When adding more trees, the variance decreases. This agrees with the idea that many high variance trees can produce a smaller variance when their predictions are averaged. Similarly, the bias decreases, but not as drastically. The rectangular distribution of targets in feature space is still assumed in this model, therefor still adding quite a lot of bias. For comparison, the bias of simple OLS from \cref{fig:linreg_biasvar_decomp} is smaller. When reaching an ensemble size of approximately $30$ trees, only slight improvements of the MSE is seen. Comparing between BT and RF, we see that considering a subset of features does decrease variance, presumably due to less correlated trees. This however does not yield significant improvements in the MSE, with BT having a more stable test MSE across different ensemble sizes than RF. 
-        \begin{figure}[H]
-            \centering
-            \includegraphics[width=\linewidth]{BiasVar_Bag_and_Rf.pdf}
-            \caption{MSE, bias and variance estimates for bagged trees (green) and random forest (blue) considering $\lfloor p/3 \rfloor$ features as each split, against increasing bag size/number of trees.}
-            \label[fig]{fig:bag_and_rf_biasvar_decomp}
-        \end{figure}
-        For the last of our tree based methods, we investigate the boosted trees. 
+            We begin by fitting a single tree, gradually allowing for more complexity by increasing the allowed tree depth, shown in figure \cref{fig:singletree_biasvar_decomp}. In contrast to the linear regression models, the variance is significantly larger, overcoming the bias contribution for a tree of depth 2. The MSE values are generally quite large, with a minimum of $22.3$ using a depth of 2 with 4 leafs. By considering the train MSE, we see that we quickly move into the realm of extreme overfitting. Allowing the tree to grow to a depth of 5 results in close to zero train MSE. A single tree, through the parameters searched here, does not result in a good model for this problem. 
+            \begin{figure}[H]
+                \centering
+                \includegraphics[width=\linewidth]{BiasVar_SingleTree.pdf}
+                \caption{MSE, bias and variance estimates for a single tree against increasing relaxation of tree depth. Train MSE is also included to show the drastic overfitting.}
+                \label[fig]{fig:singletree_biasvar_decomp}
+            \end{figure}
+            Even though a single tree did not perform well, an ensemble of trees can often give better results. Varying the number of trees in our ensemble, both the BT and RF can be seen in \cref{fig:bag_and_rf_biasvar_decomp}. Comparing with the single tree from \cref{fig:singletree_biasvar_decomp}, we see a large improvement concerning both MSE, bias and variance. When adding more trees, the variance decreases. This agrees with the idea that many high variance trees can produce a smaller variance when their predictions are averaged. Similarly, the bias decreases, but not as drastically. The rectangular distribution of targets in feature space is still assumed in this model, therefor still adding quite a lot of bias. For comparison, the bias of simple OLS from \cref{fig:linreg_biasvar_decomp} is smaller. When reaching an ensemble size of approximately $30$ trees, only slight improvements of the MSE is seen. Comparing between BT and RF, we see that considering a subset of features does decrease variance, presumably due to less correlated trees. This however does not yield significant improvements in the MSE, with BT having a more stable test MSE across different ensemble sizes than RF. 
+            \begin{figure}[H]
+                \centering
+                \includegraphics[width=\linewidth]{BiasVar_Bag_and_Rf.pdf}
+                \caption{MSE, bias and variance estimates for bagged trees (green) and random forest (blue) considering $\lfloor p/3 \rfloor$ features as each split, against increasing bag size/number of trees.}
+                \label[fig]{fig:bag_and_rf_biasvar_decomp}
+            \end{figure}
+            For the last of our tree based methods, we investigate the boosted trees.
+            \begin{figure}[H]
+                \centering
+                \includegraphics[width=\linewidth]{Boosting_n_est.pdf}
+                \caption{MSE, bias and variance estimates for boosted trees against the increasing ensemble size.}
+                \label[fig]{fig:boosting_n_est}
+            \end{figure}
+        
         
         \subsection{Support Vector Machines}
-        Lastly, we investigate how our SVM performs when increasing the margin ($\epsilon$). To assure convergence, the margin is slightly soft, setting $C = 1$. The results from both the linear and RBF kernel can be seen in \cref{fig:SVR_eps}. For small $\epsilon$, the RBF kernel outperforms the linear kernel substantially. Though having approximately equal bias', the variance of RBF is much lower than the linear kernel. 
+            Lastly, we investigate how our SVM performs when increasing the margin ($\epsilon$). To assure convergence, the margin is slightly soft, setting $C = 1$. The results from both the linear and RBF kernel can be seen in \cref{fig:SVR_eps}. For small $\epsilon$, the RBF kernel outperforms the linear kernel substantially. Though having approximately equal bias', the variance of RBF is much lower than the linear kernel. Increasing $\epsilon$ actually yields worse results for the RBF kernel, in contrast to the linear kernel where we find a low variance region with a bias dip similar to what we found for linear regression (\cref{fig:linreg_biasvar_decomp}). The increasing bias for high $\epsilon$ values might be somewhat counterintuitive, since the constraint in \cref{eq:SVM_optimasation} is loosened. However, the inclusion of more points might actually since more points are used the center the line draw out by \cref{eq:SVM_predict}. Assuming the bagged training sample is large enough to accurately represent the population, very small variations of the coefficients $\vec{w}$ should be allowed. This is in agreement with the variance decreasing even more for very large $\epsilon$ in \cref{fig:SVR_eps}.      
 
-        Can we characterize bias and variance in SVMs with respect to the kernel and its parameters?
-        \begin{figure}[H]
-            \centering
-            \includegraphics[width=\linewidth]{BiasVar_SVReps.pdf}
-            \caption{MSE, bias and variance estimates for SVR, against increasing the margin size $\epsilon$. In green, we have the linear kernel while in blue the RBF kernel. A soft margin of $C = 1$ has been used across all $\epsilon$. }
-            \label[fig]{fig:SVR_eps}
-        \end{figure}
+            Can we characterize bias and variance in SVMs with respect to the kernel and its parameters?
+            \begin{figure}[H]
+                \centering
+                \includegraphics[width=\linewidth]{BiasVar_SVReps.pdf}
+                \caption{MSE, bias and variance estimates for SVR, against increasing the margin size $\epsilon$. In green, we have the linear kernel while in blue the RBF kernel. A soft margin of $C = 1$ has been used across all $\epsilon$. }
+                \label[fig]{fig:SVR_eps}
+            \end{figure}
 
-        \begin{figure}[H]
-            \centering
-            \includegraphics[width=\linewidth]{BiasVar_SVRC.pdf}
-            \caption{MSE, bias and variance estimates for SVR, against increasing the softness of the margin $C$. In green, we have the linear kernel while in blue the RBF kernel. The respective optimal margin size $\epsilon$ found for $C= 1$ has been.}
-            \label[fig]{fig:SVR_C}
-        \end{figure}
+            \begin{figure}[H]
+                \centering
+                \includegraphics[width=\linewidth]{BiasVar_SVRC.pdf}
+                \caption{MSE, bias and variance estimates for SVR, against increasing the softness of the margin $C$. In green, we have the linear kernel while in blue the RBF kernel. The respective optimal margin size $\epsilon$ found for $C= 1$ has been.}
+                \label[fig]{fig:SVR_C}
+            \end{figure}
