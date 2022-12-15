@@ -109,7 +109,7 @@ if __name__ == "__main__":
     ax.set_ylabel(r"Explained variance")
     ax.legend()
 
-    plot_utils.save("pca_pl")
+    # plot_utils.save("pca_pl")
     plt.show()
 
     # """

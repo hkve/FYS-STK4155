@@ -6,7 +6,13 @@ We reference like this using \verb|cleveref|: \cref{int:fig:example_a}, \cref{th
     \comment{Here we describe how we construct and prepare the dataset. -\Carl}
 
     \subsubsection{MNIST}
-        A simpler test for our neural networks is the MNIST benchmark dataset. It consists of 60 000 training images and 10 000 testing images. Each image consists $28 \times 28$ pixels depicting handwritten number between 0 and 9. As such, the images are to be classified to one of the 10 categories of digits.
+        A simpler test for our neural networks is the MNIST benchmark dataset. It consists of 60 000 training images and 10 000 testing images. Each image consists $28 \times 28$ pixels depicting handwritten number between 0 and 9. As such, the images are to be classified to one of the 10 categories of digits. Some examples of the images in the dataset are depicted in \cref{met:fig:MNIST}.
+        \begin{figure}
+            \centering
+            \includegraphics[width=\linewidth]{figs/MNIST_examples.png}
+            \caption{20 example images from the MNIST dataset with their appropriate labels.}
+            \label[fig]{met:fig:MNIST}
+        \end{figure}
 
     \subsubsection{CIFAR-10}
         Initially, we applied our the LWTA NNs on the CIFAR-10 benchmark dataset for image recognition. This dataset consists of 60 000 images with $32 \times 32$ coloured pixels with RGB values, amounting to 3072 features per image. The images are divided into 10 categories, depicting one of either aeroplanes, birds, cars, cats, deer, dogs, frogs, horses, ships or trucks (see \cref{met:fig:CIFAR10}).
@@ -45,7 +51,7 @@ We reference like this using \verb|cleveref|: \cref{int:fig:example_a}, \cref{th
         \end{figure}
 
     \subsubsection{PCA}
-        \comment{Could perhaps be part of data preparation \Anna} Before being subject to the principal component method, the Premier League data was z-score normalised, centring the mean around zero, with unit variance. This ensured that no single feature with a relatively large variance would dominate any of the principal components. The principal components found created a new basis for the data, and had similar shape as the original features (they were linear combinations of them). Extracting the first few of these yielded the most important components, used for further analysis. For all principal components we found the explained variance, which is the ``amount'' of variance accounded for by the principal component in question.  \comment{Hmmm more/other/change idk \Johan}
+        \comment{Could perhaps be part of data preparation \Anna} Before being subject to the principal component method, the Premier League data was z-score normalised, centring the mean around zero, with unit variance. This ensured that no single feature with a relatively large variance would dominate any of the principal components. The principal components found created a new basis for the data, and had similar shape as the original features (they were linear combinations of them). Extracting the first few of these yielded the most important components, used for further analysis. For all principal components we found the explained variance, which is the ``amount'' of variance accounded for by the principal component in question. In order to make an attempt at reducing the dimension of the problem, we found the number of principal components necessary in order to explain 99 \% of the variance of the original features \comment{Hmmm more/other/change idk \Johan}
 
 
 \subsection{Neural Network training}
@@ -81,6 +87,9 @@ We reference like this using \verb|cleveref|: \cref{int:fig:example_a}, \cref{th
 
         We added dropout to our networks to see whether the performance was improved. \comment{Write more on this when it has been done.}
 
+
+\subsection{Visualising Pathways}
+    A good place to start with LWTA networks is to take a look at what actually happens during inference. We fitted a channel-out network on the full training MNIST dataset with three layers, 8 nodes in each and 4, 2 and 4 groups respectively in each network. This was done with a dropout rate of $0.125$, ridge penalisation added with $\lambda = 0.01$, and early stopping with $p=5$. We then plotted the pathways that were activated when inputting 200 test images depicting zeros, ones, fours and fives.
 
 \subsection{Architecture tuning}
     To see what kind of network architectures were interesting and useful when applying to the datasets at hand, we tuned the architecture using the \textit{hyperband} search algorithm \citep{Hyperband}.
