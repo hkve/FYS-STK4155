@@ -69,8 +69,15 @@
                     This is a so-called \textit{hard margin} approach, where $f(x_i)$ must make a prediction in $[y_i - \epsilon, y_i + \epsilon]$. Relaxations of this constraint can be done, allowing small deviations around the $\epsilon$ tube. This is characterized by the hyperparameter $C \geq 0$, often called a \textit{soft margin}. $C$ is proportional to the margin relaxation (inversely proportional to the regularisation strength), with $C = 0$ reducing to the hard margin approach.  
                 
                 \subsubsection{Kernels}
-                    One of the benefits of SVMs is the magic of the \textit{kernel trick}. Introducing some non-linearity can improve predictions (for instance, see~\citep{Project1} for an example using linear regression). This is done by applying some transformation $\phi$ giving new features in another (often higher dimensional) space $\mathcal{F}$, $\phi: \mathbb{R}^p \xrightarrow{} \mathcal{F}$. For large data sets, especially if $\text{dim}(\mathcal{F}) \gg p$, the transformation complexity can result in long computation times. Luckily, both our model \cref{eq:SVM_predict} and optimasation \cref{eq:SVM_optimasation} only requires the computation of the dot product in $\mathcal{F}$. The kernel trick then gives us a method to calculate the transformed dot product $\phi(x_i)^T \phi(x_i)$, without calculating $\phi(x_i)$~\citep{kernelTrick}.     
-        
+                    One of the benefits of SVMs is the magic of the \textit{kernel trick}. Introducing some non-linearity can improve predictions (for instance, see~\citep{Project1} for an example using linear regression). This is done by applying some transformation $\phi$ giving new features in another (often higher dimensional) space $\mathcal{F}$, $\phi: \mathbb{R}^p \xrightarrow{} \mathcal{F}$. For large data sets, especially if $\text{dim}(\mathcal{F}) \gg p$, the transformation complexity can result in long computation times. Luckily, both our model \cref{eq:SVM_predict} and optimasation \cref{eq:SVM_optimasation} only requires the computation of the dot product in $\mathcal{F}$. The kernel trick then gives us a method to calculate the transformed dot product $\phi(x_i)^T \phi(x_i)$, without explicitly calculating $\phi(x_i)$~\citep{kernelTrick}. We express this a function $K(x_i, x_j)$, witch usually some simpler dot product such as $x_i^T x_j$ or $||x_i - x_j||^2$.      
+                    \begin{align*}
+                        \phi(x_i)^T \phi(x_j) &= K(x_i, x_j)
+                    \end{align*}
+                    In the following, we will, in addition to the linear (not transformed) product $K(x_i, x_j) = x_i^T x_j$, consider the \textit{Gaussian radial basis function} (RBF) kernel
+                    \begin{align}
+                        \text{RBF:}\hspace{20px}& K(x_i, x_j) = \text{exp}(-\gamma ||x_i - x_j||)
+                    \end{align}
+                    Where $\gamma > 0$ is a hyperparameter.
         \begin{figure}[H]
             \centering
             \includegraphics[width=\linewidth]{BiasVar_LinearRegression.pdf}
