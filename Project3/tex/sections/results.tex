@@ -1,4 +1,5 @@
 Results here, in past tense.
+\comment{Introduce network notation -\Anna}
 
 
 \subsection{Visualising Sparse Pathways}
@@ -52,9 +53,9 @@ Results here, in past tense.
         \rowcolor{maroon!20}
         \multirow{-4}{*}{\rotatebox[origin=c]{90}{Channel-Out}}{\cellcolor{maroon!20}} & Both & \network{32, 64}{16, 32} & 0.4917 \\ \hline
         \rowcolor{cyan!20} 
-        \cellcolor{cyan!20} & None & \network{32,32}{\mathrm{ReLU}} & 0.4843 \\ \cline{2-4} 
+        \cellcolor{cyan!20} & None & \network{32,32}{*,*} & 0.4843 \\ \cline{2-4} 
         \rowcolor{cyan!50} 
-        \multirow{-2}{*}{\rotatebox[origin=c]{90}{Dense}}{\cellcolor{cyan!20} } & Ridge & \network{32,32}{\mathrm{ReLU}} & 0.4919 \\ \hline
+        \multirow{-2}{*}{\rotatebox[origin=c]{90}{Dense}}{\cellcolor{cyan!20} } & Ridge & \network{32,32}{*,*} & 0.4919 \\ \hline
         \end{tabular}
         \caption{Table of the best performing network architectures with maxout, channel-out or dense ReLU layers and various combinations of dropout and ridge penalisation added.}
         \label[tab]{res:tab:networks}
