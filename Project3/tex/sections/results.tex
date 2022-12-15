@@ -27,7 +27,7 @@ Results here, in past tense.
     \end{figure}
 
 \subsection{Tuning LWTA Architecture}
-    Tuning the architecture of our LWTA networks, we found the maxout network architecture \network{64,64}{32,16} with dropout to do the best on the CIFAR-10 dataset, achieving a test accuracy of 51.57\%. Likewise, the best performing channel-out network architecture was \network{64,16,64}{32,*,32} with L2 penalisation added, achieving a test accuracy of 50.75\%, slightly underperforming maxout. The ordinary ReLU dense network achieved an accuracy of 49.19\% on the test dataset with two layers of 32 nodes. The results are tabulated in \cref{res:tab:networks}.
+    Tuning the architecture of our LWTA networks, we found the maxout network architecture \network{64,64}{32,16} with dropout to do the best on the CIFAR-10 dataset, achieving a test accuracy of 51.28\%. Likewise, the best performing channel-out network architecture was \network{64,16,64}{32,*,32} with L2 penalisation added, achieving a test accuracy of 50.69\%, slightly underperforming maxout. The ordinary ReLU dense network achieved an accuracy of 49.19\% on the test dataset with two layers of 32 nodes. The results are tabulated in \cref{res:tab:networks}.
 
     \renewcommand{\arraystretch}{2}
     \begin{table}[ht!]
@@ -37,21 +37,21 @@ Results here, in past tense.
         & \textbf{Regularisation} & \textbf{Architecture} & \textbf{Accuracy} \\
         \hline
         \rowcolor{mint!20}
-        \cellcolor{mint!20} & None & \network{64, 32, 64}{32, 16, 8} & 0.4894 \\ \cline{2-4} 
+        \cellcolor{mint!20} & None & \network{64, 32, 64}{32, 16, 8} & 0.4909 \\ \cline{2-4} 
         \rowcolor{mint!20}
-        \cellcolor{mint!20} & Ridge & \network{64, 32}{32, *}  & 0.5094 \\ \cline{2-4} 
+        \cellcolor{mint!20} & Ridge & \network{64, 32}{32, *}  & 0.5116 \\ \cline{2-4} 
         \rowcolor{mint!50}
-        \cellcolor{mint!20} & Dropout & \network{64, 64}{32, 16} & 0.5157 \\ \cline{2-4} 
+        \cellcolor{mint!20} & Dropout & \network{64, 64}{32, 16} & 0.5128 \\ \cline{2-4} 
         \rowcolor{mint!20}
-        \multirow{-4}{*}{\rotatebox[origin=c]{90}{Maxout}}{\cellcolor{mint!20}} & Both & \network{32, 64}{16, 16} & 0.4938 \\ \hline
+        \multirow{-4}{*}{\rotatebox[origin=c]{90}{Maxout}}{\cellcolor{mint!20}} & Both & \network{32, 64}{16, 16} & 0.4969 \\ \hline
         \rowcolor{maroon!20}
-        \cellcolor{maroon!20} & None & \network{64, 16, 32}{16, 8, *} & 0.4956 \\ \cline{2-4} 
+        \cellcolor{maroon!20} & None & \network{64, 16, 32}{16, 8, *} & 0.4823 \\ \cline{2-4} 
         \rowcolor{maroon!50}
-        \cellcolor{maroon!20} & Ridge & \network{64, 16, 64}{32, *, 32} & 0.5075 \\ \cline{2-4} 
+        \cellcolor{maroon!20} & Ridge & \network{64, 16, 64}{32, *, 32} & 0.5069 \\ \cline{2-4} 
         \rowcolor{maroon!20}
-        \cellcolor{maroon!20} & Dropout & \network{32, 16, 64}{16, *, 32} & 0.4826 \\ \cline{2-4} 
+        \cellcolor{maroon!20} & Dropout & \network{32, 16, 64}{16, *, 32} & 0.4790 \\ \cline{2-4} 
         \rowcolor{maroon!20}
-        \multirow{-4}{*}{\rotatebox[origin=c]{90}{Channel-Out}}{\cellcolor{maroon!20}} & Both & \network{32, 64}{16, 32} & 0.4917 \\ \hline
+        \multirow{-4}{*}{\rotatebox[origin=c]{90}{Channel-Out}}{\cellcolor{maroon!20}} & Both & \network{32, 64}{16, 32} & 0.4987 \\ \hline
         \rowcolor{cyan!20} 
         \cellcolor{cyan!20} & None & \network{32,32}{*,*} & 0.4843 \\ \cline{2-4} 
         \rowcolor{cyan!50} 
