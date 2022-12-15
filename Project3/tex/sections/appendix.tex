@@ -107,3 +107,17 @@
         For the last of our tree based methods, we investigate the boosted trees. 
         
         \subsection{Support Vector Machines}
+        Lastly, we investigate how our SVM performs when increasing the margin ($\epsilon$). To assure convergence, the margin is slightly soft, setting $C = 1$. The results from both the linear and RBF kernel can be seen in \cref{fig:SVR_eps}  
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\linewidth]{BiasVar_SVReps.pdf}
+            \caption{MSE, bias and variance estimates for bagged trees (green) and random forest (blue) considering $\lfloor p/3 \rfloor$ features as each split, against increasing bag size/number of trees.}
+            \label[fig]{fig:SVR_eps}
+        \end{figure}
+
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\linewidth]{BiasVar_SVRC.pdf}
+            \caption{MSE, bias and variance estimates for bagged trees (green) and random forest (blue) considering $\lfloor p/3 \rfloor$ features as each split, against increasing bag size/number of trees.}
+            \label[fig]{fig:SVR_C}
+        \end{figure}
