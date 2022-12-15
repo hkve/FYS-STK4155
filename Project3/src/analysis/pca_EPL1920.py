@@ -103,65 +103,66 @@ if __name__ == "__main__":
     fig, ax = plt.subplots()
     ax.bar(range(1,n_features_org+1), exp_var, alpha=0.5)
     ax.step(range(1,n_features_org+1),cum_var_ratio)
-    ax.axvline(n_features, ls='--')
+    ax.axvline(n_features, ls='--', label=r"PCs: {ps:.0f}".format(ps=n_features))
     
-    ax.set_xlabel(r"\# PCA features")
-    ax.set_ylabel(r"Variance [\%]")
+    ax.set_xlabel(r"Principal components")
+    ax.set_ylabel(r"Explained variance")
+    ax.legend()
 
     plot_utils.save("pca_pl")
     plt.show()
 
-    """
-    Plot 2 - Feature scatter plots. 
-    """
+    # """
+    # Plot 2 - Feature scatter plots. 
+    # """
 
-    n_components_to_use = 3
+    # n_components_to_use = 3
 
-    labels={str(i): f"PC {i+1}" for i in range(n_components_to_use)}
+    # labels={str(i): f"PC {i+1}" for i in range(n_components_to_use)}
 
-    # pca = PCA(n_components = n_components)
-    # principal_components = pca.fit_transform(trainx)
+    # # pca = PCA(n_components = n_components)
+    # # principal_components = pca.fit_transform(trainx)
 
-    fig = px.scatter_matrix(
-        principal_components[:,:n_components_to_use],
-        dimensions=range(n_components_to_use),
-        color=trainy,
-        labels=labels
-    )
-    fig.update_traces(diagonal_visible=True)
-    fig.show()
-
-
-    """
-    Plot 3 - Feature composition plot.
-    """
-    cov_mat = np.cov(trainx.T)
-    eigvals, eigvecs = np.linalg.eig(cov_mat)
-    best_eigvec = eigvecs[0] 
-
-    # a_match = trainx[200]#.loc[trainx["match_id"] == 20190020]
-    # cols = trainx.columns
-
-    # for i in range(len(best_eigvec)):
-        # print(best_eigvec[i], cols[i], a_match[i])
-
-    # num_matches = len(trainx)
-    # n_features_org = np.shape(trainx)[1]
-
-    positive_sum_eigvec = np.sqrt(eigvecs[:5] ** 2)
-    five = np.sum(positive_sum_eigvec, axis=0)
-
-    fig, ax = plt.subplots()
-    ax.plot(range(1, len(five)+1), five)
-    # fig = px.line(x=range(1, len(five)+1), y=five)
+    # fig = px.scatter_matrix(
+    #     principal_components[:,:n_components_to_use],
+    #     dimensions=range(n_components_to_use),
+    #     color=trainy,
+    #     labels=labels
+    # )
+    # fig.update_traces(diagonal_visible=True)
     # fig.show()
-    plt.show()
-    # from IPython import embed; embed()
 
-    # fig, ax = plt.subplots(figsize=(14,9))
-    # ax.plot(range(1,len(five)+1), np.sqrt(eigvecs[:10].T**2), lw=0.8)
 
+    # """
+    # Plot 3 - Feature composition plot.
+    # """
+    # cov_mat = np.cov(trainx.T)
+    # eigvals, eigvecs = np.linalg.eig(cov_mat)
+    # best_eigvec = eigvecs[0] 
+
+    # # a_match = trainx[200]#.loc[trainx["match_id"] == 20190020]
+    # # cols = trainx.columns
+
+    # # for i in range(len(best_eigvec)):
+    #     # print(best_eigvec[i], cols[i], a_match[i])
+
+    # # num_matches = len(trainx)
+    # # n_features_org = np.shape(trainx)[1]
+
+    # positive_sum_eigvec = np.sqrt(eigvecs[:5] ** 2)
+    # five = np.sum(positive_sum_eigvec, axis=0)
+
+    # fig, ax = plt.subplots()
+    # ax.plot(range(1, len(five)+1), five)
+    # # fig = px.line(x=range(1, len(five)+1), y=five)
+    # # fig.show()
     # plt.show()
+    # # from IPython import embed; embed()
+
+    # # fig, ax = plt.subplots(figsize=(14,9))
+    # # ax.plot(range(1,len(five)+1), np.sqrt(eigvecs[:10].T**2), lw=0.8)
+
+    # # plt.show()
 
     exit()
 
