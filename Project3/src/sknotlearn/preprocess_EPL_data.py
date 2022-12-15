@@ -470,9 +470,10 @@ if __name__ == "__main__":
     info = get_feature_description("EPL_notes.md")
 
 
-    # data = stats_EPL19_per_game.copy()
+    data = stats_EPL19_per_game.copy()
     
-    # container = translate_data(data)
+    container = translate_data(data)
+    print(np.size(container.y.to_numpy()))
 
     # from sklearn.model_selection import train_test_split   
 
