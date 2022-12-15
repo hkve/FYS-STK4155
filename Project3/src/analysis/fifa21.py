@@ -142,7 +142,7 @@ def Trees_increasing_ensamble(X, y, filename=None, random_state=321):
         for i, n in enumerate(n_estimators):
             reg = BaggingRegressor(
                 estimator=DecisionTreeRegressor(
-                    max_depth=4,
+                    max_depth=10,
                     random_state=random_state
                 ),
                 max_features=max_features[method],
