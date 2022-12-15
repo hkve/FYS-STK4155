@@ -47,14 +47,14 @@
             \subsubsection{Boosted trees}
                 The idea behind boosted trees is combining several weak learners which iteratively learn from previous mistakes to enhance performance. In the case of decision trees, weak learners are simple trees only performing slightly better than random guesses. 
 
-                When employing gradient boost for regression the process starts by creating a single leaf, with a value $f_0(x)$ often set to the average of all output values in the training set. Implementing a differentiable cost function, e.g. the squared error for regression, the cost of the initial prediction and its gradient with respect to the predicted value is calculated. A simple tree is fit to minimise the cost. The prediction of that tree is then scaled by a coefficient and is added to the initial prediction, $f_0(x)$, creating the next: $f_1(x) = f_0(x) + \beta b(x;\gamma_1)$. Where $\beta$ is the scaling coefficient and $\gamma_1$ the prediction parameters. The process of calculating the gradient of the cost function, fitting a new tree using the gradient, and adding this tree's prediction to the existing one, is repeated, iteratively creating a better model: 
+                When employing gradient boost for regression the process starts by creating a single leaf, with a value $f_0(x)$ often set to the average of all output values in the training set. Implementing a differentiable cost function, e.g. the squared error for regression, the cost of the initial prediction and its gradient with respect to the predicted value is calculated. A simple tree is fitted to minimise the cost. The prediction of that tree is then scaled by a coefficient and is added to the initial prediction, $f_0(x)$, creating the next: $f_1(x) = f_0(x) + \beta b(x;\gamma_1)$. Here $\beta$ is the scaling coefficient and $\gamma_1$ the prediction parameters. The process of calculating the gradient of the cost function, fitting a new tree using the gradient, and adding this tree's prediction to the existing one, is repeated, iteratively creating a better model: 
                 \begin{equation}
                     f_M(x) = f_0(x) + \sum_{m=1}^M \beta b(x; \gamma_m)
                 \end{equation}
                 $\beta$ can be dynamic for various $m$. In that case the gradient of the cost function must also be calculated with respect to $\beta_m$. 
 
             \subsection{Support Vector Machines}
-            The Support Vector Machine (SVM) is most commonly used in classification problems, with the idea of constricting some hyperplane separating target classes in feature space \comment{Add ref}. By a slight change of approach, the method can also be applied to regression problems, proposed in~\citep{SVR}. 
+            The Support Vector Machine (SVM) is most commonly used in classification problems, with the idea of constricting some hyperplane separating target classes in feature space. By a slight change of approach, the method can also be applied to regression problems, proposed in~\citep{SVR}. 
             
                 \subsubsection{Regression Approach}
                     The predictions are performed using a simple linear function
@@ -69,8 +69,15 @@
                     This is a so-called \textit{hard margin} approach, where $f(x_i)$ must make a prediction in $[y_i - \epsilon, y_i + \epsilon]$. Relaxations of this constraint can be done, allowing small deviations around the $\epsilon$ tube. This is characterized by the hyperparameter $C \geq 0$, often called a \textit{soft margin}. $C$ is proportional to the margin relaxation (inversely proportional to the regularisation strength), with $C = 0$ reducing to the hard margin approach.  
                 
                 \subsubsection{Kernels}
-                    One of the benefits of SVMs is the magic of the \textit{kernel trick}. Introducing some non-linearity can improve predictions (for instance, see~\citep{Project1} for an example using linear regression). This is done by applying some transformation $f$ giving new features in another (often higher dimensional) space $\mathcal{F}$, $f: \mathbb{R}^p \xrightarrow{} \mathcal{F}$. For large data sets, especially if $\text{dim}(\mathcal{F}) \gg p$, the transformation complexity can result in long computation times. Luckily, both our model \cref{eq:SVM_predict} and optimasation \cref{eq:SVM_optimasation} only requires the computation of the dot product in $\mathcal{F}$ 
-        
+                    One of the benefits of SVMs is the magic of the \textit{kernel trick}. Introducing some non-linearity can improve predictions (for instance, see~\citep{Project1} for an example using linear regression). This is done by applying some transformation $\phi$ giving new features in another (often higher dimensional) space $\mathcal{F}$, $\phi: \mathbb{R}^p \xrightarrow{} \mathcal{F}$. For large data sets, especially if $\text{dim}(\mathcal{F}) \gg p$, the transformation complexity can result in long computation times. Luckily, both our model \cref{eq:SVM_predict} and optimasation \cref{eq:SVM_optimasation} only requires the computation of the dot product in $\mathcal{F}$. The kernel trick then gives us a method to calculate the transformed dot product $\phi(x_i)^T \phi(x_i)$, without explicitly calculating $\phi(x_i)$~\citep{kernelTrick}. We express this a function $K(x_i, x_j)$, witch usually some simpler dot product such as $x_i^T x_j$ or $||x_i - x_j||^2$.      
+                    \begin{align*}
+                        \phi(x_i)^T \phi(x_j) &= K(x_i, x_j)
+                    \end{align*}
+                    In the following, we will, in addition to the linear (not transformed) product $K(x_i, x_j) = x_i^T x_j$, consider the \textit{Gaussian radial basis function} (RBF) kernel
+                    \begin{align}
+                        \text{RBF:}\hspace{20px}& K(x_i, x_j) = \text{exp}(-\gamma ||x_i - x_j||)
+                    \end{align}
+                    Where $\gamma > 0$ is a hyperparameter.
         \begin{figure}[H]
             \centering
             \includegraphics[width=\linewidth]{BiasVar_LinearRegression.pdf}
