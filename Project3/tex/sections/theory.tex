@@ -58,6 +58,8 @@ We cite our sources like this~\citep{Project1}.
 
     When passing the output from one layer as input to the next, a linear transformation is done. Denoting the output vector from layer $\ell$ as $\vec{a}^\ell$, the transformation produces a \textit{response} $\vec{z}^{\ell} = W^\ell \vec{a}^{\ell-1} + \vec{b}^\ell$, where $W^\ell$ is a weight matrix, and $\vec{b}^\ell$ is called the bias. The response vector is then passed through an activation function (which is generally non-linear) to produce the \textit{activation} $\vec{a}^\ell = f(\vec{z}^\ell)$.
 
+    \comment{Could the terms "incoming" and "outgoing weights" be established? - \Anna}
+
 \subsection{Neurological Background and Competing Neurons}
     The first artificial neural networks were inspired by biological neurons (cells mainly located in the brain); artificial nodes represent the neurons and their activation, the weights represent the synapses (connections between neurons), and biases address the threshold for activation of each neuron/node~\citep{Project2}. Since then, the development of neurobiologically inspired artificial intelligence has only increased and many other algorithms mimicking mechanisms of the brain have been employed to enhance machine learning performance. An up-and-coming and interesting field of research is the implementation of biological competative mechanisms. 
     
@@ -88,16 +90,14 @@ We cite our sources like this~\citep{Project1}.
         Visual perception. 
 
 \subsection{Local Winner-Takes-All (LWTA)}
-    The idea of LWTA algorithms is to implement \textit{local learning} in the neural network, meaning that the entire network does not learn how to transform a given input, but it is rather outsourced to local parts of the network. In LWTA algorithms, the nodes in each layer are grouped into a number of groups $G$, and Winner-Takes-All is applied on the activation of each of these groups, only passing on the maximal output in the group. This creates various neural pathways and these learn during training, and are selected at inference time. The hypothesis is that different pathways get trained on different features of the data and that a pathway will be activated given similar data as it is trained on, making the network more flexible/better at separating input (From maxout..). 
+    The idea behind LWTA algorithms is to implement \textit{local learning} in the neural network, meaning that the entire network does not learn how to transform a given input, but the learning is rather outsourced to local parts of the network. In LWTA algorithms, the nodes in each layer are grouped into a number of groups $G$, and Winner-Takes-All is applied on the activation of each of these groups, only passing on the maximal output in the group. This creates various neural pathways which learn during training, and are selected at inference time. The hypothesis is that different pathways get specialised in recognising different features of the training data and that a pathway will be activated given a datapoint with similar features as it is trained on, making the network more flexible and better at separating input \citep{Wang}. 
 
     Two different LWTA algorithms will be employd in this report: maxout, where pathways are only formed posteriori; and channel-out, where they are also formed anteriori.
 
     \subsubsection{Maxout and Channel-Out}
-        The \textit{maxout} activation passes the input from the previous layer through the weight kernel and adds the bias as normal, but then only passes on the activation from the most active node in each group of the layer. Each group then has a common set of weight connections to the next layer in  the network.See \cref{the:fig:illustration_maxout} for illustration of a neural network with maxout actvation.
-
-        During backpropagation in training, the weights of each group are trained according to the activation of the most active node. This can be seen from the gradient of the cost function in the direction of one of the weights of an inactive node: the learning is proportional to $\pd[w^{\ell}_{ij}]{C} \propto \pd[a^\ell_i]{C} = 0$, because any infinitesimal change in the activation would still result in no activation if $a_i$ was not already the maximum of the group. 
-        
-        The neural pathways created through this algorithm consist of weights and nodes (see \cref{the:fig:illustration_maxout} for an example of a pathway). The relevant nodes of a pathway are chosen based on which activation is largest within a group, and the input weights corresponding to that nodes are consequently chosen.  
+        The \textit{maxout} activation passes the input from the previous layer through the weight kernel and adds the bias as normal, but then only passes on the activation from the most active node in each group of the layer. Each group then has a common set of output weights connected to the next layer in  the network.See \cref{the:fig:illustration_maxout} for illustration of a neural network with maxout actvation.
+        During backpropagation in training, only the incoming weights connected to the most activated nodes will be trained. This can be seen from the gradient of the cost function in the direction of one of the weights of an inactive node: the learning is proportional to $\pd[w^{\ell}_{ij}]{C} \propto \pd[a^\ell_i]{C} = 0$, because any infinitesimal change in the activation would still result in no activation if $a_i$ was not already the maximum of the group. 
+        Given a datapoint, the neural pathways created through this algorithm consist of weights and nodes (see \cref{the:fig:illustration_maxout} for an example of pathways). The relevant nodes of a pathway are chosen based on which activation is largest within a group, and the input weights corresponding to those nodes are consequently chosen \citep{Wang}. 
         
         \begin{figure}[]
             \centering
@@ -121,9 +121,10 @@ We cite our sources like this~\citep{Project1}.
         %     \end{algorithmic}
         % \end{algorithm}
 
-        \textit{Channel-out} makes a subtle, but meaningful, change to the maxout algorithm. Instead of every group having a common set of weight connections to the next layer, every node has its own set of weight connections. This results in not only local learning of the weights during backpropagation, but also leads to the activation winner choosing the set of weights that will be used in the next layer at inference time.
+        \textit{Channel-out} makes a subtle, but meaningful, change to the maxout algorithm. Instead of every group having a common set of weight connections to the next layer, every node has its own set of weight connections. This results in not only local learning of the weights during backpropagation, but also leads to the activation winner dictating the set of weights that will be used in the next layer at inference time (outgoing weights).
         Effectively, a channel-out layer works the same way as an ordinary dense layer with a linear activation function, but sets all the activations of the nodes that do not win their group to zero before passing them on to the next layer.
-        Same as with maxout, only the weights of the active nodes are trained, but this also applies to the next layer, where only weights connected to the active nodes are trained. So the local learning goes both forwards and backwards from a channel-out layer, in contrast to just backwards in the case of maxout.
+        Same as with maxout, only the weights of the active nodes are trained, but this also applies to the next layer; it not only affects the incoming weights, but also the outgoing weights.  
+        So the local learning goes both forwards and backwards from a channel-out layer, in contrast to just backwards in the case of maxout \citep{Wang}. 
         
         \begin{figure}[]
             \centering
@@ -132,7 +133,6 @@ We cite our sources like this~\citep{Project1}.
             \label[fig]{the:fig:illustration_channelout}
         \end{figure}
 
-        \comment{I place the activation illustration here, but might well be moved. -\Carl}\\
         A way to look at the function of the LWTA groups is to study the effective activation output of the group. Simplifying by looking at a group of nodes whose input is only one scalar quantity $x$. The response of the nodes in the groups are linear functions $z_i = w_i x + b_i$ of the input, and the activation output is $\operatorname{max}(z_i)$. \cref{the:fig:activation_imitation} illustrates how the maximum of a group of such functions can mimic and parameterise different convex function. In fact, it is shown that a group of an arbitrary amount of nodes can approximate any convex function \citep{Maxout_Networks}.
 
         \begin{figure}[]

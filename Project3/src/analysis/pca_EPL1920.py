@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import sys
 import seaborn as sns
-
+import plot_utils
 
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
@@ -108,6 +108,7 @@ if __name__ == "__main__":
     ax.set_xlabel(r"\# PCA features")
     ax.set_ylabel(r"Variance [\%]")
 
+    plot_utils.save("pca_pl")
     plt.show()
 
     """
