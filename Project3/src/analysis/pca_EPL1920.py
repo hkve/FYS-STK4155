@@ -98,6 +98,7 @@ if __name__ == "__main__":
     
     final_data = pd.concat([principal_data, trainy.reset_index(drop=True)], axis=1)
     print(final_data.head())
+    print(f"Total features: {trainx.shape[1]}")
 
 
     fig, ax = plt.subplots()
@@ -109,7 +110,7 @@ if __name__ == "__main__":
     ax.set_ylabel(r"Explained variance")
     ax.legend()
 
-    # plot_utils.save("pca_pl")
+    plot_utils.save("pca_pl")
     plt.show()
 
     # """

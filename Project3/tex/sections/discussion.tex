@@ -5,7 +5,9 @@ Discussion here, in present/past tense.
 
 
 \subsection{Link to existing research}
-    \comment{Compare with other LWTA on MNIST and Cifar10 \Carl}
+    \comment{I write about the CIFAR-10 results here, but will probably make a more appropriate section. -\Carl} \\
+    The results we got on the CIFAR-10 dataset, with the best test accuracy of 51.28\%, was not particularly impressive. It is however known to be a difficult dataset to score well on, with the state-of-the-art convolutional maxout network achieving a test accuracy 88.32\% \citep{Maxout_Networks}. This was done with a significantly larger network, with convolutional layers, and with more thorough image pre-processing. Channel-out networks have not achieved the same level of accuracy, with a top score of 86.80\% test accuracy \citep{Wang}. This was also our conclusion, with the channel-out network slightly underperforming maxout. However, both channel-out and maxout networks bettered the ordinary ReLU network result by 1.50\% and 2.09\% respectively.
+
     \comment{Maybe include discussion on ML as a tool in neurobiological research \Anna} 
 
 
@@ -19,7 +21,9 @@ Discussion here, in present/past tense.
     \comment{On CIFAR-10: $27+12+6+4 = 49$} \\
     \comment{On EPL: $3 \times (81 + 34 + 15 + 8 + 5) = 3 \times 143 = 429$}
 
-\subsubsection{PCA - did not choose the PCA-features}
+\subsubsection{PCA}
+    The decision to not use PCA for our further analysis of the premier league data was first and foremost made with respect to figure \ref{res:fig:explained_variance} where we would need 42 principal components in order to explain 99 \% of the variance. Considering the relatively few features in the original dataset, 87, we could as well perform the analysis directly on the original features. Perhaps if we put the threshold lower than 99 \%, say 80 \%, the principal components would greatly reduce (by-eye inspection of the figure yield about 15), but at the caveat of reduced explained variance. It is fair to assume that PCA would be of great benefit for a larger number of features. \comment{Add something about the other datasets here? (that they could probably benefit from PCA even though we have not done it)\Johan}. 
+    
 
 \subsubsection{Explainability of MO/CO}
     \comment{Can features be recognised in the pathways? NB! Features human notice are not necessarily the same as the ones a machine notice -\Anna}
