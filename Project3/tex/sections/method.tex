@@ -68,12 +68,12 @@ We reference like this using \verb|cleveref|: \cref{int:fig:example_a}, \cref{th
     \subsubsection{Regularisation}
         \comment{Write about L2-regularisation. -\Carl}
 
-        A problem that can occur in LWTA layers is when the weights of one node becomes much larger than those of the other nodes in the group, resulting in training of just this single node. A common technique to combat this is to add a dropout layer before and/or after the LWTA layer. The dropout layer randomly sets elements in its input vector to zero, according to a dropout rate, before passing it on to the next layer. This means that the nodes in a group cannot solely lean on one specific node, and forces pathways in the network to not learn specific trends `too much'. As such, it prevents overfitting, and can be seen as a regularisation method. The dropout layers are only active during training, and do not drop any activations at inference time. The effect of dropout on a LWTA network is illustrated in \cref{met:fig:dropout_network}.
+        A problem that can occur in LWTA layers is when the weight of a certain input to one of the nodes of a group becomes much larger than those of the other nodes in the group, resulting in the output of the group being dominated by a single node and a single input. This can result in overly local training, perhaps even of a single node and a single weight. A common technique to combat this is to add a dropout layer before and/or after the LWTA layer. The dropout layer randomly sets elements of its input vector to zero, according to a dropout rate, before passing it on to the next layer. This means that the nodes in a group cannot solely lean on one specific node or input, and forces pathways in the network to not learn specific trends `too much'. As such, it prevents overfitting, and can be seen as a regularisation method. The dropout layers are only active during training, and do not drop any activations at inference time. The effect of dropout on a LWTA network is illustrated in \cref{met:fig:dropout_network}.
 
         \begin{figure}
             \centering
             \includegraphics[width=\linewidth]{figs/illustration_dropout.png}
-            \caption{An illustration channel-out neural network with a dropout added to the second channel-out layer.}
+            \caption{An illustration channel-out neural network with a dropout added to the first channel-out layer. Only the lower group in the first hidden layer is trained.}
             \label[fig]{met:fig:dropout_network}
         \end{figure}
 
@@ -116,5 +116,9 @@ We reference like this using \verb|cleveref|: \cref{int:fig:example_a}, \cref{th
     \subsubsection{CIFAR-10}
         On the CIFAR-10 dataset, we tuned using 1 hyperband iteration with a maximum number of epochs $R=30$ and $\eta=3$. We used early stopping with $p=5$ to terminate the training. After finding best network architectures, we fitted them on the full training dataset, evaluating their accuracy on the test dataset. We used early stopping with $p=10$ during this training.
 
+        When adding dropout we used a dropout rate of $0.1$, and with Ridge penalisation we used $\lambda=10^{-4}$.
+
     \subsubsection{Premier League Dataset}
         With the smaller Premier League dataset, we could afford 3 full iterations of the hyperband search with a maximum number of epochs $R=150$ and again $\eta=3$. Again, we used early stopping during the tuning, with $p=15$. After finding the top-performing architectures, we trained on the full training set with early stopping with $p=30$.
+
+        When adding dropout we used a dropout rate of $0.25$, and with Ridge penalisation we used $\lambda=10^{-4}$.
