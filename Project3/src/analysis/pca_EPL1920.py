@@ -77,6 +77,9 @@ if __name__ == "__main__":
     Plot 1 - Step plot and histogram. 
     """
 
+    scaler = StandardScaler()
+    trainx = scaler.fit_transform(trainx)
+
     num_matches = len(trainx)
     n_features_org = np.shape(trainx)[1]
 
@@ -126,6 +129,38 @@ if __name__ == "__main__":
     )
     fig.update_traces(diagonal_visible=True)
     fig.show()
+
+
+    """
+    Plot 3 - Feature composition plot.
+    """
+    cov_mat = np.cov(trainx.T)
+    eigvals, eigvecs = np.linalg.eig(cov_mat)
+    best_eigvec = eigvecs[0] 
+
+    # a_match = trainx[200]#.loc[trainx["match_id"] == 20190020]
+    # cols = trainx.columns
+
+    # for i in range(len(best_eigvec)):
+        # print(best_eigvec[i], cols[i], a_match[i])
+
+    # num_matches = len(trainx)
+    # n_features_org = np.shape(trainx)[1]
+
+    positive_sum_eigvec = np.sqrt(eigvecs[:5] ** 2)
+    five = np.sum(positive_sum_eigvec, axis=0)
+
+    fig, ax = plt.subplots()
+    ax.plot(range(1, len(five)+1), five)
+    # fig = px.line(x=range(1, len(five)+1), y=five)
+    # fig.show()
+    plt.show()
+    # from IPython import embed; embed()
+
+    # fig, ax = plt.subplots(figsize=(14,9))
+    # ax.plot(range(1,len(five)+1), np.sqrt(eigvecs[:10].T**2), lw=0.8)
+
+    # plt.show()
 
     exit()
 
