@@ -45,13 +45,16 @@
             
             \subsubsection{Boosted trees}
         \subsection{Support Vector Machines}
-        The Support Vector Machine (SVM) is most commonly used in classification problems, with the idea of constricting some hyperplane separating target classes in feature space \comment{Add ref}. 
-        
+        The Support Vector Machine (SVM) is most commonly used in classification problems, with the idea of constricting some hyperplane separating target classes in feature space \comment{Add ref}. By a slight change of approach, the method can also be applied to regression problems, proposed in~\citep{SVR}. The predictions are performed using a simple linear function
         \begin{align*}
-            \underset{\vec{w}}{\text{argmin}}&  \left[ \frac{1}{2}||\vec{w}||^2 \right], \\
-            \text{subject to}\hspace{20px} &|y_i - \langle \vec{w}, x_i \rangle - b| \leq \epsilon  
+            f(x_i) = \langle \vec{w}, x_i \rangle + b \text{ with } \vec{w} \in \mathcal{F}, b \in \mathbb{R} 
         \end{align*}
-        $\epsilon$ free parameter, serves a threshold ($\epsilon$ intensive tube), all predictions are in an $\epsilon$ range around the data point $y_i$ ~\citep{SVR}
+        Where $\langle \cdot,\cdot\rangle$ is the dot product in $\mathcal{F}$ space. The choice of this dot product is commonly named the \textit{kernel}, to be explained in more detailed later. We want to find the optimal values of $\set{\vec{w}, b}$ such that the predictions of $f(x_i)$ lies inside some region around the $y_i$ training data. This region is defined by the hyperparameter $\epsilon$ (the so-called $\epsilon$ intensive tube \footnote{Not to be confused with the famouse $\epsilon$-sausage used for proofs of continuity, introduced by the math professor \textit{Arne Hole}.}). This can be formulated as an optimasation of $\vec{w}$, subject to the $\epsilon$ constraint ~\citep{SVRgood}.  
+        \begin{align*}
+            \underset{\vec{w}}{\text{argmin}}&  \left[ \langle \vec{w}, \vec{w} \rangle \right], \\
+            \text{subject to}\hspace{20px} &|y_i - f(x_i)| \leq \epsilon  
+        \end{align*}
+        This is a so-called \textit{hard margin} approach, where $f(x_i)$ must make a prediction in $[y_i - \epsilon, y_i + \epsilon]$. Relaxations of this constraint can be done, allowing small deviations around the $\epsilon$ tube. This is characterized by the hyperparameter $C \geq 0$, often called a \textit{soft margin}. $C$ is inversely proportional to the margin relaxation, with $C = 0$ reducing to the hard margin approach.  
         \begin{figure}[H]
             \centering
             \includegraphics[width=\linewidth]{BiasVar_LinearRegression.pdf}
