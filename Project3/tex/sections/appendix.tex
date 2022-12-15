@@ -78,6 +78,10 @@
                         \text{RBF:}\hspace{20px}& K(x_i, x_j) = \text{exp}(-\gamma ||x_i - x_j||)
                     \end{align}
                     Where $\gamma > 0$ is a hyperparameter.
+
+    \section{Findings and Discussion}
+        \subsection{Linear Regression}
+        The bias-variance decomposition of OLS, Ridge and Lasso can be seen in figure \cref{fig:linreg_biasvar_decomp}. For OLS, there is no penalisation to vary, and all bias contributions comes from the assumption of first order polynomial response. Increasing the feature space, be it introducing higher order polynomials or exponential terms, would allow the fit to be more flexible, presumably increasing bias. When increasing the penalisation parameter $\alpha$ slightly, both Ridge and Lasso stays quite close to the simple OLS case as expected. At around $\alpha = 10^{-2}$ there is a slight decrease in both bias and variance for both models, with MSE minima at $8.46$, $8.27$ using $\alpha = 1.38, 0.12$ for Ridge and Lasso respectively. In these regions, the variance decreases as expect since the solution space for the optimal parameters shrink. There is also a dip in bias, which might be due to finding a specific set of parameters that works better for our subset of features. We do not use all of FIFAs features, as well as probably including some unimportant ones. There is probably some exclusion and inclusion bias where a penalised model better handles these by shrinking unimportant features. Going beyond the dip both Ridge and Lasso bias increases, indicating that the model is underfitting.
         \begin{figure}[H]
             \centering
             \includegraphics[width=\linewidth]{BiasVar_LinearRegression.pdf}
@@ -85,17 +89,20 @@
             \label[fig]{fig:linreg_biasvar_decomp}
         \end{figure}
 
+        \subsection{Tree Based Methods}
+        We begin by fitting a single tree, gradually allowing for more complexity by increasing the allowed tree depth, shown in figure \cref{fig:singletree_biasvar_decomp}. In contrast to the linear regression models, the variance is significantly larger, overcoming the bias contribution for a tree of depth 2. The MSE values are generally quite large, with a minimum of $22.3$ using a depth of 2 with 4 leafs. By considering the train MSE, we see that we quickly move into the realm of extreme overfitting. Allowing the tree to grow to a depth of 5 results in close to zero train MSE. A single tree, through the parameters searched here, does not result in a good model for this problem. 
         \begin{figure}[H]
             \centering
             \includegraphics[width=\linewidth]{BiasVar_SingleTree.pdf}
-            \caption{MSE, bias and variance estimates for a single tree against increasing relaxation of tree depth.}
+            \caption{MSE, bias and variance estimates for a single tree against increasing relaxation of tree depth. Train MSE is also included to show the drastic overfitting.}
             \label[fig]{fig:singletree_biasvar_decomp}
         \end{figure}
+        Even though a single tree did not perform well, an ensemble of trees can often give better results. Varying the number of trees in our ensemble, both the bagged trees and random forest can be seen in \cref{fig:bag_and_rf_biasvar_decomp} 
 
         \begin{figure}[H]
             \centering
             \includegraphics[width=\linewidth]{BiasVar_Bag_and_Rf.pdf}
             \caption{MSE, bias and variance estimates for bagging trees (green) and random forest (blue), against increasing bag size/number of trees.}
-            \label[fig]{fig:singletree_biasvar_decomp}
+            \label[fig]{fig:bag_and_rf_biasvar_decomp}
         \end{figure}
-
+        \subsection{Support Vector Machines}
