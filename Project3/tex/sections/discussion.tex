@@ -19,7 +19,9 @@ Discussion here, in present/past tense.
     \comment{On CIFAR-10: $27+12+6+4 = 49$} \\
     \comment{On EPL: $3 \times (81 + 34 + 15 + 8 + 5) = 3 \times 143 = 429$}
 
-\subsubsection{PCA - did not choose the PCA-features}
+\subsubsection{PCA}
+    The decision to not use PCA for our further analysis of the premier league data was first and foremost made with respect to figure \ref{res:fig:explained_variance} where we would need 42 principal components in order to explain 99 \% of the variance. Considering the relatively few features in the original dataset, 87, we could as well perform the analysis directly on the original features. Perhaps if we put the threshold lower than 99 \%, say 80 \%, the principal components would greatly reduce (by-eye inspection of the figure yield about 15), but at the caveat of reduced explained variance. It is fair to assume that PCA would be of great benefit for a larger number of features. \comment{Add something about the other datasets here? (that they could probably benefit from PCA even though we have not done it)\Johan}. 
+    
 
 \subsubsection{Explainability of MO/CO}
     \comment{Can features be recognised in the pathways? NB! Features human notice are not necessarily the same as the ones a machine notice -\Anna}
