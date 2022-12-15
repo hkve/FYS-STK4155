@@ -39,10 +39,10 @@
             \begin{align}
                 \hat{F}(x) = \frac{1}{B}\sum_{b = 1}^{B} \hat{f}^b (x) \label{eq:app:bagged_trees}
             \end{align}
-            Where $\hat{f}^b$ is a single decision tree, fitted using the data from bag $b$. $B$ represents the total number of trees, which we will call ensemble size.
+            Where $\hat{f}^b$ is a single decision tree, fitted using the data from bag $b$. $B$ represents the total number of trees, which we will call ensemble size. We will call this method bagged trees (BT).
 
             \subsubsection{Random Forest}
-            Random forest uses the same methodology as bagged trees. Bootstrap is performed in the same manner \cref{eq:app:bagged_trees}, but only a random subset of features is considered at each node split. We represent the number of features considered by $m$, with $m = 1$ reducing to bagged trees. From ~\citep{hastie01statisticallearning}, a ration of $m = \lfloor p/3 \rfloor$ usually performs well on regression problems. This is expedient since trees might be highly correlated, especially if a single feature is highly important for reducing the training MSE. If all features are considered for each split \comment{Not done? -\Anna}
+            Random forest (RF) uses the same methodology as bagged trees. Bootstrap is performed in the same manner \cref{eq:app:bagged_trees}, but only a random subset of features is considered at each node split. We represent the number of features considered by $m$, with $m = 1$ reducing to bagged trees. From ~\citep{hastie01statisticallearning}, a ration of $m = \lfloor p/3 \rfloor$ usually performs well on regression problems. This is expedient since trees might be highly correlated, especially if a single feature is very important for reducing the training MSE. If all features are considered for each split, the random forest reduced to the bagged trees.
             
             \subsubsection{Boosted trees}
                 The idea behind boosted trees is combining several weak learners which iteratively learn from previous mistakes to enhance performance. In the case of decision trees, weak learners are simple trees only performing slightly better than random guesses. 
@@ -97,12 +97,27 @@
             \caption{MSE, bias and variance estimates for a single tree against increasing relaxation of tree depth. Train MSE is also included to show the drastic overfitting.}
             \label[fig]{fig:singletree_biasvar_decomp}
         \end{figure}
-        Even though a single tree did not perform well, an ensemble of trees can often give better results. Varying the number of trees in our ensemble, both the bagged trees and random forest can be seen in \cref{fig:bag_and_rf_biasvar_decomp} 
-
+        Even though a single tree did not perform well, an ensemble of trees can often give better results. Varying the number of trees in our ensemble, both the BT and RF can be seen in \cref{fig:bag_and_rf_biasvar_decomp}. Comparing with the single tree from \cref{fig:singletree_biasvar_decomp}, we see a large improvement concerning both MSE, bias and variance. When adding more trees, the variance decreases. This agrees with the idea that many high variance trees can produce a smaller variance when their predictions are averaged. Similarly, the bias decreases, but not as drastically. The rectangular distribution of targets in feature space is still assumed in this model, therefor still adding quite a lot of bias. For comparison, the bias of simple OLS from \cref{fig:linreg_biasvar_decomp} is smaller. When reaching an ensemble size of approximately $30$ trees, only slight improvements of the MSE is seen. Comparing between BT and RF, we see that considering a subset of features does decrease variance, presumably due to less correlated trees. This however does not yield significant improvements in the MSE, with BT having a more stable test MSE across different ensemble sizes than RF. 
         \begin{figure}[H]
             \centering
             \includegraphics[width=\linewidth]{BiasVar_Bag_and_Rf.pdf}
-            \caption{MSE, bias and variance estimates for bagging trees (green) and random forest (blue), against increasing bag size/number of trees.}
+            \caption{MSE, bias and variance estimates for bagged trees (green) and random forest (blue) considering $\lfloor p/3 \rfloor$ features as each split, against increasing bag size/number of trees.}
             \label[fig]{fig:bag_and_rf_biasvar_decomp}
         \end{figure}
+        For the last of our tree based methods, we investigate the boosted trees. 
+        
         \subsection{Support Vector Machines}
+        Lastly, we investigate how our SVM performs when increasing the margin ($\epsilon$). To assure convergence, the margin is slightly soft, setting $C = 1$. The results from both the linear and RBF kernel can be seen in \cref{fig:SVR_eps}. 
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\linewidth]{BiasVar_SVReps.pdf}
+            \caption{MSE, bias and variance estimates for SVR, against increasing the margin size $\epsilon$. In green, we have the linear kernel while in blue the RBF kernel. A soft margin of $C = 1$ has been used across all $\epsilon$. }
+            \label[fig]{fig:SVR_eps}
+        \end{figure}
+
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\linewidth]{BiasVar_SVRC.pdf}
+            \caption{MSE, bias and variance estimates for SVR, against increasing the softness of the margin $C$. In green, we have the linear kernel while in blue the RBF kernel. The respective optimal margin size $\epsilon$ found for $C= 1$ has been.}
+            \label[fig]{fig:SVR_C}
+        \end{figure}

@@ -1,9 +1,10 @@
 \comment{Results here, in past tense.}
-To have a compact manner of referring to a specific implemented network structure, we introduce a new notation. A network with a specific architecture will hereby be referred to as \network{\textit{nodes by layer}}{\textit{groups by layer}}, where the number of nodes in each hidden layer is presented in the superscript and number of groups in each layer in the subscript. In both cases the numbers are presented starting with the first hidden layer, and ending with the last. When the number of nodes is identical to the number of groups, meaning there is only one node per group, the sign * will be used in the subscript to state the layer is dense with ReLU activation function implemented. For example, if a network has three layers: 32 nodes and two nodes per group; 64 nodes and four nodes per group; and 16 nodes and one node per group with ReLU, it will be denoted as \network{32, 64, 16}{16, 16, *}. 
+To have a compact manner of referring to a specific implemented network structure, we introduce a new notation. A network with a specific architecture will hereby be referred to as \network{\textit{nodes by layer}}{\textit{groups by layer}}, where the superscript indicates the number of nodes in each hidden layer, chronologically, and the subscript indicates number of groups in each these layers. Whenever the number of groups equals the number of nodes, and we get an ordinary dense layer, we add a ReLU activation on the node output, and indicate it with an asterisk $*$. As an example, if a network has three layers: 32 nodes and two nodes per group; 64 nodes and four nodes per group; and 16 nodes and one node per group with ReLU, it will be denoted as \network{32, 64, 16}{16, 16, *}. 
 
 
 
 \subsection{Visualising Sparse Pathways}
+    Accuracy $0.8409$.
     \begin{figure}
         \begin{subfigure}{\linewidth}
             \centering
@@ -58,7 +59,7 @@ To have a compact manner of referring to a specific implemented network structur
         \rowcolor{cyan!50} 
         \multirow{-2}{*}{\rotatebox[origin=c]{90}{Dense}}{\cellcolor{cyan!20} } & Ridge & \network{32,32}{*,*} & 0.4919 \\ \hline
         \end{tabular}
-        \caption{Table of the best performing network architectures with maxout, channel-out or dense ReLU layers and various combinations of dropout and ridge penalisation added.}
+        \caption{Table of the best performing network architectures on the CIFAR-10 dataset. We used maxout, channel-out or dense ReLU layers and various combinations of dropout and ridge penalisation added.}
         \label[tab]{res:tab:networks}
     \end{table}
     \renewcommand{\arraystretch}{1}
@@ -76,7 +77,7 @@ To have a compact manner of referring to a specific implemented network structur
             \caption{The test accuracy history of the best performing channel-out networks.}
             \label[fig]{res:fig:best_channelout}
         \end{subfigure}
-        \caption{The best performing LWTA models after tuning were trained on the full training dataset and their test accuracy history is plotted here. For the network architecture of the various models see \cref{res:tab:networks}.}
+        \caption{The best performing LWTA models after tuning on the CIFAR-10 dataset were trained on the full training dataset and their test accuracy history is plotted here. For the network architecture of the various models see \cref{res:tab:networks}.}
         \label[fig]{res:fig:best_LWTA}
     \end{figure}
     \comment{Discussion note: Comment on the lack of resampling used here. -\Carl}
@@ -97,12 +98,12 @@ To have a compact manner of referring to a specific implemented network structur
             \cellcolor{maroon!20} & None & \network{8,64,16,64}{*,32,*,32} & 0.5484 \\ \cline{2-4} 
             \rowcolor{maroon!20}
             \multirow{-2}{*}{\rotatebox[origin=c]{90}{CO}}{\cellcolor{maroon!20}} & Both & \network{8, 64}{*, 32} & 0.4839 \\ \hline
-            \rowcolor{cyan!50} 
-            \cellcolor{cyan!20} & None & \network{16,16}{*,*} & 0.5161 \\ \cline{2-4} 
             \rowcolor{cyan!20} 
+            \cellcolor{cyan!20} & None & \network{16,16}{*,*} & 0.5161 \\ \cline{2-4} 
+            \rowcolor{cyan!50} 
             \multirow{-2}{*}{\rotatebox[origin=c]{90}{Dense}}{\cellcolor{cyan!20} } & Ridge & \network{16,16}{*,*} & 0.5887 \\ \hline
             \end{tabular}
-            \caption{Table of the best performing network architectures with maxout, channel-out or dense ReLU layers and various combinations of dropout and ridge penalisation added.}
+            \caption{Table of the best performing network architectures on the EPL dataset, with maxout, channel-out or dense ReLU layers and various combinations of dropout and ridge penalisation added.}
             \label[tab]{res:tab:EPL_networks}
         \end{table}
         \renewcommand{\arraystretch}{1}
@@ -115,11 +116,11 @@ To have a compact manner of referring to a specific implemented network structur
         \end{figure}
 
 \subsection{PCA on Premier League data}
-    By performing PCA on the Premier League data we found its principal components. The explained variance as a function of principal components is plotted in figure~\ref{res:fig:explained_variance} as both a cumulative sum and histogram bars. As seen from the plot, 42 principal components explains 99 \% of the variance of the original features. \comment{mention something about 99 percent earlier? \Johan}
+    By performing PCA on the Premier League data we found its principal components. The explained variance as a function of principal components is plotted in figure~\ref{res:fig:explained_variance} as both a cumulative sum and histogram bars. As seen from the plot, 42 principal components explains 99 \% of the variance of the original features. Since this would reduce the dimensionality by approximately one half only, and we considered relatively few dimensions we decided not to use the principal components for further analysis. 
     \begin{figure}
         \centering
         \includegraphics[width=\linewidth]{figs/pca_pl.pdf}
-        \caption{Explained variance \comment{writemore and fix plot \Johan}}
+        \caption{Explained variance as function of the number of principal components, shown both as a cumulative step function and histogram bars showing the step increase for each component.}
         \label[fig]{res:fig:explained_variance}
     \end{figure}
 
