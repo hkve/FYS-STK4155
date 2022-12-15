@@ -59,7 +59,7 @@ To have a compact manner of referring to a specific implemented network structur
         \rowcolor{cyan!50} 
         \multirow{-2}{*}{\rotatebox[origin=c]{90}{Dense}}{\cellcolor{cyan!20} } & Ridge & \network{32,32}{*,*} & 0.4919 \\ \hline
         \end{tabular}
-        \caption{Table of the best performing network architectures with maxout, channel-out or dense ReLU layers and various combinations of dropout and ridge penalisation added.}
+        \caption{Table of the best performing network architectures on the CIFAR-10 dataset. We used maxout, channel-out or dense ReLU layers and various combinations of dropout and ridge penalisation added.}
         \label[tab]{res:tab:networks}
     \end{table}
     \renewcommand{\arraystretch}{1}
@@ -77,7 +77,7 @@ To have a compact manner of referring to a specific implemented network structur
             \caption{The test accuracy history of the best performing channel-out networks.}
             \label[fig]{res:fig:best_channelout}
         \end{subfigure}
-        \caption{The best performing LWTA models after tuning were trained on the full training dataset and their test accuracy history is plotted here. For the network architecture of the various models see \cref{res:tab:networks}.}
+        \caption{The best performing LWTA models after tuning on the CIFAR-10 dataset were trained on the full training dataset and their test accuracy history is plotted here. For the network architecture of the various models see \cref{res:tab:networks}.}
         \label[fig]{res:fig:best_LWTA}
     \end{figure}
     \comment{Discussion note: Comment on the lack of resampling used here. -\Carl}
@@ -103,7 +103,7 @@ To have a compact manner of referring to a specific implemented network structur
             \rowcolor{cyan!50} 
             \multirow{-2}{*}{\rotatebox[origin=c]{90}{Dense}}{\cellcolor{cyan!20} } & Ridge & \network{16,16}{*,*} & 0.5887 \\ \hline
             \end{tabular}
-            \caption{Table of the best performing network architectures with maxout, channel-out or dense ReLU layers and various combinations of dropout and ridge penalisation added.}
+            \caption{Table of the best performing network architectures on the EPL dataset, with maxout, channel-out or dense ReLU layers and various combinations of dropout and ridge penalisation added.}
             \label[tab]{res:tab:EPL_networks}
         \end{table}
         \renewcommand{\arraystretch}{1}
