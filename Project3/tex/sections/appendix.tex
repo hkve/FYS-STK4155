@@ -90,18 +90,19 @@
         \end{figure}
 
         \subsection{Tree Based Methods}
-
+        We begin by fitting a single tree, gradually allowing for more complexity by increasing the allowed tree depth, shown in figure \cref{fig:singletree_biasvar_decomp}. In contrast to the linear regression models, the variance is significantly larger, overcoming the bias contribution for a tree of depth 2. The MSE values are generally quite large, with a minimum of $22.3$ using a depth of 2 with 4 leafs. By considering the train MSE, we see that we quickly move into the realm of extreme overfitting. Allowing the tree to grow to a depth of 5 results in close to zero train MSE. A single tree, through the parameters searched here, does not result in a good model for this problem. 
         \begin{figure}[H]
             \centering
             \includegraphics[width=\linewidth]{BiasVar_SingleTree.pdf}
-            \caption{MSE, bias and variance estimates for a single tree against increasing relaxation of tree depth.}
+            \caption{MSE, bias and variance estimates for a single tree against increasing relaxation of tree depth. Train MSE is also included to show the drastic overfitting.}
             \label[fig]{fig:singletree_biasvar_decomp}
         \end{figure}
+        Even though a single tree did not perform well, an ensemble of trees can often give better results. Varying the number of trees in our ensemble, both the bagged trees and random forest can be seen in \cref{fig:bag_and_rf_biasvar_decomp} 
 
         \begin{figure}[H]
             \centering
             \includegraphics[width=\linewidth]{BiasVar_Bag_and_Rf.pdf}
             \caption{MSE, bias and variance estimates for bagging trees (green) and random forest (blue), against increasing bag size/number of trees.}
-            \label[fig]{fig:singletree_biasvar_decomp}
+            \label[fig]{fig:bag_and_rf_biasvar_decomp}
         \end{figure}
         \subsection{Support Vector Machines}
