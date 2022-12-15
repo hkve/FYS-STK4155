@@ -315,7 +315,7 @@ def load_EPL(encoded : bool = False) -> pd.DataFrame:
 def get_result_distribution(previous_season : bool = True):
     res = np.ones(3)
     if previous_season:
-        # this does not make any sense atm, will fix at some points
+        # this does not make any sense atm, will fix at some point
         W = understats_EPL18["wins"].sum()
         D = understats_EPL18["draws"].sum()
         L = understats_EPL18["loses"].sum()
@@ -355,7 +355,7 @@ def get_feature_description(md_filename : str = None) -> dict:
         "scored":       "Goals scored",
         "missed":       "Goals conceded",
         "wins":         "Whether the team has won (1) or not (0)",
-        "draws":        "Whether the team has drwan (1) or not (0)",
+        "draws":        "Whether the team has drawn (1) or not (0)",
         "loses":        "Whether the team has lost (1) or not (0)",
         "pts":          "League points gained (= 3, 1, 0 for w, d, l)",
         "npxGD":        "The difference between 'for' and 'against' expected goals without penalties and own goals",
@@ -415,7 +415,7 @@ def get_feature_description(md_filename : str = None) -> dict:
     prev_season_opp_pd  = prev_season_pd.add_suffix("_opp")
 
 
-    # back to dict:
+    # back to dict: (why have I made this so difficult??)
     match_day       = match_day_pd.to_dict()
     season          = season_pd.to_dict()
     prev_match      = prev_match_pd.to_dict()
@@ -427,10 +427,35 @@ def get_feature_description(md_filename : str = None) -> dict:
     info = {**match_day, **season, **prev_match, **prev_season, **season_opp, **prev_season_opp}
 
     if md_filename is not None:
-        infopd = pd.DataFrame.from_dict(info, orient='index')  
-        infopd.columns = ["Description"]
+
+        # much back and forth here, but it works now, so idk 
+
+        header0 = f"# Features in dataset from {LEAGUE} season {YEAR}/{YEAR+1}\n"
+        
+        tab1 = match_day_pd.transpose()
+        tab2 = season_pd.transpose()
+        tab3 = prev_match_pd.transpose()
+        tab4 = prev_season_pd.transpose()
+        tab5 = season_opp_pd.transpose()
+        tab6 = prev_season_opp_pd.transpose()
+
+        head1 = "## Match information"
+        head2 = f"## Team attributes ({YEAR})"
+        head3 = f"## Team's previous league match stats"
+        head4 = f"## Team's previous season stats and attributes ({prevYEAR})"
+        head5 = f"## Opponent attributes ({YEAR})"
+        head6 = f"## Opponent's previous season stats and attributes ({prevYEAR})"
+
+        tables = [tab1, tab2, tab3, tab4, tab5, tab6]
+        titles = [head1, head2, head3, head4, head5, head6]
+
         filename = md_filename.strip(".md") + ".md"
-        infopd.to_markdown(PATH/filename)
+        with open(PATH/filename, "w") as outfile:
+            outfile.write(header0 + "\n")
+            for tab, head in zip(tables, titles):
+                tab.columns = ["Description"]
+                tab = tab.to_markdown()
+                outfile.write(head + "\n" + tab + "\n")
     
     return info
 
@@ -439,49 +464,38 @@ def get_feature_description(md_filename : str = None) -> dict:
 if __name__ == "__main__":
 
     print("\n>>>\n")
+    
     RUN()
 
-    # season = ['position','team','matches','wins','draws','loses','scored','missed','pts','xG','xG_diff','npxG','xGA','xGA_diff','npxGA','npxGD','ppda_coef','oppda_coef','deep','deep_allowed','xpts','xpts_diff']
-    # match = ['h_a','xG','xGA','npxG','npxGA','deep','deep_allowed','scored','missed','xpts','result','date','wins','draws','loses','pts','npxGD','ppda_coef','ppda_att','ppda_def','oppda_coef','oppda_att','oppda_def','team','xG_diff','xGA_diff','xpts_diff']
-
-    # print("\n SEASON")
-    # for s in season:
-    #     if s not in match:
-    #         print(s)
-    # print("\n MATCH")
-    # for m in match:
-    #     if m not in season:
-    #         print(m)
-
-    info = get_feature_description("tmp.md")
+    info = get_feature_description("EPL_notes.md")
 
 
-    data = stats_EPL19_per_game.copy()
+    # data = stats_EPL19_per_game.copy()
     
-    container = translate_data(data)
+    # container = translate_data(data)
 
-    from sklearn.model_selection import train_test_split   
+    # from sklearn.model_selection import train_test_split   
 
-    trainx, testx, trainy, testy = train_test_split(container.x, container.y)
-    # print(trainx)
+    # trainx, testx, trainy, testy = train_test_split(container.x, container.y)
+    # # print(trainx)
 
-    cols = trainx.columns
+    # cols = trainx.columns
 
-    prevseason = []
-    prevgame = []
-    opp = []
-    other = []
+    # prevseason = []
+    # prevgame = []
+    # opp = []
+    # other = []
  
-    for col in cols:
-        col = str(col)
-        if col.split("_")[-1] == "ps":
-            prevseason.append(col)
-        elif col.split("_")[-1] == "pg":
-            prevgame.append(col)
-        elif col.split("_")[-1] == "opp":
-            opp.append(col)
-        else:
-            other.append(col)
+    # for col in cols:
+    #     col = str(col)
+    #     if col.split("_")[-1] == "ps":
+    #         prevseason.append(col)
+    #     elif col.split("_")[-1] == "pg":
+    #         prevgame.append(col)
+    #     elif col.split("_")[-1] == "opp":
+    #         opp.append(col)
+    #     else:
+    #         other.append(col)
 
     # print("This game: \n", other)
     # print("Previous season: \n", prevseason)
