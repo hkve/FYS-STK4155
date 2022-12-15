@@ -1,8 +1,10 @@
-Results here, in past tense.
-\comment{Introduce network notation -\Anna}
+\comment{Results here, in past tense.}
+To have a compact manner of referring to a specific implemented network structure, we introduce a new notation. A network with a specific architecture will hereby be referred to as \network{\textit{nodes by layer}}{\textit{groups by layer}}, where the number of nodes in each hidden layer is presented in the superscript and number of groups in each layer in the subscript. In both cases the numbers are presented starting with the first hidden layer, and ending with the last. When the number of nodes is identical to the number of groups, meaning there is only one node per group, the sign * will be used in the subscript to state the layer is dense with ReLU activation function implemented. For example, if a network has three layers: 32 nodes and two nodes per group; 64 nodes and four nodes per group; and 16 nodes and one node per group with ReLU, it will be denoted as \network{32, 64, 16}{16, 16, *}. 
+
 
 
 \subsection{Visualising Sparse Pathways}
+    Accuracy $0.8409$.
     \begin{figure}
         \begin{subfigure}{\linewidth}
             \centering
