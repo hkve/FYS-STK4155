@@ -74,18 +74,18 @@ We reference like this using \verb|cleveref|: \cref{int:fig:example_a}, \cref{th
         \comment{Discussion note: Early stopping prevents overfitting. -\Carl}
 
     \subsubsection{Regularisation}
-        \comment{Write about L2-regularisation. -\Carl}
+        The first method we applied to combat overfitting was to add a L2 penalisation term to the kernel weights of the layers, as was done in \cite{Project2}. This adds a term to the cost function penalising large weights, and is parametrised with a hyperparameter $\lambda$, whose size is proportional to the penalisation.
 
         A problem that can occur in LWTA layers is when the weight of a certain input to one of the nodes of a group becomes much larger than those of the other nodes in the group, resulting in the output of the group being dominated by a single node and a single input. This can result in overly local training, perhaps even of a single node and a single weight. A common technique to combat this is to add a dropout layer before and/or after the LWTA layer. The dropout layer randomly sets elements of its input vector to zero, according to a dropout rate, before passing it on to the next layer. This means that the nodes in a group cannot solely lean on one specific node or input, and forces pathways in the network to not learn specific trends `too much'. As such, it prevents overfitting, and can be seen as a regularisation method. The dropout layers are only active during training, and do not drop any activations at inference time. The effect of dropout on a LWTA network is illustrated in \cref{met:fig:dropout_network}.
 
         \begin{figure}
             \centering
-            \includegraphics[width=\linewidth]{figs/illustration_dropout.png}
+            \includegraphics[width=.9\linewidth]{figs/illustration_dropout.png}
             \caption{An illustration channel-out neural network with a dropout added to the first channel-out layer. Only the lower group in the first hidden layer is trained.}
             \label[fig]{met:fig:dropout_network}
         \end{figure}
 
-        We added dropout to our networks to see whether the performance was improved. \comment{Write more on this when it has been done.}
+        When adding dropout to our networks, we did so with between every layer with the same dropout rate. This includes dropout on the input layer.
 
 
 \subsection{Visualising Pathways}
