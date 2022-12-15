@@ -268,9 +268,9 @@ if __name__ == "__main__":
     X, y = utils.get_fifa_data(n=10000, random_state=rnd)
     X_train, X_val, y_train, y_val = train_test_split(X, y, train_size=3/4, random_state=rnd)
 
-    LinearModel_comparison(X_train, y_train, filename="BiasVar_LinearRegression", random_state=rnd)
+    # LinearModel_comparison(X_train, y_train, filename="BiasVar_LinearRegression", random_state=rnd)
     # Singel_tree_increasing_depth(X, y, filename="BiasVar_SingleTree", random_state=rnd)
     # Trees_increasing_ensamble(X, y, filename="BiasVar_Bag_and_Rf.pdf")
 
-    # Boosting(X, y)
+    Boosting(X, y)
     # SupperVecReg(X, y)
