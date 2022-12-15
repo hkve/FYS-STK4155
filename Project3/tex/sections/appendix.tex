@@ -12,7 +12,7 @@
         With $\sigma^2$ as the irreducible error. To estimate model bias and variance, the bootstrap resampling technique will be performed, using a total of 200 bootstrap rounds for each set of model parameters. Taking different sets of models, we will compare between these and try to find the optimal model based minimizing both bias and variance. If not specified otherwise, MSE values (and of course bias and variance) is calculated using the bootstrapped test data.
 
     \section{Dataset and Preparation}
-        The popular video game series FIFA has new releases yearly, with a large fan base for both recreational and competitive play. Consequently, the interest of analyzing in-game data with the goal of getting a small edge is becoming more popular. For instance ~\citep{fifa21playersvalue} tries to estimate players market value based on players characteristics. Here, we will use a similar dataset ~\citep{fifa21_data}, with the goal of calculating the \textit{overall score}, a single number between 1 and 99 representing the players skill and worth. The FIFA21 version will be used. Overall score will be estimated using 38 different minor attributes, such as player dribbling skill and mental composure. All of these are real numbers in the range 1 to 99. In total there are $n = 18944$ players, where we pick a subset of $10000$ players, weighted such that we get players from different football leagues and skill levels. These 38 features are presumably not all FIFA uses to calculate the overall score, indicating that a perfect model can not be found through this approach. 
+        The popular video game series FIFA has new releases yearly, with a large fan base for both recreational and competitive play. Consequently, the interest of analyzing in-game data with the goal of getting a small edge is becoming more popular. For instance ~\citep{fifa21playersvalue} tries to estimate players market value based on players characteristics. Here, we will use a similar dataset ~\citep{fifa21_data}, with the goal of calculating the \textit{overall score}, a single number between 1 and 99 representing the players skill and worth. The FIFA21 version will be used. Overall score will be estimated using 38 different minor attributes, such as player dribbling skill and mental composure. All of these are real numbers in the range 1 to 99. In total there are $n = 18944$ players, where we pick a subset of $10000$ players, weighted such that we get players from different football leagues and skill levels. These $p = 38$ features are presumably not all FIFA uses to calculate the overall score, indicating that a perfect model can not be found through this approach. 
         
     \section{Umbrella term for methods not neural networks}
         We will present the key theory required for three different sets of estimation methods; \textit{Linear Regression}, \textit{Tree based methods} and \textit{Super Vector Machines}.
@@ -77,7 +77,7 @@
                     \begin{align}
                         \text{RBF:}\hspace{20px}& K(x_i, x_j) = \text{exp}(-\gamma ||x_i - x_j||)
                     \end{align}
-                    Where $\gamma > 0$ is a hyperparameter.
+                    Where $\gamma > 0$ is a hyperparameter. Here we will only consider $\gamma = 1/(p\sigma_X^2)$, sometimes simply called the Gaussian kernel, where $\sigma_X^2$ is the variance in $X$ across all features. 
 
     \section{Findings and Discussion}
         \subsection{Linear Regression}
@@ -107,7 +107,9 @@
         For the last of our tree based methods, we investigate the boosted trees. 
         
         \subsection{Support Vector Machines}
-        Lastly, we investigate how our SVM performs when increasing the margin ($\epsilon$). To assure convergence, the margin is slightly soft, setting $C = 1$. The results from both the linear and RBF kernel can be seen in \cref{fig:SVR_eps}. 
+        Lastly, we investigate how our SVM performs when increasing the margin ($\epsilon$). To assure convergence, the margin is slightly soft, setting $C = 1$. The results from both the linear and RBF kernel can be seen in \cref{fig:SVR_eps}. For small $\epsilon$, the RBF kernel outperforms the linear kernel substantially. Though having approximately equal bias', the variance of RBF is much lower than the linear kernel. 
+
+        Can we characterize bias and variance in SVMs with respect to the kernel and its parameters?
         \begin{figure}[H]
             \centering
             \includegraphics[width=\linewidth]{BiasVar_SVReps.pdf}
