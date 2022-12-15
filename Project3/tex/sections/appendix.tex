@@ -17,9 +17,10 @@
     \section{Umbrella term for methods not neural networks}
         We will present the key theory required for three different sets of estimation methods; \textit{Linear Regression}, \textit{Tree based methods} and \textit{Super Vector Machines}.
         \subsection{Linear Regression}
-            For linear regression models, we will consider ordinary least squares (OLS), Ridge regression and Lasso regression. OLS assumes a linear relationship between the features and target, that is a specific data point is simply the sum over features, multiplied by a coefficient for each feature. Ridge and Lasso regression adds a constraint to coefficient sizes, using an $L_2$ and $L_1$ norm respectively, presumably introducing bias. See ~\citep{Project1} for a more in depth explanation.
+        For linear regression models, we will consider ordinary least squares (OLS), Ridge regression and Lasso regression. OLS assumes a linear relationship between the features and target, that is a specific data point is simply the sum over features, multiplied by a coefficient for each feature. Ridge and Lasso regression adds a constraint to coefficient sizes, using an $L_2$ and $L_1$ norm respectively, presumably introducing bias. This will be represented through the hyperparameter $\alpha$, proportional to the regularisation strength. See ~\citep{Project1} for a more in depth explanation.
             
-            In addition, since all features are assumed to give a positive contribution to the overall score (setting all to 99 should yield an overall score of 99), the coefficients are constrained to be positive.  
+        In addition, since all features are assumed to give a positive contribution to the overall score (setting all to 99 should yield an overall score of 99), the coefficients are constrained to be positive.  
+        
         \subsection{Tree Based Methods}
             A decision tree uses a flow-chart like structure to generate predictions. Based on a single features value, a \textit{node} performs some test on the feature (i.e. threshold). Using the outcome of the test, the tree follows one of two paths, called \textit{branches}. Each of these branches can then have new nodes, testing based on new features, creating more branches. This continues until no more nodes are reached, where in the regression case, a specific value is predicted. These final outcomes of branches are called \textit{leaves}. The maximum number of nodes, following a single branch, gives the \textit{depth} of the tree. 
             There is a plethora of ways to construct a regression tree. The most common approach is \textit{recursive binary splitting}, where separation of the targets into regions $R_1, R_2, \ldots R_J$ is performed based on the input features. When a simple feature inequality is used, these regions are high-dimensional boxes. Considering the set of features $\set{x_a}$ $a = 1,\ldots,p$. We propose a pair of half-planes 
@@ -46,23 +47,37 @@
             \subsubsection{Boosted trees}
                 The idea behind boosted trees is combining several weak learners which iteratively learn from previous mistakes to enhance performance. In the case of decision trees, weak learners are simple trees only performing slightly better than random guesses. 
 
-                When employing gradient boost for regression the process starts by creating a single leaf, with a value $f_0(x)$ often set to the average of all output values in the training set. Implementing a differentiable cost function, e.g. the squared error for regression, the cost of the initial prediction and its gradient with respect to the predicted value is calculated. A simple tree is fit to minimise the cost. The prediction of that tree is then scaled by a coefficient and is added to the initial prediction, $f_0(x)$, creating the next: $f_1(x) = f_0(x) + \beta b(x;\gamma_1)$. Where $\beta$ is the scaling coefficient and $\gamma_1$ the prediction parameters. The process of calculating the gradient of the cost function, fitting a new tree using the gradient, and adding this tree's prediction to the existing one, is repeated, iteratively creating a better model: 
+                When employing gradient boost for regression the process starts by creating a single leaf, with a value $f_0(x)$ often set to the average of all output values in the training set. Implementing a differentiable cost function, e.g. the squared error for regression, the cost of the initial prediction and its gradient with respect to the predicted value is calculated. A simple tree is fitted to minimise the cost. The prediction of that tree is then scaled by a coefficient and is added to the initial prediction, $f_0(x)$, creating the next: $f_1(x) = f_0(x) + \beta b(x;\gamma_1)$. Here $\beta$ is the scaling coefficient and $\gamma_1$ the prediction parameters. The process of calculating the gradient of the cost function, fitting a new tree using the gradient, and adding this tree's prediction to the existing one, is repeated, iteratively creating a better model: 
                 \begin{equation}
                     f_M(x) = f_0(x) + \sum_{m=1}^M \beta b(x; \gamma_m)
                 \end{equation}
                 $\beta$ can be dynamic for various $m$. In that case the gradient of the cost function must also be calculated with respect to $\beta_m$. 
 
-        \subsection{Support Vector Machines}
-        The Support Vector Machine (SVM) is most commonly used in classification problems, with the idea of constricting some hyperplane separating target classes in feature space \comment{Add ref}. By a slight change of approach, the method can also be applied to regression problems, proposed in~\citep{SVR}. The predictions are performed using a simple linear function
-        \begin{align*}
-            f(x_i) = \langle \vec{w}, x_i \rangle + b \text{ with } \vec{w} \in \mathcal{F}, b \in \mathbb{R} 
-        \end{align*}
-        Where $\langle \cdot,\cdot\rangle$ is the dot product in $\mathcal{F}$ space. The choice of this dot product is commonly named the \textit{kernel}, to be explained in more detailed later. We want to find the optimal values of $\set{\vec{w}, b}$ such that the predictions of $f(x_i)$ lies inside some region around the $y_i$ training data. This region is defined by the hyperparameter $\epsilon$ (the so-called $\epsilon$ intensive tube \footnote{Not to be confused with the famouse $\epsilon$-sausage used for proofs of continuity, introduced by the math professor \textit{Arne Hole}.}). This can be formulated as an optimasation of $\vec{w}$, subject to the $\epsilon$ constraint ~\citep{SVRgood}.  
-        \begin{align*}
-            \underset{\vec{w}}{\text{argmin}}&  \left[ \langle \vec{w}, \vec{w} \rangle \right], \\
-            \text{subject to}\hspace{20px} &|y_i - f(x_i)| \leq \epsilon  
-        \end{align*}
-        This is a so-called \textit{hard margin} approach, where $f(x_i)$ must make a prediction in $[y_i - \epsilon, y_i + \epsilon]$. Relaxations of this constraint can be done, allowing small deviations around the $\epsilon$ tube. This is characterized by the hyperparameter $C \geq 0$, often called a \textit{soft margin}. $C$ is inversely proportional to the margin relaxation, with $C = 0$ reducing to the hard margin approach.  
+            \subsection{Support Vector Machines}
+            The Support Vector Machine (SVM) is most commonly used in classification problems, with the idea of constricting some hyperplane separating target classes in feature space. By a slight change of approach, the method can also be applied to regression problems, proposed in~\citep{SVR}. 
+            
+                \subsubsection{Regression Approach}
+                    The predictions are performed using a simple linear function
+                    \begin{align}
+                        f(x_i) = \vec{w}^T x_i + b \text{ with } \vec{w} \in \mathbb{R}^p, b \in \mathbb{R} \label[eq]{eq:SVM_predict} 
+                    \end{align}
+                    We want to find the optimal values of $\set{\vec{w}, b}$ such that the predictions of $f(x_i)$ lies inside some region around the $y_i$ training data. This region is defined by the hyperparameter $\epsilon$ (the so-called $\epsilon$ intensive tube \footnote{Not to be confused with the famouse $\epsilon$-sausage used for proofs of continuity, introduced by the math professor \textit{Arne Hole}.}). This can be formulated as an optimasation of $\vec{w}$, subject to the $\epsilon$ constraint ~\citep{SVRgood}.  
+                    \begin{align}
+                        \underset{\vec{w}}{\text{argmin  }}   ||\vec{w}||^2 
+                        \hspace{10px}\text{subject to}\hspace{10px} |y_i - f(x_i)| \leq \epsilon \label[eq]{eq:SVM_optimasation}
+                    \end{align}
+                    This is a so-called \textit{hard margin} approach, where $f(x_i)$ must make a prediction in $[y_i - \epsilon, y_i + \epsilon]$. Relaxations of this constraint can be done, allowing small deviations around the $\epsilon$ tube. This is characterized by the hyperparameter $C \geq 0$, often called a \textit{soft margin}. $C$ is proportional to the margin relaxation (inversely proportional to the regularisation strength), with $C = 0$ reducing to the hard margin approach.  
+                
+                \subsubsection{Kernels}
+                    One of the benefits of SVMs is the magic of the \textit{kernel trick}. Introducing some non-linearity can improve predictions (for instance, see~\citep{Project1} for an example using linear regression). This is done by applying some transformation $\phi$ giving new features in another (often higher dimensional) space $\mathcal{F}$, $\phi: \mathbb{R}^p \xrightarrow{} \mathcal{F}$. For large data sets, especially if $\text{dim}(\mathcal{F}) \gg p$, the transformation complexity can result in long computation times. Luckily, both our model \cref{eq:SVM_predict} and optimasation \cref{eq:SVM_optimasation} only requires the computation of the dot product in $\mathcal{F}$. The kernel trick then gives us a method to calculate the transformed dot product $\phi(x_i)^T \phi(x_i)$, without explicitly calculating $\phi(x_i)$~\citep{kernelTrick}. We express this a function $K(x_i, x_j)$, witch usually some simpler dot product such as $x_i^T x_j$ or $||x_i - x_j||^2$.      
+                    \begin{align*}
+                        \phi(x_i)^T \phi(x_j) &= K(x_i, x_j)
+                    \end{align*}
+                    In the following, we will, in addition to the linear (not transformed) product $K(x_i, x_j) = x_i^T x_j$, consider the \textit{Gaussian radial basis function} (RBF) kernel
+                    \begin{align}
+                        \text{RBF:}\hspace{20px}& K(x_i, x_j) = \text{exp}(-\gamma ||x_i - x_j||)
+                    \end{align}
+                    Where $\gamma > 0$ is a hyperparameter.
         \begin{figure}[H]
             \centering
             \includegraphics[width=\linewidth]{BiasVar_LinearRegression.pdf}
