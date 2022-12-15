@@ -41,9 +41,14 @@
             Where $\hat{f}^b$ is a single decision tree, fitted using the data from bag $b$. $B$ represents the total number of trees, which we will call ensemble size.
 
             \subsubsection{Random Forest}
-            Random forest uses the same methodology as bagged trees. Bootstrap is performed in the same manner \cref{eq:app:bagged_trees}, but only a random subset of features is considered at each node split. We represent the number of features considered by $m$, with $m = 1$ reducing to bagged trees. From ~\citep{hastie01statisticallearning}, a ration of $m = \lfloor p/3 \rfloor$ usually performs well on regression problems. This is expedient since trees might be highly correlated, especially if a single feature is highly important for reducing the training MSE. If all features are considered for each split 
+            Random forest uses the same methodology as bagged trees. Bootstrap is performed in the same manner \cref{eq:app:bagged_trees}, but only a random subset of features is considered at each node split. We represent the number of features considered by $m$, with $m = 1$ reducing to bagged trees. From ~\citep{hastie01statisticallearning}, a ration of $m = \lfloor p/3 \rfloor$ usually performs well on regression problems. This is expedient since trees might be highly correlated, especially if a single feature is highly important for reducing the training MSE. If all features are considered for each split \comment{Not done? -\Anna}
             
             \subsubsection{Boosted trees}
+                The idea behind boosted trees is combining several weak learners which iteratively learn from previous mistakes to enhance performance. In the case of decision trees, weak learners are shallow trees only performing slightly better than random guesses. 
+
+                When employing gradient boost for regression the process starts by creating a single leaf, with a value $f_0(x)$ often set to the average of all output values in the training set. Implementing a differentiable cost function, e.g. the squared error for regression, the cost of the initial prediction, and its gradient with respect to the predicted value is calculated. In the case of squared error for regression, this results in the negative residual times 2. A shallow tree is fit to the negative gradient and a scaled version of that tree is added to the initial prediction, $f_0(x)$, creating the next: $f_1(x)$. The process of calculating the gradient of the cost function, fitting a new tree using the gradient, and adding this tree's prediction to the existing one, is repeated, iteratively creating a better model.      
+
+
         \subsection{Support Vector Machines}
         The Support Vector Machine (SVM) is most commonly used in classification problems, with the idea of constricting some hyperplane separating target classes in feature space \comment{Add ref}. By a slight change of approach, the method can also be applied to regression problems, proposed in~\citep{SVR}. The predictions are performed using a simple linear function
         \begin{align*}
