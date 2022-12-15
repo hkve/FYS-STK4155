@@ -168,7 +168,7 @@ def Trees_increasing_ensamble(X, y, filename=None, random_state=321):
     plt.show()
 
 def Boosting(X, y, filename=None, random_state=321):
-    n_estimators = np.linspace(10,100,5, dtype=int)
+    n_estimators = np.linspace(10,100,51, dtype=int)
 
     ls = {
         "mse": "solid",
@@ -184,7 +184,13 @@ def Boosting(X, y, filename=None, random_state=321):
     ax.plot(n_estimators, bias, label="Bias$^2$", ls=ls["bias"], c=c)
     ax.plot(n_estimators, var, label="Var", ls=ls["var"], c=c)
     ax.set(xlabel="Ensamble size")
-    ax.legend()
+    ax.legend(ncol=3)
+
+    y_mse = np.min(mse)
+    x_n_est = n_estimators[np.argmin(mse)]
+    ax.vlines(x=x_n_est, ymin=ax.get_ylim()[0], ymax=y_mse, ls="dashed", color="k", alpha=0.25)
+    ax.scatter(x_n_est, y_mse, color="k", marker="x", alpha=0.25)
+
     plot_utils.save(filename + "_n_est")
     plt.show()
 
@@ -197,7 +203,7 @@ def Boosting(X, y, filename=None, random_state=321):
     ax.plot(subsamples, bias, label="Bias$^2$", ls=ls["bias"], c=c)
     ax.plot(subsamples, var, label="Var", ls=ls["var"], c=c)
 
-    ax.legend()
+    ax.legend(ncol=3)
     plot_utils.save(filename + "_subsamples")
     plt.show()
 
@@ -276,5 +282,5 @@ if __name__ == "__main__":
     # Singel_tree_increasing_depth(X, y, filename="BiasVar_SingleTree", random_state=rnd)
     # Trees_increasing_ensamble(X, y, filename="BiasVar_Bag_and_Rf.pdf")
 
-    Boosting(X, y)
+    Boosting(X, y, filename="Boosting")
     # SupperVecReg(X, y, filename="BiasVar_SVR", random_state=rnd)
