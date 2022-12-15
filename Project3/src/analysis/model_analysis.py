@@ -5,7 +5,7 @@ import tensorflow as tf
 import pandas as pd
 
 
-def plot_loss_history(history, ax=None):
+def plot_history(history, ax=None):
     if ax is None:
         _, ax = plt.subplots()
 
@@ -16,11 +16,11 @@ def plot_loss_history(history, ax=None):
     return ax
 
 
-def fit_and_plot_val_losses(models: list[tf.keras.Model],
-                            model_names: list[str],
-                            fit_kwargs: dict(),
-                            ax=None,
-                            filename=None):
+def fit_and_plot_val_accuracy(models: list[tf.keras.Model],
+                              model_names: list[str],
+                              fit_kwargs: dict(),
+                              ax=None,
+                              filename=None):
     if ax is None:
         _, ax = plt.subplots()
 
@@ -29,7 +29,7 @@ def fit_and_plot_val_losses(models: list[tf.keras.Model],
         ax.plot(results.history["val_accuracy"], label=model_name)
         print(f"Best accuracy of {model_name} : "
               f"{np.max(results.history['val_accuracy'])}")
-    ax.set_ylabel("Loss")
+    ax.set_ylabel("Accuracy")
     ax.set_xlabel("Epochs")
     ax.legend()
 
@@ -51,64 +51,107 @@ if __name__ == "__main__":
     from tensorno.utils import count_parameters
 
     # x_train, y_train, x_test, y_test = load_MNIST()
-    # x_train, y_train, x_test, y_test = load_CIFAR10()
-    dataset = load_EPL(encoded=True)
-    y = dataset.y.to_numpy()
-    labels = np.array(["w", "d", "l"])
-    y = np.array([np.where(y_ == range(len(labels)), 1, 0) for y_ in y],
-                 dtype=int)
-    x = dataset.x
-    x = x.astype(float)
 
-    x_train, x_test, y_train, y_test = train_test_split(x, y,
-                                                        train_size=5/6,
-                                                        shuffle=False)
+    x_train, y_train, x_test, y_test = load_CIFAR10()
 
     # Flattening image arrays.
-    # x_train = x_train.reshape((x_train.shape[0], np.prod(x_train.shape[1:])))
-    # x_test = x_test.reshape((x_test.shape[0], np.prod(x_test.shape[1:])))
+    x_train = x_train.reshape((x_train.shape[0], np.prod(x_train.shape[1:])))
+    x_test = x_test.reshape((x_test.shape[0], np.prod(x_test.shape[1:])))
 
+    # dataset = load_EPL(encoded=True)
+    # y = dataset.y.to_numpy()
+    # labels = np.array(["w", "d", "l"])
+    # y = np.array([np.where(y_ == range(len(labels)), 1, 0) for y_ in y],
+    #              dtype=int)
+    # x = dataset.x
+    # x = x.astype(float)
+    # x_train, x_test, y_train, y_test = train_test_split(x, y,
+    #                                                     train_size=5/6,
+    #                                                     shuffle=False)
+
+    # Scaling data
     scaler = StandardScaler()
     x_train = scaler.fit_transform(x_train)
     x_test = scaler.transform(x_test)
 
     """Saving some good models in a bad way..."""
-    # model1 = build_LWTA_classifier(  # CIFAR10
-    #     num_layers=3,
-    #     units=[64, 32, 64],
-    #     num_groups=[32, 16, 8],
-    #     num_features=x_train.shape[-1],
-    #     num_categories=y_train.shape[-1],
-    #     Layer="max_out",
-    # )
-    # model2 = build_LWTA_classifier(  # CIFAR10_l2
-    #     num_layers=2,
-    #     units=[64, 32],
-    #     num_groups=[32, 32],
-    #     num_features=x_train.shape[-1],
-    #     num_categories=y_train.shape[-1],
-    #     lmbda=1e-4,
-    #     Layer="max_out",
-    # )
-    # model3 = build_LWTA_classifier(  # CIFAR10_do
-    #     num_layers=2,
-    #     units=[64, 64],
-    #     num_groups=[32, 16],
-    #     num_features=x_train.shape[-1],
-    #     num_categories=y_train.shape[-1],
-    #     dropout_rate=0.1,
-    #     Layer="max_out",
-    # )
-    # model4 = build_LWTA_classifier(  # CIFAR10_do_l2
-    #     num_layers=2,
-    #     units=[32, 64],
-    #     num_groups=[16, 16],
-    #     num_features=x_train.shape[-1],
-    #     num_categories=y_train.shape[-1],
-    #     dropout_rate=0.1,
-    #     lmbda=1e-4,
-    #     Layer="max_out",
-    # )
+    # Maxout on CIFAR10 data
+    model1 = build_LWTA_classifier(  # CIFAR10
+        num_layers=3,
+        units=[64, 32, 64],
+        num_groups=[32, 16, 8],
+        num_features=x_train.shape[-1],
+        num_categories=y_train.shape[-1],
+        Layer="max_out",
+    )
+    model2 = build_LWTA_classifier(  # CIFAR10_l2
+        num_layers=2,
+        units=[64, 32],
+        num_groups=[32, 32],
+        num_features=x_train.shape[-1],
+        num_categories=y_train.shape[-1],
+        lmbda=1e-4,
+        Layer="max_out",
+    )
+    model3 = build_LWTA_classifier(  # CIFAR10_do
+        num_layers=2,
+        units=[64, 64],
+        num_groups=[32, 16],
+        num_features=x_train.shape[-1],
+        num_categories=y_train.shape[-1],
+        dropout_rate=0.1,
+        Layer="max_out",
+    )
+    model4 = build_LWTA_classifier(  # CIFAR10_do_l2
+        num_layers=2,
+        units=[32, 64],
+        num_groups=[16, 16],
+        num_features=x_train.shape[-1],
+        num_categories=y_train.shape[-1],
+        dropout_rate=0.1,
+        lmbda=1e-4,
+        Layer="max_out",
+    )
+
+    # Channel-out on CIFAR-10 data
+    model1 = build_LWTA_classifier(  # CIFAR10
+        num_layers=3,
+        units=[64, 16, 32],
+        num_groups=[16, 8, 32],
+        num_features=x_train.shape[-1],
+        num_categories=y_train.shape[-1],
+        Layer="channel_out",
+    )
+    model2 = build_LWTA_classifier(  # CIFAR10_l2
+        num_layers=3,
+        units=[64, 16, 64],
+        num_groups=[32, 16, 32],
+        num_features=x_train.shape[-1],
+        num_categories=y_train.shape[-1],
+        lmbda=1e-4,
+        Layer="channel_out",
+    )
+    model3 = build_LWTA_classifier(  # CIFAR10_do
+        num_layers=3,
+        units=[32, 16, 64],
+        num_groups=[16, 16, 32],
+        num_features=x_train.shape[-1],
+        num_categories=y_train.shape[-1],
+        dropout_rate=0.1,
+        Layer="channel_out",
+    )
+    model4 = build_LWTA_classifier(  # CIFAR10_dp_l2
+        num_layers=2,
+        units=[32, 64],
+        num_groups=[16, 32],
+        num_features=x_train.shape[-1],
+        num_categories=y_train.shape[-1],
+        dropout_rate=0.5,
+        lmbda=1e-4,
+        Layer="channel_out",
+    )
+
+    # LWTA on EPL data
     model1 = build_LWTA_classifier(  # EPL
         num_layers=2,
         units=[8, 16],
@@ -127,43 +170,6 @@ if __name__ == "__main__":
         lmbda=1e-4,
         Layer="max_out",
     )
-
-    # model1 = build_LWTA_classifier(  # CIFAR10
-    #     num_layers=3,
-    #     units=[64, 16, 32],
-    #     num_groups=[16, 8, 32],
-    #     num_features=x_train.shape[-1],
-    #     num_categories=y_train.shape[-1],
-    #     Layer="channel_out",
-    # )
-    # model2 = build_LWTA_classifier(  # CIFAR10_l2
-    #     num_layers=3,
-    #     units=[64, 16, 64],
-    #     num_groups=[32, 16, 32],
-    #     num_features=x_train.shape[-1],
-    #     num_categories=y_train.shape[-1],
-    #     lmbda=1e-4,
-    #     Layer="channel_out",
-    # )
-    # model3 = build_LWTA_classifier(  # CIFAR10_do
-    #     num_layers=3,
-    #     units=[32, 16, 64],
-    #     num_groups=[16, 16, 32],
-    #     num_features=x_train.shape[-1],
-    #     num_categories=y_train.shape[-1],
-    #     dropout_rate=0.1,
-    #     Layer="channel_out",
-    # )
-    # model4 = build_LWTA_classifier(  # CIFAR10_dp_l2
-    #     num_layers=2,
-    #     units=[32, 64],
-    #     num_groups=[16, 32],
-    #     num_features=x_train.shape[-1],
-    #     num_categories=y_train.shape[-1],
-    #     dropout_rate=0.1,
-    #     lmbda=1e-4,
-    #     Layer="channel_out",
-    # )
     model3 = build_LWTA_classifier(  # EPL
         num_layers=4,
         units=[8, 64, 16, 64],
@@ -188,7 +194,7 @@ if __name__ == "__main__":
                                                      verbose=1,
                                                      restore_best_weights=True)
 
-    fit_and_plot_val_losses(
+    fit_and_plot_val_accuracy(
         models=[model1, model2, model3, model4],
         # model_names=[r"channelout", r"channelout w/ L2",
         #              r"channelout w/ DO", r"channelout w/ DO \& L2"],
@@ -217,18 +223,18 @@ if __name__ == "__main__":
     print(f"Number of parameters in network: {count_parameters(model2)}")
 
     history = {
-        "train loss LWTA": results.history["loss"],
-        "val loss LWTA": results.history["val_loss"]
+        "train accuracy NN": results.history["accuracy"],
+        "test accuracy NN": results.history["val_accuracy"]
     }
     _, ax = plt.subplots()
-    ax = plot_loss_history(history, ax=ax)
+    ax = plot_history(history, ax=ax)
 
     ###
     # Ordinary Network
     ###
     model = build_FFNN_classifier(  # Dense model
         num_layers=2,
-        units=[32, 32],
+        units=[16, 16],
         num_features=x_train.shape[-1],
         num_categories=y_train.shape[-1],
         lmbda=1e-4,
@@ -237,7 +243,7 @@ if __name__ == "__main__":
 
     results = model.fit(
         x_train, y_train,
-        epochs=100,
+        epochs=300,
         validation_data=(x_test, y_test),
         callbacks=[early_stopper, ]
     )
@@ -246,10 +252,10 @@ if __name__ == "__main__":
     print(f"Number of parameters in network: {count_parameters(model)}")
 
     history = {
-        "train loss NN": results.history["loss"],
-        "val loss NN": results.history["val_loss"]
+        "train accuracy NN": results.history["accuracy"],
+        "test accuracy NN": results.history["val_accuracy"]
     }
-    plot_loss_history(history)
+    plot_history(history)
 
     plt.show()
     """
