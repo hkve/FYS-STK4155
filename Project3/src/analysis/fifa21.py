@@ -199,8 +199,8 @@ def Boosting(X, y, filename=None, random_state=321):
     plot_utils.save(filename)
     plt.show()
 
-def SupperVecReg_panalisation(X, y, filename=None, random_state=321):
-    C = np.linspace(0.01, 1, 10)
+def SupperVecReg(X, y, filename=None, random_state=321):
+    eps = np.logspace(-3, 0, 10)
     
     kernels = ["linear", "rbf"]
 
@@ -213,16 +213,55 @@ def SupperVecReg_panalisation(X, y, filename=None, random_state=321):
     c = {kernel: plot_utils.colors[i] for i, kernel in enumerate(kernels)}
     fig, ax = plt.subplots()
 
+    mins = {kernel: {} for kernel in kernels}
     for kernel in kernels:
         method_params = {"kernel": kernel}
-        mse, bias, var = utils.bootstrap(X, y, SVR, param_name="C", method_params=method_params, params=C, scale_y=True)
+        mse, bias, var = utils.bootstrap(X, y, SVR, param_name="epsilon", params=eps, method_params=method_params, scale_y=True)
+
+        mins[kernel]["mse"] = np.min(mse)
+        mins[kernel]["eps"] = eps[np.argmin(mse)]
+
+        ax.plot(eps, mse, label="MSE", ls=ls["mse"], c=c[kernel])
+        ax.plot(eps, bias, label="Bias$^2$", ls=ls["bias"], c=c[kernel])
+        ax.plot(eps, var, label="Var", ls=ls["var"], c=c[kernel])
+    
+    x_eps, y_mse = [], []
+    for v in mins.values():
+        x_eps.append(v["eps"])
+        y_mse.append(v["mse"])
+
+    ax.vlines(x=x_eps, ymin=ax.get_ylim()[0], ymax=y_mse, ls="dashed", color="k", alpha=0.25)
+    ax.scatter(x_eps, y_mse, color="k", marker="x", alpha=0.25)
+    ax.set_xscale("log")
+    ax.set(xlabel="$\epsilon$")
+
+    ax.legend()
+    plt.show()
+
+    fig, ax = plt.subplots()
+    C = np.logspace(-1, 2, 10)
+    pen_mins = {kernel: {} for kernel in kernels}
+    for kernel in kernels:
+        method_params = {"kernel": kernel, "epsilon": mins[kernel]["eps"]}
+        mse, bias, var = utils.bootstrap(X, y, SVR, param_name="C", params=C, method_params=method_params, scale_y=True)
+
+        pen_mins[kernel]["mse"] = np.min(mse)
+        pen_mins[kernel]["C"] = C[np.argmin(mse)]
 
         ax.plot(C, mse, label="MSE", ls=ls["mse"], c=c[kernel])
         ax.plot(C, bias, label="Bias$^2$", ls=ls["bias"], c=c[kernel])
         ax.plot(C, var, label="Var", ls=ls["var"], c=c[kernel])
+    
+    x_C, y_mse = [], []
+    for v in pen_mins.values():
+        x_C.append(v["C"])
+        y_mse.append(v["mse"])
 
-    ax.legend()
+    ax.vlines(x=x_C, ymin=ax.get_ylim()[0], ymax=y_mse, ls="dashed", color="k", alpha=0.25)
+    ax.scatter(x_C, y_mse, color="k", marker="x", alpha=0.25)
+    ax.set(xlabel="C")
     plt.show()
+
 if __name__ == "__main__":
     rnd = 3211
     X, y = utils.get_fifa_data(n=10000, random_state=rnd)
@@ -233,4 +272,4 @@ if __name__ == "__main__":
     # Trees_increasing_ensamble(X, y, filename="BiasVar_Bag_and_Rf.pdf")
 
     # Boosting(X, y)
-    SupperVecReg_panalisation(X, y)
+    SupperVecReg(X, y)
