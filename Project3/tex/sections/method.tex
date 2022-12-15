@@ -20,16 +20,20 @@ We reference like this using \verb|cleveref|: \cref{int:fig:example_a}, \cref{th
 
     \subsubsection{Premier League 2019 Season}
         \comment{Outline: (1) data acquisition + credits (2) main features/groups of features (3) assumptions and weaknesses -\Nanna}
-        \comment{Some cool intro sentence. The following is very draft-y. -\Nanna} 
-        As well as for many other sports, data science is becoming more and more leading ("stadig mer inflytelsesrik") in the football industry \citep{Herbinet2018}, both from the viewpoint of the team (strategy, tactics, player acquisition), the odds (betting?) market (match, table, odds calculation) and the economically interested/motivated parties. Analysts working in the larger leagues have technology at their disposal that allows them to analyse more complex data than the main match events such as number of goals scored or corner given. For instance, a group on football analysts will most likely measure a team's or player's performance through metrics like expected goals (xG) or the number of passes allowed per defensive action (PPDA). The former is a very much used measure in football, but the algorithm behind it is not universal. In the European Premier League (EPL), the xG of two teams is updated by the minute during their clash. 
+        \comment{Some cool intro sentence. The following is very draft-y. Will write it properly when my head is clear xD -\Nanna} 
+        As well as for many other sports, data science is becoming more and more leading ("stadig mer innflytelsesrik") in the football industry~\citep{Herbinet2018}, both from the viewpoint of the team (strategy, tactics, player acquisition), the odds (betting?) market (match, table, odds calculation) and the solely economically interested/motivated parties. Analysts working in the larger leagues have access to technology that allows them to analyse more complex data than the main match events such as number of goals scored or corner given. For instance, a group on football analysts will most likely measure a team's or player's performance through metrics like expected goals (xG) or the number of passes allowed per defensive action (PPDA). The former is a very much used measure in football, but the algorithm behind it is not universal. In the European Premier League (EPL), the xG for two teams is updated live by the minute during their clash. 
         
-        For the biggest\comment{(most famous? coolest? best? idk -\Nanna)} football league in the world, the bookmakers keep the most interesting data to themselves. It is also common for a team to keep their database private. To find a ...
+        For the biggest\comment{(most famous? coolest? best? idk -\Nanna)} football league in the world, the bookmakers keep the most interesting data to themselves. It is also common for a team to keep their database private. 
+
+        The challenges in collecting data and the time scope of this project (has) compelled us to keep the purpose simple and ambitions somewhat low. In particular, we aim to foresee the outcome of a league match in EPL season 19/20 with a data set as shown in \comment{some figure}. 
+        
+        The choice to look back only one league game for one team is due to a great ease in the data acquisition process.  
 
 
     \subsubsection{Data Preparation}
         \comment{Describe preprocessing of data, i.e. scaling etc. -\Carl}
         \comment{Data splitting \Anna}
-        To train and evaluate our models we implemented the relevant data and and as in our previous projects we split it in training data ($\sfrac{5}{6}$ of the data) and testing data ($\sfrac{1}{6}$ of the data) \citep{Project1}\citep{Project2}. When tuning the architecture, we further split the training data into a tuning set and a validation set used for monitoring overfitting, implementing early stopping with $p=5$. We used a split of $\sfrac{3}{4}$. See \cref{the:fig:illustration_data} for illustration of the data splitting. 
+        To train and evaluate our models we implemented the relevant data and as in our previous projects we split it in training data ($\sfrac{5}{6}$ of the data) and testing data ($\sfrac{1}{6}$ of the data) \citep{Project1, Project2}. When tuning the architecture, we further split the training data into a tuning set and a validation set used for monitoring overfitting, implementing early stopping with $p=5$. We used a split of $\sfrac{3}{4}$. See \cref{the:fig:illustration_data} for illustration of the data splitting. 
 
         \begin{figure}[]
             \centering
