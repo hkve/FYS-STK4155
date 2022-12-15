@@ -49,9 +49,9 @@ We reference like this using \verb|cleveref|: \cref{int:fig:example_a}, \cref{th
     \subsubsection{Optimisation Algorithm}
         When optimising the cost function of our problems we built on what we found in \citep{Project2}, using stochastic gradient descent with a batch size of 32. We used the Adam algorithm with hyperparameters $\beta_1 = 0.9$, $\beta_2 = 0.999$ and a learning rate $\eta = 0.001$. These hyperparameters were not tuned in any of our searches. The number of training epochs was decided with early stopping termination criterion. This means monitoring the loss of the network on a validation dataset after each epoch of training, and stopping the training if there is no improvement after a number of epochs $p$, called the \textit{patience}.
 
-        All the datasets used pose classification problems with 3 or 10 categories. The cost function we used for optimisation was the standard categorical cross-entropy. Predicting probabilities $\vec{\tilde{p}}_c$ for the outcome being in category $c$ for the datapoints $\vec{y}$, with $n$ datapoints, the categorical cross-entropy is given by
+        All the datasets used pose classification problems with 3 or 10 categories. The cost function we used for optimisation was the standard categorical cross-entropy. Predicting probabilities $\vec{p}_c$ for the outcome being in category $c$ for the datapoints $\vec{y}_c$, with $n$ datapoints, the categorical cross-entropy is given by
         \begin{align}
-            \mathcal{L}(\tilde{y}) = \sum_{i=1}^n \sum_{c \in \mathrm{categories}} y_i \log\pclosed{p_{i,c}}
+            \mathcal{L}(\tilde{y}) = \sum_{i=1}^n \sum_{c \in \mathrm{categories}} y_{i,c} \log\pclosed{p_{i,c}}.
         \end{align}
 
         \comment{Discussion note: Early stopping prevents overfitting. -\Carl}
@@ -105,6 +105,7 @@ We reference like this using \verb|cleveref|: \cref{int:fig:example_a}, \cref{th
         % \end{algorithm}
 
     \subsubsection{CIFAR-10}
-        During the tuning on the CIFAR-10, we used early stopping with $p=5$ to terminate the training. After finding best network architectures, we fitted them on the full training dataset, evaluating their accuracy on the test dataset. We used early stopping with $p=10$ during this training.
+        On the CIFAR-10 dataset, we tuned using 1 hyperband iteration with a maximum number of epochs $R=30$ and $\eta=3$. We used early stopping with $p=5$ to terminate the training. After finding best network architectures, we fitted them on the full training dataset, evaluating their accuracy on the test dataset. We used early stopping with $p=10$ during this training.
 
     \subsubsection{Premier League Dataset}
+        With the smaller Premier League dataset, we could afford 3 full iterations of the hyperband search with a maximum number of epochs $R=150$ and again $\eta=3$. Again, we used early stopping during the tuning, with $p=15$. After finding the top-performing architectures, we trained on the full training set with early stopping with $p=30$.

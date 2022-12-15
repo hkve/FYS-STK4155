@@ -13,6 +13,7 @@ from tensorno.utils import get_all_activations
 def plot_channelout_architecture(network: tf.keras.Model,
                                  inputs,
                                  ax=None,
+                                 filename=None,
                                  **plot_kwargs):
     """Plots a channel out network on specified ax, with pathways indicating
     the active nodes for every datapoint in the input.
@@ -41,6 +42,9 @@ def plot_channelout_architecture(network: tf.keras.Model,
         ).reshape(all_activations[-1].shape[-1])
         npt.plot_pathways(network.layers, isactive, ax=ax, **plot_kwargs)
 
+    if filename is not None:
+        plt.savefig(plot_utils.make_figs_path(filename))
+
     return ax
 
 
@@ -53,8 +57,8 @@ if __name__ == "__main__":
     from tensorno.bob import build_LWTA_classifier
     from tensorno.utils import count_parameters
 
-    # x_train, y_train, x_test, y_test = load_MNIST()
-    x_train, y_train, x_test, y_test = load_CIFAR10()
+    x_train, y_train, x_test, y_test = load_MNIST()
+    # x_train, y_train, x_test, y_test = load_CIFAR10()
 
     # Flattening image arrays.
     x_train = x_train.reshape((x_train.shape[0], np.prod(x_train.shape[1:])))
@@ -74,7 +78,7 @@ if __name__ == "__main__":
         num_groups=[4, 2, 4],
         num_features=x_train.shape[-1],
         num_categories=y_train.shape[-1],
-        dropout_rate=0.1,
+        dropout_rate=1/8,
         lmbda=1e-2,
         Layer="channel_out",
     )
@@ -82,21 +86,25 @@ if __name__ == "__main__":
     test_digits = np.argwhere(y_test == 1)[:, 1]
     idcs_zeros = np.argwhere(test_digits == 0)[:50]
     idcs_ones = np.argwhere(test_digits == 1)[:50]
+    idcs_fours = np.argwhere(test_digits == 4)[:50]
+    idcs_fives = np.argwhere(test_digits == 5)[:50]
+    idcs_sevens = np.argwhere(test_digits == 7)[:50]
+    idcs_eigths = np.argwhere(test_digits == 8)[:50]
 
     ax = plot_channelout_architecture(model, inputs=x_test[idcs_zeros],
                                       color=plot_utils.colors[1])
     plot_channelout_architecture(model, inputs=x_test[idcs_ones],
                                  ax=ax, color=plot_utils.colors[2])
+    plt.savefig(plot_utils.make_figs_path("LWTA_architecture_untrained01"))
 
     early_stopper = tf.keras.callbacks.EarlyStopping(monitor="val_loss",
                                                      patience=5,
                                                      verbose=1,
                                                      restore_best_weights=True)
 
-    tf.random.set_seed(321)
     model.fit(
         x_train, y_train,
-        epochs=500,
+        epochs=100,
         validation_data=(x_val, y_val),
         callbacks=[early_stopper]
     )
@@ -108,4 +116,18 @@ if __name__ == "__main__":
                                       color=plot_utils.colors[1])
     plot_channelout_architecture(model, inputs=x_test[idcs_ones],
                                  ax=ax, color=plot_utils.colors[2])
+    plt.savefig(plot_utils.make_figs_path("LWTA_architecture_trained01"))
+
+    ax = plot_channelout_architecture(model, inputs=x_test[idcs_fours],
+                                      color=plot_utils.colors[1])
+    plot_channelout_architecture(model, inputs=x_test[idcs_fives],
+                                 ax=ax, color=plot_utils.colors[2])
+    plt.savefig(plot_utils.make_figs_path("LWTA_architecture_trained45"))
+
+    ax = plot_channelout_architecture(model, inputs=x_test[idcs_sevens],
+                                      color=plot_utils.colors[1])
+    plot_channelout_architecture(model, inputs=x_test[idcs_eigths],
+                                 ax=ax, color=plot_utils.colors[2])
+    plt.savefig(plot_utils.make_figs_path("LWTA_architecture_trained78"))
+
     plt.show()
