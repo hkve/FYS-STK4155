@@ -1,5 +1,5 @@
 \comment{Results here, in past tense.}
-To have a compact manner of referring to a specific implemented network structure, we introduce a new notation. A network with a specific architecture will hereby be referred to as \network{\textit{nodes by layer}}{\textit{groups by layer}}, where the number of nodes in each hidden layer is presented in the superscript and number of groups in each layer in the subscript. In both cases the numbers are presented starting with the first hidden layer, and ending with the last. When the number of nodes is identical to the number of groups, meaning there is only one node per group, the sign * will be used in the subscript to state the layer is dense with ReLU activation function implemented. For example, if a network has three layers: 32 nodes and two nodes per group; 64 nodes and four nodes per group; and 16 nodes and one node per group with ReLU, it will be denoted as \network{32, 64, 16}{16, 16, *}. 
+To have a compact manner of referring to a specific implemented network structure, we introduce a new notation. A network with a specific architecture will hereby be referred to as \network{\textit{nodes by layer}}{\textit{groups by layer}}, where the superscript indicates the number of nodes in each hidden layer, chronologically, and the subscript indicates number of groups in each these layers. Whenever the number of groups equals the number of nodes, and we get an ordinary dense layer, we add a ReLU activation on the node output, and indicate it with an asterisk $*$. As an example, if a network has three layers: 32 nodes and two nodes per group; 64 nodes and four nodes per group; and 16 nodes and one node per group with ReLU, it will be denoted as \network{32, 64, 16}{16, 16, *}. 
 
 
 
@@ -98,9 +98,9 @@ To have a compact manner of referring to a specific implemented network structur
             \cellcolor{maroon!20} & None & \network{8,64,16,64}{*,32,*,32} & 0.5484 \\ \cline{2-4} 
             \rowcolor{maroon!20}
             \multirow{-2}{*}{\rotatebox[origin=c]{90}{CO}}{\cellcolor{maroon!20}} & Both & \network{8, 64}{*, 32} & 0.4839 \\ \hline
-            \rowcolor{cyan!50} 
-            \cellcolor{cyan!20} & None & \network{16,16}{*,*} & 0.5161 \\ \cline{2-4} 
             \rowcolor{cyan!20} 
+            \cellcolor{cyan!20} & None & \network{16,16}{*,*} & 0.5161 \\ \cline{2-4} 
+            \rowcolor{cyan!50} 
             \multirow{-2}{*}{\rotatebox[origin=c]{90}{Dense}}{\cellcolor{cyan!20} } & Ridge & \network{16,16}{*,*} & 0.5887 \\ \hline
             \end{tabular}
             \caption{Table of the best performing network architectures with maxout, channel-out or dense ReLU layers and various combinations of dropout and ridge penalisation added.}
