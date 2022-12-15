@@ -57,6 +57,7 @@ def LinearModel_comparison(X, y, filename=None, random_state=321):
     
     x = [mins[Ridge]["alpha"], mins[Lasso]["alpha"]]
     y = [mins[Ridge]["mse"], mins[Lasso]["mse"]]
+    print(mins)
     ax.vlines(x=x, ymin=new_lim[0], ymax=y, ls="dashed", color="k", alpha=0.25)
     ax.scatter(x, y, color="k", marker="x", alpha=0.25)
     ax.legend(ncol=3)
@@ -267,9 +268,9 @@ if __name__ == "__main__":
     X, y = utils.get_fifa_data(n=10000, random_state=rnd)
     X_train, X_val, y_train, y_val = train_test_split(X, y, train_size=3/4, random_state=rnd)
 
-    # LinearModel_comparison(X_train, y_train, filename="BiasVar_LinearRegression", random_state=rnd)
+    LinearModel_comparison(X_train, y_train, filename="BiasVar_LinearRegression", random_state=rnd)
     # Singel_tree_increasing_depth(X, y, filename="BiasVar_SingleTree", random_state=rnd)
     # Trees_increasing_ensamble(X, y, filename="BiasVar_Bag_and_Rf.pdf")
 
     # Boosting(X, y)
-    SupperVecReg(X, y)
+    # SupperVecReg(X, y)
