@@ -12,7 +12,8 @@ from sklearn.decomposition import PCA
 from sklearn.metrics import accuracy_score, multilabel_confusion_matrix
 
 #   Import data preperation tools
-from sknotlearn.datasets import load_EPL, get_result_distribution
+from preprocess_EPL_data import load_EPL, get_result_distribution
+# from sknotlearn.datasets import load_EPL, get_result_distribution
 
 
 # FIXME slette funksjonen under?
