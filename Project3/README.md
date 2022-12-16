@@ -1,13 +1,12 @@
-# FYS-STK4155 Project 5 SOMETITLE
+# Locally Competing Neural Networks
+## FYS-STK4155 Project 5 
 ### Collaborators: [Carl Martin Fevang](https://github.com/carlmfe), [Anna Aasen](https://github.com/Annaaasen), [Håkon Kvernmoen](https://github.com/hkve), [Nanna Bryne](https://github.com/nannabryne), [Johan Mylius Kroken](https://github.com/johanmkr)
 
-## Abstract (could  also remove  this)
-> Abstract of the report placed here-
+## Abstract
+> We integrated two LWTA algorithms, maxout and channel-out, with `tensorflow` neural networks and applied them to the MNIST and CIFAR-10 image recognition datasets. We visualised how these algorithms train specific pathways in its architecture, providing an opportunity to discern how information is encoded in the neural networks. A maxout neural network including dropout achieved a test accuracy of 51.28\% on the CIFAR-10 dataset, and a test accuracy of 50.69\% with a channel-out network with L2 weight penalisation. Furthermore, we created and analysed a dataset comprised of statistics from English Premier League football matches, and applied LWTA NNs in classifying results of the final matches 124 matches of the 2019/2020 season. With a maxout NN with dropout and L2 weight penalisation we got an accuracy of 58.06\%, and with a plain channel-out NN we got 54.84\%. Neither of these beat an ordinary dense NN with ReLU activation achieving an accuracy of 58.87\%. Here goes PCA results.
 
 ## Report
 The report can be found [here](tex/main.pdf) or in `tex/main.pdf`. 
-
-
 ## Prerequisites
 The following packages are required:
 
@@ -19,7 +18,6 @@ The following packages are required:
 * `seaborn` $\geq$ 0.12.0
 * `imageio` $\geq$ 1.5
 * `autograd` $\geq$ 1.5
-
 
 ## Excecution of Code
 The code is executed by running scripts in the `analysis` folder. Scripts in the `sknotlearn` and `tensorno` folders are utility files which are not necessary to run on their own. 
