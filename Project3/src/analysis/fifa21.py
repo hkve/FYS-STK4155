@@ -233,6 +233,7 @@ def SupperVecReg(X, y, filename=None, random_state=321):
         ax.plot(eps, bias, label="Bias$^2$", ls=ls["bias"], c=c[kernel])
         ax.plot(eps, var, label="Var", ls=ls["var"], c=c[kernel])
     
+    print(mins)
     x_eps, y_mse = [], []
     for v in mins.values():
         x_eps.append(v["eps"])
@@ -243,7 +244,7 @@ def SupperVecReg(X, y, filename=None, random_state=321):
     ax.set_xscale("log")
     ax.set(xlabel="$\epsilon$")
     ax.legend(ncol=2)
-    plot_utils.save(filename + "eps")
+    # plot_utils.save(filename + "eps")
     plt.show()
 
     fig, ax = plt.subplots()
@@ -260,6 +261,7 @@ def SupperVecReg(X, y, filename=None, random_state=321):
         ax.plot(C, bias, label="Bias$^2$", ls=ls["bias"], c=c[kernel])
         ax.plot(C, var, label="Var", ls=ls["var"], c=c[kernel])
     
+    print(pen_mins)
     x_C, y_mse = [], []
     for v in pen_mins.values():
         x_C.append(v["C"])
@@ -270,7 +272,7 @@ def SupperVecReg(X, y, filename=None, random_state=321):
     ax.set(xlabel="C")
     ax.set_xscale("log")
     ax.legend(ncol=2)
-    plot_utils.save(filename + "C")
+    # plot_utils.save(filename + "C")
     plt.show()
 
 if __name__ == "__main__":
@@ -282,5 +284,5 @@ if __name__ == "__main__":
     # Singel_tree_increasing_depth(X, y, filename="BiasVar_SingleTree", random_state=rnd)
     # Trees_increasing_ensamble(X, y, filename="BiasVar_Bag_and_Rf.pdf")
 
-    Boosting(X, y, filename="Boosting")
-    # SupperVecReg(X, y, filename="BiasVar_SVR", random_state=rnd)
+    # Boosting(X, y, filename="Boosting")
+    SupperVecReg(X, y, filename="BiasVar_SVR", random_state=rnd)
