@@ -1,30 +1,30 @@
-\comment{Results here, in past tense.}
+\comment{Results here, in past tense.}\\
 To have a compact manner of referring to a specific implemented network structure, we introduce a new notation. A network with a specific architecture will hereby be referred to as \network{\textit{nodes by layer}}{\textit{groups by layer}}, where the superscript indicates the number of nodes in each hidden layer, chronologically, and the subscript indicates number of groups in each these layers. Whenever the number of groups equals the number of nodes, and we get an ordinary dense layer, we add a ReLU activation on the node output, and indicate it with an asterisk $*$. As an example, if a network has three layers: 32 nodes and two nodes per group; 64 nodes and four nodes per group; and 16 nodes and one node per group with ReLU, it will be denoted as \network{32, 64, 16}{16, 16, *}. 
 
 
 
 \subsection{Visualising Sparse Pathways}
-    Accuracy $0.8409$.
+    After training the channel-out network \network{8,8,8}{4,2,4} on the MNIST dataset, we got a final test accuracy of 84.09\%. The activation pathways are visualised in \cref{res:fig:LWTA_architecture}.
     \begin{figure}
         \begin{subfigure}{\linewidth}
             \centering
             \includegraphics[width=\linewidth]{figs/LWTA_architecture_untrained.pdf}
-            \caption{The untrained network predicting validation images of zeros in blue and ones in pink.}
+            \caption{The untrained network predicting test images of zeros in blue and ones in pink.}
             \label[fig]{res:fig:LWTA_architecture_untrained}
         \end{subfigure}
         \begin{subfigure}{\linewidth}
             \centering
             \includegraphics[width=\linewidth]{figs/LWTA_architecture_trained01.pdf}
-            \caption{The trained network predicting validation images of zeros in blue and ones in pink.}
+            \caption{The trained network predicting test images of zeros in blue and ones in pink.}
             \label[fig]{res:fig:LWTA_architecture_trained01}
         \end{subfigure}
         \begin{subfigure}{\linewidth}
             \centering
             \includegraphics[width=\linewidth]{figs/LWTA_architecture_trained45.pdf}
-            \caption{The trained network predicting validation images of fours in blue and fives in pink.}
+            \caption{The trained network predicting test images of fours in blue and fives in pink.}
             \label[fig]{res:fig:LWTA_architecture_trained45}
         \end{subfigure}
-        \caption{An illustration of the active pathways as 100 input images belonging to two different classes are passed through a channel-out network. The network was trained on the full training dataset for 26 epochs before stopping early with $p=5$, and had a final validation accuracy of $0.8555$.}
+        \caption{Illustrations of the active pathways as 100 input images from the MNIST test dataset belonging to two different classes are passed through a channel-out network. The network was trained on the full training dataset for 26 epochs before stopping early with $p=5$.}
         \label[fig]{res:fig:LWTA_architecture}
     \end{figure}
 
