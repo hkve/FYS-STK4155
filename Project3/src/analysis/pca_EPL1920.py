@@ -12,7 +12,7 @@ from sklearn.decomposition import PCA
 from sklearn.metrics import accuracy_score, multilabel_confusion_matrix
 
 #   Import data preperation tools
-from preprocess_EPL_data import load_EPL, get_result_distribution
+# from preprocess_EPL_data import load_EPL, get_result_distribution
 # from sknotlearn.datasets import load_EPL, get_result_distribution
 
 
@@ -227,6 +227,10 @@ if __name__ == "__main__":
     # prev_season_stats = trainx.filter(regex="_ps$", axis=1)
     # print(prev_season_stats.head())
 
+
+
+    generate_explained_variance_plot(trainx, SHOW=True)
+    
     sys.exit()
     
     
