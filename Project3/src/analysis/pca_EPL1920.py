@@ -232,7 +232,7 @@ if __name__ == "__main__":
 
 
     generate_explained_variance_plot(trainx, SHOW=True)
-    
+
     sys.exit()
     
     
