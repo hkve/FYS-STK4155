@@ -1,6 +1,6 @@
 # Features in dataset from EPL season 2019/2020
 
-_Total number of features: 86_ 
+_Total number of features: 87_ 
 ## Match information
 |           | Description                                                   |
 |:----------|:--------------------------------------------------------------|
@@ -8,20 +8,14 @@ _Total number of features: 86_
 | team      | Full team name                                                |
 | opp_team  | Oppoent's full team name                                      |
 | date      | Date of match day (%Y-%m-%d)                                  |
+| days_rest | Number of days the team have been resting from league matches |
 | ground    | Home (= h) or away (= a) pitch of team                        |
 | day       | Weekday (= 1, .., 7 = Mon., ..., Sun.)                        |
-| days_rest | Number of days the team have been resting from league matches |
-## Team attributes (2019)
-|              | Description                    |
-|:-------------|:-------------------------------|
-| annual_wages | Million £ used on player wages |
-| n_contracts  | Players under contract         |
 ## Team's previous league match stats
 |                 | Description                                                                               |
 |:----------------|:------------------------------------------------------------------------------------------|
 | ground_pg       | Home (= h) or away (= a) pitch of team                                                    |
 | day_pg          | Weekday (= 1, .., 7 = Mon., ..., Sun.)                                                    |
-| days_rest_pg    | Number of days the team have been resting from league matches                             |
 | S_pg            | Shots                                                                                     |
 | ST_pg           | Shots on target                                                                           |
 | C_pg            | Corners won                                                                               |
@@ -52,11 +46,15 @@ _Total number of features: 86_
 | ppda_def_pg     | PPDA defensive actions                                                                    |
 | oppda_att_pg    | OPPDA attacking actions                                                                   |
 | oppda_def_pg    | OPPDA defensive actions                                                                   |
-## Team's previous season stats and attributes (2018)
+## Team attributes (2019)
+|              | Description                    |
+|:-------------|:-------------------------------|
+| annual_wages | Million £ used on player wages |
+| n_contracts  | Players under contract         |
+## Team's previous season stats (2018)
 |                 | Description                                                                               |
 |:----------------|:------------------------------------------------------------------------------------------|
 | position_ps     | League position                                                                           |
-| matches_ps      | (omitted) Macthes played                                                                  |
 | xG_ps           | Expected goals                                                                            |
 | xGA_ps          | Expected goals against                                                                    |
 | npxG_ps         | Expected goals, not counting penalties or own goals                                       |
@@ -76,16 +74,17 @@ _Total number of features: 86_
 | xG_diff_ps      | Difference betweeen xG and actual goals scored                                            |
 | xGA_diff_ps     | Difference between expected goals against and missed                                      |
 | xpts_diff_ps    | Difference between actual and expected points                                             |
+| annual_wages_ps | Million £ used on player wages                                                            |
+| n_contracts_ps  | Players under contract                                                                    |
 ## Opponent attributes (2019)
 |                  | Description                    |
 |:-----------------|:-------------------------------|
 | annual_wages_opp | Million £ used on player wages |
 | n_contracts_opp  | Players under contract         |
-## Opponent's previous season stats and attributes (2018)
+## Opponent's previous season stats (2018)
 |                     | Description                                                                               |
 |:--------------------|:------------------------------------------------------------------------------------------|
 | position_ps_opp     | League position                                                                           |
-| matches_ps_opp      | (omitted) Macthes played                                                                  |
 | xG_ps_opp           | Expected goals                                                                            |
 | xGA_ps_opp          | Expected goals against                                                                    |
 | npxG_ps_opp         | Expected goals, not counting penalties or own goals                                       |
@@ -105,3 +104,5 @@ _Total number of features: 86_
 | xG_diff_ps_opp      | Difference betweeen xG and actual goals scored                                            |
 | xGA_diff_ps_opp     | Difference between expected goals against and missed                                      |
 | xpts_diff_ps_opp    | Difference between actual and expected points                                             |
+| annual_wages_ps_opp | Million £ used on player wages                                                            |
+| n_contracts_ps_opp  | Players under contract                                                                    |
