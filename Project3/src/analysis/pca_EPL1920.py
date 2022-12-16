@@ -11,13 +11,11 @@ from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.decomposition import PCA
 from sklearn.metrics import accuracy_score, multilabel_confusion_matrix
 
-
-# Testing johan
-import plotly.express as px
-
+#   Import data preperation tools
+from sknotlearn.datasets import load_EPL, get_result_distribution
 
 
-
+# FIXME slette funksjonen under?
 
 # def randomGuessesHmm(
 #             num_matches : int, 
@@ -138,49 +136,15 @@ def get_random_accuarcy(
     return accuracy, distr
 
 
+def generate_explained_variance_plot(
+            trainx: pd.DataFrame,
+            SHOW: bool = False) -> None:
+    """Function to generate and plot the explained variance from principal component analysis. It is plotted both as a step-wise cumulative function and with histogram bars showing the explained variance of each principal component.
 
-
-
-if __name__ == "__main__":
-
-    print("\n >>> \n")
-
-    import context
-    from sknotlearn.datasets import load_EPL, get_result_distribution
-
-    data0 = load_EPL(False, False)
-    ref_accuracy_smart, _  = get_random_accuarcy(data0)
-    ref_accuracy_octopus, _  = get_random_accuarcy(data0, True)
-    print(f"\nAccuracy from learned random guesser: {ref_accuracy_smart*100:5.2f} %.")
-    print(f"\nAccuracy from octopus: {ref_accuracy_octopus*100:5.2f} %.")
-    
-    
-    
-    container = load_EPL(True)
-    
-    trainx, testx, trainy, testy = train_test_split(container.x, container.y, test_size=1/6)
-    # print(len(trainy), len(testy))
-    # trainx, valx,  trainy, valy  = train_test_split(trainx,      trainy,      test_size=0.2)
-    # print(trainx.head())
-    cols = list(trainx.columns)
-
-    # opp_ = cols[ lambda x: x.split["_"][-1] == "ps"]
-
-
-    # opp_team_stats = trainx.filter(regex="_opp$", axis=1)
-    # print(opp_team_stats.head())
-
-    # prev_season_stats = trainx.filter(regex="_ps$", axis=1)
-    # print(prev_season_stats.head())
-
-    # other = 
-
-    sys.exit()
-
+    Args:
+        trainx (pd.DataFrame): Pandas data frame with the unscaled data in the basis of the original features.
+        SHOW (bool): If true, the plot is also shown. Default is False.
     """
-    Plot 1 - Step plot and histogram. 
-    """
-
     scaler = StandardScaler()
     trainx = scaler.fit_transform(trainx)
 
@@ -216,6 +180,56 @@ if __name__ == "__main__":
 
     plot_utils.save("pca_pl")
     plt.show()
+
+
+
+if __name__ == "__main__":
+
+    print("\n >>> \n")
+
+    # import context
+
+    container = load_EPL(True)
+    data0 = load_EPL(False, False)
+    ref_accuracy_smart, _  = get_random_accuarcy(data0)
+    ref_accuracy_octopus, _  = get_random_accuarcy(data0, True)
+    print(f"\nAccuracy from learned random guesser: {ref_accuracy_smart*100:5.2f} %.")
+    print(f"\nAccuracy from octopus: {ref_accuracy_octopus*100:5.2f} %.")
+    
+    #   Split the data into training and test sets. We will only use the training data when performing PCA
+    trainx, testx, trainy, testy = train_test_split(container.x, container.y, test_size=1/6)
+
+    #   Function to generate and plot the explained variance.
+    generate_explained_variance_plot(trainx, show=True)
+    
+
+    #   Delete everything under sys.exit()???? -J
+    sys.exit()
+    
+    
+    # print(len(trainy), len(testy))
+    # trainx, valx,  trainy, valy  = train_test_split(trainx,      trainy,      test_size=0.2)
+    # print(trainx.head())
+    # cols = list(trainx.columns)
+
+    # opp_ = cols[ lambda x: x.split["_"][-1] == "ps"]
+
+
+    # opp_team_stats = trainx.filter(regex="_opp$", axis=1)
+    # print(opp_team_stats.head())
+
+    # prev_season_stats = trainx.filter(regex="_ps$", axis=1)
+    # print(prev_season_stats.head())
+
+    # other = 
+
+
+
+    """
+    Plot 1 - Step plot and histogram. 
+    """
+
+
 
     # """
     # Plot 2 - Feature scatter plots. 
