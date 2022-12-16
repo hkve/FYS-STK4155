@@ -66,13 +66,18 @@ All figures can be found in `tex/figs`. All code and data files can be found in 
     * `datasets.py` $\to$ Contains all datasets
     * `fifa21_EAsports_reader.py` $\to$ Read and creates the FIFA2021 dataset
     * `preprocess_EPL_data.py` $\to$ Preprocesses the EPL data
-    * `breast_cancer.csv` $\to$  Dataset
-    * `EPL1920.csv` $\to$  Dataset
-    * `players_21_subset_csv` $\to$  Dataset
-    * `players_21.csv` $\to$  Dataset
-    * `salary18.csv` $\to$  Dataset
-    * `salary19.csv` $\to$  Dataset
-    * `understat_per_game.csv` $\to$  Dataset
+    * `EPL_notes.md` $\to$ Tables describing the features in the EPL dataset
+    * `breast_cancer.csv` $\to$ Dataset
+    * `EPL1920.csv` $\to$ Dataset
+        - Credit: https://www.football-data.co.uk/englandm.php
+    * `players_21_subset_csv` $\to$ Dataset
+    * `players_21.csv` $\to$ Dataset
+    * `salary18.csv` $\to$ Dataset 
+        - Credit: https://fbref.com/en/comps/9/2018-2019/2018-2019-Premier-League-Stats
+    * `salary19.csv` $\to$ Dataset 
+        - Credit: https://fbref.com/en/comps/9/2018-2019/2018-2019-Premier-League-Stats
+    * `understat_per_game.csv` $\to$ Dataset
+        - Credit: https://www.kaggle.com/datasets/slehkyi/extended-football-stats-for-european-leagues-xg?select=understat_per_game.csv
     
 * `tensorno`
     * `bob.py` $\to$ Contains network builders
