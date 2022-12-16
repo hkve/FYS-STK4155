@@ -2,27 +2,24 @@
 ### Collaborators: [Carl Martin Fevang](https://github.com/carlmfe), [Anna Aasen](https://github.com/Annaaasen), [Håkon Kvernmoen](https://github.com/hkve), [Nanna Bryne](https://github.com/nannabryne), [Johan Mylius Kroken](https://github.com/johanmkr)
 
 ## Abstract (could  also remove  this)
-    -Abstract of the report placed here-
+> Abstract of the report placed here-
 
 ## Report and work
-The report can be found [here](https://github.com/hkve/FYS-STK4155/tree/main/Project3/tex/main.pdf) or in `tex/main.pdf`. (Insert correct [link](tex/main.pdf))
+The report can be found [here](tex/main.pdf) or in `tex/main.pdf`. 
 
 
 ## Prerequisites
-The following dependencies are required (check versions of these):
+The following packages are required:
 
-* `numpy`
-* `sklearn`
-* `tensorflow`
-* `pandas`
-* `matplotlib`
-* `random`
-* `pathlib`
-* `datetime`
-* `keras_tuner`
-* `math`
-* `context`
-* `seaborn`
+* `numpy` $\geq$ 1.17
+* `sklearn` Any
+* `tensorflow`$\geq$ 2.9
+* `pandas` $\geq$ 1.4
+* `matplotlib` $\geq$ 3.1 
+* `seaborn` $\geq$ 0.12.0
+* `imageio` $\geq$ 1.5
+* `autograd` $\geq$ 1.5
+
 
 
 ## Structure
