@@ -23,7 +23,7 @@ The following packages are required:
 
 
 ## Structure
-some structure
+some structure, also write something about Carl Martins files (hyperparameter tuning or something).
 
 
 ## Excecution of Code
