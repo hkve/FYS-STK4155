@@ -11,13 +11,12 @@ from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.decomposition import PCA
 from sklearn.metrics import accuracy_score, multilabel_confusion_matrix
 
-
-# Testing johan
-import plotly.express as px
-
-
+#   Import data preperation tools
+# from preprocess_EPL_data import load_EPL, get_result_distribution
+# from sknotlearn.datasets import load_EPL, get_result_distribution
 
 
+# FIXME slette funksjonen under?
 
 # def randomGuessesHmm(
 #             num_matches : int, 
@@ -80,7 +79,7 @@ def randomGuesses(
 
 def get_random_accuarcy(
             data : pd.DataFrame,
-            uniform : bool = False) -> tuple:
+            distribution : str = "estimated") -> tuple:
     """
     Get the accuracy for a random guess, given that it knows the EPL trend:
         * 50 % chance of home win
@@ -91,25 +90,35 @@ def get_random_accuarcy(
     ----------
     data : pd.DataFrame
         the non-endoded data from load_EPL()
-    uniform : bool, optional
-        set to True if one wants to guess assuming a uniform distribution, by defualt False
+    distribution : str, optional
+        distribution for random sampling, by default "estimated"
+            "estimated" - 50 % chance of home win, 30 % chance of away win, 20 % chance of draw
+            "uniform" - 1/3 chance of home win, 1/3 chance of away win, 1/3 chance of draw
+            "home wins" - 100 % chance of home win, 0 % chance of away win, 0 % chance of draw
         
     Returns
     -------
-    float, ndarray
-        accuracy, home distribution [W, D, L]
+    float
+        accuracy
     """
     home_result = data.loc[data["ground"] == "h"]["result"].reset_index(drop=True, inplace=False)
     away_result = data.loc[data["ground"] == "a"]["result"].reset_index(drop=True, inplace=False)
     
-    if uniform:
-        ### 1/3 chance of home win, 1/3 chance of away win, 1/3 chance of draw
-        guess_home = randomGuesses(len(home_result), [1/3,1/3,1/3])
-        guess_away = randomGuesses(len(away_result), [1/3,1/3,1/3])
-    else:
+    if distribution == "estimated":
         ### 50 % chance of home win, 30 % chance of away win, 20 % chance of draw
         guess_home = randomGuesses(len(home_result), [0.5,0.2,0.3])
         guess_away = randomGuesses(len(away_result), [0.3,0.2,0.5])
+    elif distribution == "uniform":
+        ### 1/3 chance of home win, 1/3 chance of away win, 1/3 chance of draw
+        guess_home = randomGuesses(len(home_result), [1/3,1/3,1/3])
+        guess_away = randomGuesses(len(away_result), [1/3,1/3,1/3])
+    elif distribution == "home wins":
+        ### 100 % chance of home win, 0 % chance of away win, 0 % chance of draw
+        guess_home = randomGuesses(len(home_result), [1,0,0])
+        guess_away = randomGuesses(len(away_result), [0,0,1])
+    else:
+        print("Provide valid argument")
+        
 
     
     res_map = {'w': 2, 'd': 1, 'l': 0}
@@ -124,60 +133,29 @@ def get_random_accuarcy(
         actual_home[j] = home_result["actual"][j]
         actual_away[j] = away_result["actual"][j]
     
-    hl = len(actual_home[actual_home==0])
-    hd = len(actual_home[actual_home==1])
-    hw = len(actual_home[actual_home==2])
-    hm = hw + hd + hl
-    distr = np.array([hw, hd, hl])/hm
+    # hl = len(actual_home[actual_home==0])
+    # hd = len(actual_home[actual_home==1])
+    # hw = len(actual_home[actual_home==2])
+    # hm = hw + hd + hl
     
     actual = np.append(actual_home, actual_away)
     guess = np.append(guess_home, guess_away)
 
     accuracy = accuracy_score(actual, guess)
 
-    return accuracy, distr
+    return accuracy
 
 
+def generate_explained_variance_plot(
+            trainx: pd.DataFrame,
+            SHOW: bool = False) -> None:
+    """Function to generate and plot the explained variance from principal component analysis. It is plotted both as a step-wise cumulative function and with histogram bars showing the explained variance of each principal component.
 
-
-
-if __name__ == "__main__":
-
-    print("\n >>> \n")
-
-    import context
-    from sknotlearn.datasets import load_EPL, get_result_distribution
-
-    ref_accuracy, _  = get_random_accuarcy(load_EPL(False, False))
-
-    print(f"\nAccuracy from random guesses: {ref_accuracy:.2f}.")
-    
-    
-    container = load_EPL(True)
-    
-    trainx, testx, trainy, testy = train_test_split(container.x, container.y, test_size=1/6)
-    print(len(trainy), len(testy))
-    # trainx, valx,  trainy, valy  = train_test_split(trainx,      trainy,      test_size=0.2)
-    # print(trainx.head())
-    cols = list(trainx.columns)
-
-    # opp_ = cols[ lambda x: x.split["_"][-1] == "ps"]
-
-
-    # opp_team_stats = trainx.filter(regex="_opp$", axis=1)
-    # print(opp_team_stats.head())
-
-    # prev_season_stats = trainx.filter(regex="_ps$", axis=1)
-    # print(prev_season_stats.head())
-
-    # other = 
-
-    sys.exit()
+    Args:
+        trainx (pd.DataFrame): Pandas data frame with the unscaled data in the basis of the original features.
+        SHOW (bool): If true, the plot is also shown. Default is False.
 
     """
-    Plot 1 - Step plot and histogram. 
-    """
-
     scaler = StandardScaler()
     trainx = scaler.fit_transform(trainx)
 
@@ -213,6 +191,74 @@ if __name__ == "__main__":
 
     plot_utils.save("pca_pl")
     plt.show()
+
+
+if __name__ == "__main__":
+
+    print("\n >>> \n")
+
+    import context
+    from sknotlearn.datasets import load_EPL, get_result_distribution
+
+    ### Get encoded data
+    container = load_EPL(True)
+    trainx, testx, trainy, testy = train_test_split(container.x, container.y, test_size=1/6)
+    n_train = len(trainx)
+    n_test = len(testx)
+
+
+    ### Guess randomly (on test data)
+    data0 = load_EPL(False, False).iloc[n_train:]
+    ref_accuracy_smart  = get_random_accuarcy(data0)
+    ref_accuracy_octopus  = get_random_accuarcy(data0, "uniform")
+    ref_accuracy_baby  = get_random_accuarcy(data0, "home wins")
+    print(f"Accuracy from learned random guesser: {ref_accuracy_smart*100:5.2f} %")
+    print(f"Accuracy from octopus: {ref_accuracy_octopus*100:5.2f} %")
+    print(f"Accuracy from baby: {ref_accuracy_baby*100:5.2f} %")
+    
+    
+
+    cols = list(trainx.columns)
+
+    # opp_ = cols[ lambda x: x.split["_"][-1] == "ps"]
+
+
+    # opp_team_stats = trainx.filter(regex="_opp$", axis=1)
+    # print(opp_team_stats.head())
+
+    # prev_season_stats = trainx.filter(regex="_ps$", axis=1)
+    # print(prev_season_stats.head())
+
+
+
+    generate_explained_variance_plot(trainx, SHOW=True)
+
+    sys.exit()
+    
+    
+    # print(len(trainy), len(testy))
+    # trainx, valx,  trainy, valy  = train_test_split(trainx,      trainy,      test_size=0.2)
+    # print(trainx.head())
+    # cols = list(trainx.columns)
+
+    # opp_ = cols[ lambda x: x.split["_"][-1] == "ps"]
+
+
+    # opp_team_stats = trainx.filter(regex="_opp$", axis=1)
+    # print(opp_team_stats.head())
+
+    # prev_season_stats = trainx.filter(regex="_ps$", axis=1)
+    # print(prev_season_stats.head())
+
+    # other = 
+
+
+
+    """
+    Plot 1 - Step plot and histogram. 
+    """
+
+
 
     # """
     # Plot 2 - Feature scatter plots. 

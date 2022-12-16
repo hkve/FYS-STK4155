@@ -10,22 +10,21 @@ if __name__ == "__main__":
     from sknotlearn.datasets import load_MNIST, load_CIFAR10, load_EPL
     from tensorno.tuner import tune_LWTA_architecture
 
-    # x_train, y_train, x_test, y_test = load_MNIST()
-    # x_train, y_train, x_test, y_test = load_CIFAR10()
-    dataset = load_EPL(encoded=True)
-    y = dataset.y.to_numpy()
-    labels = np.array(["w", "d", "l"])
-    y = np.array([np.where(y_ == range(len(labels)), 1, 0) for y_ in y], dtype=int)
-    x = dataset.x
-    x = x.astype(float)
-
-    x_train, x_test, y_train, y_test = train_test_split(x, y,
-                                                        train_size=5/6,
-                                                        shuffle=False)
-
+    x_train, y_train, x_test, y_test = load_CIFAR10()
     # Flattening image arrays.
-    # x_train = x_train.reshape((x_train.shape[0], np.prod(x_train.shape[1:])))
-    # x_test = x_test.reshape((x_test.shape[0], np.prod(x_test.shape[1:])))
+    x_train = x_train.reshape((x_train.shape[0], np.prod(x_train.shape[1:])))
+    x_test = x_test.reshape((x_test.shape[0], np.prod(x_test.shape[1:])))
+
+    # dataset = load_EPL(encoded=True)
+    # y = dataset.y.to_numpy()
+    # labels = np.array(["w", "d", "l"])
+    # y = np.array([np.where(y_ == range(len(labels)), 1, 0) for y_ in y],
+    #              dtype=int)
+    # x = dataset.x
+    # x = x.astype(float)
+    # x_train, x_test, y_train, y_test = train_test_split(x, y,
+    #                                                     train_size=5/6,
+    #                                                     shuffle=False)
 
     scaler = StandardScaler()
     x_train = scaler.fit_transform(x_train)
@@ -36,12 +35,12 @@ if __name__ == "__main__":
     )
 
     early_stopper = tf.keras.callbacks.EarlyStopping(monitor="val_loss",
-                                                     patience=15,
+                                                     patience=5,
                                                      verbose=1,
                                                      restore_best_weights=True)
 
     tuner = tune_LWTA_architecture(
-        layer_type="channel_out",
+        layer_type="max_out",
         train_data=(x_train, y_train),
         val_data=(x_val, y_val),
         isregression=False,
@@ -53,13 +52,13 @@ if __name__ == "__main__":
             lmbda=1e-4
         ),
         tuner_kwargs=dict(
-            max_epochs=150,
-            hyperband_iterations=3,
-            project_name="EPL_do_l2_es",
-            overwrite=True
+            max_epochs=50,
+            hyperband_iterations=1,
+            project_name="CIFAR10_do_l2_test",
+            # overwrite=True
         ),
         search_kwargs=dict(
-            epochs=150,
+            epochs=30,
             callbacks=[early_stopper, ]
         )
     )
