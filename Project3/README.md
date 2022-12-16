@@ -22,8 +22,28 @@ The following packages are required:
 
 
 ## Excecution of Code
-some excecution stuff
+The code is executed by running scripts in the `analysis` folder. Scripts in the `sknotlearn` and `tensorno` folders are utility files which are not necessary to run on their own. 
 
+Within the `analysis` folder:
+
+In order to tune the LWTA-networks execute:
+
+    python3 tune_LWTA_architecture.py
+
+In order to visualise its activations and/or pathways execute one or both of the following:
+
+    python3 visualise_activation.py
+    python3 visualise_network.py
+
+In order to generate the explained variance from the PCA on the EPL data, and show plot, execute:
+
+    python3 pca_EPL1920.py
+
+In order to run the bias-variance analysis of the FIFA2021 dataset execute:
+
+    python3 fifa21.py
+
+Happy execution!
 
 ## Structure
 some structure, also write something about Carl Martins files (hyperparameter tuning or something).
@@ -36,7 +56,7 @@ All figures can be found in `tex/figs`. All code and data files can be found in 
     * `fifa21_utils.py` $\to$ Utilities to the above analysis
     * `model_analysis.py` $\to$ Generate model specific plots
     * `network_plot_tools.py` $\to$ Tool for general plotting
-    * `pca_EPL1929.py` $\to$ PCA of the EPL data
+    * `pca_EPL1920.py` $\to$ PCA of the EPL data
     * `plot_utils.py` $\to$ Utilities for plotting
     * `tune_LWTA_architecture.py` $\to$ Tune architecture of networks
     * `visualise_activation.py` $\to$ Visualise LWTA activation
