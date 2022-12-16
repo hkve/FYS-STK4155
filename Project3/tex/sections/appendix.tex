@@ -104,7 +104,7 @@
                 \caption{MSE, bias and variance estimates for bagged trees (green) and random forest (blue) considering $\lfloor p/3 \rfloor$ features as each split, against increasing bag size/number of trees.}
                 \label[fig]{fig:bag_and_rf_biasvar_decomp}
             \end{figure}
-            For the last of our tree based methods, we investigate the boosted trees.
+            For the last of our tree based methods, we investigate the boosted trees. The MSE, bias and variance calculated while varying the number of predictors is shown in \cref{fig:boosting_n_est}. 
             \begin{figure}[H]
                 \centering
                 \includegraphics[width=\linewidth]{Boosting_n_est.pdf}
@@ -114,7 +114,7 @@
         
         
         \subsection{Support Vector Machines}
-            Lastly, we investigate how our SVM performs when increasing the margin ($\epsilon$). To assure convergence, the margin is slightly soft, setting $C = 1$. The results from both the linear and RBF kernel can be seen in \cref{fig:SVR_eps}. For small $\epsilon$, the RBF kernel outperforms the linear kernel substantially. Though having approximately equal bias', the variance of RBF is much lower than the linear kernel. Increasing $\epsilon$ actually yields worse results for the RBF kernel, in contrast to the linear kernel where we find a low variance region with a bias dip similar to what we found for linear regression (\cref{fig:linreg_biasvar_decomp}). The increasing bias for high $\epsilon$ values might be somewhat counterintuitive, since the constraint in \cref{eq:SVM_optimasation} is loosened. However, the inclusion of more points might actually since more points are used the center the line draw out by \cref{eq:SVM_predict}. Assuming the bagged training sample is large enough to accurately represent the population, very small variations of the coefficients $\vec{w}$ should be allowed. This is in agreement with the variance decreasing even more for very large $\epsilon$ in \cref{fig:SVR_eps}. These results yielded optimal MSE values for  
+            Lastly, we investigate how our SVM performs when increasing the margin ($\epsilon$). To assure convergence, the margin is slightly soft, setting $C = 1$. The results from both the linear and RBF kernel can be seen in \cref{fig:SVR_eps}. For small $\epsilon$, the RBF kernel outperforms the linear kernel substantially. Though having approximately equal bias', the variance of RBF is much lower than the linear kernel. Increasing $\epsilon$ actually yields worse results for the RBF kernel, in contrast to the linear kernel where we find a low variance region with a bias dip similar to what we found for linear regression (\cref{fig:linreg_biasvar_decomp}). The increasing bias for high $\epsilon$ values might be somewhat counterintuitive, since the constraint in \cref{eq:SVM_optimasation} is loosened. However, the inclusion of many points might actually increase the bias since more points are used to center the line draw out by \cref{eq:SVM_predict}. Assuming the bagged training sample is large enough to accurately represent the population, only very small variations of the coefficients $\vec{w}$ should be allowed. This is in agreement with the variance decreasing even more for very large $\epsilon$ in \cref{fig:SVR_eps}. These results yielded optimal MSE values of $8.58$ and $11.76$ at $\epsilon = 0.35, 0.005$ for the linear and RBF kernel respectively. 
 
             Can we characterize bias and variance in SVMs with respect to the kernel and its parameters?
             \begin{figure}[H]
@@ -123,10 +123,14 @@
                 \caption{MSE, bias and variance estimates for SVR, against increasing the margin size $\epsilon$. In green, we have the linear kernel while in blue the RBF kernel. A soft margin of $C = 1$ has been used across all $\epsilon$. }
                 \label[fig]{fig:SVR_eps}
             \end{figure}
-
+            Losning the margin, parameterised by $C$, is shown in \cref{fig:SVR_C}.
+            Effects on the bias while losing the soft margin has clearer interpretation. With $C$ being small, very few or even none of the prediction by $f$ are allowed to lay outside the margin calculated by the train data. This is very clear when considering the RBF kernel, having a steeply increasing bias when $C$ approaches zero. The linear kernel however, does not seem to be very dependent on margin softness. Why this is the case is not clear, but it might give an indication of a linear $\epsilon$ tube being a good representation of the true function.
             \begin{figure}[H]
                 \centering
                 \includegraphics[width=\linewidth]{BiasVar_SVRC.pdf}
                 \caption{MSE, bias and variance estimates for SVR, against increasing the softness of the margin $C$. In green, we have the linear kernel while in blue the RBF kernel. The respective optimal margin size $\epsilon$ found for $C= 1$ has been.}
                 \label[fig]{fig:SVR_C}
             \end{figure}
+
+        \subsection{Summarising Results}
+            blbla
