@@ -34,14 +34,7 @@
         
         The EPL is the primary division for men in the English football league system. 20 teams participate each season, three of which newly promoted from the English Championship. For the biggest football league in the world, the bookmakers tend to keep the most interesting data to themselves, as do the clubs' data science teams \citep[Ch.~15]{Soccermatics}. However, being the most-watched sports league in the world, the public datasets from EPL are reliable and usually uncorrupted, and one can retrieve quite detailed match data from decades ago. 
 
-        The challenges in collecting data and the time scope of this project compelled us to keep the purpose simple and ambitions somewhat low. In particular, we aim to foresee the outcome of a league match in EPL season 19/20 with the self-composed dataset shown in \cref{met:fig:EPLdat}. After preprocessing data from various sources, our dataset contains information about the ten league matches in each game week following the first one, but from the perspective of each team, giving $ 10 \times 37\times 2 = 740$ data points. We used the games from the first $\sfrac{5}{6}$ part of the season, not counting the 10 opening matches, for training, corresponding to 308 games. The remaining 62 final games (last $\sfrac{1}{6}$ part of the season) was reserved for testing. All in all, we had 616 training data points and 124 testing data points.
-
-        \begin{figure*}
-            \centering
-            \includegraphics[width=0.74\linewidth]{figs/EPLdata_features.png}
-            \caption{Schematic of how the features describing a match are connected. }
-            \label[fig]{met:fig:EPLdata}
-        \end{figure*}
+        The challenges in collecting data and the time scope of this project compelled us to keep the purpose simple and ambitions somewhat low. In particular, we aim to foresee the outcome of a league match in EPL season 19/20 with the self-composed dataset described in \cref{app:EPL_dataset}. After preprocessing data from various sources, our dataset contains information about the ten league matches in each game week following the first one, but from the perspective of each team, giving $ 10 \times 37\times 2 = 740$ data points. We used the games from the first $\sfrac{5}{6}$ part of the season, not counting the 10 opening matches, for training, corresponding to 308 games. The remaining 62 final games (last $\sfrac{1}{6}$ part of the season) was reserved for testing. All in all, we had 616 training data points and 124 testing data points.
         
         The choice to look back only one league game for one team was due to a great ease in the data acquisition process. Trying to predict the full time result is a much more comprehensive task than to classify the outcome for a team as win (W), draw (D) or loss (L).
 

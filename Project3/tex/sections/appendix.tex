@@ -1,3 +1,18 @@
+    \section{Self-Composed Premier League Dataset}\label[app]{app:EPL_dataset}
+        In \cref{fig:EPLdata} we present the idea behind our homemade dataset. There are in total 87 features that we use in our analysis, in addition to the actual outcome for each match.
+
+        \begin{figure*}
+            \centering
+            \includegraphics[width=0.78\linewidth]{figs/EPLdata_features.png}
+            \caption{Schematic of how the features describing a match are connected. See text for further details.}
+            \label[fig]{fig:EPLdata}
+        \end{figure*}
+
+        For a clash between a team and its opponent, we have some general facts such as what weekday it happens on and whether the team is playing on familiar ground (home) or not (away). 
+        
+        Both the team and the team it is facing, each have their own \textit{team profile}: information about how much the club spends on player wages\footnote{Potential to add more attributes here, such as average age and match attendance, or scope of fanbase. Extracting such data turned out to be circumstantial, which is why we have not gone further here.} from both the season we are looking at and the previous one, and a set of underlying statistics from the season before.  In addition to table position, the underlying statistics include metrics like the total xG or none-penalty xG (npxG), PPDA in the opposition half and opponent PPDA (OPPDA) in the opposition half. A number of the features describe the deviation from an estimator and the actual value, such as the difference between xG and actual goals scored. 
+    
+    
     \section{Bias-variance Trade off}
         Ho ho ho! As Christmas is right around the corner, what is more tempting for both student and TA than to read two pages of extra task?! ARE YOU READY?
 
