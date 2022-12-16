@@ -59,7 +59,7 @@
     
     \subsubsection{Lateral Inhibition}
 
-        An example of competative mechanisms that are present in neurobiological systems is a phenomenon referred to as \textit{lateral inhibition}. It exhibits the local competative selectivity between neurons and neural pathways. This is assumed to enhance the sense of contrast and is present especially in sensory procedures. The mechanism behind lateral inhibition is that the neurons receiving the most sensory input inhibit the activity of the neurons in close proximity (radius from 200 to 500 \textmu m), making themselves the "winners" and the nearby neurons the "losers". This results in a winner-takes-all behaviour. For example, when neurons receive input from receptors of some external stimuli, the neurons connected to the most stimulated receptors will inhibit the nearby neurons connected to less stimulated receptors, making them less likely to be activated. This will lead to the outer part of the stimulus being toned down and the central stimulus appearing stronger in contrast. There exists both anatomical an physiological evidence supporting the theory of lateral inhibition~\citep{Kohonen}~\citep{Cohen}. 
+        An example of competitive mechanisms that are present in neurobiological systems is a phenomenon referred to as \textit{lateral inhibition}. It exhibits the local competitive selectivity between neurons and neural pathways. This is assumed to enhance the sense of contrast and is present especially in sensory procedures. The mechanism behind lateral inhibition is that the neurons receiving the most sensory input inhibit the activity of the neurons in close proximity (radius from 200 to 500 \textmu m), making themselves the "winners" and the nearby neurons the "losers". This results in a winner-takes-all behaviour. For example, when neurons receive input from receptors of some external stimuli, the neurons connected to the most stimulated receptors will inhibit the nearby neurons connected to less stimulated receptors, making them less likely to be activated. This will lead to the outer part of the stimulus being toned down and the central stimulus appearing stronger in contrast. There exists both anatomical a physiological evidence supporting the theory of lateral inhibition~\citep{Kohonen}~\citep{Cohen}. 
 
         
     \subsubsection{Functionality of Local Competition}
@@ -70,7 +70,7 @@
         
         Furthermore, the pathways are hypothesised to be essential in the brain for making useful distinctions between input, and develop so-called \textit{feature selectivity} \citep{Chen}. Assuming that a certain pathway encodes part of the input, called a feature,\footnote{Not to be confused with the input features in machine learning, even though there can be an overlap} the input will be decomposed and processed by various pathways. In that case neurons can be tuned to e.g., different orientations or spatial frequencies when processing a visual input.\footnote{\textit{Spatial frequency} is defined as the periodic distribution of light and dark in an image; it is high around edges and elsewhere the gradient of the pixel value is large~\citep{APA}}
         
-        The immense amount of input the brain receives at any given moment cannot be processed; somehow the brain prioritises the relevant the input. One hypothesis is that the competition between neural pathway leads to only some of the information being processed; only the winning neural pathways are activated \citep{Chen}. This hypothesis coincides with an intutive understanding of the concept of prioritising, as competition based on immediate stimuli and established neural structures seems plausible; only the input which is most pressing and coherent with previously important input is processed. 
+        The immense amount of input the brain receives at any given moment cannot be processed; somehow the brain prioritises the relevant the input. One hypothesis is that the competition between neural pathway leads to only some of the information being processed; only the winning neural pathways are activated \citep{Chen}. This hypothesis coincides with an intuitive understanding of the concept of prioritising, as competition based on immediate stimuli and established neural structures seems plausible; only the input which is most pressing and coherent with previously important input is processed. 
         
         Another way of looking at this prioritising is as a model of \textit{bottom-up attention}. Bottom-up refers to a process starting at the bottom of the cognitive processing hierarchy and working its way up. The bottom is often associated with input reception, and the top with higher-level cognitive functions. This has been used especially to model visual attention~\citep{Itti}. 
 
@@ -79,7 +79,7 @@
     \subsubsection{From Neurobiology to Machine Learning}
         When implementing machine learning models mimicking these neurobiological phenomena, one can assume some of their functionalities will follow. For one, implementing winner-takes-all behaviour in an artificial neural network will lead to neural pathways. With such artificial neural pathways one can expect decomposition of input which are encoded in various paths. Creating the pathways can be considered creating several ANNs where each is specialised on a certain feature. Each pathway will have the same input as the entire network but only a subset of the nodes and weights.  
         
-        The creation of pathways might lead to higher performance as it aims to enhance feature selectivity. As existing research on many of the presented neurobiological phenomena are executed on visual perception, e.g.~\citep{Itti}, it is reasonable to assume the winner-takes-all implementation will have largest impact on data similar to external visual stimuli. A way to check whether a path is specialised on a feature is to send similar datapoints through a trained network and examine whether a patway arises. However, it should be mentioned that the features might not be what a human expect; a model might pick up on completely different features to a human.       
+        The creation of pathways might lead to higher performance as it aims to enhance feature selectivity. As existing research on many of the presented neurobiological phenomena are executed on visual perception, e.g.~\citep{Itti}, it is reasonable to assume the winner-takes-all implementation will have the largest impact on data similar to external visual stimuli. A way to check whether a path is specialised on a feature is to send similar datapoints through a trained network and examine whether a pathway arises. However, it should be mentioned that the features might not be what a human expect; a model might pick up on completely different features to a human.       
 
         It is reasonable to assume that inhibition of return observed in the neurobiological systems can be expressed as a form of regularisation when implemented in the ANNs. 
  
@@ -87,10 +87,10 @@
 \subsection{Local Winner-Takes-All (LWTA)}
     The idea behind LWTA algorithms is to implement \textit{local learning} in the neural network, meaning that the entire network does not learn how to transform a given input, but the learning is rather outsourced to local parts of the network. In LWTA algorithms, the nodes in each layer are grouped into a number of groups $G$, and Winner-Takes-All is applied on the activation of each of these groups, only passing on the maximal output in the group. This creates various neural pathways which learn during training, and are selected at inference time. The hypothesis is that different pathways get specialised in recognising different features of the training data and that a pathway will be activated given a datapoint with similar features as it is trained on, making the network more flexible and better at separating input \citep{Wang}. 
 
-    Two different LWTA algorithms will be employd in this report: maxout, where pathways are only formed posteriori; and channel-out, where they are also formed anteriori.
+    Two different LWTA algorithms will be employed in this report: maxout, where pathways are only formed posteriori; and channel-out, where they are also formed anteriori.
 
     \subsubsection{Maxout and Channel-Out}
-        The \textit{maxout} activation passes the input from the previous layer through the weight kernel and adds the bias as normal, but then only passes on the activation from the most active node in each group of the layer. Each group then has a common set of output weights connected to the next layer in  the network.See \cref{the:fig:illustration_maxout} for illustration of a neural network with maxout actvation.
+        The \textit{maxout} activation passes the input from the previous layer through the weight kernel and adds the bias as normal, but then only passes on the activation from the most active node in each group of the layer. Each group then has a common set of output weights connected to the next layer in  the network.See \cref{the:fig:illustration_maxout} for illustration of a neural network with maxout activation.
         During backpropagation in training, only the incoming weights connected to the most activated nodes will be trained. This can be seen from the gradient of the cost function in the direction of one of the weights of an inactive node: the learning is proportional to $\pd[w^{\ell}_{ij}]{C} \propto \pd[a^\ell_i]{C} = 0$, because any infinitesimal change in the activation would still result in no activation if $a_i$ was not already the maximum of the group. 
         Given a datapoint, the neural pathways created through this algorithm consist of weights and nodes (see \cref{the:fig:illustration_maxout} for an example of pathways). The relevant nodes of a pathway are chosen based on which activation is largest within a group, and the input weights corresponding to those nodes are consequently chosen \citep{Wang}. 
         
@@ -102,25 +102,10 @@
         \end{figure}
 
 
-        % \begin{algorithm}
-        %     \caption{Max Out activation}
-        %     \begin{algorithmic}[1]
-        %         \For{$i=1$ to $g$}
-        %             \State $a_i \gets -\infty$
-        %             \For{$j=1$ to $n \bmod g$}
-        %                 \If{$z_{ij} > a_i$}
-        %                     \State $a_i \gets z_{ij}$
-        %                 \EndIf
-        %             \EndFor
-        %         \EndFor
-        %     \end{algorithmic}
-        % \end{algorithm}
-
-        \textit{Channel-out} makes a subtle, but meaningful, change to the maxout algorithm. Instead of every group having a common set of weight connections to the next layer, every node has its own set of weight connections. This results in not only local learning of the weights during backpropagation, but also leads to the activation winner dictating the set of weights that will be used in the next layer at inference time (outgoing weights).
+        \textit{Channel-out} makes a subtle, but meaningful, change to the maxout algorithm. Instead of every group having a common set of output weights, every node has its own set, making for a larger total number of parameters. This results in not only local learning of the weights during backpropagation, but also leads to the activation winner dictating the set of weights that will be used in the next layer at inference time (outgoing weights). 
         Effectively, a channel-out layer works the same way as an ordinary dense layer with a linear activation function, but sets all the activations of the nodes that do not win their group to zero before passing them on to the next layer.
         Same as with maxout, only the weights of the active nodes are trained, but this also applies to the next layer; it not only affects the incoming weights, but also the outgoing weights.  
         So the local learning goes both forwards and backwards from a channel-out layer, in contrast to just backwards in the case of maxout \citep{Wang}. 
-        \comment{In this case there exist more weights that are not trained as all nodes have their own outgoing weights.. Comment on the different number of parameters even though the same number of weights are trained in each iteration (given the same number of layers, nodes and groups)}
         
         \begin{figure}[]
             \centering

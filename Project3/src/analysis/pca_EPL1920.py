@@ -137,14 +137,15 @@ def generate_explained_variance_plot(
     principal_data = pd.DataFrame(data=principal_components[:,:n_features])
     
     final_data = pd.concat([principal_data, trainy.reset_index(drop=True)], axis=1)
-    print(final_data.head())
-    print(f"Total features: {trainx.shape[1]}")
-
+    # print(final_data.head())s
+    # print(f"Total features: {trainx.shape[1]}")
 
     fig, ax = plt.subplots()
-    ax.bar(range(1,n_features_org+1), exp_var, alpha=0.5)
-    ax.step(range(1,n_features_org+1),cum_var_ratio)
-    ax.axvline(n_features, ls='--', label=r"PCs: {ps:.0f}".format(ps=n_features))
+    ax.axhline(thresh, ls='-', lw=0.8, c=plot_utils.colors[3], alpha=0.8, label=r"EV = {th:.2f}".format(th=thresh))
+    ax.bar(range(1,n_features_org+1), exp_var, color=plot_utils.colors[1], alpha=0.7)
+    ax.step(range(1,n_features_org+1),cum_var_ratio, lw=2.6)
+    ax.axvline(n_features, ls='--', c=plot_utils.colors[2], label=r"PCs: {ps:.0f}".format(ps=n_features))
+    
     
     ax.set_xlabel(r"Principal components")
     ax.set_ylabel(r"Explained variance")
