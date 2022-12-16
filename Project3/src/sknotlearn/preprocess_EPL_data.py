@@ -337,8 +337,7 @@ def get_feature_description(md_filename : str = None) -> dict:
     # helper dicts:
     _key_match_features = {
         "ground":       "Home (= h) or away (= a) pitch of team",
-        "day":          "Weekday (= 1, .., 7 = Mon., ..., Sun.)",
-        "days_rest":    "Number of days the team have been resting from league matches"
+        "day":          "Weekday (= 1, .., 7 = Mon., ..., Sun.)"
     }
     
     _extra_match_stats = {
@@ -348,7 +347,6 @@ def get_feature_description(md_filename : str = None) -> dict:
         "F":    "Fouls committed",
         "Y":    "Yellow cards recieved",
         "R":    "Red cards recieved"
-
     }
 
     _understats = {
@@ -388,6 +386,7 @@ def get_feature_description(md_filename : str = None) -> dict:
         "team":         "Full team name",
         "opp_team":     "Oppoent's full team name",
         "date":         "Date of match day (%s)"%DATE_FORMAT,
+        "days_rest":    "Number of days the team have been resting from league matches",
         **_key_match_features
     }
 
@@ -407,8 +406,8 @@ def get_feature_description(md_filename : str = None) -> dict:
     ### Previous season stats
     prev_season = {
         "position": "League position",
-        # "matches":  "(omitted) Macthes played",
-        **_understats
+        **_understats,
+        **season
     }
     
     # create dataframes for easy suffix-fix:
@@ -432,7 +431,7 @@ def get_feature_description(md_filename : str = None) -> dict:
     prev_season_opp = prev_season_opp_pd.to_dict()
 
     ### Combine to one large frame/dict
-    info = {**match_day, **season, **prev_match, **prev_season, **season_opp, **prev_season_opp}
+    info = {**match_day, **prev_match, **season, **prev_season, **season_opp, **prev_season_opp}
     nfeatures = len(info)
 
     if md_filename is not None:
@@ -442,15 +441,15 @@ def get_feature_description(md_filename : str = None) -> dict:
         header0 = f"# Features in dataset from {LEAGUE} season {YEAR}/{YEAR+1}\n"
         
         tab1 = match_day_pd.transpose()
-        tab2 = season_pd.transpose()
-        tab3 = prev_match_pd.transpose()
+        tab2 = prev_match_pd.transpose()
+        tab3 = season_pd.transpose()
         tab4 = prev_season_pd.transpose()
         tab5 = season_opp_pd.transpose()
         tab6 = prev_season_opp_pd.transpose()
 
         head1 = "## Match information"
-        head2 = f"## Team attributes ({YEAR})"
-        head3 = f"## Team's previous league match stats"
+        head2 = f"## Team's previous league match stats"
+        head3 = f"## Team attributes ({YEAR})"
         head4 = f"## Team's previous season stats ({prevYEAR})"
         head5 = f"## Opponent attributes ({YEAR})"
         head6 = f"## Opponent's previous season stats ({prevYEAR})"
@@ -461,7 +460,7 @@ def get_feature_description(md_filename : str = None) -> dict:
         filename = md_filename.strip(".md") + ".md"
         with open(PATH/filename, "w") as outfile:
             outfile.write(header0 + "\n")
-            # outfile.write(f"_Total number of features: {nfeatures}_ \n")
+            outfile.write(f"_Total number of features: {nfeatures}_ \n")
             for tab, head in zip(tables, titles):
                 tab.columns = ["Description"]
                 tab = tab.to_markdown()
@@ -478,47 +477,6 @@ if __name__ == "__main__":
     RUN()
 
     info = get_feature_description("EPL_notes.md")
-
-
-    data = stats_EPL19_per_game.copy()
-    container = translate_data(data)
-
-    cols = container.x.columns
-    
-    for col in cols:
-        print(col)
-    print("#features = ", len(cols))
-    print(np.size(container.y.to_numpy()))
-
-    # from sklearn.model_selection import train_test_split   
-
-    # trainx, testx, trainy, testy = train_test_split(container.x, container.y)
-    # # print(trainx)
-
-    # cols = trainx.columns
-
-    # prevseason = []
-    # prevgame = []
-    # opp = []
-    # other = []
- 
-    # for col in cols:
-    #     col = str(col)
-    #     if col.split("_")[-1] == "ps":
-    #         prevseason.append(col)
-    #     elif col.split("_")[-1] == "pg":
-    #         prevgame.append(col)
-    #     elif col.split("_")[-1] == "opp":
-    #         opp.append(col)
-    #     else:
-    #         other.append(col)
-
-    # print("This game: \n", other)
-    # print("Previous season: \n", prevseason)
-    # print("Previous game: \n", prevgame)
-    # print("Opponent: \n", opp)
-    
-
 
     print("\n---\n")
 
