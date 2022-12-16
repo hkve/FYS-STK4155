@@ -6,13 +6,14 @@ Discussion here, in present/past tense.
 
 \subsection{Link to existing research}
     \comment{I write about the CIFAR-10 results here, but will probably make a more appropriate section. -\Carl} \\
-    The results we got on the CIFAR-10 dataset, with the best test accuracy of 51.28\%, was not particularly impressive. It is however known to be a difficult dataset to score well on, with the state-of-the-art convolutional maxout network achieving a test accuracy 88.32\% \citep{Maxout_Networks}. This was done with a significantly larger network, with convolutional layers, and with more thorough image pre-processing. Channel-out networks have not achieved the same level of accuracy, with a top score of 86.80\% test accuracy \citep{Wang}. This was also our conclusion, with the channel-out network slightly underperforming maxout. However, both channel-out and maxout networks bettered the ordinary ReLU network result by 1.50 pp and 2.09 pp respectively.
+    The results we got on the CIFAR-10 dataset, with the best test accuracy of 51.28\%, was not particularly impressive. It is however known to be a difficult dataset to score well on, with the state-of-the-art convolutional maxout network achieving a test accuracy 88.32\% \citep{Maxout_Networks}, which was the best result of any NN at the time. This was done with a significantly larger network, with convolutional layers, and with more thorough image pre-processing. Channel-out networks have not achieved the same level of accuracy, with a top score of 86.80\% test accuracy \citep{Wang}. This was also our conclusion, with the channel-out network slightly underperforming maxout. However, both channel-out and maxout networks bettered the ordinary ReLU network result by 1.50 pp and 2.09 pp respectively.
 
     \comment{Maybe include discussion on ML as a tool in neurobiological research \Anna} 
 
 
 \subsection{Overfitting}
-    \comment{I thought it would be fitting (haha) with a separate discussion on overfitting and the various ways in which we have combatted it here. -\Carl}
+    \comment{I thought it would be fitting (haha) with a separate discussion on overfitting and the various ways in which we have combatted it here. -\Carl} \\
+
 
 
 \subsubsection{Hyperparameter Tuning}
@@ -27,7 +28,7 @@ Discussion here, in present/past tense.
 
     One drawback with regard to the dataset could also be the fact that we composed it ourselves, from a variety of sources, hence yielding some highly correlated features. These should probably have been analysed further with a correlation matrix, but this work was not prioritised here, as we quickly discarded the analysis of principal components. Performing correlation analysis would be of greater importance if the dataset contained more features and/or if they were completely unknown to us \comment{hmm bad sentence me thinks, but brian is porridge \Johan}. 
 
-    For instance, performing PCA on the MNIST dataset of $28\cdot 28 = 784$ features would arguably be a good idea. Likewise for the CIFAR-10 dataset of $32\cdot 32 = 1024$ features. However, this was not done due to the time limit of this project. The analysis of the models trained using these datasets could be performed without PCA without loosing too much  computational efficient, but a PCA analysis would have been  informative in its own rights. 
+    For instance, performing PCA on the MNIST dataset of $28\times 28 = 784$ features would arguably be a good idea. Likewise for the CIFAR-10 dataset of $32\times 32 = 1024$ features. However, this was not done due to the time limit of this project. The analysis of the models trained using these datasets could be performed without PCA without loosing too much  computational efficient, but a PCA analysis would have been  informative in its own rights. 
     
     For future work \comment{this should eventually go in the conclusion}:
     \begin{itemize}
