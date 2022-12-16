@@ -1,5 +1,8 @@
+
+
 \subsection{Datasets}
     First, it will be useful to introduce the datasets we will use for training and testing our networks in this project.
+
     \subsubsection{MNIST}
         A simpler test for our neural networks is the MNIST benchmark dataset. It consists of 60 000 training images and 10 000 testing images. Each image consists $28 \times 28$ pixels depicting handwritten number between 0 and 9. As such, the images are to be classified to one of the 10 categories of digits. Some examples of the images in the dataset are depicted in \cref{met:fig:MNIST}.
         \begin{figure}
@@ -131,8 +134,7 @@
         When adding dropout we used a dropout rate of $0.1$, and with Ridge penalisation we used $\lambda=10^{-4}$.
 
     \subsubsection{Premier League Dataset}
-        For comparison, we made an algorithm that guesses the outcome of a match given the ground (home/away) with the knowledge that overall, almost half EPL games result in home win, about a third in away win and the rest in draw.\footnote{According to~\citep{SoccerSTATS}, in EPL 18/19, 48 \% ended in home wins, 34 \% in away wins and 19 \% in draws.} In addition, we attempted to simulate our very own ``Paul the Octopus''\comment{Cite 2 site -\Nanna} by telling the algorithm to assume that the three outcomes are equally frequent. We were interested in the accuracy scores from these guesses. Finally, we calculated the accuracy score for the rather boring case of only betting home wins, necessarily corresponding to the portion of EPL 19/20 matches ending this way. 
-
+    For comparison, we made an algorithm that guesses the outcome of a match given the ground (home/away) with the knowledge that overall, almost half EPL games result in home win, about a third in away win and the rest in draw.\footnote{According to~\citep{SoccerSTATS}, in EPL 18/19, 48 \% ended in home wins, 34 \% in away wins and 19 \% in draws.} In addition, we attempted to simulate our very own ``Paul the Octopus''\comment{Cite 2 site -\Nanna} by telling the algorithm to assume that the three outcomes are equally frequent. We were interested in the accuracy scores from these guesses. Finally, we calculated the accuracy score for the rather boring case of only betting home wins, necessarily corresponding to the portion of EPL 19/20 matches ending this way. 
         With the smaller Premier League dataset, we could afford 3 full iterations of the hyperband search with a maximum number of epochs $R=150$ and again $\eta=3$. Again, we used early stopping during the tuning, with $p=15$. After finding the top-performing architectures, we trained on the full training set with early stopping with $p=30$.
 
         When adding dropout we used a dropout rate of $0.25$, and with Ridge penalisation we used $\lambda=10^{-4}$.
