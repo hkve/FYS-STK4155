@@ -62,7 +62,7 @@
         \comment{Could perhaps be part of data preparation \Anna} Before being subject to the principal component method, the Premier League data was z-score normalised, centring the mean around zero, with unit variance. This ensured that no single feature with a relatively large variance would dominate any of the principal components. The principal components found created a new basis for the data, and had similar shape as the original features (they were linear combinations of them). Extracting the first few of these yielded the most important components, used for further analysis. For all principal components we found the explained variance, which is the ``amount'' of variance accounted for by the principal component in question. In order to make an attempt at reducing the dimension of the problem, we found the number of principal components necessary in order to explain 99 \% of the variance of the original features. \comment{Hmmm more/other/change idk \Johan} The Premier League dataset was the only dataset on which we performed PCA analysis.  
 
 
-\subsection{Neural Network training}
+\subsection{Neural Network Training}
 
     \subsubsection{Initialisation of the Neural Network Weights}
         It is important to take care when initialising the weights and biases of a neural network to ensure fast convergence during training. We initialised the weights according to the He algorithm~\citep{He}. In our case it meant initialising the weights of node $i$ in layer $\ell$ by the distribution
@@ -76,7 +76,7 @@
 
         All the datasets used pose classification problems with 3 or 10 categories. The cost function we used for optimisation was the standard categorical cross-entropy. Predicting probabilities $\vec{p}_c$ for the outcome being in category $c$ for the datapoints $\vec{y}_c$, with $n$ datapoints, the categorical cross-entropy is given by
         \begin{align}
-            C(p) = \sum_{i=1}^n \sum_{c \in \mathrm{categories}} y_{i,c} \log\pclosed{p_{i,c}}.
+            C(\vec{p}) = \sum_{i=1}^n \sum_{c \in \mathrm{categories}} y_{i,c} \log\pclosed{p_{i,c}}.
         \end{align}
 
     \subsubsection{Regularisation}
