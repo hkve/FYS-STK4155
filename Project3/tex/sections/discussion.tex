@@ -1,20 +1,10 @@
-Discussion here, in present/past tense.
 
 \subsection{Interpretation of LWTA Networks}
     From \cref{res:fig:LWTA_architecture_trained01} and \cref{res:fig:LWTA_architecture_trained45} it is clear that separate pathways are formed that are specialised on input that are to be categorised differently. The untrained network \cref{res:fig:LWTA_architecture_untrained} displays no such patterns. In \cref{res:fig:LWTA_architecture_trained01} we can see that the lowest node in the middle layer strongly correlates with results that are classified as 0, with clear pathways being formed with the same nodes in the groups of the layers before and after. This coincides with our expectations based on the neurobiological pathways and feature selectivity. A further analysis of different inputs could help give insight into what these pathways have learned, be it roundness of the digits, amount of dark vs. light, digit placement in the picture, or perhaps some completely different and unintuitive feature. This provides a way to start extracting information about what the network is actually learning, making the model more explainable. It might however learn trends that are not obvious for a human to discern. 
 
+\subsection{Comparison to State-of-the-Art LWTA Performance}
 
-
-\subsection{hey}
- - Mention feature selectivity
- - comment on featuren not being what we think
-
-\subsection{Link to existing research}
-    \comment{I write about the CIFAR-10 results here, but will probably make a more appropriate section. -\Carl} \\
-    The results we got on the CIFAR-10 dataset, with the best test accuracy of 51.28\%, was not particularly impressive. It is however known to be a difficult dataset to score well on, with the state-of-the-art convolutional maxout network achieving a test accuracy 88.32\% \citep{Maxout_Networks}, which was the best result of any NN at the time. This was done with a significantly larger network, with convolutional layers, and with more thorough image pre-processing. Channel-out networks have not achieved the same level of accuracy, with a top score of 86.80\% test accuracy \citep{Wang}. This was also our conclusion, with the channel-out network slightly underperforming maxout. However, both channel-out and maxout networks bettered the ordinary ReLU network result by 1.50 pp and 2.09 pp respectively.
-
-    \comment{Maybe include discussion on ML as a tool in neurobiological research \Anna} 
-
+    The results we got on the CIFAR-10 dataset, with the best test accuracy of 51.28\%, was not particularly impressive. It is however known to be a difficult dataset to score well on, with the state-of-the-art convolutional maxout network achieving a test accuracy 88.32\% \citep{Maxout_Networks}, which was the best result of any NN at the time. This was done with a significantly larger network, with convolutional layers, and with more thorough image pre-processing. Channel-out networks have not achieved the same level of accuracy, with a top score of 86.80\% test accuracy \citep{Wang}. This was also our conclusion, with the channel-out network slightly underperforming maxout. However, both channel-out and maxout networks bettered the ordinary ReLU network result by 1.50 pp and 2.09 pp respectively. 
 
 \subsection{Overfitting}
     Throughout this project, we implemented many methods to reduce the chance of overfitting the NNs to the training data. Primary of these have been early stopping, which uses a validation dataset which the network does not train on to monitor whether the cost is improving during the training. As long as the validation cost is improving, we can assume that the network has not yet overfitted the training data, but when the training cost keeps improving and the validation cost goes up, it is a clear sign that the model is starting to overfit.
@@ -33,7 +23,7 @@ Discussion here, in present/past tense.
 
     The lack of clear results is probably due to the fact that even after tuning, only a rather small part of the parameter space was ever explored. Doing one hyperband iteration with $R=30$, $\eta=3$, as we did with the CIFAR-10 dataset, means only 49 hyperparameter points were explored, whereas there are roughly 1 million available architecture configurations. Without the use of model averaging or any resampling techniques, we can also not be sure that the tuning did not find network architectures that were particularly `lucky' with the initial parameters and thus found a good optimum within the tuning time. On the EPL dataset we could afford a bit more thorough exploration of the architecture hyperparameter space, with three iterations $R=150$, $\eta=3$ we explored a total of 429 hyperparameter points; still not great, but better.
     
-    \subsection{Generation of dataset}
+    \subsection{Generation of Dataset}
         The MNIST and CIFAR-10 datasets was used ``out of the box'' and are thus not relevant for this analysis. On the other hand, the EPL dataset was generated for this purpose, with individual parts of the dataset obtained from a variety of sources.
         
         When concatenating different parts into one big dataset like this, some features are likely to correlate to a large extend. This is not unusual for large dataset, but it is fair to assume that it has affected both the analysis of the data and the PCA. There is also a question as to how the data was sampled and processed by the different sources. Ultimately this lead to a possible incoherence in the dataset which is hard to measure. On the other hand, the features all originated from the same games so, assuming valid sources, they should more or less tell the same story, yielding a reliable dataset. 
