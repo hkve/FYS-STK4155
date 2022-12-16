@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import sys
 import seaborn as sns
 import plot_utils
+from collections import namedtuple
 
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
@@ -16,6 +17,35 @@ import plotly.express as px
 
 
 
+
+
+# def randomGuessesHmm(
+#             num_matches : int, 
+#             odds : list = [1/3, 1/3, 1/3]) -> np.ndarray:
+#     """
+#     Generate a set of random guesses for the result (W, D, L) for comparison.
+
+#     Parameters
+#     ----------
+#     num_matches : int
+#         number of matches in the set for which to compare with
+#     odds : list, optional
+#         naive distribution of wins, draws, losses, respectively, by default [1/3, 1/3, 1/3]
+
+#     Returns
+#     -------
+#     np.ndarray
+#         result matrix
+#     """
+#     result = np.zeros((num_matches, 3))
+#     # iterate through matches (as I did not manage to do it directly...)
+#     for m in range(num_matches):
+#         # multinomial?
+#         x = np.random.choice([0,1,2], p=odds)
+#         result[m, x] = 1
+
+#     # maybe make dataframe and map??
+#     return result
 
 def randomGuesses(
             num_matches : int, 
@@ -35,15 +65,78 @@ def randomGuesses(
     np.ndarray
         result matrix
     """
-    result = np.zeros((num_matches, 3))
+    np.random.seed(12345)
+    result = np.zeros(num_matches)
     # iterate through matches (as I did not manage to do it directly...)
     for m in range(num_matches):
         # multinomial?
-        x = np.random.choice([0,1,2], p=odds)
-        result[m, x] = 1
+        x = np.random.choice([2,1,0], p=odds)
+        result[m] = x
 
     # maybe make dataframe and map??
     return result
+
+
+
+def get_random_accuarcy(
+            data : pd.DataFrame,
+            uniform : bool = False) -> tuple:
+    """
+    Get the accuracy for a random guess, given that it knows the EPL trend:
+        * 50 % chance of home win
+        * 30 % chance of away win
+        * 20 % chance of draw
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        the non-endoded data from load_EPL()
+    uniform : bool, optional
+        set to True if one wants to guess assuming a uniform distribution, by defualt False
+        
+    Returns
+    -------
+    float, ndarray
+        accuracy, home distribution [W, D, L]
+    """
+    home_result = data.loc[data["ground"] == "h"]["result"].reset_index(drop=True, inplace=False)
+    away_result = data.loc[data["ground"] == "a"]["result"].reset_index(drop=True, inplace=False)
+    
+    if uniform:
+        ### 1/3 chance of home win, 1/3 chance of away win, 1/3 chance of draw
+        guess_home = randomGuesses(len(home_result), [1/3,1/3,1/3])
+        guess_away = randomGuesses(len(away_result), [1/3,1/3,1/3])
+    else:
+        ### 50 % chance of home win, 30 % chance of away win, 20 % chance of draw
+        guess_home = randomGuesses(len(home_result), [0.5,0.2,0.3])
+        guess_away = randomGuesses(len(away_result), [0.3,0.2,0.5])
+
+    
+    res_map = {'w': 2, 'd': 1, 'l': 0}
+    home_result["actual"] = home_result.map(res_map)
+    away_result["actual"] = away_result.map(res_map)
+ 
+    ## brute force (why does it not work otherwise???):
+    actual_home = np.zeros_like(guess_home)
+    actual_away = np.zeros_like(guess_away)
+
+    for j in range(len(actual_away)):
+        actual_home[j] = home_result["actual"][j]
+        actual_away[j] = away_result["actual"][j]
+    
+    hl = len(actual_home[actual_home==0])
+    hd = len(actual_home[actual_home==1])
+    hw = len(actual_home[actual_home==2])
+    hm = hw + hd + hl
+    distr = np.array([hw, hd, hl])/hm
+    
+    actual = np.append(actual_home, actual_away)
+    guess = np.append(guess_home, guess_away)
+
+    accuracy = accuracy_score(actual, guess)
+
+    return accuracy, distr
+
 
 
 
@@ -55,7 +148,13 @@ if __name__ == "__main__":
     import context
     from sknotlearn.datasets import load_EPL, get_result_distribution
 
+    ref_accuracy, _  = get_random_accuarcy(load_EPL(False, False))
+
+    print(f"\nAccuracy from random guesses: {ref_accuracy:.2f}.")
+    
+    
     container = load_EPL(True)
+    sys.exit()
     
     trainx, testx, trainy, testy = train_test_split(container.x, container.y, test_size=0.2)
     # trainx, valx,  trainy, valy  = train_test_split(trainx,      trainy,      test_size=0.2)
