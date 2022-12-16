@@ -16,9 +16,7 @@
     
     
     \section{Bias-variance Trade off}
-        Ho ho ho! As Christmas is right around the corner, what is more tempting for both student and TA than to read two pages of extra task?! ARE YOU READY?
-
-        We will in the following take a little detour from LWTA networks to investigate an important dissection of model error. The total error of a statistical model can be decomposed into three main contributions; the \textit{bias}, \textit{variance} and \textit{irreducible} error.
+        We will in the following take a little detour from LWTA networks to investigate an important dissection of model error. If you are reading this in one sitting, this is the time to grab yourself a new cup of coffee. The total error of a statistical model can be decomposed into three main contributions; the \textit{bias}, \textit{variance} and \textit{irreducible} error.
         
         Every learning algorithm makes some assumptions about the relationship between input features and target outputs. Using a model with high bias indicates that there are hard restrictions on the predictions and might result in missing key relations between features and targets, frequently called underfitting. Relaxing model restrictions can yield a lower bias, but at the cost of potentially increasing the variance, often called overfitting. The variance describes how sensitive a model is to fluctuations in training data. High variance might result from a model taking training data noise into consideration when fitting its parameters. Giving the model more constraints can help to decrease the variance, at the cost of introducing more bias. This is the basis for the \textit{bias-variance tradeoff}, where we aim to find the set of parameters giving both a small bias and a small variance. The irreducible error comes from deviation between the assumed underlying function and the targets in the dataset (noise). As the name suggests, this contribution will always be there (assuming the dataset targets are noisy) irrespective of an optimal model.  
         \section{Setup and Resampling}
