@@ -2,7 +2,7 @@ import os
 import sys
 from imageio import imread
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from data import Data
+# from data import Data
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import analysis.plot_utils as plot_utils
 import numpy as np
