@@ -354,6 +354,7 @@ def get_feature_description(md_filename : str = None) -> dict:
         "deep_allowed": "Opponent passes completed within an estimated 20 yards of goal (crosses excluded)",
         "scored":       "Goals scored",
         "missed":       "Goals conceded",
+        "xpts":         "Expected points",
         "wins":         "Whether the team has won (1) or not (0)",
         "draws":        "Whether the team has drawn (1) or not (0)",
         "loses":        "Whether the team has lost (1) or not (0)",
@@ -377,6 +378,7 @@ def get_feature_description(md_filename : str = None) -> dict:
 
     ### Match features (only those that we know before game start)
     match_day = {
+        "match_id":     "Match ID",
         "team":         "Full team name",
         "opp_team":     "Oppoent's full team name",
         "date":         "Date of match day (%s)"%DATE_FORMAT,
@@ -425,6 +427,7 @@ def get_feature_description(md_filename : str = None) -> dict:
 
     ### Combine to one large frame/dict
     info = {**match_day, **season, **prev_match, **prev_season, **season_opp, **prev_season_opp}
+    nfeatures = len(info)
 
     if md_filename is not None:
 
@@ -452,6 +455,7 @@ def get_feature_description(md_filename : str = None) -> dict:
         filename = md_filename.strip(".md") + ".md"
         with open(PATH/filename, "w") as outfile:
             outfile.write(header0 + "\n")
+            outfile.write(f"_Total number of features: {nfeatures}_ \n")
             for tab, head in zip(tables, titles):
                 tab.columns = ["Description"]
                 tab = tab.to_markdown()
@@ -471,8 +475,13 @@ if __name__ == "__main__":
 
 
     data = stats_EPL19_per_game.copy()
-    
     container = translate_data(data)
+
+    cols = container.x.columns
+    
+    for col in cols:
+        print(col)
+    print("#features = ", len(cols))
     print(np.size(container.y.to_numpy()))
 
     # from sklearn.model_selection import train_test_split   
