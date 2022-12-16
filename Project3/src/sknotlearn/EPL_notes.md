@@ -1,8 +1,10 @@
 # Features in dataset from EPL season 2019/2020
 
+_Total number of features: 86_ 
 ## Match information
 |           | Description                                                   |
 |:----------|:--------------------------------------------------------------|
+| match_id  | Match ID                                                      |
 | team      | Full team name                                                |
 | opp_team  | Oppoent's full team name                                      |
 | date      | Date of match day (%Y-%m-%d)                                  |
@@ -35,6 +37,7 @@
 | deep_allowed_pg | Opponent passes completed within an estimated 20 yards of goal (crosses excluded)         |
 | scored_pg       | Goals scored                                                                              |
 | missed_pg       | Goals conceded                                                                            |
+| xpts_pg         | Expected points                                                                           |
 | wins_pg         | Whether the team has won (1) or not (0)                                                   |
 | draws_pg        | Whether the team has drawn (1) or not (0)                                                 |
 | loses_pg        | Whether the team has lost (1) or not (0)                                                  |
@@ -62,6 +65,7 @@
 | deep_allowed_ps | Opponent passes completed within an estimated 20 yards of goal (crosses excluded)         |
 | scored_ps       | Goals scored                                                                              |
 | missed_ps       | Goals conceded                                                                            |
+| xpts_ps         | Expected points                                                                           |
 | wins_ps         | Whether the team has won (1) or not (0)                                                   |
 | draws_ps        | Whether the team has drawn (1) or not (0)                                                 |
 | loses_ps        | Whether the team has lost (1) or not (0)                                                  |
@@ -90,6 +94,7 @@
 | deep_allowed_ps_opp | Opponent passes completed within an estimated 20 yards of goal (crosses excluded)         |
 | scored_ps_opp       | Goals scored                                                                              |
 | missed_ps_opp       | Goals conceded                                                                            |
+| xpts_ps_opp         | Expected points                                                                           |
 | wins_ps_opp         | Whether the team has won (1) or not (0)                                                   |
 | draws_ps_opp        | Whether the team has drawn (1) or not (0)                                                 |
 | loses_ps_opp        | Whether the team has lost (1) or not (0)                                                  |
