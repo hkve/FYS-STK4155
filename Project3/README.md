@@ -1,4 +1,5 @@
-# FYS-STK4155 Project 5 SOMETITLE
+# Locally Competing Neural Networks
+## FYS-STK4155 Project 5 
 ### Collaborators: [Carl Martin Fevang](https://github.com/carlmfe), [Anna Aasen](https://github.com/Annaaasen), [Håkon Kvernmoen](https://github.com/hkve), [Nanna Bryne](https://github.com/nannabryne), [Johan Mylius Kroken](https://github.com/johanmkr)
 
 ## Abstract
