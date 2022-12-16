@@ -32,12 +32,12 @@ All figures can be found in `tex/figs`. All code and data files can be found in 
 
 * `analysis`
     * `context.py` $\to$ File to redirect paths
-    * `fifa21_utils.py` $\to$ short description
-    * `fifa21.py` $\to$ short desc
+    * `fifa21.py` $\to$ Bias-variance tradeoff analysis of FIFA2021 data
+    * `fifa21_utils.py` $\to$ Utilities to the above analysis
     * `model_analysis.py` $\to$ short desc
     * `network_plot_tools.py` $\to$ short desc
-    * `pca_EPL1929.py` $\to$ short desc
-    * `plot_utils.py` $\to$ short desc
+    * `pca_EPL1929.py` $\to$ PCA of the EPL data
+    * `plot_utils.py` $\to$ Utilities for plotting
     * `tune_LWTA_architecture.py` $\to$ short desc
     * `visualise_activation.py` $\to$ short desc
     * `visualise_network.py` $\to$ short desc
@@ -45,7 +45,7 @@ All figures can be found in `tex/figs`. All code and data files can be found in 
 * `sknotlearn`
     * `data.py` $\to$  short desc
     * `datasets.py` $\to$  short desc
-    * `fifa21_EAsports_reader.py` $\to$  short desc
+    * `fifa21_EAsports_reader.py` $\to$ Read and creates the FIFA2021 dataset
     * `preprocess_EPL_data.py` $\to$  short desc
     * `breast_cancer.csv` $\to$  Dataset
     * `EPL1920.csv` $\to$  Dataset
