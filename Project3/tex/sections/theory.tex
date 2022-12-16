@@ -116,11 +116,10 @@
         %     \end{algorithmic}
         % \end{algorithm}
 
-        \textit{Channel-out} makes a subtle, but meaningful, change to the maxout algorithm. Instead of every group having a common set of weight connections to the next layer, every node has its own set of weight connections. This results in not only local learning of the weights during backpropagation, but also leads to the activation winner dictating the set of weights that will be used in the next layer at inference time (outgoing weights).
+        \textit{Channel-out} makes a subtle, but meaningful, change to the maxout algorithm. Instead of every group having a common set of output weights, every node has its own set, making for a larger total number of parameters. This results in not only local learning of the weights during backpropagation, but also leads to the activation winner dictating the set of weights that will be used in the next layer at inference time (outgoing weights). 
         Effectively, a channel-out layer works the same way as an ordinary dense layer with a linear activation function, but sets all the activations of the nodes that do not win their group to zero before passing them on to the next layer.
         Same as with maxout, only the weights of the active nodes are trained, but this also applies to the next layer; it not only affects the incoming weights, but also the outgoing weights.  
         So the local learning goes both forwards and backwards from a channel-out layer, in contrast to just backwards in the case of maxout \citep{Wang}. 
-        \comment{In this case there exist more weights that are not trained as all nodes have their own outgoing weights.. Comment on the different number of parameters even though the same number of weights are trained in each iteration (given the same number of layers, nodes and groups)}
         
         \begin{figure}[]
             \centering
