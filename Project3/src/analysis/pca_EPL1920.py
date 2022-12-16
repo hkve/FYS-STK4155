@@ -80,7 +80,7 @@ def randomGuesses(
 
 def get_random_accuarcy(
             data : pd.DataFrame,
-            uniform : bool = False) -> tuple:
+            distribution : str = "estimated") -> tuple:
     """
     Get the accuracy for a random guess, given that it knows the EPL trend:
         * 50 % chance of home win
@@ -91,25 +91,35 @@ def get_random_accuarcy(
     ----------
     data : pd.DataFrame
         the non-endoded data from load_EPL()
-    uniform : bool, optional
-        set to True if one wants to guess assuming a uniform distribution, by defualt False
+    distribution : str, optional
+        distribution for random sampling, by default "estimated"
+            "estimated" - 50 % chance of home win, 30 % chance of away win, 20 % chance of draw
+            "uniform" - 1/3 chance of home win, 1/3 chance of away win, 1/3 chance of draw
+            "home wins" - 100 % chance of home win, 0 % chance of away win, 0 % chance of draw
         
     Returns
     -------
-    float, ndarray
-        accuracy, home distribution [W, D, L]
+    float
+        accuracy
     """
     home_result = data.loc[data["ground"] == "h"]["result"].reset_index(drop=True, inplace=False)
     away_result = data.loc[data["ground"] == "a"]["result"].reset_index(drop=True, inplace=False)
     
-    if uniform:
-        ### 1/3 chance of home win, 1/3 chance of away win, 1/3 chance of draw
-        guess_home = randomGuesses(len(home_result), [1/3,1/3,1/3])
-        guess_away = randomGuesses(len(away_result), [1/3,1/3,1/3])
-    else:
+    if distribution == "estimated":
         ### 50 % chance of home win, 30 % chance of away win, 20 % chance of draw
         guess_home = randomGuesses(len(home_result), [0.5,0.2,0.3])
         guess_away = randomGuesses(len(away_result), [0.3,0.2,0.5])
+    elif distribution == "uniform":
+        ### 1/3 chance of home win, 1/3 chance of away win, 1/3 chance of draw
+        guess_home = randomGuesses(len(home_result), [1/3,1/3,1/3])
+        guess_away = randomGuesses(len(away_result), [1/3,1/3,1/3])
+    elif distribution == "home wins":
+        ### 100 % chance of home win, 0 % chance of away win, 0 % chance of draw
+        guess_home = randomGuesses(len(home_result), [1,0,0])
+        guess_away = randomGuesses(len(away_result), [0,0,1])
+    else:
+        print("Provide valid argument")
+        
 
     
     res_map = {'w': 2, 'd': 1, 'l': 0}
@@ -124,18 +134,17 @@ def get_random_accuarcy(
         actual_home[j] = home_result["actual"][j]
         actual_away[j] = away_result["actual"][j]
     
-    hl = len(actual_home[actual_home==0])
-    hd = len(actual_home[actual_home==1])
-    hw = len(actual_home[actual_home==2])
-    hm = hw + hd + hl
-    distr = np.array([hw, hd, hl])/hm
+    # hl = len(actual_home[actual_home==0])
+    # hd = len(actual_home[actual_home==1])
+    # hw = len(actual_home[actual_home==2])
+    # hm = hw + hd + hl
     
     actual = np.append(actual_home, actual_away)
     guess = np.append(guess_home, guess_away)
 
     accuracy = accuracy_score(actual, guess)
 
-    return accuracy, distr
+    return accuracy
 
 
 
@@ -149,10 +158,12 @@ if __name__ == "__main__":
     from sknotlearn.datasets import load_EPL, get_result_distribution
 
     data0 = load_EPL(False, False)
-    ref_accuracy_smart, _  = get_random_accuarcy(data0)
-    ref_accuracy_octopus, _  = get_random_accuarcy(data0, True)
+    ref_accuracy_smart  = get_random_accuarcy(data0)
+    ref_accuracy_octopus  = get_random_accuarcy(data0, "uniform")
+    ref_accuracy_baby  = get_random_accuarcy(data0, "home wins")
     print(f"\nAccuracy from learned random guesser: {ref_accuracy_smart*100:5.2f} %.")
     print(f"\nAccuracy from octopus: {ref_accuracy_octopus*100:5.2f} %.")
+    print(f"\nAccuracy from baby: {ref_accuracy_baby*100:5.2f} %.")
     
     
     
