@@ -11,13 +11,12 @@ from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.decomposition import PCA
 from sklearn.metrics import accuracy_score, multilabel_confusion_matrix
 
-
-# Testing johan
-import plotly.express as px
-
-
+#   Import data preperation tools
+from preprocess_EPL_data import load_EPL, get_result_distribution
+# from sknotlearn.datasets import load_EPL, get_result_distribution
 
 
+# FIXME slette funksjonen under?
 
 # def randomGuessesHmm(
 #             num_matches : int, 
@@ -147,7 +146,51 @@ def get_random_accuarcy(
     return accuracy
 
 
+def generate_explained_variance_plot(
+            trainx: pd.DataFrame,
+            SHOW: bool = False) -> None:
+    """Function to generate and plot the explained variance from principal component analysis. It is plotted both as a step-wise cumulative function and with histogram bars showing the explained variance of each principal component.
 
+    Args:
+        trainx (pd.DataFrame): Pandas data frame with the unscaled data in the basis of the original features.
+        SHOW (bool): If true, the plot is also shown. Default is False.
+
+    """
+    scaler = StandardScaler()
+    trainx = scaler.fit_transform(trainx)
+
+    num_matches = len(trainx)
+    n_features_org = np.shape(trainx)[1]
+
+    pca = PCA()
+    principal_components = pca.fit_transform(trainx)
+
+    exp_var = pca.explained_variance_ratio_
+    cum_var_ratio = np.cumsum(exp_var)
+    thresh = 0.99
+    n_features = list(cum_var_ratio).index(cum_var_ratio[cum_var_ratio >= thresh][0])
+    # print(f"Best #features = {n_features}")
+
+    # print("\n", np.shape(principal_components), "\n..")
+
+    principal_data = pd.DataFrame(data=principal_components[:,:n_features])
+    
+    final_data = pd.concat([principal_data, trainy.reset_index(drop=True)], axis=1)
+    print(final_data.head())
+    print(f"Total features: {trainx.shape[1]}")
+
+
+    fig, ax = plt.subplots()
+    ax.bar(range(1,n_features_org+1), exp_var, alpha=0.5)
+    ax.step(range(1,n_features_org+1),cum_var_ratio)
+    ax.axvline(n_features, ls='--', label=r"PCs: {ps:.0f}".format(ps=n_features))
+    
+    ax.set_xlabel(r"Principal components")
+    ax.set_ylabel(r"Explained variance")
+    ax.legend()
+
+    plot_utils.save("pca_pl")
+    plt.show()
 
 
 if __name__ == "__main__":
@@ -186,49 +229,32 @@ if __name__ == "__main__":
     # prev_season_stats = trainx.filter(regex="_ps$", axis=1)
     # print(prev_season_stats.head())
 
+    sys.exit()
+    
+    
+    # print(len(trainy), len(testy))
+    # trainx, valx,  trainy, valy  = train_test_split(trainx,      trainy,      test_size=0.2)
+    # print(trainx.head())
+    # cols = list(trainx.columns)
+
+    # opp_ = cols[ lambda x: x.split["_"][-1] == "ps"]
+
+
+    # opp_team_stats = trainx.filter(regex="_opp$", axis=1)
+    # print(opp_team_stats.head())
+
+    # prev_season_stats = trainx.filter(regex="_ps$", axis=1)
+    # print(prev_season_stats.head())
+
     # other = 
 
-    sys.exit()
+
 
     """
     Plot 1 - Step plot and histogram. 
     """
 
-    scaler = StandardScaler()
-    trainx = scaler.fit_transform(trainx)
 
-    num_matches = len(trainx)
-    n_features_org = np.shape(trainx)[1]
-
-    pca = PCA()
-    principal_components = pca.fit_transform(trainx)
-
-    exp_var = pca.explained_variance_ratio_
-    cum_var_ratio = np.cumsum(exp_var)
-    thresh = 0.99
-    n_features = list(cum_var_ratio).index(cum_var_ratio[cum_var_ratio >= thresh][0])
-    # print(f"Best #features = {n_features}")
-
-    # print("\n", np.shape(principal_components), "\n..")
-
-    principal_data = pd.DataFrame(data=principal_components[:,:n_features])
-    
-    final_data = pd.concat([principal_data, trainy.reset_index(drop=True)], axis=1)
-    print(final_data.head())
-    print(f"Total features: {trainx.shape[1]}")
-
-
-    fig, ax = plt.subplots()
-    ax.bar(range(1,n_features_org+1), exp_var, alpha=0.5)
-    ax.step(range(1,n_features_org+1),cum_var_ratio)
-    ax.axvline(n_features, ls='--', label=r"PCs: {ps:.0f}".format(ps=n_features))
-    
-    ax.set_xlabel(r"Principal components")
-    ax.set_ylabel(r"Explained variance")
-    ax.legend()
-
-    plot_utils.save("pca_pl")
-    plt.show()
 
     # """
     # Plot 2 - Feature scatter plots. 

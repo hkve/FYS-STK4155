@@ -14,7 +14,6 @@ Discussion here, in present/past tense.
 
 
 \subsection{Overfitting}
-    \comment{I thought it would be fitting (haha) with a separate discussion on overfitting and the various ways in which we have combatted it here. -\Carl} \\
     Throughout this project, we implemented many methods to reduce the chance of overfitting the NNs to the training data. Primary of these have been early stopping, which uses a validation dataset which the network does not train on to monitor whether the cost is improving during the training. As long as the validation cost is improving, we can assume that the network has not yet overfitted the training data, but when the training cost keeps improving and the validation cost goes up, it is a clear sign that the model is starting to overfit.
 
     L2 penalisation on the kernel weights also helps by penalising situations where the networks learn to delicately balance large weights against each other. This can create results that are stable on the training dataset, but when exposed to inputs not yet seen, the large weights that were balanced on the training inputs can create large fluctuations in the outputs resulting in instability.

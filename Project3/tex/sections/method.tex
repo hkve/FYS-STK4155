@@ -1,10 +1,5 @@
-Method here, in past tense.
-
-We reference like this using \verb|cleveref|: \cref{int:fig:example_a}, \cref{theo:eq:newton2}.
-
 \subsection{Datasets}
-    \comment{Here we describe how we construct and prepare the dataset. -\Carl}
-
+    First, it will be useful to introduce the datasets we will use for training and testing our networks in this project.
     \subsubsection{MNIST}
         A simpler test for our neural networks is the MNIST benchmark dataset. It consists of 60 000 training images and 10 000 testing images. Each image consists $28 \times 28$ pixels depicting handwritten number between 0 and 9. As such, the images are to be classified to one of the 10 categories of digits. Some examples of the images in the dataset are depicted in \cref{met:fig:MNIST}.
         \begin{figure}
@@ -74,14 +69,12 @@ We reference like this using \verb|cleveref|: \cref{int:fig:example_a}, \cref{th
         where $\hat{n}$ is the number of inputs to the layer. The biases were all initialised to zero.
 
     \subsubsection{Optimisation Algorithm}
-        When optimising the cost function of our problems we built on what we found in \citep{Project2}, using stochastic gradient descent with a batch size of 32. We used the Adam algorithm with hyperparameters $\beta_1 = 0.9$, $\beta_2 = 0.999$ and a learning rate $\eta = 0.001$. These hyperparameters were not tuned in any of our searches. The number of training epochs was decided with early stopping termination criterion. This means monitoring the loss of the network on a validation dataset after each epoch of training, and stopping the training if there is no improvement after a number of epochs $p$, called the \textit{patience}.
+        When optimising the cost function of our problems we built on what we found in \citep{Project2}, using stochastic gradient descent with a batch size of 32. We used the Adam algorithm with hyperparameters $\beta_1 = 0.9$, $\beta_2 = 0.999$ and a learning rate $\eta = 0.001$. These hyperparameters were not tuned in any of our searches. The number of training epochs was decided with early stopping termination criterion. This means monitoring the cost of the network on a validation dataset after each epoch of training, and stopping the training if there is no improvement after a number of epochs $p$, called the \textit{patience}.
 
         All the datasets used pose classification problems with 3 or 10 categories. The cost function we used for optimisation was the standard categorical cross-entropy. Predicting probabilities $\vec{p}_c$ for the outcome being in category $c$ for the datapoints $\vec{y}_c$, with $n$ datapoints, the categorical cross-entropy is given by
         \begin{align}
-            \mathcal{L}(\tilde{y}) = \sum_{i=1}^n \sum_{c \in \mathrm{categories}} y_{i,c} \log\pclosed{p_{i,c}}.
+            C(p) = \sum_{i=1}^n \sum_{c \in \mathrm{categories}} y_{i,c} \log\pclosed{p_{i,c}}.
         \end{align}
-
-        \comment{Discussion note: Early stopping prevents overfitting. -\Carl}
 
     \subsubsection{Regularisation}
         The first method we applied to combat overfitting was to add a L2 penalisation term to the kernel weights of the layers, as was done in \cite{Project2}. This adds a term to the cost function penalising large weights, and is parametrised with a hyperparameter $\lambda$, whose size is proportional to the penalisation.
