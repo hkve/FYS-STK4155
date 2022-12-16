@@ -37,13 +37,12 @@ We reference like this using \verb|cleveref|: \cref{int:fig:example_a}, \cref{th
         
         %By the end of the season, three teams are necessarily relegated to this 
 
-        The challenges in collecting data and the time scope of this project compelled us to keep the purpose simple and ambitions somewhat low. In particular, we aim to foresee the outcome of a league match in EPL season 19/20 with a dataset as shown in \comment{some figure (work in progress)}. After preprocessing stats from various sources, our dataset contains information about the ten league matches in each game week following the first one, but from the perspective of each team, giving $ 10 \times 37\times 2 = 740$ data points.
+        The challenges in collecting data and the time scope of this project compelled us to keep the purpose simple and ambitions somewhat low. In particular, we aim to foresee the outcome of a league match in EPL season 19/20 with a dataset as shown in \comment{some figure (work in progress)}. After preprocessing stats from various sources, our dataset contains information about the ten league matches in each game week following the first one, but from the perspective of each team, giving $ 10 \times 37\times 2 = 740$ data points. We used the games from the first $\sfrac{5}{6}$ part of the season, not counting the 10 opening matches, for training, corresponding to 308 games. The remaining final games (62 games, last $\sfrac{1}{6}$ part of the season) was reserved for testing. 
+        All in all, we had 616 training data points and 124 testing data points.
         
         The choice to look back only one league game for one team was due to a great ease in the data acquisition process. Trying to predict the full time result is a much more comprehensive task than to classify the outcome for a team as win (W), draw (D) or loss (L).
 
         Another important simplification we made concerns the promoted teams. As these teams did not participate in EPL by the beginning of 2018, we (quite naively) assumed that their previous season team profile corresponds to that of the average lower quartile of that season's table. \comment{(Ouf heavy sentence)} 
-
-
 
         
 
