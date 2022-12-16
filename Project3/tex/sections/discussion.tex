@@ -13,6 +13,13 @@ Discussion here, in present/past tense.
 
 \subsection{Overfitting}
     \comment{I thought it would be fitting (haha) with a separate discussion on overfitting and the various ways in which we have combatted it here. -\Carl} \\
+    Throughout this project, we implemented many methods to reduce the chance of overfitting the NNs to the training data. Primary of these have been early stopping, which uses a validation dataset which the network does not train on to monitor whether the cost is improving during the training. As long as the validation cost is improving, we can assume that the network has not yet overfitted the training data, but when the training cost keeps improving and the validation cost goes up, it is a clear sign that the model is starting to overfit.
+
+    L2 penalisation on the kernel weights also helps by penalising situations where the networks learn to delicately balance large weights against each other. This can create results that are stable on the training dataset, but when exposed to inputs not yet seen, the large weights that were balanced on the training inputs can create large fluctuations in the outputs resulting in instability.
+
+    Dropout is a third regularisation method that ensures that the network does not rely overly much on the activation of certain nodes or on certain input features. In LWTA networks where information is encoded in pathways, it is especially regularising, as it prevents pathways form becoming overly specific to certain trends. If a certain pathway learns how to handle a specific trend at the cost of other pathways learning it, if it is dropped during training, the network will not do well on that trend, and the other pathways are forced to learn it too.
+
+    Finally, LWTA methods can prevent overfitting themselves, as the information is learned locally on subnetworks that are not as complex or capable of learning much information. This means that the subnetworks chosen at inference time are not as prone to being overfit.
 
 
 
