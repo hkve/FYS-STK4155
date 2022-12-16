@@ -1,17 +1,32 @@
 # FYS-STK4155 Project 5 SOMETITLE
-### Carl, Anna, Håkon, Nanna, Johan INSERT ETTERNAMN
+### Collaborators: [Carl Martin Fevang](github.com/carlmfe), [Anna Aasen](github.com/Annaaasen), [Håkon Kvernmoen](github.com/hkve), [Nanna Bryne](github.com/nannabryne), [Johan Mylius Kroken](github.com/johanmkr)
+
+## Report and work
+The report can be found [here](somelink) or in `tex/main.pdf`. (Insert correct link)
+
+## Prerequisites
+The following dependencies are required (check versions of these):
+
+* `numpy`
+* `sklearn`
+* `tensorflow`
+* `pandas`
+* `matplotlib`
+* `random`
+* `pathlib`
+* `datetime`
+* `keras_tuner`
+* `math`
+* `context`
+* `seaborn`
 
 
-## Main results (not necessary maybe)
-some results
+## Structure
+some structure
+
 
 ## Excecution of Code
 some excecution stuff
 
 
-## Prerequisites
-Dependencies
-
-## Structure
-some structure
 
