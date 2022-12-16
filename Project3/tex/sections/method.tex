@@ -1,5 +1,3 @@
-
-
 \subsection{Datasets}
     First, it will be useful to introduce the datasets we will use for training and testing our networks in this project.
 
@@ -42,9 +40,7 @@
 
 
     \subsubsection{Data Preparation}
-        \comment{Describe preprocessing of data, i.e. scaling etc. -\Carl}
-        \comment{Data splitting \Anna}
-        To train and evaluate our models we implemented the relevant data and as in our previous projects we split it in training data ($\sfrac{5}{6}$ of the data) and testing data ($\sfrac{1}{6}$ of the data) \citep{Project1, Project2}. When tuning the architecture, we further split the training data into a tuning set and a validation set used for monitoring overfitting, implementing early stopping with $p=5$. We used a split of $\sfrac{3}{4}$. See \cref{the:fig:illustration_data} for illustration of the data splitting. 
+        To train and evaluate our models we implemented the relevant data and as in our previous projects we split it in training data ($\sfrac{5}{6}$ of the data) and testing data ($\sfrac{1}{6}$ of the data) \citep{Project1, Project2}. When tuning the architecture, we further split the training data into a tuning set and a validation set used for monitoring overfitting, implementing early stopping with $p=5$. We used a split of $\sfrac{3}{4}$. See \cref{the:fig:illustration_data} for illustration of the data splitting.
 
         \begin{figure}[]
             \centering
@@ -52,6 +48,8 @@
             \caption{Illustration of data splitting.}
             \label[fig]{the:fig:illustration_data}
         \end{figure}
+
+        All data was preprocessed by scaling the training dataset features with the Standard Scaling algorithm, such that the features all have mean zero and with standard deviation one. This is explained in detail in \cite{Project1}.
 
     \subsubsection{PCA}
         Before being subject to the principal component method, the Premier League data was z-score normalised, centring the mean around zero, with unit variance. This ensured that no single feature with a relatively large variance would dominate any of the principal components. The principal components found created a new basis for the data, and had similar shape as the original features (they were linear combinations of them). Extracting the first few of these yielded the most important components. For all principal components we found the explained variance, which is the ``amount'' of variance accounted for by the principal component in question. In order to make an attempt at reducing the dimension of the problem, we found the number of principal components necessary in order to explain 99 \% of the variance of the original features. The Premier League dataset was the only dataset on which we performed PCA.  
@@ -92,12 +90,12 @@
 \subsection{Visualising Pathways}
     A good place to start with LWTA networks is to take a look at what actually happens during inference. We fitted a channel-out network on the full training MNIST dataset with three layers, 8 nodes in each and 4, 2 and 4 groups respectively in each network. This was done with a dropout rate of $0.125$, ridge penalisation added with $\lambda = 0.01$, and early stopping with $p=5$. We then plotted the pathways that were activated when inputting 200 test images depicting zeros, ones, fours and fives.
 
-\subsection{Architecture tuning}
+\subsection{Architecture Tuning}
     To see what kind of network architectures were interesting and useful when applying to the datasets at hand, we tuned the architecture using the \textit{hyperband} search algorithm \citep{Hyperband}.
 
     We searched with a variable number of hidden layers between 2\textendash5, a number of nodes in the layers between 8\textendash64 in powers of 2, and a number of groups in the layers between 4\textendash32, again in powers of 2. When hyperparameters were chosen such that the number of groups was equal to or greater than the number of units in a layer, we set the layer to be a dense layer with the specified number of units, but added a ReLU activation to the output.
 
-    \subsubsection{Hyperband Search}
+    \subsubsection{Hyperband Search Algorithm}
         The hyperband search algorithm serves as a way to tune the hyperparameters of a model in a way such that more computing resources are dedicated to more promising areas of the hyperparameter space. It is based on the \textit{successive halving} algorithm, in which a finite budget $B$ (i.e. number of training epochs) is divided evenly between $n$ randomly sampled points from the hyperparameter space. These hyperparameters are then used to build $n$ models that are trained according to $r = B/n$ allocated resources on a tuning dataset, and their loss evaluated on a validation dataset, passing on the $k$ top performing models.\footnote{Usually the top half of the is passed on, as the algorithm name would indicate.} 
         These $k$ models are then trained further, with a new $n=k$ and consequently more resources $r$. This halving is then repeated until there is one model remaining. As hyperparameter points are discarded ($n$ decreases), the amount of allocated resources $r$ increases; meaning the more promising hyperparameter points are allotted exponentially more resources.
 
@@ -105,23 +103,6 @@
 
         Hyperband takes two hyper(hyper)parameters, $R$ indicating the maximum amount of epochs of training for any single hyperparameter point, and a factor $\eta$ which is the reciprocal of the fraction of points that are passed on during each halving.
 
-        % \begin{algorithm}
-        %     \caption{Hyperband search algorithm}
-        %     \begin{algorithmic}[1]
-        %         \Procedure{Hyperband}{$R, \eta$}
-        %             \State $\msub{s}{max} \gets \floor{\log_\eta(R)},\quad B \gets (\msub{s}{max}+1) R$
-        %             \For{$s \in \cclosed{\msub{s}{max}, \msub{s}{max}-1, \ldots, 0}$}
-        %                 \State $n \gets \ceil{\frac{B}{R} \frac{\eta^s}{(s+1)}},\quad r \gets R\eta^{-s}$
-        %                 \State $T \gets \mathtt{get\_hyperparameter\_configurations}(n)$
-        %                 \For{$i \in \cclosed{0, \ldots, s}$}
-        %                     \State $n_i \gets \floor{n \eta^{-i}},\quad r_i \gets r \eta^{i}$
-        %                     \State $L \gets \cclosed{\mathtt{fit\_then\_eval\_val\_loss}(t, r_i): t\in T}$
-        %                     \State $T \gets \mathtt{top\_k}(T, L, \floor{\sfrac{n_i}{\eta}})$
-        %                 \EndFor
-        %             \EndFor
-        %         \EndProcedure
-        %     \end{algorithmic}
-        % \end{algorithm}
 
     \subsubsection{CIFAR-10}
         On the CIFAR-10 dataset, we tuned using 1 hyperband iteration with a maximum number of epochs $R=30$ and $\eta=3$. We used early stopping with $p=5$ to terminate the training. After finding best network architectures, we fitted them on the full training dataset, evaluating their accuracy on the test dataset. We used early stopping with $p=10$ during this training.
@@ -129,7 +110,7 @@
         When adding dropout we used a dropout rate of $0.1$, and with Ridge penalisation we used $\lambda=10^{-4}$.
 
     \subsubsection{Premier League Dataset}
-        For comparison, we made an algorithm that guesses the outcome of a match given the ground (home/away) with the knowledge that overall, almost half EPL games result in home win, about a third in away win and the rest in draw.\footnote{According to~\citep{SoccerSTATS}, in EPL 18/19, 48\% ended in home wins, 34\% in away wins and 19\% in draws.} In addition, we attempted to simulate our very own ``Paul the Octopus''\citep{PaulTheOctopus} by telling the algorithm to assume that the three outcomes are equally frequent. We were interested in the accuracy scores from these guesses. Finally, we calculated the accuracy score for the rather boring case of only betting home wins, necessarily corresponding to the portion of EPL 19/20 matches in the set ending this way. 
+        For comparison, we made an algorithm that guesses the outcome of a match given the ground (home/away) with the knowledge that overall, almost half EPL games result in home win, about a third in away win and the rest in draw.\footnote{According to~\citep{SoccerSTATS}, in EPL 18/19, 48\% ended in home wins, 34\% in away wins and 19\% in draws.} In addition, we attempted to simulate our very own ``Paul the Octopus \citep{PaulTheOctopus} by telling the algorithm to assume that the three outcomes are equally frequent. We were interested in the accuracy scores from these guesses. Finally, we calculated the accuracy score for the rather boring case of only betting home wins, necessarily corresponding to the portion of EPL 19/20 matches in the set ending this way. 
 
         With the smaller Premier League dataset, we could afford 3 full iterations of the hyperband search with a maximum number of epochs $R=150$ and again $\eta=3$. Again, we used early stopping during the tuning, with $p=15$. After finding the top-performing architectures, we trained on the full training set with early stopping with $p=30$.
 
