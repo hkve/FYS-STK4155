@@ -281,7 +281,7 @@ def translate_data(
     def encoder(data, features):
         oe = OrdinalEncoder()
         data[features] = oe.fit_transform(data[features])
-        return data
+        return oe, data
 
     container = namedtuple("container", ["x", "y"])
     
@@ -290,9 +290,9 @@ def translate_data(
         if feat is not None:
             features[feat] = data.drop(feat)
 
-    features = encoder(features, ["team", "opp_team", "result", "result_pg", "ground", "ground_pg", "date"])
+    oe, features = encoder(features, ["team", "opp_team", "result", "result_pg", "ground", "ground_pg", "date"])
     ind_feats = features.drop(["result"], axis=1)
-    return container(ind_feats, features["result"])
+    return oe, container(ind_feats, features["result"])
 
 
 
@@ -304,10 +304,16 @@ def scale_data():
 
 
 ### Simple way of collecting data (temp.) 
-def load_EPL(encoded : bool = False) -> pd.DataFrame:
+def load_EPL(
+        encoded : bool = False,
+        return_encoder : bool = False) -> pd.DataFrame:
     RUN()
     if encoded:
-        return translate_data(stats_EPL19_per_game)
+        oe, container = translate_data(stats_EPL19_per_game)
+        if return_encoder:
+            return oe, container
+        else:
+            return container
     else:
         return stats_EPL19_per_game
 
@@ -401,7 +407,7 @@ def get_feature_description(md_filename : str = None) -> dict:
     ### Previous season stats
     prev_season = {
         "position": "League position",
-        "matches":  "(omitted) Macthes played",
+        # "matches":  "(omitted) Macthes played",
         **_understats
     }
     
@@ -445,9 +451,9 @@ def get_feature_description(md_filename : str = None) -> dict:
         head1 = "## Match information"
         head2 = f"## Team attributes ({YEAR})"
         head3 = f"## Team's previous league match stats"
-        head4 = f"## Team's previous season stats and attributes ({prevYEAR})"
+        head4 = f"## Team's previous season stats ({prevYEAR})"
         head5 = f"## Opponent attributes ({YEAR})"
-        head6 = f"## Opponent's previous season stats and attributes ({prevYEAR})"
+        head6 = f"## Opponent's previous season stats ({prevYEAR})"
 
         tables = [tab1, tab2, tab3, tab4, tab5, tab6]
         titles = [head1, head2, head3, head4, head5, head6]
@@ -455,7 +461,7 @@ def get_feature_description(md_filename : str = None) -> dict:
         filename = md_filename.strip(".md") + ".md"
         with open(PATH/filename, "w") as outfile:
             outfile.write(header0 + "\n")
-            outfile.write(f"_Total number of features: {nfeatures}_ \n")
+            # outfile.write(f"_Total number of features: {nfeatures}_ \n")
             for tab, head in zip(tables, titles):
                 tab.columns = ["Description"]
                 tab = tab.to_markdown()
