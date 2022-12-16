@@ -80,7 +80,6 @@ To have a compact manner of referring to a specific implemented network structur
         \caption{The best performing LWTA models after tuning on the CIFAR-10 dataset were trained on the full training dataset and their test accuracy history is plotted here. For the network architecture of the various models see \cref{res:tab:networks}.}
         \label[fig]{res:fig:best_LWTA}
     \end{figure}
-    \comment{Discussion note: Comment on the lack of resampling used here. -\Carl}
 
     \subsubsection{Tuning on the Premier League Dataset}
         On the Premier League data we found the maxout network \network{16, 64}{8, 32} with dropout and L2 penalisation to score best, with a test accuracy of 58.06\%. The best channel-out network was \network{8, 64, 16, 64}{*, 32, *, 32} with no additional regularisation, scoring an accuracy of 54.84\% on the test data. An ordinary dense ReLU network \network{16, 16}{*, *} outdid both LWTA algorithms however, with a test accuracy of 58.87\%. The results are tabulated in \cref{res:tab:EPL_networks}. The training history of the LWTA algorithms is found in \cref{res:fig:best_EPL}.
