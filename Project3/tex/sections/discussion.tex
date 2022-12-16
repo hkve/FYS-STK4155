@@ -35,7 +35,7 @@ Discussion here, in present/past tense.
 
     One drawback with regard to the dataset could also be the fact that we composed it ourselves, from a variety of sources, hence yielding some highly correlated features. These should probably have been analysed further with a correlation matrix, but this work was not prioritised here, as we quickly discarded the analysis of principal components. Performing correlation analysis would be of greater importance if the dataset contained more features and/or if they were completely unknown to us \comment{hmm bad sentence me thinks, but brian is porridge \Johan}. 
 
-    For instance, performing PCA on the MNIST dataset of $28\cdot 28 = 784$ features would arguably be a good idea. Likewise for the CIFAR-10 dataset of $32\cdot 32 = 1024$ features. However, this was not done due to the time limit of this project. The analysis of the models trained using these datasets could be performed without PCA without loosing too much  computational efficient, but a PCA analysis would have been  informative in its own rights. 
+    For instance, performing PCA on the MNIST dataset of $28\times 28 = 784$ features would arguably be a good idea. Likewise for the CIFAR-10 dataset of $32\times 32 = 1024$ features. However, this was not done due to the time limit of this project. The analysis of the models trained using these datasets could be performed without PCA without loosing too much  computational efficient, but a PCA analysis would have been  informative in its own rights. 
     
     For future work \comment{this should eventually go in the conclusion}:
     \begin{itemize}
@@ -48,4 +48,9 @@ Discussion here, in present/past tense.
     
 
 \subsubsection{Explainability of MO/CO}
-    \comment{Can features be recognised in the pathways? NB! Features human notice are not necessarily the same as the ones a machine notice -\Anna}
+	\comment{Can features be recognised in the pathways? NB! Features human notice are not necessarily the same as the ones a machine notice -\Anna}
+
+
+
+\subsection{Generation of datasets}
+	The MNIST and CIFAR-10 datasets was used ``out of the box'' and are thus not relevant for this analysis. On the other hand, the EPL dataset was generated for this purpose, with individual parts of the dataset obtained from a variety of sources \comment{Nanna skriver du om dette noko plass? \Johan}. When concatenating different parts into one big dataset like this, some features are likely to correlate to a large extend. This is not unusual for large dataset, but it is fair to assume that is affected both the analysis of the data and the PCA. There is also a question as to how the data was sampled and processed by the different sources. Ultimatley this lead to a possible incoherence in the dataset which is hard to measure. On the other hand, the features all originate from the same games so, assuming valid sources, they should more or less tell the saWhen concatenating different parts into one big dataset like this, some features are likely to correlate to a large extend. This is not unusual for large dataset, but it is fair to assume that is affected both the analysis of the data and the PCA. There is also a question as to how the data was sampled and processed by the different sources. Ultimatley this lead to a possible incoherence in the dataset which is hard to measure. On the other hand, the features all originate from the same games so, assuming valid sources, they should more or less tell the same story, yielding a reliable dataset.  
