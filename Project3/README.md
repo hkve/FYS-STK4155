@@ -34,19 +34,18 @@ All figures can be found in `tex/figs`. All code and data files can be found in 
     * `context.py` $\to$ File to redirect paths
     * `fifa21.py` $\to$ Bias-variance tradeoff analysis of FIFA2021 data
     * `fifa21_utils.py` $\to$ Utilities to the above analysis
-    * `model_analysis.py` $\to$ short desc
-    * `network_plot_tools.py` $\to$ short desc
+    * `model_analysis.py` $\to$ Generate model specific plots
+    * `network_plot_tools.py` $\to$ Tool for general plotting
     * `pca_EPL1929.py` $\to$ PCA of the EPL data
     * `plot_utils.py` $\to$ Utilities for plotting
-    * `tune_LWTA_architecture.py` $\to$ short desc
-    * `visualise_activation.py` $\to$ short desc
-    * `visualise_network.py` $\to$ short desc
+    * `tune_LWTA_architecture.py` $\to$ Tune architecture of networks
+    * `visualise_activation.py` $\to$ Visualise LWTA activation
+    * `visualise_network.py` $\to$ Visualise LWTA pathways
 
 * `sknotlearn`
-    * `data.py` $\to$  short desc
-    * `datasets.py` $\to$  short desc
+    * `datasets.py` $\to$ Contains all datasets
     * `fifa21_EAsports_reader.py` $\to$ Read and creates the FIFA2021 dataset
-    * `preprocess_EPL_data.py` $\to$  short desc
+    * `preprocess_EPL_data.py` $\to$ Preprocesses the EPL data
     * `breast_cancer.csv` $\to$  Dataset
     * `EPL1920.csv` $\to$  Dataset
     * `players_21_subset_csv` $\to$  Dataset
@@ -56,10 +55,10 @@ All figures can be found in `tex/figs`. All code and data files can be found in 
     * `understat_per_game.csv` $\to$  Dataset
     
 * `tensorno`
-    * `bob.py` $\to$  short desc
-    * `layers.py` $\to$  short desc
-    * `tuner.py` $\to$  short desc
-    * `utils.py` $\to$  short desc
+    * `bob.py` $\to$ Contains network builders
+    * `layers.py` $\to$ Contains LWTA layers
+    * `tuner.py` $\to$ Contains LWTA tuners
+    * `utils.py` $\to$ Contains LWTA utils
 
 
 
