@@ -148,15 +148,18 @@ if __name__ == "__main__":
     import context
     from sknotlearn.datasets import load_EPL, get_result_distribution
 
-    ref_accuracy, _  = get_random_accuarcy(load_EPL(False, False))
-
-    print(f"\nAccuracy from random guesses: {ref_accuracy:.2f}.")
+    data0 = load_EPL(False, False)
+    ref_accuracy_smart, _  = get_random_accuarcy(data0)
+    ref_accuracy_octopus, _  = get_random_accuarcy(data0, True)
+    print(f"\nAccuracy from learned random guesser: {ref_accuracy_smart*100:5.2f} %.")
+    print(f"\nAccuracy from octopus: {ref_accuracy_octopus*100:5.2f} %.")
+    
     
     
     container = load_EPL(True)
     
     trainx, testx, trainy, testy = train_test_split(container.x, container.y, test_size=1/6)
-    print(len(trainy), len(testy))
+    # print(len(trainy), len(testy))
     # trainx, valx,  trainy, valy  = train_test_split(trainx,      trainy,      test_size=0.2)
     # print(trainx.head())
     cols = list(trainx.columns)
