@@ -58,14 +58,12 @@ if __name__ == "__main__":
     from tensorno.utils import count_parameters
 
     x_train, y_train, x_test, y_test = load_MNIST()
-    # x_train, y_train, x_test, y_test = load_CIFAR10()
 
     # Flattening image arrays.
     x_train = x_train.reshape((x_train.shape[0], np.prod(x_train.shape[1:])))
     x_test = x_test.reshape((x_test.shape[0], np.prod(x_test.shape[1:])))
 
     scaler = StandardScaler()
-    # scaler = MinMaxScaler()
     x_train = scaler.fit_transform(x_train)
     x_test = scaler.transform(x_test)
 

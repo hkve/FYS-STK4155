@@ -168,7 +168,7 @@ def Trees_increasing_ensamble(X, y, filename=None, random_state=321):
     plt.show()
 
 def Boosting(X, y, filename=None, random_state=321):
-    n_estimators = np.linspace(10,100,5, dtype=int)
+    n_estimators = np.linspace(10,100,51, dtype=int)
 
     ls = {
         "mse": "solid",
@@ -184,7 +184,14 @@ def Boosting(X, y, filename=None, random_state=321):
     ax.plot(n_estimators, bias, label="Bias$^2$", ls=ls["bias"], c=c)
     ax.plot(n_estimators, var, label="Var", ls=ls["var"], c=c)
     ax.set(xlabel="Ensamble size")
-    ax.legend()
+    ax.legend(ncol=3)
+
+    y_mse = np.min(mse)
+    x_n_est = n_estimators[np.argmin(mse)]
+    ax.vlines(x=x_n_est, ymin=ax.get_ylim()[0], ymax=y_mse, ls="dashed", color="k", alpha=0.25)
+    ax.scatter(x_n_est, y_mse, color="k", marker="x", alpha=0.25)
+
+    plot_utils.save(filename + "_n_est")
     plt.show()
 
     subsamples = np.linspace(0.2,0.9, 8)
@@ -196,12 +203,12 @@ def Boosting(X, y, filename=None, random_state=321):
     ax.plot(subsamples, bias, label="Bias$^2$", ls=ls["bias"], c=c)
     ax.plot(subsamples, var, label="Var", ls=ls["var"], c=c)
 
-    ax.legend()
-    plot_utils.save(filename)
+    ax.legend(ncol=3)
+    plot_utils.save(filename + "_subsamples")
     plt.show()
 
 def SupperVecReg(X, y, filename=None, random_state=321):
-    eps = np.logspace(-3, 0, 10)
+    eps = np.logspace(-3, 0, 100)
     
     kernels = ["linear", "rbf"]
 
@@ -235,12 +242,12 @@ def SupperVecReg(X, y, filename=None, random_state=321):
     ax.scatter(x_eps, y_mse, color="k", marker="x", alpha=0.25)
     ax.set_xscale("log")
     ax.set(xlabel="$\epsilon$")
-
-    ax.legend()
+    ax.legend(ncol=2)
+    plot_utils.save(filename + "eps")
     plt.show()
 
     fig, ax = plt.subplots()
-    C = np.logspace(-1, 2, 10)
+    C = np.logspace(-1, 2, 100)
     pen_mins = {kernel: {} for kernel in kernels}
     for kernel in kernels:
         method_params = {"kernel": kernel, "epsilon": mins[kernel]["eps"]}
@@ -261,6 +268,9 @@ def SupperVecReg(X, y, filename=None, random_state=321):
     ax.vlines(x=x_C, ymin=ax.get_ylim()[0], ymax=y_mse, ls="dashed", color="k", alpha=0.25)
     ax.scatter(x_C, y_mse, color="k", marker="x", alpha=0.25)
     ax.set(xlabel="C")
+    ax.set_xscale("log")
+    ax.legend(ncol=2)
+    plot_utils.save(filename + "C")
     plt.show()
 
 if __name__ == "__main__":
@@ -268,9 +278,9 @@ if __name__ == "__main__":
     X, y = utils.get_fifa_data(n=10000, random_state=rnd)
     X_train, X_val, y_train, y_val = train_test_split(X, y, train_size=3/4, random_state=rnd)
 
-    LinearModel_comparison(X_train, y_train, filename="BiasVar_LinearRegression", random_state=rnd)
+    # LinearModel_comparison(X_train, y_train, filename="BiasVar_LinearRegression", random_state=rnd)
     # Singel_tree_increasing_depth(X, y, filename="BiasVar_SingleTree", random_state=rnd)
     # Trees_increasing_ensamble(X, y, filename="BiasVar_Bag_and_Rf.pdf")
 
-    # Boosting(X, y)
-    # SupperVecReg(X, y)
+    Boosting(X, y, filename="Boosting")
+    # SupperVecReg(X, y, filename="BiasVar_SVR", random_state=rnd)
