@@ -1,7 +1,7 @@
 Discussion here, in present/past tense.
 
 \subsection{Interpretation of LWTA Networks}
-    From \cref{res:fig:LWTA_architecture_trained01} and \cref{res:fig:LWTA_architecture_trained45} it is clear that separate pathways are formed that are specialised on input that are to be categorised differently. The untrained network \cref{res:fig:LWTA_architecture_untrained} displays no such patterns. In \cref{res:fig:LWTA_architecture_trained01} we can see that the lowest node in the middle layer strongly correlates with results that are classified as 0, with clear pathways being formed with the same nodes in the groups of the layers before and after. This coincides with our expectations based on the neurobiological pathways and feature selectivity. A further analysis of different inputs could help give insight into what these pathways have learned, be it roundness of the digits, amount of dark vs. light, digit placement in the picture, or perhaps some completely different and unintuitive feature. This provides a way to start extracting information about what the network is actually learning, making the model more explainalble. It might however learn trends that are not obvious for a human to discern. 
+    From \cref{res:fig:LWTA_architecture_trained01} and \cref{res:fig:LWTA_architecture_trained45} it is clear that separate pathways are formed that are specialised on input that are to be categorised differently. The untrained network \cref{res:fig:LWTA_architecture_untrained} displays no such patterns. In \cref{res:fig:LWTA_architecture_trained01} we can see that the lowest node in the middle layer strongly correlates with results that are classified as 0, with clear pathways being formed with the same nodes in the groups of the layers before and after. This coincides with our expectations based on the neurobiological pathways and feature selectivity. A further analysis of different inputs could help give insight into what these pathways have learned, be it roundness of the digits, amount of dark vs. light, digit placement in the picture, or perhaps some completely different and unintuitive feature. This provides a way to start extracting information about what the network is actually learning, making the model more explainable. It might however learn trends that are not obvious for a human to discern. 
 
 
 
@@ -46,9 +46,6 @@ Discussion here, in present/past tense.
     For instance, performing PCA on the MNIST dataset of $28\times 28 = 784$ features would arguably be a good idea. Likewise for the CIFAR-10 dataset of $32\times 32 = 1024$ features. However, this was not done due to the time limit of this project. The analysis of the models trained using these datasets could be performed without PCA while not loosing too much computational efficiency, but a PCA analysis would have been informative in its own rights. 
 
 
-    
 
-\subsubsection{Explainability of MO/CO}
-	\comment{Can features be recognised in the pathways? NB! Features human notice are not necessarily the same as the ones a machine notice -\Anna}
 
 
