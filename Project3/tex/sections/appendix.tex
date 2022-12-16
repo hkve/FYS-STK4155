@@ -104,7 +104,7 @@
                 \caption{MSE, bias and variance estimates for bagged trees (green) and random forest (blue) considering $\lfloor p/3 \rfloor$ features as each split, against increasing bag size/number of trees.}
                 \label[fig]{fig:bag_and_rf_biasvar_decomp}
             \end{figure}
-            For the last of our tree based methods, we investigate the boosted trees. The MSE, bias and variance calculated while varying the number of predictors is shown in \cref{fig:boosting_n_est}. 
+            For the last of our tree based methods, we investigate the boosted trees. The MSE, bias and variance calculated while varying the number of predictors is shown in \cref{fig:boosting_n_est}. For a small ensemble size at around 10 predictors, the trees are not trained enough to give accurate score predictions, signifying that the model is underfitting. Increasing the number of predictors, the bias is decreased while the variance increases, indicating that the weak learners together has enough flexibility to mimic the underlying function. The smallest test MSE was found to be 10.89, using 17 weak learners.
             \begin{figure}[H]
                 \centering
                 \includegraphics[width=\linewidth]{Boosting_n_est.pdf}
