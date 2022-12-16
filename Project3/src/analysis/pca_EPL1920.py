@@ -200,22 +200,24 @@ if __name__ == "__main__":
     import context
     from sknotlearn.datasets import load_EPL, get_result_distribution
 
-    data0 = load_EPL(False, False)
+    ### Get encoded data
+    container = load_EPL(True)
+    trainx, testx, trainy, testy = train_test_split(container.x, container.y, test_size=1/6)
+    n_train = len(trainx)
+    n_test = len(testx)
+
+
+    ### Guess randomly (on test data)
+    data0 = load_EPL(False, False).iloc[n_train:]
     ref_accuracy_smart  = get_random_accuarcy(data0)
     ref_accuracy_octopus  = get_random_accuarcy(data0, "uniform")
     ref_accuracy_baby  = get_random_accuarcy(data0, "home wins")
-    print(f"\nAccuracy from learned random guesser: {ref_accuracy_smart*100:5.2f} %.")
-    print(f"\nAccuracy from octopus: {ref_accuracy_octopus*100:5.2f} %.")
-    print(f"\nAccuracy from baby: {ref_accuracy_baby*100:5.2f} %.")
+    print(f"Accuracy from learned random guesser: {ref_accuracy_smart*100:5.2f} %")
+    print(f"Accuracy from octopus: {ref_accuracy_octopus*100:5.2f} %")
+    print(f"Accuracy from baby: {ref_accuracy_baby*100:5.2f} %")
     
     
-    
-    container = load_EPL(True)
-    
-    trainx, testx, trainy, testy = train_test_split(container.x, container.y, test_size=1/6)
-    # print(len(trainy), len(testy))
-    # trainx, valx,  trainy, valy  = train_test_split(trainx,      trainy,      test_size=0.2)
-    # print(trainx.head())
+
     cols = list(trainx.columns)
 
     # opp_ = cols[ lambda x: x.split["_"][-1] == "ps"]
