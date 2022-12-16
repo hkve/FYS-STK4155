@@ -133,6 +133,4 @@
             \end{figure}
 
         \subsection{Summarising Results}
-            Through a study of the bootstrapped estimates for test MSE, bias and variance applied to player scores from FIFA21, we found that penalised      
-        
-        The penalised linear regression models performed  
+            Through a study of the bootstrapped estimates for test MSE, bias and variance applied to player scores from FIFA21, we found that penalised linear regression and the linear kernel SVR performed the best. In general, the bias was larger than variance, except for the single regression tree and ensemble tree methods composed of a few trees. This is in agreement with decision trees in general being easily overfitted. Increasing the ensemble size did decrease the test MSE, with increasing variance for boosting and reducing it for BT and RF. We hypothesize that the scores calculated in FIFA21 are calculated using some linear relationship between features. Since we might have included irrelevant and excluding relevant features, the penalised linear models and linear kernel SVMs are natural choices. Moving forward, it would be interesting to make some polynomial features for the linear regression models, introducing more parameters to fit and presumably reducing bias. For SVR, more extensively searches tuning kernel parameters in addition to trying more kernels could potentially improve results. 
