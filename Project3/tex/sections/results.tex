@@ -119,7 +119,7 @@ To have a compact manner of referring to a specific implemented network structur
         In comparison, the random guesses we made all resulted in accuracy scores below 50\%. The wild guesser (the octopus) performed worst with an accuracy score of 35.48 \%, whereas the craven guesser (only home wins) got an accuracy score of 48.39\% on the test set. The `learned' random guesser (50/20/30 for home win/draw/loss) was correct in 39.52\% of the cases. 
 
 \subsection{PCA on Premier League data}
-    By performing PCA on the Premier League data we found its principal components. The explained variance as a function of principal components is plotted in figure~\ref{res:fig:explained_variance} as both a cumulative sum and histogram bars. As seen from the plot, 42 principal components explains 99 \% of the variance of the original features. Since this would reduce the dimensionality by approximately one half only, and we considered relatively few dimensions we decided not to use the principal components for further analysis. 
+    By performing PCA on the Premier League data we found its principal components. The explained variance as a function of principal components is plotted in \cref{res:fig:explained_variance} as both a cumulative sum and histogram bars. As seen from the plot, 42 principal components explains 99 \% of the variance of the original features. Since this would reduce the dimensionality by approximately one half only, and we considered relatively few features we decided not to use the principal components for further analysis. 
     \begin{figure}
         \centering
         \includegraphics[width=\linewidth]{figs/pca_pl.pdf}
