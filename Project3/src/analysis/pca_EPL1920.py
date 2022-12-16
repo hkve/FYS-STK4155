@@ -154,9 +154,9 @@ if __name__ == "__main__":
     
     
     container = load_EPL(True)
-    sys.exit()
     
-    trainx, testx, trainy, testy = train_test_split(container.x, container.y, test_size=0.2)
+    trainx, testx, trainy, testy = train_test_split(container.x, container.y, test_size=1/6)
+    print(len(trainy), len(testy))
     # trainx, valx,  trainy, valy  = train_test_split(trainx,      trainy,      test_size=0.2)
     # print(trainx.head())
     cols = list(trainx.columns)
@@ -171,6 +171,8 @@ if __name__ == "__main__":
     # print(prev_season_stats.head())
 
     # other = 
+
+    sys.exit()
 
     """
     Plot 1 - Step plot and histogram. 
