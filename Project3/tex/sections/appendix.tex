@@ -124,7 +124,7 @@
                 \label[fig]{fig:SVR_eps}
             \end{figure}
             Losning the margin, parameterised by $C$, is shown in \cref{fig:SVR_C}.
-            Effects on the bias while losing the soft margin has clearer interpretation. With $C$ being small, very few or even none of the prediction by $f$ are allowed to lay outside the margin calculated by the train data. This is very clear when considering the RBF kernel, having a steeply increasing bias when $C$ approaches zero. The linear kernel however, does not seem to be very dependent on margin softness. Why this is the case is not clear, but it might give an indication of a linear $\epsilon$ tube being a good representation of the true function.
+            Effects on the bias while losing the soft margin has clearer interpretation. With $C$ being small, very few or even none of the prediction by $f$ are allowed to lay outside the margin calculated by the train data. This is very clear when considering the RBF kernel, having a steeply increasing bias when $C$ approaches zero. The linear kernel however, does not seem to be very dependent on margin softness. Why this is the case is not clear, but it might give an indication of a linear $\epsilon$ tube being a good representation of the true function. However, probing the bias of different kernels is a difficult task and no obvious comparison between the two methods can be drawn. Kernel specific parameters, like $\gamma$ for RBF, can also influence the bias, see for instance~\citep{RBFkernel}.   
             \begin{figure}[H]
                 \centering
                 \includegraphics[width=\linewidth]{BiasVar_SVRC.pdf}
@@ -133,4 +133,6 @@
             \end{figure}
 
         \subsection{Summarising Results}
-            blbla
+            Through a study of the bootstrapped estimates for test MSE, bias and variance applied to player scores from FIFA21, we found that penalised      
+        
+        The penalised linear regression models performed  
