@@ -1,8 +1,8 @@
 # FYS-STK4155 Project 5 SOMETITLE
-### Collaborators: [Carl Martin Fevang](github.com/carlmfe), [Anna Aasen](github.com/Annaaasen), [Håkon Kvernmoen](github.com/hkve), [Nanna Bryne](github.com/nannabryne), [Johan Mylius Kroken](github.com/johanmkr)
-
+### Collaborators: [Carl Martin Fevang](https://github.com/carlmfe), [Anna Aasen](https://github.com/Annaaasen), [Håkon Kvernmoen](https://github.com/hkve), [Nanna Bryne](https://github.com/nannabryne), [Johan Mylius Kroken](https://github.com/johanmkr)
+https://
 ## Report and work
-The report can be found [here](github.com/hkve/FYS-STK4155/tree/main/Project3/tex/main.pdf) or in `tex/main.pdf`. (Insert correct link)
+The report can be found [here](https://github.com/hkve/FYS-STK4155/tree/main/Project3/tex/main.pdf) or in `tex/main.pdf`. (Insert correct [link](tex/main.pdf))
 
 
 ## Prerequisites
